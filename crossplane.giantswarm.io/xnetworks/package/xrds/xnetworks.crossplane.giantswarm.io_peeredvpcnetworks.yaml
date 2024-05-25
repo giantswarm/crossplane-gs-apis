@@ -1,0 +1,472 @@
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: (devel)
+  creationTimestamp: null
+  name: peeredvpcnetworks.xnetworks.crossplane.giantswarm.io
+spec:
+  claimNames:
+    kind: PeeredVpcNetworkClaim
+    plural: peeredvpcnetworkclaims
+  defaultCompositionRef:
+    name: peered-vpc-network
+  enforcedCompositionRef:
+    name: peered-vpc-network
+  group: xnetworks.crossplane.giantswarm.io
+  names:
+    kind: PeeredVpcNetwork
+    listKind: PeeredVpcNetworkList
+    plural: peeredvpcnetworks
+    shortNames:
+    - pvpc
+    singular: peeredvpcnetwork
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.region
+      name: Region
+      type: string
+    - jsonPath: .status.vpcID
+      name: VpcID
+      type: string
+    name: v1alpha1
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              cidr:
+                description: CIDR is the CIDR block for the VPC.
+                type: string
+              deletionPolicy:
+                default: Delete
+                description: |-
+                  DeletionPolicy specifies what will happen to the underlying external
+                  when this managed resource is deleted - either "Delete" or "Orphan" the
+                  external resource.
+                  This field is planned to be deprecated in favor of the ManagementPolicies
+                  field in a future release. Currently, both could be set independently and
+                  non-default values would be honored if the feature flag is enabled.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                enum:
+                - Orphan
+                - Delete
+                type: string
+              managementPolicies:
+                default:
+                - '*'
+                description: |-
+                  THIS IS A BETA FIELD. It is on by default but can be opted out
+                  through a Crossplane feature flag.
+                  ManagementPolicies specify the array of actions Crossplane is allowed to
+                  take on the managed and external resources.
+                  This field is planned to replace the DeletionPolicy field in a future
+                  release. Currently, both could be set independently and non-default
+                  values would be honored if the feature flag is enabled. If both are
+                  custom, the DeletionPolicy field will be ignored.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                  and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                  - Observe
+                  - Create
+                  - Update
+                  - Delete
+                  - LateInitialize
+                  - '*'
+                  type: string
+                type: array
+              peering:
+                description: Peering is the VPC to peer with.
+                properties:
+                  disabled:
+                    description: Disabled specifies if the peering connection should
+                      be disabled.
+                    type: boolean
+                  region:
+                    description: Region specifies the region the VPC is found in
+                    type: string
+                  vpcName:
+                    description: VpcName specifies the name of the VPC to peer with.
+                    type: string
+                required:
+                - disabled
+                - region
+                - vpcName
+                type: object
+              providerConfigRef:
+                default:
+                  name: default
+                description: |-
+                  ProviderConfigReference specifies how the provider that will be used to
+                  create, observe, update, and delete this managed resource should be
+                  configured.
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                  policy:
+                    description: Policies for referencing.
+                    properties:
+                      resolution:
+                        default: Required
+                        description: |-
+                          Resolution specifies whether resolution of this reference is required.
+                          The default is 'Required', which means the reconcile will fail if the
+                          reference cannot be resolved. 'Optional' means this reference will be
+                          a no-op if it cannot be resolved.
+                        enum:
+                        - Required
+                        - Optional
+                        type: string
+                      resolve:
+                        description: |-
+                          Resolve specifies when this reference should be resolved. The default
+                          is 'IfNotPresent', which will attempt to resolve the reference only when
+                          the corresponding field is not present. Use 'Always' to resolve the
+                          reference on every reconcile.
+                        enum:
+                        - Always
+                        - IfNotPresent
+                        type: string
+                    type: object
+                required:
+                - name
+                type: object
+              publishConnectionDetailsTo:
+                description: |-
+                  PublishConnectionDetailsTo specifies the connection secret config which
+                  contains a name, metadata and a reference to secret store config to
+                  which any connection details for this managed resource should be written.
+                  Connection details frequently include the endpoint, username,
+                  and password required to connect to the managed resource.
+                properties:
+                  configRef:
+                    default:
+                      name: default
+                    description: |-
+                      SecretStoreConfigRef specifies which secret store config should be used
+                      for this ConnectionSecret.
+                    properties:
+                      name:
+                        description: Name of the referenced object.
+                        type: string
+                      policy:
+                        description: Policies for referencing.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    required:
+                    - name
+                    type: object
+                  metadata:
+                    description: Metadata is the metadata for connection secret.
+                    properties:
+                      annotations:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          Annotations are the annotations to be added to connection secret.
+                          - For Kubernetes secrets, this will be used as "metadata.annotations".
+                          - It is up to Secret Store implementation for others store types.
+                        type: object
+                      labels:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          Labels are the labels/tags to be added to connection secret.
+                          - For Kubernetes secrets, this will be used as "metadata.labels".
+                          - It is up to Secret Store implementation for others store types.
+                        type: object
+                      type:
+                        description: |-
+                          Type is the SecretType for the connection secret.
+                          - Only valid for Kubernetes Secret Stores.
+                        type: string
+                    type: object
+                  name:
+                    description: Name is the name of the connection secret.
+                    type: string
+                required:
+                - name
+                type: object
+              region:
+                description: Region is the region in which the VPC will be created.
+                type: string
+              subnets:
+                description: PeeredSubnets defines how many public and private subnet
+                  sets to create.
+                properties:
+                  availabilityZones:
+                    description: |-
+                      AvailabilityZones is a list of availability zones in the region. The number
+                      of availability zones must match the number of bits x the number of subnetsets
+                      (public + private). The VPC Cidr must be big enough to encompass all the
+                      subnet CIDR blocks.
+                    items:
+                      type: string
+                    maxItems: 3
+                    minItems: 3
+                    type: array
+                  bits:
+                    description: |-
+                      Bits is a list of subnet bits to use for the subnet CIDR blocks. Basically
+                      how to split the VPC CIDR. Each bit represents the CIDR block size for a
+                      single availability zone. The number of bits must match the number of
+                      availability zones in the region.
+
+
+                      For example, if the VPC CIDR is 192.168.1.0/24 and the region has 3
+                      availability zones, the bits could be [2, 2, 2] which would result in
+                      3 subnets with CIDR blocks allowing for 64 hosts each.
+
+
+                      For a more advanced configuration you might splut this into 1 public and
+                      3 private subnet sets with the following bits:
+
+
+                      [
+                        3, 3, 3, # Public subnet,  each on /27 giving 30 hosts x 3
+                        4, 4, 4, # Private subnet, each on /28 giving 14 hosts x 3
+                        4, 4, 4, # Private subnet, each on /28 giving 14 hosts x 3
+                        4, 4, 4  # Private subnet, each on /28 giving 14 hosts x 3
+                      ]
+                    items:
+                      type: integer
+                    maxItems: 3
+                    minItems: 1
+                    type: array
+                  function:
+                    default: cidrsubnets
+                    description: |-
+                      Function defines the function to use to calculate the CIDR blocks for the
+                      subnets. The default is "cidrsubnets" which will split the VPC CIDR into
+                      equal parts based on the number of bits provided. `cidrsubnets` is the only
+                      function being made available as part of this XRD and as it's defaulted
+                      it can be hidden from the user. The function input expects a path though
+                      so this has to exist but isn't expected to be defined on the claim.
+                    enum:
+                    - cidrsubnets
+                    type: enum
+                  privateSets:
+                    description: |-
+                      PrivateSets defines how many private subnet-sets to create with each set
+                      spanning 3 availability zones
+                    maximum: 3
+                    minimum: 1
+                    type: integer
+                  publicSets:
+                    description: |-
+                      PublicSets defines how many public subnet-sets to create with each set
+                      spanning 3 availability zones
+                    maximum: 3
+                    minimum: 1
+                    type: integer
+                required:
+                - availabilityZones
+                - bits
+                - privateSets
+                - publicSets
+                type: object
+              tags:
+                additionalProperties:
+                  type: string
+                description: Tags is a map of additional tags to assign to the VPC.
+                maxProperties: 50
+                type: object
+                x-kubernetes-map-type: atomic
+              writeConnectionSecretToRef:
+                description: |-
+                  WriteConnectionSecretToReference specifies the namespace and name of a
+                  Secret to which any connection details for this managed resource should
+                  be written. Connection details frequently include the endpoint, username,
+                  and password required to connect to the managed resource.
+                  This field is planned to be replaced in a future release in favor of
+                  PublishConnectionDetailsTo. Currently, both could be set independently
+                  and connection details would be published to both without affecting
+                  each other.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                  namespace:
+                    description: Namespace of the secret.
+                    type: string
+                required:
+                - name
+                - namespace
+                type: object
+            required:
+            - cidr
+            - peering
+            - region
+            - subnets
+            type: object
+          status:
+            properties:
+              calculatedCidrs:
+                description: Contains the CIDR blocks output by function-cidr
+                items:
+                  type: string
+                type: array
+                x-kubernetes-list-type: atomic
+              cidrBlock:
+                description: The Ipv4 cidr block defined for this VPC
+                type: string
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        LastTransitionTime is the last time this condition transitioned from one
+                        status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        A Message containing details about this condition's last transition from
+                        one status to another, if any.
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: |-
+                        Type of this condition. At most one of each condition type may apply to
+                        a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              id:
+                description: ID The VPC ID
+                type: string
+              internetGateway:
+                description: The internet gateway defined in this VPC
+                type: string
+              natGateways:
+                additionalProperties:
+                  type: string
+                description: A map of NAT gateways defined in this VPC
+                type: object
+                x-kubernetes-map-type: atomic
+              privateRouteTables:
+                description: A map of private route tables defined in this VPC
+                items:
+                  additionalProperties:
+                    type: string
+                  description: StatusRouteTables is a map of route tables and their
+                    status
+                  type: object
+                  x-kubernetes-map-type: atomic
+                type: array
+                x-kubernetes-list-type: atomic
+              privateSubnets:
+                description: A map of private subnets defined in this VPC
+                items:
+                  additionalProperties:
+                    type: string
+                  description: StatusSubnets is a map of subnets and their status
+                  type: object
+                  x-kubernetes-map-type: atomic
+                type: array
+                x-kubernetes-list-type: atomic
+              publicRouteTables:
+                description: A map of public route tables defined in this VPC
+                items:
+                  additionalProperties:
+                    type: string
+                  description: StatusRouteTables is a map of route tables and their
+                    status
+                  type: object
+                  x-kubernetes-map-type: atomic
+                type: array
+                x-kubernetes-list-type: atomic
+              publicSubnets:
+                description: A list of maps of public subnets defined in this VPC
+                items:
+                  additionalProperties:
+                    type: string
+                  description: StatusSubnets is a map of subnets and their status
+                  type: object
+                  x-kubernetes-map-type: atomic
+                type: array
+                x-kubernetes-list-type: atomic
+              securityGroups:
+                additionalProperties:
+                  type: string
+                description: A map of security groups defined in this VPC
+                type: object
+                x-kubernetes-map-type: atomic
+              subnetBits:
+                items:
+                  type: integer
+                type: array
+              transitGateways:
+                additionalProperties:
+                  type: string
+                description: A map of transit gateways defined in this VPC
+                nullable: true
+                type: object
+                x-kubernetes-map-type: atomic
+              vpcPeeringConnections:
+                additionalProperties:
+                  type: string
+                description: A map of VPC peering connections defined in this VPC
+                nullable: true
+                type: object
+                x-kubernetes-map-type: atomic
+            required:
+            - id
+            type: object
+            x-kubernetes-map-type: atomic
+        required:
+        - spec
+        type: object
+    served: true
