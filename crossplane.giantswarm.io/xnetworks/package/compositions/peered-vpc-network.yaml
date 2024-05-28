@@ -21,9 +21,10 @@ spec:
       metadata:
         creationTimestamp: null
       spec:
+        enabledRef: spec.peering.enabled
         patchTo: ""
-        providerConfigRef: ""
-        regionRef: ""
+        providerConfigRef: spec.providerConfigRef.name
+        regionRef: spec.region
         vpcRef: spec.peering.vpcName
     step: network-discovery
   - functionRef:
