@@ -181,6 +181,8 @@ github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9G
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
 github.com/mproffitt/crossbuilder v0.0.1-dev3 h1:uey0S7mL5J0nlEq/o4jP6nuECVWi+rplN7pksXKuER8=
 github.com/mproffitt/crossbuilder v0.0.1-dev3/go.mod h1:yX4gIL7KxTeiW/5sR6roV0HYhpD4pFa3942mCEuLNMk=
+github.com/mproffitt/function-cidr v0.0.0-20240528204613-a5ff3a0e6daa h1:vH6y13Z4k9Zo8TRwPsBorsmWZJLlYZIACR4iTCJrhkM=
+github.com/mproffitt/function-cidr v0.0.0-20240528204613-a5ff3a0e6daa/go.mod h1:iHKLkOBrNQP10J+fYXuJWaRm+34Nmkv6KPOzvnNML/o=
 github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 h1:C3w9PqII01/Oq1c1nUAm88MOHcQC9l5mIlSMApZMrHA=
 github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822/go.mod h1:+n7T8mK8HuQTcFwEeznm/DIxMOiR9yIdICNftLE1DvQ=
 github.com/nxadm/tail v1.4.8 h1:nPr65rt6Y5JFSKQO7qToXr7pePgD6Gwiw05lkbyAQTE=
@@ -228,8 +230,6 @@ github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsT
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/tmccombs/hcl2json v0.3.3 h1:+DLNYqpWE0CsOQiEZu+OZm5ZBImake3wtITYxQ8uLFQ=
 github.com/tmccombs/hcl2json v0.3.3/go.mod h1:Y2chtz2x9bAeRTvSibVRVgbLJhLJXKlUeIvjeVdnm4w=
-github.com/upbound/function-cidr v0.4.0 h1:/xizgYqckrZvI6v4vgkt58RUCUnFrMvSdMNpTWbjWWg=
-github.com/upbound/function-cidr v0.4.0/go.mod h1:I9YG3+FyEB9LGmBd4OYI0/HqIMR8t22RqmFeJ+ismzk=
 github.com/upbound/provider-aws v1.4.0 h1:ff5PrRG3xvJnIOuMO8joYvRjBqBsgyZmjD1k4o1I7Mg=
 github.com/upbound/provider-aws v1.4.0/go.mod h1:V7o+GczY5NvMnD5IhpPEliFGDzEbJM+L6pmUFuhpcrE=
 github.com/upbound/provider-azure v1.1.0 h1:39tVdaWrDAXxo/mNRmzyOop5QO1E7j5SugTKp+/aOBw=

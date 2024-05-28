@@ -299,16 +299,6 @@ spec:
             type: object
           status:
             properties:
-              additionalCidrBlocks:
-                description: A list of additional VPC CIDR blocks defined in this
-                  VPC
-                items:
-                  type: string
-                type: array
-                x-kubernetes-list-type: atomic
-              cidrBlock:
-                description: The Ipv4 cidr block defined for this VPC
-                type: string
               conditions:
                 description: Conditions of the resource.
                 items:
@@ -348,85 +338,6 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
-              id:
-                description: ID The VPC ID
-                type: string
-              internetGateway:
-                description: The internet gateway defined in this VPC
-                type: string
-              natGateways:
-                additionalProperties:
-                  type: string
-                description: A map of NAT gateways defined in this VPC
-                type: object
-                x-kubernetes-map-type: atomic
-              privateRouteTables:
-                description: A map of private route tables defined in this VPC
-                items:
-                  additionalProperties:
-                    type: string
-                  description: StatusRouteTables is a map of route tables and their
-                    status
-                  type: object
-                  x-kubernetes-map-type: atomic
-                type: array
-                x-kubernetes-list-type: atomic
-              privateSubnets:
-                description: A map of private subnets defined in this VPC
-                items:
-                  additionalProperties:
-                    type: string
-                  description: StatusSubnets is a map of subnets and their status
-                  type: object
-                  x-kubernetes-map-type: atomic
-                type: array
-                x-kubernetes-list-type: atomic
-              publicRouteTables:
-                description: A map of public route tables defined in this VPC
-                items:
-                  additionalProperties:
-                    type: string
-                  description: StatusRouteTables is a map of route tables and their
-                    status
-                  type: object
-                  x-kubernetes-map-type: atomic
-                type: array
-                x-kubernetes-list-type: atomic
-              publicSubnets:
-                description: A list of maps of public subnets defined in this VPC
-                items:
-                  additionalProperties:
-                    type: string
-                  description: StatusSubnets is a map of subnets and their status
-                  type: object
-                  x-kubernetes-map-type: atomic
-                type: array
-                x-kubernetes-list-type: atomic
-              region:
-                description: The region this VPC is located in
-                type: string
-              securityGroups:
-                additionalProperties:
-                  type: string
-                description: A map of security groups defined in this VPC
-                type: object
-                x-kubernetes-map-type: atomic
-              transitGateways:
-                additionalProperties:
-                  type: string
-                description: A map of transit gateways defined in this VPC
-                nullable: true
-                type: object
-                x-kubernetes-map-type: atomic
-              vpcPeeringConnections:
-                additionalProperties:
-                  type: string
-                description: A map of VPC peering connections defined in this VPC
-                nullable: true
-                type: object
-                x-kubernetes-map-type: atomic
-            required:
-            - id
             type: object
             x-kubernetes-map-type: atomic
         required:
