@@ -25,7 +25,7 @@ spec:
         patchTo: ""
         providerConfigRef: spec.providerConfigRef.name
         regionRef: spec.region
-        vpcRef: spec.peering.vpcName
+        vpcRef: spec.peering.remoteVpcs
     step: network-discovery
   - functionRef:
       name: function-kcl
@@ -64,11 +64,11 @@ spec:
               }
               for s in _oxr.spec.subnetsets.cidrs
           ]
+
           {
               **_oxr
               status.subnetBits = _nb
           }
-        target: XR
     step: function-kcl-subnet-bits
   - functionRef:
       name: function-cidr

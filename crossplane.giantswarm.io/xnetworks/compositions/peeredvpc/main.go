@@ -12,7 +12,7 @@ import (
 	xapiextv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	xnd "github.com/giantswarm/crossplane-fn-network-discovery/pkg/input/v1beta1"
 	"github.com/mproffitt/crossbuilder/pkg/generate/composition/build"
-	cidr "github.com/upbound/function-cidr/input/v1beta1"
+	cidr "github.com/mproffitt/function-cidr/input/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -75,7 +75,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					EnabledRef:        "spec.peering.enabled",
 					ProviderConfigRef: "spec.providerConfigRef.name",
 					RegionRef:         "spec.region",
-					VpcNameRef:        "spec.peering.vpcName",
+					VpcNameRef:        "spec.peering.remoteVpcs",
 				},
 			},
 		})
@@ -92,7 +92,6 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 				Spec: xkcl.RunSpec{
 					Source: kclSubnetsTemplate,
-					Target: "XR",
 				},
 			},
 		})
@@ -107,10 +106,9 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					APIVersion: "cidr.fn.crossplane.io/v1beta1",
 					Kind:       "Parameters",
 				},
-				CidrFunc:     "cidrsubnets",
-				PrefixField:  "spec.vpcCidr",
-				NewBitsField: "spec.subnet.bits",
-				OutputField:  "status.calculatedCidrs",
+				CidrFunc:         "multiprefixloop",
+				MultiPrefixField: "spec.subnetsets.cidrs",
+				OutputField:      "status.calculatedCidrs",
 			},
 		})
 
@@ -126,7 +124,6 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 				Spec: xkcl.RunSpec{
 					Source: kclResourcesTemplate,
-					Target: "Resources",
 				},
 			},
 		})
@@ -143,7 +140,6 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 				Spec: xkcl.RunSpec{
 					Source: kclPatchTemplate,
-					Target: "XR",
 				},
 			},
 		})

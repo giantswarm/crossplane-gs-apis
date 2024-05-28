@@ -26,6 +26,7 @@ _nb = [
     }
     for s in _oxr.spec.subnetsets.cidrs
 ]
+
 {
     **_oxr
     status.subnetBits = _nb
