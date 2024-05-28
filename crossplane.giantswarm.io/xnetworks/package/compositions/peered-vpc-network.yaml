@@ -69,19 +69,18 @@ spec:
               **_oxr
               status.subnetBits = _nb
           }
+        target: ""
     step: function-kcl-subnet-bits
   - functionRef:
       name: function-cidr
     input:
       apiVersion: cidr.fn.crossplane.io/v1beta1
-      cidrFunc: cidrsubnets
+      cidrFunc: multiprefixloop
       kind: Parameters
       metadata:
         creationTimestamp: null
-      newBitsField: spec.subnet.bits
+      multiPrefixField: spec.subnetsets.cidrs
       outputField: status.calculatedCidrs
-      prefix: ""
-      prefixField: spec.vpcCidr
     step: function-cidr
   - functionRef:
       name: function-kcl
@@ -499,7 +498,7 @@ spec:
           l = len([i for x in _items for i in x if i])
           # flatten items and exclude any empty elements
           items = [i for x in _items for i in x if i]
-        target: Resources
+        target: ""
     step: function-kcl-create-resources
   - functionRef:
       name: function-kcl
@@ -553,7 +552,7 @@ spec:
                   for name, item in _ocs if item.kind == "NATGateway"
               }
           }
-        target: XR
+        target: ""
     step: function-kcl-patch-xr
   - functionRef:
       name: function-patch-and-transform
