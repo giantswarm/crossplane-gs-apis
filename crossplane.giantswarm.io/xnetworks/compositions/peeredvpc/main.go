@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 	"fmt"
+
+	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 
 	xgt "github.com/crossplane-contrib/function-go-templating/input/v1beta1"
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
@@ -41,18 +42,9 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		kclResourcesTemplate string
 		kclPatchTemplate     string
 		err                  error
-		azCount              int = 3
-
-		// A /24 VPC Cidr will provide up to 5 subnets at /28 (the smallest subnet
-		// size allowed by AWS). As we don't know what the user wants to create, we
-		// will work on the assumption that they might have up to 3 public and 3
-		// private subnets. and they disable the subnets they will not use via the
-		// CEL filter.
-		pubSubCount int = 3
-		priSubCount int = 3
 	)
 
-	var resources []xpt.ComposedTemplate = createResources(pubSubCount, priSubCount, azCount)
+	var resources []xpt.ComposedTemplate = createResources()
 
 	kclSubnetsTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/subnets.k")
 	if err != nil {
@@ -80,7 +72,10 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "Input",
 				},
 				Spec: &xnd.Spec{
-					VpcNameRef: "spec.peering.vpcName",
+					EnabledRef:        "spec.peering.enabled",
+					ProviderConfigRef: "spec.providerConfigRef.name",
+					RegionRef:         "spec.region",
+					VpcNameRef:        "spec.peering.vpcName",
 				},
 			},
 		})
@@ -209,7 +204,7 @@ func combineNameRegionPatch(toFieldPath, suffix string) xpt.ComposedPatch {
 	}
 }
 
-func createResources(pubSubCount, priSubCount, azCount int) []xpt.ComposedTemplate {
+func createResources() []xpt.ComposedTemplate {
 	var resources []xpt.ComposedTemplate = []xpt.ComposedTemplate{
 		createVpcResource(),
 		createDefaultSgControl(),
