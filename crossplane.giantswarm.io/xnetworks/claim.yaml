@@ -1,0 +1,48 @@
+apiVersion: xnetworks.crossplane.giantswarm.io/v1alpha1
+kind: PeeredVpcNetworkClaim
+metadata:
+  labels:
+    owner: honeybadger
+    provider: aws
+    app.kubernetes.io/name: my-peered-vpc
+    app.kubernetes.io/instance: my-peered-vpc-network
+    app.kubernetes.io/part-of: my-peered-vpc
+    app.kubernetes.io/managed-by: crossplane
+  name: my-peered-vpc-network
+  namespace: default
+spec:
+  compositionSelector:
+    matchLabels:
+      provider: aws
+      component: network
+  deletionPolicy: Delete
+  region: eu-central-1
+  providerConfigRef:
+    name: default
+  peering:
+    remoteVpcs:
+    - name: myapp-basic-vpc
+      allowPublic: true
+    - name: rds-postgres-db
+      allowPublic: false
+    enabled: true
+  subnetsets:
+    cidrs:
+    - prefix: '10.16.0.0/24'
+      public:
+        mask: /27
+        count: 1
+        lbSetIndex: 0
+      private:
+        mask: /28
+        count: 3
+        lbSetIndex: 2
+    availabilityZones:
+    - a
+    - b
+    - c
+  tags:
+    common:
+      giantswarm.io/owner: honeybadger
+      giantswarm.io/managed-by: crossplane
+      giantswarm.io/part-of: my-peered-vpc

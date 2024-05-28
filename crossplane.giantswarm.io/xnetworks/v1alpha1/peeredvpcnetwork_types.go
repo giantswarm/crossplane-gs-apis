@@ -72,6 +72,8 @@ type PeeredVpcTags struct {
 	Cluster map[string]string `json:"cluster,omitempty"`
 }
 
+// PeeredVpcNetworkParameters defines the parameters for creating a VPC with
+// the option of peered subnets.
 type PeeredVpcNetworkParameters struct {
 
 	// Region is the region in which the VPC will be created.
@@ -82,7 +84,7 @@ type PeeredVpcNetworkParameters struct {
 	// PeeredSubnets defines how many public and private subnet sets to create.
 	//
 	// +required
-	PeeredSubnets PeeredSubnets `json:"subnets"`
+	PeeredSubnets PeeredSubnets `json:"subnetsets"`
 
 	// Tags is a map of additional tags to assign to the VPC.
 	//
@@ -96,7 +98,18 @@ type PeeredVpcNetworkParameters struct {
 	Peering VpcPeering `json:"peering"`
 }
 
+// VpcPeering defines the parameters for VPC peering.
+//
+// If enabled, the VPC will be peered with the VPCs specified in the
+// `remoteVpcs` field.
 type VpcPeering struct {
+	// AllowPublic specifies if the VPC peering connections should be allowed to
+	// be linked to the public subnets
+	// Defaults to false
+	//
+	// +optional
+	// +default=false
+	AllowPublic bool `json:"allowPublic"`
 	// Enabled specifies if the VPC peering connections should be enabled for
 	// this VPC.
 	// Defaults to false
@@ -113,6 +126,7 @@ type VpcPeering struct {
 	RemoteVpcs []VpcPeer `json:"remoteVpcs"`
 }
 
+// VpcPeer defines the parameters for peering with a VPC.
 type VpcPeer struct {
 	// Disabled specifies if the peering connection should be disabled.
 	// Defaults to true
@@ -141,6 +155,8 @@ type VpcPeer struct {
 	ProviderConfigRef string `json:"providerConfigRef"`
 }
 
+// PeeredSubnetSet defines the parameters for creating a set of subnets with the
+// same mask.
 type PeeredSubnetSet struct {
 	// Prefix is the CIDR prefix to use for the subnet set
 	//
@@ -199,6 +215,8 @@ type PeeredSubnetBuilder struct {
 	LoadBalancerIndex int `json:"lbSetIndex"`
 }
 
+// PeeredSubnets defines the parameters for creating a set of subnets with the
+// same mask.
 type PeeredSubnets struct {
 	// Cidrs is a list of PeeredSubnetSets to create in the VPC
 	//
