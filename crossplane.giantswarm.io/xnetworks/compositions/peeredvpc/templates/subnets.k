@@ -22,6 +22,7 @@ _nb = [
         _x = int(_vpcSize)
 
         prefix = s.prefix
+        offset = s.offset
         newBits = cb(s.public.mask, _x, s.public.count) + cb(s.private.mask, _x, s.private.count)
     }
     for s in _oxr.spec.subnetsets.cidrs

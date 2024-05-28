@@ -107,7 +107,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "Parameters",
 				},
 				CidrFunc:         "multiprefixloop",
-				MultiPrefixField: "spec.subnetsets.cidrs",
+				MultiPrefixField: "status.subnetBits",
 				OutputField:      "status.calculatedCidrs",
 			},
 		})
