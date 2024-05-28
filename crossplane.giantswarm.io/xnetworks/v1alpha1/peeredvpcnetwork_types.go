@@ -8,6 +8,23 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// PeerVpcNetworkSpec defines the desired state of PeerVpcNetwork
+//
+// This is a more advanced composition that uses KCL language to calculate the
+// overall structure of the VPC and subnets, utilising dynamic calculation for
+// the components of the VPC.
+//
+// A claim made against this composition will result in the creation of a VPC
+// with a number of subnets grouped into sets of 3 availability zones.
+//
+// If VPC Peering is enabled, the VPC will be peered with the VPCs specified in
+// the claim under the `spec.peering.remoteVpcs` field.
+//
+// Up to 5 CIDR ranges can be specified and these are done via the
+// `spec.subnetsets.cidrs` field, where the first entry in the list is the
+// default VPC CIDR and all subsequent entries are attached as additional
+// VPC CIDRs.
+//
 // +kubebuilder:object:root=true
 // +kubebuilder:storageversion
 // +genclient
@@ -34,84 +51,169 @@ type PeeredVpcNetworkSpec struct {
 	PeeredVpcNetworkParameters `json:",inline"`
 }
 
+// PeeredVpcTags defines the tags to apply to the VPC and subnets.
+type PeeredVpcTags struct {
+	// common tags apoplied to all resources
+	//
+	// +optional
+	// +mapType=granular
+	Common map[string]string `json:"common,omitempty"`
+
+	// Subnet tags to apply to all subnetsets
+	//
+	// +optional
+	// +mapType=granular
+	Subnet map[string]string `json:"subnet,omitempty"`
+
+	// Cluster tags to apply subnets for autodiscovery of load balancers
+	//
+	// +optional
+	// +mapType=granular
+	Cluster map[string]string `json:"cluster,omitempty"`
+}
+
 type PeeredVpcNetworkParameters struct {
 
 	// Region is the region in which the VPC will be created.
+	//
+	// +required
 	Region string `json:"region"`
 
-	// CIDR is the CIDR block for the VPC.
-	CIDR string `json:"cidr"`
-
 	// PeeredSubnets defines how many public and private subnet sets to create.
+	//
+	// +required
 	PeeredSubnets PeeredSubnets `json:"subnets"`
 
 	// Tags is a map of additional tags to assign to the VPC.
+	//
 	// +optional
-	// +mapType=atomic
-	// +kubebuilder:validation:MaxProperties=50
-	Tags map[string]string `json:"tags,omitempty"`
+	// +structType=granular
+	Tags PeeredVpcTags `json:"tags,omitempty"`
 
 	// Peering is the VPC to peer with.
-	Peering VpcPeer `json:"peering"`
+	//
+	// +optional
+	Peering VpcPeering `json:"peering"`
+}
+
+type VpcPeering struct {
+	// Enabled specifies if the VPC peering connections should be enabled for
+	// this VPC.
+	// Defaults to false
+	//
+	// +optional
+	// +default=false
+	Enabled bool `json:"enabled"`
+
+	// RemoteVpcs is a list of VPCs to peer with.
+	//
+	// +listType=atomic
+	// +kubebuilder:validation:MaxItems=125
+	// +optional
+	RemoteVpcs []VpcPeer `json:"remoteVpcs"`
 }
 
 type VpcPeer struct {
+	// Disabled specifies if the peering connection should be disabled.
+	// Defaults to true
+	//
+	// +optional
+	// +default=true
+	AllowPublic bool `json:"allowPublic"`
 
-	// VpcName specifies the name of the VPC to peer with.
-	VpcName string `json:"vpcName"`
+	// Name specifies the name of the VPC to peer with.
+	//
+	// +required
+	Name string `json:"name"`
 
-	// Region specifies the region the VPC is found in
+	// Region specifies the region the VPC is found in.
+	//
+	// If not defined, the region of the VPC will be assumed to be the same as
+	// the region of the peered VPC.
+	//
+	// +optional
 	Region string `json:"region"`
 
-	// Disabled specifies if the peering connection should be disabled.
-	Disabled bool `json:"disabled"`
+	// ProviderConfigRef specifies the provider config to use for the peering
+	// connection.
+	//
+	// +optional
+	ProviderConfigRef string `json:"providerConfigRef"`
+}
+
+type PeeredSubnetSet struct {
+	// Prefix is the CIDR prefix to use for the subnet set
+	//
+	// +required
+	// +immutable
+	Prefix Cidr `json:"prefix"`
+
+	// Public is the number of public subnets to create in this set
+	//
+	// +required
+	Public PeeredSubnetBuilder `json:"public"`
+
+	// Private is the number of private subnets to create in this set
+	//
+	// +required
+	Private PeeredSubnetBuilder `json:"private"`
+}
+
+// PeeredSubnetBuilder defines the parameters for creating a set of subnets
+// with the same mask.
+//
+// The mask is the destination CIDR range to use and the count is the number of
+// subnets to create with this mask. It is your responsibility to ensure that
+// the VPC Cidr to be used as a prefix is large enough to encompass all the
+// subnets created, if not an error will be returned on the staus of the XR
+//
+// The offset is the number of bits to offset the subnet mask by. This is useful
+// when you may want to create only private subnets, leaving public to be
+// created at a later time, or just want to control how the subnets are created.
+// If no offset is specified, the subnets will be created from the start of the
+// cidr range
+type PeeredSubnetBuilder struct {
+	// Mask is the CIDR mask to use for the subnet set
+	//
+	// +required
+	// +immutable
+	Mask string `json:"mask"`
+
+	// Count is the number of subnet sets to create with this mask
+	//
+	// +optional
+	// +default=0
+	Count int `json:"count"`
+
+	// Offset is the number of bits to offset the subnet mask by
+	//
+	// +optional
+	// +default=0
+	Offset int `json:"offset"`
+
+	// Determines which subnet set in this range to use for kubernetes load
+	// balancers. -1 means no load balancer tag is defined on this group
+	//
+	// +optional
+	// +default=-1
+	LoadBalancerIndex int `json:"lbSetIndex"`
 }
 
 type PeeredSubnets struct {
-	// PublicSets defines how many public subnet-sets to create with each set
-	// spanning 3 availability zones
+	// Cidrs is a list of PeeredSubnetSets to create in the VPC
 	//
-	// +required
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=3
-	PublicSets int `json:"publicSets"`
-
-	// PrivateSets defines how many private subnet-sets to create with each set
-	// spanning 3 availability zones
-	//
-	// +required
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=3
-	PrivateSets int `json:"privateSets"`
-
-	// Bits is a list of subnet bits to use for the subnet CIDR blocks. Basically
-	// how to split the VPC CIDR. Each bit represents the CIDR block size for a
-	// single availability zone. The number of bits must match the number of
-	// availability zones in the region.
-	//
-	// For example, if the VPC CIDR is 192.168.1.0/24 and the region has 3
-	// availability zones, the bits could be [2, 2, 2] which would result in
-	// 3 subnets with CIDR blocks allowing for 64 hosts each.
-	//
-	// For a more advanced configuration you might splut this into 1 public and
-	// 3 private subnet sets with the following bits:
-	//
-	// [
-	//   3, 3, 3, # Public subnet,  each on /27 giving 30 hosts x 3
-	//   4, 4, 4, # Private subnet, each on /28 giving 14 hosts x 3
-	//   4, 4, 4, # Private subnet, each on /28 giving 14 hosts x 3
-	//   4, 4, 4  # Private subnet, each on /28 giving 14 hosts x 3
-	// ]
+	// Each PeeredSubnetSet will create 1 subnet
 	//
 	// +required
 	// +kubebuilder:validation:MinItems=1
-	// +kubebuilder:validation:MaxItems=3
-	Bits []int `json:"bits"`
+	// +kubebuilder:validation:MaxItems=5
+	// +listType=atomic
+	Cidrs []PeeredSubnetSet `json:"cidrs"`
 
-	// AvailabilityZones is a list of availability zones in the region. The number
-	// of availability zones must match the number of bits x the number of subnetsets
-	// (public + private). The VPC Cidr must be big enough to encompass all the
-	// subnet CIDR blocks.
+	// AvailabilityZones is a list of availability zones in the region. The
+	// number of availability zones must match the number of bits x the number
+	// of subnetsets (public + private). The VPC Cidr must be big enough to
+	// encompass all the subnet CIDR blocks.
 	//
 	// +required
 	// +kubebuilder:validation:MinItems=3
@@ -119,30 +221,42 @@ type PeeredSubnets struct {
 	AvailabilityZones []string `json:"availabilityZones"`
 
 	// Function defines the function to use to calculate the CIDR blocks for the
-	// subnets. The default is "cidrsubnets" which will split the VPC CIDR into
-	// equal parts based on the number of bits provided. `cidrsubnets` is the only
-	// function being made available as part of this XRD and as it's defaulted
-	// it can be hidden from the user. The function input expects a path though
-	// so this has to exist but isn't expected to be defined on the claim.
+	// subnets. The default is "multiprefixloop" which will split multiple CIDRs
+	// into equal parts based on the number of bits provided.
+	// `multiprefixloop` is the only function being made available as part of
+	// this XRD and as it's defaulted it can be hidden from the user. The
+	// function input expects a path though so this has to exist but isn't
+	// expected to be defined on the claim.
 	//
 	// +optional
-	// +kubebuilder:validation:Type=enum
-	// +kubebuilder:validation:Enum=cidrsubnets
-	// +kubebuilder:default=cidrsubnets
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:Enum=multiprefixloop
+	// +kubebuilder:default=multiprefixloop
 	Function string `json:"function"`
 }
 
 type PeeredVpcNetworkStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
 
-	// Contains details of the created VPC
-	// +structType=atomic
-	nd.Vpc `json:",omitempty"`
-
 	// Contains the CIDR blocks output by function-cidr
-	// +listType=atomic
-	CalculatedCidrs []string `json:"calculatedCidrs,omitempty"`
-	SubnetBits      []int    `json:"subnetBits,omitempty"`
+	//
+	// +optional
+	// +mapType=atomic
+	CalculatedCidrs map[string][]string `json:"calculatedCidrs,omitempty"`
+
+	// Contains the subnet bits output by function-kcl-subnet-bits
+	//
+	// +mapType=atomic
+	// +optional
+	// +immutable
+	SubnetBits map[string][]int `json:"subnetBits,omitempty"`
+
+	// Vpcs contains details of both the peered VPCs and the current local VPC
+	// The current VPC can be found at the `self` key
+	//
+	// +optional
+	// +mapType=atomic
+	Vpcs map[string]nd.Vpc `json:"vpcs,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -154,8 +268,11 @@ type PeeredVpcNetworkList struct {
 
 // Repository type metadata.
 var (
-	PeeredVpcNetworkKind             = "PeeredVpcNetwork"
-	PeeredVpcNetworkGroupKind        = schema.GroupKind{Group: XRDGroup, Kind: PeeredVpcNetworkKind}.String()
+	PeeredVpcNetworkKind      = "PeeredVpcNetwork"
+	PeeredVpcNetworkGroupKind = schema.GroupKind{
+		Group: XRDGroup,
+		Kind:  PeeredVpcNetworkKind,
+	}.String()
 	PeeredVpcNetworkKindAPIVersion   = PeeredVpcNetworkKind + "." + GroupVersion.String()
 	PeeredVpcNetworkGroupVersionKind = GroupVersion.WithKind(PeeredVpcNetworkKind)
 )

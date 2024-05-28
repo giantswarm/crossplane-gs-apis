@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crossbuilder/v1alpha1"
+	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 	"fmt"
 
 	xgt "github.com/crossplane-contrib/function-go-templating/input/v1beta1"
@@ -27,7 +27,7 @@ func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 }
 
 func (b *builder) Build(c build.CompositionSkeleton) {
-	c.WithName("peeredvpc").
+	c.WithName("peered-vpc-network").
 		WithMode(xapiextv1.CompositionModePipeline).
 		WithLabels(map[string]string{
 			"provider":  "aws",
@@ -37,10 +37,11 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 
 	// Load the template
 	var (
-		gotemplate         string
-		kclSubnetsTemplate string
-		err                error
-		azCount            int = 3
+		kclSubnetsTemplate   string
+		kclResourcesTemplate string
+		kclPatchTemplate     string
+		err                  error
+		azCount              int = 3
 
 		// A /24 VPC Cidr will provide up to 5 subnets at /28 (the smallest subnet
 		// size allowed by AWS). As we don't know what the user wants to create, we
@@ -53,12 +54,17 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 
 	var resources []xpt.ComposedTemplate = createResources(pubSubCount, priSubCount, azCount)
 
-	gotemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/template.go")
+	kclSubnetsTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/subnets.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclSubnetsTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/subnets.go")
+	kclResourcesTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/resources.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclPatchTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/patching.k")
 	if err != nil {
 		panic(err)
 	}
@@ -91,6 +97,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 				Spec: xkcl.RunSpec{
 					Source: kclSubnetsTemplate,
+					Target: "XR",
 				},
 			},
 		})
@@ -112,19 +119,36 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 			},
 		})
 
-	c.NewPipelineStep("go-templating").
+	c.NewPipelineStep("function-kcl-create-resources").
 		WithFunctionRef(xapiextv1.FunctionReference{
-			Name: "function-go-templating",
+			Name: "function-kcl",
 		}).
 		WithInput(build.ObjectKindReference{
-			Object: &xgt.GoTemplate{
+			Object: &xkcl.KCLInput{
 				TypeMeta: metav1.TypeMeta{
-					APIVersion: "gotemplating.fn.crossplane.io/v1beta1",
-					Kind:       "GoTemplate",
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLRun",
 				},
-				Source: xgt.InlineSource,
-				Inline: &xgt.TemplateSourceInline{
-					Template: gotemplate,
+				Spec: xkcl.RunSpec{
+					Source: kclResourcesTemplate,
+					Target: "Resources",
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-kcl-patch-xr").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLRun",
+				},
+				Spec: xkcl.RunSpec{
+					Source: kclPatchTemplate,
+					Target: "XR",
 				},
 			},
 		})
@@ -192,28 +216,5 @@ func createResources(pubSubCount, priSubCount, azCount int) []xpt.ComposedTempla
 		createInternetGateway(),
 	}
 
-	for _, s := range patchSubnets(true, pubSubCount) {
-		resources = append(resources, s)
-	}
-
-	for _, s := range patchSubnets(false, priSubCount) {
-		resources = append(resources, s)
-	}
-
-	for _, eip := range patchEips(azCount) {
-		resources = append(resources, eip)
-	}
-
-	for _, ngw := range patchNatGateways(azCount) {
-		resources = append(resources, ngw)
-	}
-
-	for _, igwrt := range patchInternetGatewayRoutes(azCount) {
-		resources = append(resources, igwrt)
-	}
-
-	for _, ngwrt := range patchNatGatewayRoutes(azCount) {
-		resources = append(resources, ngwrt)
-	}
 	return resources
 }

@@ -1,0 +1,407 @@
+_oxr = option("params").oxr
+_ocs = option("params").ocs
+
+_requestedSets = [
+    c.public.count + c.private.count
+    for c in _oxr.spec.subnetsets.cidrs
+]
+
+_zones = _oxr.spec.subnetsets.availabilityZones
+
+assert sum(_requestedSets)*len(_zones) < 200, """
+    The number of subnet sets you are requesting will exceed the maximum number
+    of subnets allowed by AWS. The sum of all counts multiplied by the number of
+    availability zones must be less than 200.
+"""
+
+# The first entry in the `subnetsets.cidrs` list is the primary CIDR range for
+# the VPC.
+#
+# The remaining entries are additional CIDR ranges that can be attached with AWS
+# allowing up to 4 additional CIDR ranges.
+_additionalCidrs = [
+    s.prefix
+    for s in _oxr.spec.subnetsets.cidrs[1:]
+]
+
+# The name of the application is used to prefix all resources
+_appName = _claimRef.name if bool(_claimRef) else ""
+_calculatedCidrs = _oxr.status.calculatedCidrs
+_claimRef = _oxr.spec.claimRef
+_clusterTags = _oxr.spec.tags.cluster if _oxr.spec.tags.cluster else {}
+_dp = _oxr.spec.deletionPolicy
+_labels = _oxr.metadata.labels
+_pcr = _oxr.spec.providerConfigRef
+_region = _oxr.spec.region
+
+_peeringEnabled = _oxr.spec.peering.enabled
+_tags = _labels | _oxr.spec.tags.common | {
+    region: _region,
+}
+
+# Separate out created public and private subnets and route tables
+_pubsn = [
+    x.status.subnetIds
+    for _, x in _ocs
+    if x.kind == "SubnetSet" and x.spec.type == "public"
+]
+_pubrtbls = [
+    x.status.routeTableIds
+    for _, x in _ocs
+    if x.kind == "SubnetSet" and x.spec.type == "public"
+]
+_prisn = [
+    x.status.subnetIds
+    for _, x in _ocs
+    if x.kind == "SubnetSet" and x.spec.type == "private"
+]
+_prirtbls = [
+    x.status.routeTableIds
+    for _, x in _ocs
+    if x.kind == "SubnetSet" and x.spec.type == "private"
+]
+
+chunksplit = lambda size: int subnets: [] -> [] {
+    # split the subnets array into chunks of size `size`
+    [
+        subnets[i:i + size:]
+        for i in range(0, len(subnets), size)
+    ]
+}
+
+# Create the SubnetSets
+#
+# SubnetSets are a collection of Subnets and RouteTables per availability zone
+# Each set logically belongs together as they share consecutive CIDR ranges
+# and have one subnet and one route table per requested availability zone (3)
+_subnetsets = [
+    {
+        _subnets = chunksplit(len(_zones), _calculatedCidrs[s.prefix])
+        _visibility = "public" if i < s.public.count else "private"
+        _index = i if _visibility == "public" else i - s.public.count
+        _snlbtag = {
+            **_clusterTags
+            "kubernetes.io/role/elb": 1
+        } if _index == s.public.lbSetIndex and _visibility == "public" else {
+            **_clusterTags
+            "kubernetes.io/role/internal-elb": 1
+        } if _index == s.private.lbSetIndex and _visibility == "private" else {}
+        apiVersion: "xnetworks.crossplane.giantswarm.io/v1alpha1"
+        kind: "SubnetSet"
+        metadata: {
+            name: "${_appName}-subnet-${_index}"
+            labels: _labels
+        }
+        spec: {
+            claimRef: _claimRef
+            deletionPolicy: _dp
+            region: _region
+            providerConfigRef: _pcr
+            subnet: {
+                a: {
+                    cidrBlock: _subnets[i][0]
+                    zone: _zones[0]
+                }
+                b: {
+                    cidrBlock: _subnets[i][1]
+                    zone: _zones[1]
+                }
+                c: {
+                    cidrBlock: _subnets[i][2]
+                    zone: _zones[2]
+                }
+            }
+            type: _visibility
+            tags: _tags | _oxr.spec.tags.subnet | _snlbtag
+            vpcId: _oxr.status.id
+        }
+    }
+    for s in _oxr.spec.subnetsets.cidrs
+    for i in range(s.public.count + s.private.count)
+    if _oxr.status.vpcs.self.id
+]
+
+# Create Additional VPC CIDRs
+#
+# Each VPC may have up to 4 additional CIDRs attached
+_acs = [
+    {
+        apiVersion: "ec2.aws.upbound.io/v1beta1"
+        kind: "VPCIPv4CidrBlockAssociation"
+        metadata: {
+            labels: _labels
+            name: "${_appName}-${i}"
+        }
+        spec: {
+            deletionPolicy: _dp
+            forProvider: {
+                cidrBlock: cidr
+                region: _region
+                vpcIdSelector: {
+                    matchControllerRef: True
+                }
+            }
+            _providerConfigRef: _pcr
+        }
+    }
+    for i, cidr in _additionalCidrs
+]
+
+# Create Elastic IPs for the nat gateways
+#
+# Each NAT Gateway must be associated with an EIP
+_eips = [
+    {
+        apiVersion: "ec2.aws.upbound.io/v1beta1"
+        kind: "EIP"
+        metadata: {
+            labels: _labels | {
+                availabilityZone: az
+                utilization: "nat-gateway"
+            }
+            name: "${_appName}-${_region}${az}-${i}"
+        }
+        spec: {
+            deletionPolicy: _dp
+            forProvider: {
+                domain: "vpc"
+                region: _region
+                tags: _tags | {Name: "${_appName}-${_region}${az}-${i}"}
+            }
+            _providerConfigRef: _pcr
+        }
+    }
+    for i, az in _zones if _pubsn
+]
+
+# NAT Gateways
+#
+# One NatGateway per availability zone is created and attached
+# to the first public subnet
+_natgateways = [
+    {
+        apiVersion: "ec2.aws.upbound.io/v1beta1"
+        kind: "NATGateway"
+        metadata: {
+            labels: {availabilityZone: az} | _labels
+            name: "${_appName}-${_region}${az}"
+        }
+        spec: {
+            deletionPolicy: _dp
+            forProvider: {
+                allocationIdSelector: {
+                    matchControllerRef: True
+                    matchLabels: {availabilityZone: az}
+                }
+                region: _region
+                subnetId: _pubsn
+                tags: {Name: "${_appName}-${_region}${az}"} | _tags
+            }
+            _providerConfigRef: _pcr
+        }
+    }
+    for i, az in _zones
+    if _pubsn and _eips
+]
+
+_natgatewaysCreated = len([ngw for ngw in _natgateways if ngw]) == len(_zones)
+
+# Nat Gateway Routes
+#
+# One route per private route table
+_ngwRoutes = [
+    {
+        apiVersion: "ec2.aws.upbound.io/v1beta1"
+        kind: "Route"
+        metadata: {
+            labels: {availabilityZone: az} | _labels
+            name: "${_appName}-${_region}${az}"
+        }
+        spec: {
+            deletionPolicy: _dp
+            forProvider: {
+                destinationCidrBlock: "0.0.0.0/0"
+                natGatewayIdSelector: {
+                    matchControllerRef: True
+                    matchLabels: {availabilityZone: az}
+                }
+                region: _region
+                routeTableId: rtbl
+            }
+            providerConfigRef: _pcr
+        }
+    }
+    for i, x in _prirtbls
+    for az, rtbl in x
+    if _pubsn and _natgatewaysCreated
+]
+
+# Internet Gateway Routes
+#
+# One IGW route per public route table
+_igwRoutes = [
+    {
+        apiVersion: "ec2.aws.upbound.io/v1beta1"
+        kind: "Route"
+        metadata: {
+            labels: {availabilityZone: az} | _labels
+            name: "${_appName}-ngw-${az}"
+        }
+        spec: {
+            deletionPolicy: _dp
+            forProvider: {
+                destinationCidrBlock: "0.0.0.0/0"
+                gatewayIdSelector: {
+                    matchControllerRef: True
+                    matchLabels: {availabilityZone: az}
+                }
+                region: _region
+                routeTableId: rtbl
+            }
+            providerConfigRef: _pcr
+        }
+    }
+    for i, x in _pubrtbls
+    for az, rtbl in x if _pubsn
+]
+
+# Create Peering connections
+#
+# One peering connection per remote VPC is created
+_peering = [
+    {
+        apiVersion: "ec2.aws.upbound.io/v1beta1"
+        kind: "VPCPeeringConnection"
+        metadata: {
+            labels: _labels | {vpcName: x.name}
+            name: "${_appName}-${_region}-${x.name}"
+        }
+        spec: {
+            deletionPolicy: _dp
+            forProvider: {
+                autoAccept: True
+                peerVpcId: _oxr.status.vpcs[x.name].remoteVpc
+                region: _region
+                tags: {Name: "${_appName}-${_region}-${x.name}"} | _tags
+                vpcId: _oxr.status.id
+            }
+            providerConfigRef: _pcr
+        }
+    }
+    for x in _oxr.spec.peering.remoteVpcs
+    if _oxr.spec.peering.enabled and _oxr.status.vpcs.self.id
+]
+
+# Used as a check for if the peering connections have been created
+_peeringConnections = [
+    p for p in _ocs if p.kind == "VPCPeeringConnection"
+]
+_peeringCreated = len(_peeringConnections) == len(_peering)
+
+# This is the most complicated part of the setup, adding the peering connections
+# to the route tables
+#
+# The following blocks of code map route tables to CIDR ranges on either side of
+# the VPC peering connection.
+#
+# Remote VPC route tables take the CIDR range(s) of the VPC created by this
+# composition whilst route tables created by this composition take the remote
+# CIDR range(s)
+#
+# It is possible to disable peering on public route tables but not private route
+# tables in this composition. The options available are: public+private or
+# private only
+
+allowsPublic = lambda vpc: str -> bool {
+    _a = [
+        x.allowPublic for x in _oxr.spec.peering.remoteVpcs if x.name == vpc
+    ][0]
+}
+
+# First lets build a mapping from our own CIDR blocks to every route table that
+# is not ours
+_rmtTables = [ # public route tables if requested
+    {id = i, vpcCidr = cidr, selector = name}
+    # iterate available CIDR ranges
+    for cidr in [_oxr.status.vpcs.self.cidr] + _oxr.status.vpcs.self.additionalCidrs
+    # foreach VPC discovered
+    for name, vpc in _oxr.status.vpcs
+    # for each of this compositions route tables
+    for _, i in vpc.publicRouteTables
+    if name != "self" and allowsPublic(name)
+] + [ # private route tables
+    {
+        id = i,
+        vpcCidr = _oxr.status.vpcs.self.cidr,
+        selector = name
+    }
+    for cidr in [_oxr.status.vpcs.self.cidr] + _oxr.status.vpcs.self.additionalCidrs
+    for name, vpc in _oxr.status.vpcs
+    for _, i in vpc.privateRouteTables
+    if name != "self"
+]
+
+# Then map all remote CIDRs to our own route tables
+#
+# This is slightly different to the above as the `allowPublic` flag doesn't
+# need to be discovered for the current VPC (static location)
+_myRouteTables = [
+    {
+        id = i,
+        vpcCidr = cidr,
+        selector = name
+    }
+    for name, vpc in _oxr.status.vpcs
+    for cidr in [vpc.cidr] + vpc.additionalCidrs
+    for _, i in [
+        r for r in _pubrtbls
+        if _oxr.spec.peering.allowPublic
+    ] + [
+        r for r in _prirtbls
+    ]
+    if name != "self"
+]
+
+# Create the Peering routes
+#
+# This is achieved by combining the two lists _rmtTables and _myRouteTables
+# and then creating a route for each, with the peering ID selector set to the
+# name of the peering connection for that VPC
+_peeringRoutes = [
+    {
+        apiVersion: "ec2.aws.upbound.io/v1beta1"
+        kind: "Route"
+        metadata: {
+            labels: _labels
+            name: "${_appName}-route-${i}"
+        }
+        spec: {
+            deletionPolicy: _dp
+            forProvider: {
+                destinationCidrBlock: r.vpcCidr
+                routeTableId: r.id
+                region: _region
+                vpcPeeringConnectionIdSelector: {
+                    matchControllerRef: True
+                    matchLabels: {
+                        vpcName: r.selector
+                    }
+                }
+            }
+            providerConfigRef: _pcr
+        }
+    }
+    for i, r in _rmtTables + _myRouteTables
+    # only create if peering is enabled and we have a VPC ID and peering
+    # connections have been created
+    if _oxr.spec.peering.enabled and _oxr.status.vpcs.self.id and _peeringCreated
+]
+
+# Create the list of items to return
+_items = [
+    _subnetsets, _acs, _eips, _natgateways,
+    _ngwRoutes, _igwRoutes, _peering, _peeringRoutes
+]
+l = len([i for x in _items for i in x if i])
+# flatten items and exclude any empty elements
+items = [i for x in _items for i in x if i]

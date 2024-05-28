@@ -6,7 +6,7 @@ metadata:
     component: networking
     provider: aws
     type: vpc
-  name: peeredvpc
+  name: peered-vpc-network
 spec:
   compositeTypeRef:
     apiVersion: xnetworks.crossplane.giantswarm.io/v1alpha1

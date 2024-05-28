@@ -1,4 +1,4 @@
-module crossbuilder
+module github.com/giantswarm/crossplane-gs-apis
 
 go 1.22.2
 

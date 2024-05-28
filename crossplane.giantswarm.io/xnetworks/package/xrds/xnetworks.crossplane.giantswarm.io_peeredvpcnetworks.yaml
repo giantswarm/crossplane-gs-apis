@@ -34,12 +34,30 @@ spec:
     referenceable: true
     schema:
       openAPIV3Schema:
+        description: |-
+          PeerVpcNetworkSpec defines the desired state of PeerVpcNetwork
+
+
+          This is a more advanced composition that uses KCL language to calculate the
+          overall structure of the VPC and subnets, utilising dynamic calculation for
+          the components of the VPC.
+
+
+          A claim made against this composition will result in the creation of a VPC
+          with a number of subnets grouped into sets of 3 availability zones.
+
+
+          If VPC Peering is enabled, the VPC will be peered with the VPCs specified in
+          the claim under the `spec.peering.remoteVpcs` field.
+
+
+          Up to 5 CIDR ranges can be specified and these are done via the
+          `spec.subnetsets.cidrs` field, where the first entry in the list is the
+          default VPC CIDR and all subsequent entries are attached as additional
+          VPC CIDRs.
         properties:
           spec:
             properties:
-              cidr:
-                description: CIDR is the CIDR block for the VPC.
-                type: string
               deletionPolicy:
                 default: Delete
                 description: |-
@@ -84,20 +102,44 @@ spec:
               peering:
                 description: Peering is the VPC to peer with.
                 properties:
-                  disabled:
-                    description: Disabled specifies if the peering connection should
-                      be disabled.
+                  enabled:
+                    description: |-
+                      Enabled specifies if the VPC peering connections should be enabled for
+                      this VPC.
+                      Defaults to false
                     type: boolean
-                  region:
-                    description: Region specifies the region the VPC is found in
-                    type: string
-                  vpcName:
-                    description: VpcName specifies the name of the VPC to peer with.
-                    type: string
-                required:
-                - disabled
-                - region
-                - vpcName
+                  remoteVpcs:
+                    description: RemoteVpcs is a list of VPCs to peer with.
+                    items:
+                      properties:
+                        allowPublic:
+                          description: |-
+                            Disabled specifies if the peering connection should be disabled.
+                            Defaults to true
+                          type: boolean
+                        name:
+                          description: Name specifies the name of the VPC to peer
+                            with.
+                          type: string
+                        providerConfigRef:
+                          description: |-
+                            ProviderConfigRef specifies the provider config to use for the peering
+                            connection.
+                          type: string
+                        region:
+                          description: |-
+                            Region specifies the region the VPC is found in.
+
+
+                            If not defined, the region of the VPC will be assumed to be the same as
+                            the region of the peered VPC.
+                          type: string
+                      required:
+                      - name
+                      type: object
+                    maxItems: 125
+                    type: array
+                    x-kubernetes-list-type: atomic
                 type: object
               providerConfigRef:
                 default:
@@ -224,82 +266,126 @@ spec:
                 properties:
                   availabilityZones:
                     description: |-
-                      AvailabilityZones is a list of availability zones in the region. The number
-                      of availability zones must match the number of bits x the number of subnetsets
-                      (public + private). The VPC Cidr must be big enough to encompass all the
-                      subnet CIDR blocks.
+                      AvailabilityZones is a list of availability zones in the region. The
+                      number of availability zones must match the number of bits x the number
+                      of subnetsets (public + private). The VPC Cidr must be big enough to
+                      encompass all the subnet CIDR blocks.
                     items:
                       type: string
                     maxItems: 3
                     minItems: 3
                     type: array
-                  bits:
+                  cidrs:
                     description: |-
-                      Bits is a list of subnet bits to use for the subnet CIDR blocks. Basically
-                      how to split the VPC CIDR. Each bit represents the CIDR block size for a
-                      single availability zone. The number of bits must match the number of
-                      availability zones in the region.
+                      Cidrs is a list of PeeredSubnetSets to create in the VPC
 
 
-                      For example, if the VPC CIDR is 192.168.1.0/24 and the region has 3
-                      availability zones, the bits could be [2, 2, 2] which would result in
-                      3 subnets with CIDR blocks allowing for 64 hosts each.
-
-
-                      For a more advanced configuration you might splut this into 1 public and
-                      3 private subnet sets with the following bits:
-
-
-                      [
-                        3, 3, 3, # Public subnet,  each on /27 giving 30 hosts x 3
-                        4, 4, 4, # Private subnet, each on /28 giving 14 hosts x 3
-                        4, 4, 4, # Private subnet, each on /28 giving 14 hosts x 3
-                        4, 4, 4  # Private subnet, each on /28 giving 14 hosts x 3
-                      ]
+                      Each PeeredSubnetSet will create 1 subnet
                     items:
-                      type: integer
-                    maxItems: 3
+                      properties:
+                        prefix:
+                          description: Prefix is the CIDR prefix to use for the subnet
+                            set
+                          pattern: ^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$
+                          type: string
+                        private:
+                          description: Private is the number of private subnets to
+                            create in this set
+                          properties:
+                            count:
+                              description: Count is the number of subnet sets to create
+                                with this mask
+                              type: integer
+                            lbSetIndex:
+                              description: |-
+                                Determines which subnet set in this range to use for kubernetes load
+                                balancers. -1 means no load balancer tag is defined on this group
+                              type: integer
+                            mask:
+                              description: Mask is the CIDR mask to use for the subnet
+                                set
+                              type: string
+                            offset:
+                              description: Offset is the number of bits to offset
+                                the subnet mask by
+                              type: integer
+                          required:
+                          - mask
+                          type: object
+                        public:
+                          description: Public is the number of public subnets to create
+                            in this set
+                          properties:
+                            count:
+                              description: Count is the number of subnet sets to create
+                                with this mask
+                              type: integer
+                            lbSetIndex:
+                              description: |-
+                                Determines which subnet set in this range to use for kubernetes load
+                                balancers. -1 means no load balancer tag is defined on this group
+                              type: integer
+                            mask:
+                              description: Mask is the CIDR mask to use for the subnet
+                                set
+                              type: string
+                            offset:
+                              description: Offset is the number of bits to offset
+                                the subnet mask by
+                              type: integer
+                          required:
+                          - mask
+                          type: object
+                      required:
+                      - prefix
+                      - private
+                      - public
+                      type: object
+                    maxItems: 5
                     minItems: 1
                     type: array
+                    x-kubernetes-list-type: atomic
                   function:
-                    default: cidrsubnets
+                    default: multiprefixloop
                     description: |-
                       Function defines the function to use to calculate the CIDR blocks for the
-                      subnets. The default is "cidrsubnets" which will split the VPC CIDR into
-                      equal parts based on the number of bits provided. `cidrsubnets` is the only
-                      function being made available as part of this XRD and as it's defaulted
-                      it can be hidden from the user. The function input expects a path though
-                      so this has to exist but isn't expected to be defined on the claim.
+                      subnets. The default is "multiprefixloop" which will split multiple CIDRs
+                      into equal parts based on the number of bits provided.
+                      `multiprefixloop` is the only function being made available as part of
+                      this XRD and as it's defaulted it can be hidden from the user. The
+                      function input expects a path though so this has to exist but isn't
+                      expected to be defined on the claim.
                     enum:
-                    - cidrsubnets
-                    type: enum
-                  privateSets:
-                    description: |-
-                      PrivateSets defines how many private subnet-sets to create with each set
-                      spanning 3 availability zones
-                    maximum: 3
-                    minimum: 1
-                    type: integer
-                  publicSets:
-                    description: |-
-                      PublicSets defines how many public subnet-sets to create with each set
-                      spanning 3 availability zones
-                    maximum: 3
-                    minimum: 1
-                    type: integer
+                    - multiprefixloop
+                    type: string
                 required:
                 - availabilityZones
-                - bits
-                - privateSets
-                - publicSets
+                - cidrs
                 type: object
               tags:
-                additionalProperties:
-                  type: string
                 description: Tags is a map of additional tags to assign to the VPC.
-                maxProperties: 50
+                properties:
+                  cluster:
+                    additionalProperties:
+                      type: string
+                    description: Cluster tags to apply subnets for autodiscovery of
+                      load balancers
+                    type: object
+                    x-kubernetes-map-type: granular
+                  common:
+                    additionalProperties:
+                      type: string
+                    description: common tags apoplied to all resources
+                    type: object
+                    x-kubernetes-map-type: granular
+                  subnet:
+                    additionalProperties:
+                      type: string
+                    description: Subnet tags to apply to all subnetsets
+                    type: object
+                    x-kubernetes-map-type: granular
                 type: object
-                x-kubernetes-map-type: atomic
+                x-kubernetes-map-type: granular
               writeConnectionSecretToRef:
                 description: |-
                   WriteConnectionSecretToReference specifies the namespace and name of a
@@ -322,22 +408,19 @@ spec:
                 - namespace
                 type: object
             required:
-            - cidr
-            - peering
             - region
             - subnets
             type: object
           status:
             properties:
               calculatedCidrs:
+                additionalProperties:
+                  items:
+                    type: string
+                  type: array
                 description: Contains the CIDR blocks output by function-cidr
-                items:
-                  type: string
-                type: array
-                x-kubernetes-list-type: atomic
-              cidrBlock:
-                description: The Ipv4 cidr block defined for this VPC
-                type: string
+                type: object
+                x-kubernetes-map-type: atomic
               conditions:
                 description: Conditions of the resource.
                 items:
@@ -354,13 +437,6 @@ spec:
                         A Message containing details about this condition's last transition from
                         one status to another, if any.
                       type: string
-                    observedGeneration:
-                      description: |-
-                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
-                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
-                        with respect to the current state of the instance.
-                      format: int64
-                      type: integer
                     reason:
                       description: A Reason for this condition's last transition from
                         one status to another.
@@ -384,88 +460,106 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
-              id:
-                description: ID The VPC ID
-                type: string
-              internetGateway:
-                description: The internet gateway defined in this VPC
-                type: string
-              natGateways:
-                additionalProperties:
-                  type: string
-                description: A map of NAT gateways defined in this VPC
-                type: object
-                x-kubernetes-map-type: atomic
-              privateRouteTables:
-                description: A map of private route tables defined in this VPC
-                items:
-                  additionalProperties:
-                    type: string
-                  description: StatusRouteTables is a map of route tables and their
-                    status
-                  type: object
-                  x-kubernetes-map-type: atomic
-                type: array
-                x-kubernetes-list-type: atomic
-              privateSubnets:
-                description: A map of private subnets defined in this VPC
-                items:
-                  additionalProperties:
-                    type: string
-                  description: StatusSubnets is a map of subnets and their status
-                  type: object
-                  x-kubernetes-map-type: atomic
-                type: array
-                x-kubernetes-list-type: atomic
-              publicRouteTables:
-                description: A map of public route tables defined in this VPC
-                items:
-                  additionalProperties:
-                    type: string
-                  description: StatusRouteTables is a map of route tables and their
-                    status
-                  type: object
-                  x-kubernetes-map-type: atomic
-                type: array
-                x-kubernetes-list-type: atomic
-              publicSubnets:
-                description: A list of maps of public subnets defined in this VPC
-                items:
-                  additionalProperties:
-                    type: string
-                  description: StatusSubnets is a map of subnets and their status
-                  type: object
-                  x-kubernetes-map-type: atomic
-                type: array
-                x-kubernetes-list-type: atomic
-              securityGroups:
-                additionalProperties:
-                  type: string
-                description: A map of security groups defined in this VPC
-                type: object
-                x-kubernetes-map-type: atomic
               subnetBits:
-                items:
-                  type: integer
-                type: array
-              transitGateways:
                 additionalProperties:
-                  type: string
-                description: A map of transit gateways defined in this VPC
-                nullable: true
+                  items:
+                    type: integer
+                  type: array
+                description: Contains the subnet bits output by function-kcl-subnet-bits
                 type: object
                 x-kubernetes-map-type: atomic
-              vpcPeeringConnections:
+              vpcs:
                 additionalProperties:
-                  type: string
-                description: A map of VPC peering connections defined in this VPC
-                nullable: true
+                  description: Vpc holds VPC information
+                  properties:
+                    cidrBlock:
+                      description: The Ipv4 cidr block defined for this VPC
+                      type: string
+                    id:
+                      description: ID The VPC ID
+                      type: string
+                    internetGateway:
+                      description: The internet gateway defined in this VPC
+                      type: string
+                    natGateways:
+                      additionalProperties:
+                        type: string
+                      description: A map of NAT gateways defined in this VPC
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    privateRouteTables:
+                      description: A map of private route tables defined in this VPC
+                      items:
+                        additionalProperties:
+                          type: string
+                        description: StatusRouteTables is a map of route tables and
+                          their status
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    privateSubnets:
+                      description: A map of private subnets defined in this VPC
+                      items:
+                        additionalProperties:
+                          type: string
+                        description: StatusSubnets is a map of subnets and their status
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    publicRouteTables:
+                      description: A map of public route tables defined in this VPC
+                      items:
+                        additionalProperties:
+                          type: string
+                        description: StatusRouteTables is a map of route tables and
+                          their status
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    publicSubnets:
+                      description: A list of maps of public subnets defined in this
+                        VPC
+                      items:
+                        additionalProperties:
+                          type: string
+                        description: StatusSubnets is a map of subnets and their status
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    securityGroups:
+                      additionalProperties:
+                        type: string
+                      description: A map of security groups defined in this VPC
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    transitGateways:
+                      additionalProperties:
+                        type: string
+                      description: A map of transit gateways defined in this VPC
+                      nullable: true
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    vpcPeeringConnections:
+                      additionalProperties:
+                        type: string
+                      description: A map of VPC peering connections defined in this
+                        VPC
+                      nullable: true
+                      type: object
+                      x-kubernetes-map-type: atomic
+                  required:
+                  - id
+                  type: object
+                description: |-
+                  Vpcs contains details of both the peered VPCs and the current local VPC
+                  The current VPC can be found at the `self` key
                 type: object
                 x-kubernetes-map-type: atomic
-            required:
-            - id
             type: object
-            x-kubernetes-map-type: atomic
         required:
         - spec
         type: object

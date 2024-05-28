@@ -44,6 +44,13 @@ func createInternetGateway() xpt.ComposedTemplate {
 			},
 			combineNameRegionPatch("spec.forProvider.tags.Name", "-igw"),
 			combineNameRegionPatch("metadata.name", ""),
+			{
+				Type: xpt.PatchTypeToCompositeFieldPath,
+				Patch: xpt.Patch{
+					ToFieldPath:   strPtr("status.vpcs.self.internetGateway"),
+					FromFieldPath: strPtr("status.atProvider.id"),
+				},
+			},
 		},
 	}
 }

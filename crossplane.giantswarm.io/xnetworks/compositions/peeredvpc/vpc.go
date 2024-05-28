@@ -59,7 +59,7 @@ func createVpcResource() xpt.ComposedTemplate {
 			{
 				Type: xpt.PatchTypeToCompositeFieldPath,
 				Patch: xpt.Patch{
-					ToFieldPath:   strPtr("status.id"),
+					ToFieldPath:   strPtr("status.vpcs.self.id"),
 					FromFieldPath: strPtr("status.atProvider.id"),
 				},
 			},
