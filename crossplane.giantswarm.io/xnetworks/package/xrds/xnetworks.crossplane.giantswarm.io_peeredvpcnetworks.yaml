@@ -102,6 +102,12 @@ spec:
               peering:
                 description: Peering is the VPC to peer with.
                 properties:
+                  allowPublic:
+                    description: |-
+                      AllowPublic specifies if the VPC peering connections should be allowed to
+                      be linked to the public subnets
+                      Defaults to false
+                    type: boolean
                   enabled:
                     description: |-
                       Enabled specifies if the VPC peering connections should be enabled for
@@ -111,6 +117,8 @@ spec:
                   remoteVpcs:
                     description: RemoteVpcs is a list of VPCs to peer with.
                     items:
+                      description: VpcPeer defines the parameters for peering with
+                        a VPC.
                       properties:
                         allowPublic:
                           description: |-
@@ -260,7 +268,7 @@ spec:
               region:
                 description: Region is the region in which the VPC will be created.
                 type: string
-              subnets:
+              subnetsets:
                 description: PeeredSubnets defines how many public and private subnet
                   sets to create.
                 properties:
@@ -282,6 +290,9 @@ spec:
 
                       Each PeeredSubnetSet will create 1 subnet
                     items:
+                      description: |-
+                        PeeredSubnetSet defines the parameters for creating a set of subnets with the
+                        same mask.
                       properties:
                         prefix:
                           description: Prefix is the CIDR prefix to use for the subnet
@@ -409,7 +420,7 @@ spec:
                 type: object
             required:
             - region
-            - subnets
+            - subnetsets
             type: object
           status:
             properties:
