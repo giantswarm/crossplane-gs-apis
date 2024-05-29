@@ -56,6 +56,13 @@ type TagSet struct {
 type VpcId string
 
 type SubnetSetParameters struct {
+	// AppIndex is the index of the application that the subnet is being created for.
+	//
+	// This is used for complex applications that require multiple subnet groupsr
+	// Normally leave this on the default.
+	// +optional
+	// +default=-1
+	AppIndex int `json:"appIndex,omitempty"`
 
 	// Region is the region you'd like the VPC to be created in.
 	// +immutable

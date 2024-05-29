@@ -1,5 +1,6 @@
 _oxr = option("params").oxr
-_ocs = option("params").ocs
+_dxr = option("params").dxr
+_ocs = option("params").ocds
 
 _requestedSets = [
     c.public.count + c.private.count
@@ -26,7 +27,7 @@ _additionalCidrs = [
 
 # The name of the application is used to prefix all resources
 _appName = _claimRef.name if bool(_claimRef) else ""
-_calculatedCidrs = _oxr.status.calculatedCidrs
+_calculatedCidrs = _oxr.status.calculatedCidrs if _oxr.status and _oxr.status.calculatedCidrs else {}
 _claimRef = _oxr.spec.claimRef
 _clusterTags = _oxr.spec.tags.cluster if _oxr.spec.tags.cluster else {}
 _dp = _oxr.spec.deletionPolicy
@@ -39,33 +40,48 @@ _tags = _labels | _oxr.spec.tags.common | {
     region: _region,
 }
 
+# Created checks
+_vpcs = _oxr.status.vpcs if _oxr.status and _oxr.status.vpcs else {}
+_self = _vpcs.self if _vpcs else {}
+
+_peeringConnections = [
+    p.Resource for _, p in _ocs if _ocs and p.Resource.kind == "VPCPeeringConnection"
+]
+_peeringCreated = len(_peeringConnections) == len(_peering)
+
+_ngw = [
+    ngw.Resource for _, ngw in _ocs if _ocs and ngw.Resource.kind == "NATGateway"
+]
+_natgatewaysCreated = len([ngw for ngw in _ngw if ngw]) == len(_zones)
+
 # Separate out created public and private subnets and route tables
 _pubsn = [
-    x.status.subnetIds
+    x.Resource.status.subnets
     for _, x in _ocs
-    if x.kind == "SubnetSet" and x.spec.type == "public"
+    if x.Resource.kind == "SubnetSet" and x.Resource.spec.type == "public" and _ocs
 ]
 _pubrtbls = [
-    x.status.routeTableIds
+    x.Resource.status.routeTables
     for _, x in _ocs
-    if x.kind == "SubnetSet" and x.spec.type == "public"
+    if x.Resource.kind == "SubnetSet" and x.Resource.spec.type == "public" and _ocs
 ]
 _prisn = [
-    x.status.subnetIds
+    x.Resource.status.subnets
     for _, x in _ocs
-    if x.kind == "SubnetSet" and x.spec.type == "private"
+    if x.Resource.kind == "SubnetSet" and x.Resource.spec.type == "private" and _ocs
 ]
 _prirtbls = [
-    x.status.routeTableIds
+    x.Resource.status.routeTables
     for _, x in _ocs
-    if x.kind == "SubnetSet" and x.spec.type == "private"
+    if x.Resource.kind == "SubnetSet" and x.Resource.spec.type == "private" and _ocs
 ]
 
 chunksplit = lambda size: int subnets: [] -> [] {
     # split the subnets array into chunks of size `size`
-    [
+    [] if not subnets or subnets == Undefined else [
         subnets[i:i + size:]
         for i in range(0, len(subnets), size)
+        if subnets != Undefined
     ]
 }
 
@@ -79,46 +95,47 @@ _subnetsets = [
         _subnets = chunksplit(len(_zones), _calculatedCidrs[s.prefix])
         _visibility = "public" if i < s.public.count else "private"
         _index = i if _visibility == "public" else i - s.public.count
-        _snlbtag = {
+        _snlbtag = {Name: "${_appName}-${_visibility}-subnet-${_index}"} | {
             **_clusterTags
-            "kubernetes.io/role/elb": 1
+            "kubernetes.io/role/elb": "1"
         } if _index == s.public.lbSetIndex and _visibility == "public" else {
             **_clusterTags
-            "kubernetes.io/role/internal-elb": 1
+            "kubernetes.io/role/internal-elb": "1"
         } if _index == s.private.lbSetIndex and _visibility == "private" else {}
         apiVersion: "xnetworks.crossplane.giantswarm.io/v1alpha1"
         kind: "SubnetSet"
         metadata: {
-            name: "${_appName}-subnet-${_index}"
+            name: "${_appName}-${_visibility}-subnet-${_index}"
             labels: _labels
         }
         spec: {
+            appIndex: _index
             claimRef: _claimRef
             deletionPolicy: _dp
             region: _region
             providerConfigRef: _pcr
-            subnet: {
+            subnets: {
                 a: {
-                    cidrBlock: _subnets[i][0]
+                    cidrBlock: _subnets[i][0] if len(_subnets) > 0 and len(_subnets[i]) > 0 else ""
                     zone: _zones[0]
                 }
                 b: {
-                    cidrBlock: _subnets[i][1]
+                    cidrBlock: _subnets[i][1] if len(_subnets) > 0 and len(_subnets[i]) > 1 else ""
                     zone: _zones[1]
                 }
                 c: {
-                    cidrBlock: _subnets[i][2]
+                    cidrBlock: _subnets[i][2] if len(_subnets) > 0 and len(_subnets[i]) > 2 else ""
                     zone: _zones[2]
                 }
             }
             type: _visibility
             tags: _tags | _oxr.spec.tags.subnet | _snlbtag
-            vpcId: _oxr.status.id
+            vpcId: _self.id
         }
     }
     for s in _oxr.spec.subnetsets.cidrs
     for i in range(s.public.count + s.private.count)
-    if _oxr.status.vpcs.self.id
+    if _calculatedCidrs and _self and _self.id
 ]
 
 # Create Additional VPC CIDRs
@@ -177,7 +194,8 @@ _eips = [
 # NAT Gateways
 #
 # One NatGateway per availability zone is created and attached
-# to the first public subnet
+# to the first available public subnet set
+_keys = [k for k in _pubsn[0] if len(_pubsn) > 0]
 _natgateways = [
     {
         apiVersion: "ec2.aws.upbound.io/v1beta1"
@@ -194,7 +212,7 @@ _natgateways = [
                     matchLabels: {availabilityZone: az}
                 }
                 region: _region
-                subnetId: _pubsn
+                subnetId: _pubsn[0][_keys[i]]
                 tags: {Name: "${_appName}-${_region}${az}"} | _tags
             }
             _providerConfigRef: _pcr
@@ -203,8 +221,6 @@ _natgateways = [
     for i, az in _zones
     if _pubsn and _eips
 ]
-
-_natgatewaysCreated = len([ngw for ngw in _natgateways if ngw]) == len(_zones)
 
 # Nat Gateway Routes
 #
@@ -215,7 +231,7 @@ _ngwRoutes = [
         kind: "Route"
         metadata: {
             labels: {availabilityZone: az} | _labels
-            name: "${_appName}-${_region}${az}"
+            name: "${_appName}-ngw-${i}-${_region}${az}"
         }
         spec: {
             deletionPolicy: _dp
@@ -245,7 +261,7 @@ _igwRoutes = [
         kind: "Route"
         metadata: {
             labels: {availabilityZone: az} | _labels
-            name: "${_appName}-ngw-${az}"
+            name: "${_appName}-igw-${i}-${_region}${az}"
         }
         spec: {
             deletionPolicy: _dp
@@ -253,7 +269,6 @@ _igwRoutes = [
                 destinationCidrBlock: "0.0.0.0/0"
                 gatewayIdSelector: {
                     matchControllerRef: True
-                    matchLabels: {availabilityZone: az}
                 }
                 region: _region
                 routeTableId: rtbl
@@ -280,23 +295,17 @@ _peering = [
             deletionPolicy: _dp
             forProvider: {
                 autoAccept: True
-                peerVpcId: _oxr.status.vpcs[x.name].remoteVpc
+                peerVpcId: _vpcs[x.name].id
                 region: _region
                 tags: {Name: "${_appName}-${_region}-${x.name}"} | _tags
-                vpcId: _oxr.status.id
+                vpcId: _self.id
             }
             providerConfigRef: _pcr
         }
     }
     for x in _oxr.spec.peering.remoteVpcs
-    if _oxr.spec.peering.enabled and _oxr.status.vpcs.self.id
+    if _vpcs and _self and _vpcs[x.name] and _oxr.spec.peering.enabled and _self.id
 ]
-
-# Used as a check for if the peering connections have been created
-_peeringConnections = [
-    p for p in _ocs if p.kind == "VPCPeeringConnection"
-]
-_peeringCreated = len(_peeringConnections) == len(_peering)
 
 # This is the most complicated part of the setup, adding the peering connections
 # to the route tables
@@ -320,46 +329,48 @@ allowsPublic = lambda vpc: str -> bool {
 
 # First lets build a mapping from our own CIDR blocks to every route table that
 # is not ours
-_rmtTables = [ # public route tables if requested
+_rmtTables = [] if not _vpcs else [ # public route tables if requested
     {id = i, vpcCidr = cidr, selector = name}
-    # iterate available CIDR ranges
-    for cidr in [_oxr.status.vpcs.self.cidr] + _oxr.status.vpcs.self.additionalCidrs
-    # foreach VPC discovered
-    for name, vpc in _oxr.status.vpcs
-    # for each of this compositions route tables
-    for _, i in vpc.publicRouteTables
-    if name != "self" and allowsPublic(name)
+    for name, vpc in _vpcs
+    for cidr in [vpc.cidrBlock] + vpc.additionalCidrBlocks
+    for _, index in vpc.publicRouteTables or []
+    for _, i in index
+    if vpc and "publicRouteTables" in vpc and name != "self" and allowsPublic(name)
 ] + [ # private route tables
     {
         id = i,
-        vpcCidr = _oxr.status.vpcs.self.cidr,
+        vpcCidr = vpc.cidrBlock,
         selector = name
     }
-    for cidr in [_oxr.status.vpcs.self.cidr] + _oxr.status.vpcs.self.additionalCidrs
-    for name, vpc in _oxr.status.vpcs
-    for _, i in vpc.privateRouteTables
-    if name != "self"
+    for name, vpc in _vpcs
+    for cidr in [vpc.cidrBlock] + vpc.additionalCidrBlocks
+    for _, index in vpc.privateRouteTables or []
+    for _, i in index
+    if vpc and "privateRouteTables" in vpc and name != "self"
 ]
 
 # Then map all remote CIDRs to our own route tables
 #
 # This is slightly different to the above as the `allowPublic` flag doesn't
 # need to be discovered for the current VPC (static location)
+_additionalCidrBlocks = _self.additionalCidrBlocks if _self and "additionalCidrBlocks" in _self else []
 _myRouteTables = [
     {
         id = i,
         vpcCidr = cidr,
         selector = name
     }
-    for name, vpc in _oxr.status.vpcs
-    for cidr in [vpc.cidr] + vpc.additionalCidrs
-    for _, i in [
+    for cidr in [_self.cidrBlock] + _additionalCidrBlocks
+    for _, index in [
         r for r in _pubrtbls
-        if _oxr.spec.peering.allowPublic
+        if _oxr.spec.peering.allowPublic and _pubrtbls
     ] + [
         r for r in _prirtbls
+        if _prirtbls
     ]
-    if name != "self"
+    for _, i in index
+    for name, vpc in _vpcs
+    if _vpcs and _self and name != "self"
 ]
 
 # Create the Peering routes
@@ -394,7 +405,7 @@ _peeringRoutes = [
     for i, r in _rmtTables + _myRouteTables
     # only create if peering is enabled and we have a VPC ID and peering
     # connections have been created
-    if _oxr.spec.peering.enabled and _oxr.status.vpcs.self.id and _peeringCreated
+    if _self and _self.id and _oxr.spec.peering.enabled and _peeringCreated
 ]
 
 # Create the list of items to return
@@ -402,6 +413,5 @@ _items = [
     _subnetsets, _acs, _eips, _natgateways,
     _ngwRoutes, _igwRoutes, _peering, _peeringRoutes
 ]
-l = len([i for x in _items for i in x if i])
 # flatten items and exclude any empty elements
 items = [i for x in _items for i in x if i]

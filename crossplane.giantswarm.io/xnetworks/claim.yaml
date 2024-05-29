@@ -37,6 +37,15 @@ spec:
         mask: /28
         count: 3
         lbSetIndex: 2
+    - prefix: '10.18.0.0/23'
+      public:
+        mask: ""
+        count: 0
+        lbSetIndex: 0
+      private:
+        mask: /27
+        count: 3
+        lbSetIndex: 0
     availabilityZones:
     - a
     - b

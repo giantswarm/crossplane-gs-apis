@@ -5,6 +5,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	nd "github.com/giantswarm/crossplane-fn-network-discovery/pkg/composite/v1beta1"
+	fncdr "github.com/mproffitt/function-cidr/input/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -260,20 +261,19 @@ type PeeredVpcNetworkStatus struct {
 	//
 	// +optional
 	// +mapType=atomic
-	CalculatedCidrs map[string][]string `json:"calculatedCidrs,omitempty"`
+	CalculatedCidrs map[string][]string `json:"calculatedCidrs"`
 
 	// Contains the subnet bits output by function-kcl-subnet-bits
 	//
-	// +mapType=atomic
+	// +listType=atomic
 	// +optional
-	// +immutable
-	SubnetBits map[string][]int `json:"subnetBits,omitempty"`
+	SubnetBits []fncdr.MultiPrefix `json:"subnetBits"`
 
 	// Vpcs contains details of both the peered VPCs and the current local VPC
 	// The current VPC can be found at the `self` key
 	//
 	// +optional
-	// +mapType=atomic
+	// +mapType=granular
 	Vpcs map[string]nd.Vpc `json:"vpcs,omitempty"`
 }
 

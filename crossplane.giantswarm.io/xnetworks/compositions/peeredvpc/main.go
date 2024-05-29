@@ -38,13 +38,12 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 
 	// Load the template
 	var (
+		err                  error
 		kclSubnetsTemplate   string
 		kclResourcesTemplate string
 		kclPatchTemplate     string
-		err                  error
+		resources            []xpt.ComposedTemplate = createResources()
 	)
-
-	var resources []xpt.ComposedTemplate = createResources()
 
 	kclSubnetsTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/subnets.k")
 	if err != nil {
@@ -76,6 +75,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					ProviderConfigRef: "spec.providerConfigRef.name",
 					RegionRef:         "spec.region",
 					VpcNameRef:        "spec.peering.remoteVpcs",
+					PatchTo:           "status.vpcs",
 				},
 			},
 		})
@@ -88,7 +88,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 			Object: &xkcl.KCLInput{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: "krm.kcl.dev/v1alpha1",
-					Kind:       "KCLRun",
+					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
 					Source: kclSubnetsTemplate,
@@ -120,7 +120,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 			Object: &xkcl.KCLInput{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: "krm.kcl.dev/v1alpha1",
-					Kind:       "KCLRun",
+					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
 					Source: kclResourcesTemplate,
@@ -136,7 +136,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 			Object: &xkcl.KCLInput{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: "krm.kcl.dev/v1alpha1",
-					Kind:       "KCLRun",
+					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
 					Source: kclPatchTemplate,
@@ -160,6 +160,11 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 				Resources: resources,
 			},
+		})
+
+	c.NewPipelineStep("function-auto-ready").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-auto-ready",
 		})
 }
 

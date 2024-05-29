@@ -5,7 +5,8 @@
 package v1alpha1
 
 import (
-	"github.com/giantswarm/crossplane-fn-network-discovery/pkg/composite/v1beta1"
+	compositev1beta1 "github.com/giantswarm/crossplane-fn-network-discovery/pkg/composite/v1beta1"
+	"github.com/mproffitt/function-cidr/input/v1beta1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -182,23 +183,14 @@ func (in *PeeredVpcNetworkStatus) DeepCopyInto(out *PeeredVpcNetworkStatus) {
 	}
 	if in.SubnetBits != nil {
 		in, out := &in.SubnetBits, &out.SubnetBits
-		*out = make(map[string][]int, len(*in))
-		for key, val := range *in {
-			var outVal []int
-			if val == nil {
-				(*out)[key] = nil
-			} else {
-				inVal := (*in)[key]
-				in, out := &inVal, &outVal
-				*out = make([]int, len(*in))
-				copy(*out, *in)
-			}
-			(*out)[key] = outVal
+		*out = make([]v1beta1.MultiPrefix, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
 	if in.Vpcs != nil {
 		in, out := &in.Vpcs, &out.Vpcs
-		*out = make(map[string]v1beta1.Vpc, len(*in))
+		*out = make(map[string]compositev1beta1.Vpc, len(*in))
 		for key, val := range *in {
 			(*out)[key] = *val.DeepCopy()
 		}
