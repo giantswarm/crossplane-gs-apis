@@ -1,6 +1,6 @@
 _oxr = option("params").oxr
 _ocs = option("params").ocds
-
+_blank = {a: "", aName: "a", b: "", bName: "b", c: "", cName: "c"}
 {
     **_oxr
     **{
@@ -27,7 +27,7 @@ _ocs = option("params").ocds
                 self: {
                     privateRouteTables +=  [
                         {
-                            _i = item.Resource.status.routeTables
+                            _i = item.Resource.status.routeTables or _blank
                             "${_i.aName}": "${_i.a}"
                             "${_i.bName}": "${_i.b}"
                             "${_i.cName}": "${_i.c}"
@@ -35,7 +35,7 @@ _ocs = option("params").ocds
                     ]
                     privateSubnets += [
                         {
-                            _i = item.Resource.status.subnets
+                            _i = item.Resource.status.subnets or _blank
                             "${_i.aName}": "${_i.a}"
                             "${_i.bName}": "${_i.b}"
                             "${_i.cName}": "${_i.c}"
@@ -53,7 +53,7 @@ _ocs = option("params").ocds
                 self: {
                     publicRouteTables +=  [
                         {
-                            _i = item.Resource.status.routeTables
+                            _i = item.Resource.status.routeTables or _blank
                             "${_i.aName}": "${_i.a}"
                             "${_i.bName}": "${_i.b}"
                             "${_i.cName}": "${_i.c}"
@@ -61,7 +61,7 @@ _ocs = option("params").ocds
                     ]
                     publicSubnets += [
                         {
-                            _i = item.Resource.status.subnets
+                            _i = item.Resource.status.subnets or _blank
                             "${_i.aName}": "${_i.a}"
                             "${_i.bName}": "${_i.b}"
                             "${_i.cName}": "${_i.c}"

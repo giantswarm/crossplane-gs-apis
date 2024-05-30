@@ -14,7 +14,7 @@ cb = lambda x: str, s: int, c: int -> [] {
     Create 3 subnet bits for each subnet group requested
 
     :param x: The mask of the subnet
-    :param s: The size of the subnet
+    :param s: The size of the vpc prefix
     :param c: The number of subnets requested
     """
     [m(x) - s for _ in range(_azl) for _ in range(c) if c > 0 and x != ""]
@@ -30,7 +30,7 @@ cb = lambda x: str, s: int, c: int -> [] {
             _x = int(_vpcSize)
 
             prefix = s.prefix
-            offset = s.offset
+            offset = m(s.offset) - _x
             newBits = cb(s.public.mask, _x, s.public.count) + cb(s.private.mask, _x, s.private.count)
         }
         for s in _oxr.spec.subnetsets.cidrs

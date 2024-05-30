@@ -45,7 +45,6 @@ func createDefaultSgControl() xpt.ComposedTemplate {
 				Type:         xpt.PatchTypePatchSet,
 				PatchSetName: strPtr("metadata"),
 			},
-			combineNameRegionPatch("metadata.name", ""),
 		},
 	}
 }

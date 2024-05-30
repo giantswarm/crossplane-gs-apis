@@ -43,7 +43,6 @@ func createInternetGateway() xpt.ComposedTemplate {
 				PatchSetName: strPtr("metadata"),
 			},
 			combineNameRegionPatch("spec.forProvider.tags.Name", "-igw"),
-			combineNameRegionPatch("metadata.name", ""),
 			{
 				Type: xpt.PatchTypeToCompositeFieldPath,
 				Patch: xpt.Patch{

@@ -55,26 +55,27 @@ _ngw = [
 ]
 _natgatewaysCreated = len([ngw for ngw in _ngw if ngw]) == len(_zones)
 
+_blank = {a: "", aName: "a", b: "", bName: "b", c: "", cName: "c"}
 # Separate out created public and private subnets and route tables
 _pubsn = [
-    x.Resource.status.subnets
-    for _, x in _ocs
-    if x.Resource.kind == "SubnetSet" and x.Resource.spec.type == "public" and _ocs
+    x
+    for _, x in _self.publicSubnets or [_blank]
+    if _self and _self.publicSubnets
 ]
 _pubrtbls = [
-    x.Resource.status.routeTables
-    for _, x in _ocs
-    if x.Resource.kind == "SubnetSet" and x.Resource.spec.type == "public" and _ocs
+    x
+    for _, x in _self.publicRouteTables or [_blank]
+    if _self and _self.publicRouteTables
 ]
 _prisn = [
-    x.Resource.status.subnets
-    for _, x in _ocs
-    if x.Resource.kind == "SubnetSet" and x.Resource.spec.type == "private" and _ocs
+    x
+    for _, x in _self.privateSubnets or [_blank]
+    if _self and _self.privateSubnets
 ]
 _prirtbls = [
-    x.Resource.status.routeTables
-    for _, x in _ocs
-    if x.Resource.kind == "SubnetSet" and x.Resource.spec.type == "private" and _ocs
+    x
+    for _, x in _self.privateRouteTables or [_blank]
+    if _self and _self.privateRouteTables
 ]
 
 chunksplit = lambda size: int subnets: [] -> [] {
@@ -111,7 +112,7 @@ _subnetsets = [
         kind: "SubnetSet"
         metadata: {
             annotations: {
-                "krm.kcl.dev/composition-resource-name" = "subnnetset-${_suffix}-${_visibility}-${_index}"
+                "krm.kcl.dev/composition-resource-name" = "subnetset-${_suffix}-${_visibility}-${_index}"
             }
             labels: _labels
         }
@@ -209,8 +210,7 @@ _eips = [
 #
 # One NatGateway per availability zone is created and attached
 # to the first available public subnet set
-#_keys = [k for k in _pubsn[0]] if _pubsn and len(_pubsn) > 0 and len(_pubsn[0]) == len(_zones) else []
-_keys = ['a', 'b', 'c']
+_keys = [k for k in _pubsn[0]] if _pubsn and len(_pubsn) > 0 and len(_pubsn[0]) == len(_zones) else []
 _natgateways = [
     {
         apiVersion: "ec2.aws.upbound.io/v1beta1"
@@ -250,7 +250,7 @@ _ngwRoutes = [
             annotations: {
                 "krm.kcl.dev/composition-resource-name" = "ngw-rt-${i}"
             }
-            labels: {availabilityZone: az} | _labels
+            labels: {availabilityZone: rtbl[0]} | _labels
         }
         spec: {
             deletionPolicy: _dp
@@ -258,16 +258,16 @@ _ngwRoutes = [
                 destinationCidrBlock: "0.0.0.0/0"
                 natGatewayIdSelector: {
                     matchControllerRef: True
-                    matchLabels: {availabilityZone: az}
+                    matchLabels: {availabilityZone: rtbl[0]}
                 }
                 region: _region
-                routeTableId: rtbl
+                routeTableId: rtbl[1]
             }
             providerConfigRef: _pcr
         }
     }
     for i, x in _prirtbls
-    for az, rtbl in x
+    for _, rtbl in zip(_zones, [r for _, r in x])
     if _pubsn and _natgatewaysCreated
 ]
 

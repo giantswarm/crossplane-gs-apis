@@ -55,7 +55,6 @@ func createVpcResource() xpt.ComposedTemplate {
 				Type:         xpt.PatchTypePatchSet,
 				PatchSetName: strPtr("metadata"),
 			},
-			combineNameRegionPatch("metadata.name", ""),
 			{
 				Type: xpt.PatchTypeToCompositeFieldPath,
 				Patch: xpt.Patch{
