@@ -113,15 +113,6 @@ Example:
   - `common` These are tags that should be applied to all resources
   - `subnets` Specific tags to add to the subnets
 
-[`function-network-discovery`]: https://github.com/giantswarm/crossplane-fn-network-discovery
-[`function-cidr`]: https://github.com/mproffitt/function-cidr/
-[`function-kcl`]: https://github.com/crossplane-contrib/function-kcl
-[`function-patch-and-transform`]: https://github.com/crossplane-contrib/function-patch-and-transform
-[`function-auto-ready`]: https://github.com/crossplane-contrib/function-auto-ready
-[`function-go-templating`]: https://github.com/crossplane-contrib/function-go-templating
-[`KCL`]: https://www.kcl-lang.io/
-[`upbound/aws-provider-ec2`]: https://marketplace.upbound.io/providers/upbound/provider-aws-ec2
-
 ## Definition
 
 The definition can be found at [peeredvpcnetwork_types.go](../v1alpha1/peeredvpcnetwork_types.go)
@@ -146,6 +137,8 @@ The composition is made up of 5 main parts:
   Uses [patching.k](../compositions/peeredvpc/templates/patching.k)
 - Static resource creation and patching with `function-patch-and-transform`
   For single resources that contain minimal or no complexity.
+
+SubnetSets are created using the [SubnetSets] composition from [`giantswarm/crossplane-examples`]
 
 For a YAML version of the composition that can be applied to the cluster see
 [peered-vpc-network.yaml](../package/compositions/peered-vpc-network.yaml)
@@ -172,3 +165,14 @@ and executing it which will in turn build any/all compositions as plugins and
 execute them to generate the manifests.
 
 Output from this command is written to the `package` folder.
+
+[`function-network-discovery`]: https://github.com/giantswarm/crossplane-fn-network-discovery
+[`function-cidr`]: https://github.com/mproffitt/function-cidr/
+[`function-kcl`]: https://github.com/crossplane-contrib/function-kcl
+[`function-patch-and-transform`]: https://github.com/crossplane-contrib/function-patch-and-transform
+[`function-auto-ready`]: https://github.com/crossplane-contrib/function-auto-ready
+[`function-go-templating`]: https://github.com/crossplane-contrib/function-go-templating
+[`KCL`]: https://www.kcl-lang.io/
+[`upbound/aws-provider-ec2`]: https://marketplace.upbound.io/providers/upbound/provider-aws-ec2
+[SubnetSets]: https://github.com/giantswarm/crossplane-examples/blob/main/aws-provider/basic-network/xrd/subnet-composition.yaml
+[`giantswarm/crossplane-examples`]: https://github.com/giantswarm/crossplane-examples
