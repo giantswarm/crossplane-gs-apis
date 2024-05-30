@@ -25,8 +25,22 @@ _ocs = option("params").ocds
         "status": {
             vpcs: {
                 self: {
-                    privateRouteTables +=  [item.Resource.status.routeTables]
-                    privateSubnets += [item.Resource.status.subnets]
+                    privateRouteTables +=  [
+                        {
+                            _i = item.Resource.status.routeTables
+                            "${_i.aName}": "${_i.a}"
+                            "${_i.bName}": "${_i.b}"
+                            "${_i.cName}": "${_i.c}"
+                        }
+                    ]
+                    privateSubnets += [
+                        {
+                            _i = item.Resource.status.subnets
+                            "${_i.aName}": "${_i.a}"
+                            "${_i.bName}": "${_i.b}"
+                            "${_i.cName}": "${_i.c}"
+                        }
+                    ]
                 }
             }
         }
@@ -37,8 +51,22 @@ _ocs = option("params").ocds
         "status": {
             vpcs: {
                 self: {
-                    publicRouteTables +=  [item.Resource.status.routeTables]
-                    publicSubnets += [item.Resource.status.subnets]
+                    publicRouteTables +=  [
+                        {
+                            _i = item.Resource.status.routeTables
+                            "${_i.aName}": "${_i.a}"
+                            "${_i.bName}": "${_i.b}"
+                            "${_i.cName}": "${_i.c}"
+                        }
+                    ]
+                    publicSubnets += [
+                        {
+                            _i = item.Resource.status.subnets
+                            "${_i.aName}": "${_i.a}"
+                            "${_i.bName}": "${_i.b}"
+                            "${_i.cName}": "${_i.c}"
+                        }
+                    ]
                 }
             }
         }

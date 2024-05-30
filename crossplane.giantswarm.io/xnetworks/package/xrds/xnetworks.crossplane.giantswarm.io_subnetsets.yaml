@@ -37,7 +37,7 @@ spec:
 
                   This is used for complex applications that require multiple subnet groupsr
                   Normally leave this on the default.
-                type: integer
+                type: string
               deletionPolicy:
                 default: Delete
                 description: |-
@@ -363,13 +363,25 @@ spec:
                     description: RouteTableA is the route table ID for availability
                       zone A.
                     type: string
+                  aName:
+                    description: RouteTableAName is the name of the route table in
+                      availability zone A.
+                    type: string
                   b:
                     description: RouteTableB is the route table ID for availability
                       zone B.
                     type: string
+                  bName:
+                    description: RouteTableBName is the name of the route table in
+                      availability zone B.
+                    type: string
                   c:
                     description: RouteTableC is the route table ID for availability
                       zone C.
+                    type: string
+                  cName:
+                    description: RouteTableCName is the name of the route table in
+                      availability zone C.
                     type: string
                 type: object
                 x-kubernetes-map-type: atomic
@@ -379,11 +391,23 @@ spec:
                   a:
                     description: SubnetA is the subnet ID in availability zone A.
                     type: string
+                  aName:
+                    description: SubnetAName is the name of the subnet in availability
+                      zone A.
+                    type: string
                   b:
                     description: SubnetB is subnet ID in availability zone B.
                     type: string
+                  bName:
+                    description: SubnetBName is the name of the subnet in availability
+                      zone B.
+                    type: string
                   c:
                     description: SubnetC is the subnet ID in availability zone C.
+                    type: string
+                  cName:
+                    description: SubnetCName is the name of the subnet in availability
+                      zone C.
                     type: string
                 type: object
                 x-kubernetes-map-type: atomic

@@ -61,8 +61,8 @@ type SubnetSetParameters struct {
 	// This is used for complex applications that require multiple subnet groupsr
 	// Normally leave this on the default.
 	// +optional
-	// +default=-1
-	AppIndex int `json:"appIndex,omitempty"`
+	// +default=""
+	AppIndex string `json:"appIndex,omitempty"`
 
 	// Region is the region you'd like the VPC to be created in.
 	// +immutable
@@ -101,13 +101,25 @@ type SubnetSetStatusSubnet struct {
 	// +optional
 	SubnetA SubnetStatusId `json:"a,omitempty"`
 
+	// SubnetAName is the name of the subnet in availability zone A.
+	// +optional
+	SubnetAName string `json:"aName,omitempty"`
+
 	// SubnetB is subnet ID in availability zone B.
 	// +optional
 	SubnetB SubnetStatusId `json:"b,omitempty"`
 
+	// SubnetBName is the name of the subnet in availability zone B.
+	// +optional
+	SubnetBName string `json:"bName,omitempty"`
+
 	// SubnetC is the subnet ID in availability zone C.
 	// +optional
 	SubnetC SubnetStatusId `json:"c,omitempty"`
+
+	// SubnetCName is the name of the subnet in availability zone C.
+	// +optional
+	SubnetCName string `json:"cName,omitempty"`
 }
 
 type SubnetSetStatusRouteTable struct {
@@ -116,13 +128,25 @@ type SubnetSetStatusRouteTable struct {
 	// +optional
 	RouteTableA string `json:"a,omitempty"`
 
+	// RouteTableAName is the name of the route table in availability zone A.
+	// +optional
+	RouteTableAName string `json:"aName,omitempty"`
+
 	// RouteTableB is the route table ID for availability zone B.
 	// +optional
 	RouteTableB string `json:"b,omitempty"`
 
+	// RouteTableBName is the name of the route table in availability zone B.
+	// +optional
+	RouteTableBName string `json:"bName,omitempty"`
+
 	// RouteTableC is the route table ID for availability zone C.
 	// +optional
 	RouteTableC string `json:"c,omitempty"`
+
+	// RouteTableCName is the name of the route table in availability zone C.
+	// +optional
+	RouteTableCName string `json:"cName,omitempty"`
 }
 
 type SubnetSetStatus struct {

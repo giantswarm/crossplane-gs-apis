@@ -95,7 +95,11 @@ _subnetsets = [
         _subnets = chunksplit(len(_zones), _calculatedCidrs[s.prefix])
         _visibility = "public" if i < s.public.count else "private"
         _index = i if _visibility == "public" else i - s.public.count
-        _suffix = regex.split(regex.replace(_subnets[i][0], "\.", "-"), "/")[0] + "-" + regex.split(regex.split(_subnets[i][0], "\.")[3], "/")[0]
+
+        # this is needed for tagging the subnet sets independently of each other
+        # it creates a '-' (hyphen) separated copy of the IP address from the first
+        # subnet + the last octet from the last subnet, e.g. 192-168-0-0-255
+        _suffix = regex.split(regex.replace(_subnets[i][0], "\.", "-"), "/")[0] + "-" + regex.split(regex.split(_subnets[i][len(_zones)-1], "\.")[3], "/")[0]
         _snlbtag = {Name: "${_appName}-${_visibility}-subnet-${_index}"} | {
             **_clusterTags
             "kubernetes.io/role/elb": "1"
@@ -132,7 +136,10 @@ _subnetsets = [
                 }
             }
             type: _visibility
-            tags: _tags | _oxr.spec.tags.subnet | _snlbtag
+            tags: {
+                "all": _tags | _oxr.spec.tags.subnet
+                "subnet": _snlbtag
+            }
             vpcId: _self.id
         }
     }
@@ -202,7 +209,8 @@ _eips = [
 #
 # One NatGateway per availability zone is created and attached
 # to the first available public subnet set
-_keys = [k for k in _pubsn[0]] if len(_pubsn) > 0 and len(_pubsn[0]) == len(_zones) else []
+#_keys = [k for k in _pubsn[0]] if _pubsn and len(_pubsn) > 0 and len(_pubsn[0]) == len(_zones) else []
+_keys = ['a', 'b', 'c']
 _natgateways = [
     {
         apiVersion: "ec2.aws.upbound.io/v1beta1"
