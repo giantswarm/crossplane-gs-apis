@@ -121,3 +121,31 @@ Example:
 [`function-go-templating`]: https://github.com/crossplane-contrib/function-go-templating
 [`KCL`]: https://www.kcl-lang.io/
 [`upbound/aws-provider-ec2`]: https://marketplace.upbound.io/providers/upbound/provider-aws-ec2
+
+## Definition
+
+The definition can be found at [peeredvpcnetwork_types.go](../v1alpha1/peeredvpcnetwork_types.go)
+
+For a YAML version of this file that can be applied to a cluster, see
+[peeredvpcnetworks.yaml](../package/xrds/xnetworks.crossplane.giantswarm.io_peeredvpcnetworks.yaml)
+
+## Composition
+
+The `go` code version of the composition can be found at [../compositions/peeredvpc](../compositions/peeredvpc)
+
+The composition is made up of 5 main parts:
+
+- Network discovery. Finds information about any VPCs requested for peering
+- subnet-bits - KCL language script to calculates subnet bits from CIDR masks.
+  Uses [subnets.k](../compositions/peeredvpc/templates/subnets.k)
+- CIDR splitting using [`function-cidr`]
+- Create Resources. A KCL script to create complex and repetative resources.
+  Uses [resources.k](../compositions/peeredvpc/templates/resources.k)
+- Dynamic Patching with KCL for patches that cannot be done with
+  [function-patch-and-transform].
+  Uses [patching.k](../compositions/peeredvpc/templates/patching.k)
+- Static resource creation and patching with `function-patch-and-transform`
+  For single resources that contain minimal or no complexity.
+
+For a YAML version of the composition that can be applied to the cluster see
+[peered-vpc-network.yaml](../package/compositions/peered-vpc-network.yaml)
