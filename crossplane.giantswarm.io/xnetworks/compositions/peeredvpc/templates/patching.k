@@ -1,23 +1,8 @@
 _oxr = option("params").oxr
 _ocs = option("params").ocds
 
-_o = {
+{
     **_oxr
-    **{
-      "status": {
-          vpcs: {
-              self: {
-                  publicRouteTables = []
-                  publicSubnets = []
-                  privateRouteTables = []
-                  privateSubnets = []
-              }
-          }
-      }
-    }
-}
-dxr = {
-    **_o
     **{
         "status": {
             vpcs: {
@@ -27,6 +12,11 @@ dxr = {
                         s.prefix
                         for s in _oxr.spec.subnetsets.cidrs[1:]
                     ]
+                    publicRouteTables = []
+                    publicSubnets = []
+                    privateRouteTables = []
+                    privateSubnets = []
+
                 }
             }
         }
@@ -69,4 +59,3 @@ dxr = {
     for name, item in _ocs if _ocs and item.Resource.kind == "NATGateway"
     }
 }
-items = [dxr]

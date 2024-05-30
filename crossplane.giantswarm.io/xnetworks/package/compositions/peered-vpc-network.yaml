@@ -41,6 +41,8 @@ spec:
           username: ""
         source: |-
           _oxr = option("params").oxr
+          _azl = len(_oxr.spec.subnetsets.availabilityZones)
+
           m = lambda x: str -> int {
               """
               Get the mask as an integer value
@@ -49,30 +51,32 @@ spec:
               int(ip_mask[1]) if len(ip_mask) == 2 else int(ip_mask[0])
           }
 
-          cb = lambda x: str, size: int, c: int -> [] {
+          cb = lambda x: str, s: int, c: int -> [] {
               """
               Create 3 subnet bits for each subnet group requested
+
+              :param x: The mask of the subnet
+              :param s: The size of the subnet
+              :param c: The number of subnets requested
               """
-              [m(x) - size for _ in range(3) for _ in range(c) if c > 0 and x != ""]
+              [m(x) - s for _ in range(_azl) for _ in range(c) if c > 0 and x != ""]
           }
-
-          _nb = [
-              {
-                  _vpcSize = s.prefix.split("/")[1]
-                  _public = s.public.count
-                  _private = s.private.count
-                  _x = int(_vpcSize)
-
-                  prefix = s.prefix
-                  offset = s.offset
-                  newBits = cb(s.public.mask, _x, s.public.count) + cb(s.private.mask, _x, s.private.count)
-              }
-              for s in _oxr.spec.subnetsets.cidrs
-          ]
 
           {
               **_oxr
-              status.subnetBits = _nb
+              status.subnetBits = [
+                  {
+                      _vpcSize = s.prefix.split("/")[1]
+                      _public = s.public.count
+                      _private = s.private.count
+                      _x = int(_vpcSize)
+
+                      prefix = s.prefix
+                      offset = s.offset
+                      newBits = cb(s.public.mask, _x, s.public.count) + cb(s.private.mask, _x, s.private.count)
+                  }
+                  for s in _oxr.spec.subnetsets.cidrs
+              ]
           }
         target: ""
     step: function-kcl-subnet-bits
@@ -100,6 +104,7 @@ spec:
           password: ""
           username: ""
         source: |-
+          import regex
           _oxr = option("params").oxr
           _dxr = option("params").dxr
           _ocs = option("params").ocds
@@ -183,7 +188,6 @@ spec:
               [] if not subnets or subnets == Undefined else [
                   subnets[i:i + size:]
                   for i in range(0, len(subnets), size)
-                  if subnets != Undefined
               ]
           }
 
@@ -197,6 +201,7 @@ spec:
                   _subnets = chunksplit(len(_zones), _calculatedCidrs[s.prefix])
                   _visibility = "public" if i < s.public.count else "private"
                   _index = i if _visibility == "public" else i - s.public.count
+                  _suffix = regex.split(regex.replace(_subnets[i][0], "\.", "-"), "/")[0] + "-" + regex.split(regex.split(_subnets[i][0], "\.")[3], "/")[0]
                   _snlbtag = {Name: "${_appName}-${_visibility}-subnet-${_index}"} | {
                       **_clusterTags
                       "kubernetes.io/role/elb": "1"
@@ -207,11 +212,13 @@ spec:
                   apiVersion: "xnetworks.crossplane.giantswarm.io/v1alpha1"
                   kind: "SubnetSet"
                   metadata: {
-                      name: "${_appName}-${_visibility}-subnet-${_index}"
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name" = "subnnetset-${_suffix}-${_visibility}-${_index}"
+                      }
                       labels: _labels
                   }
                   spec: {
-                      appIndex: _index
+                      appIndex: _suffix
                       claimRef: _claimRef
                       deletionPolicy: _dp
                       region: _region
@@ -249,7 +256,9 @@ spec:
                   kind: "VPCIPv4CidrBlockAssociation"
                   metadata: {
                       labels: _labels
-                      name: "${_appName}-${i}"
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name" = "cidrassoc-${i}"
+                      }
                   }
                   spec: {
                       deletionPolicy: _dp
@@ -274,11 +283,13 @@ spec:
                   apiVersion: "ec2.aws.upbound.io/v1beta1"
                   kind: "EIP"
                   metadata: {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name" = "eip-${i}"
+                      }
                       labels: _labels | {
                           availabilityZone: az
                           utilization: "nat-gateway"
                       }
-                      name: "${_appName}-${_region}${az}-${i}"
                   }
                   spec: {
                       deletionPolicy: _dp
@@ -297,14 +308,16 @@ spec:
           #
           # One NatGateway per availability zone is created and attached
           # to the first available public subnet set
-          _keys = [] if not _pubsn else [k for k in _pubsn[0] if len(_pubsn) > 0]
+          _keys = [k for k in _pubsn[0]] if len(_pubsn) > 0 and len(_pubsn[0]) == len(_zones) else []
           _natgateways = [
               {
                   apiVersion: "ec2.aws.upbound.io/v1beta1"
                   kind: "NATGateway"
                   metadata: {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name" = "ngw-${i}"
+                      }
                       labels: {availabilityZone: az} | _labels
-                      name: "${_appName}-${_region}${az}"
                   }
                   spec: {
                       deletionPolicy: _dp
@@ -332,8 +345,10 @@ spec:
                   apiVersion: "ec2.aws.upbound.io/v1beta1"
                   kind: "Route"
                   metadata: {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name" = "ngw-rt-${i}"
+                      }
                       labels: {availabilityZone: az} | _labels
-                      name: "${_appName}-ngw-${i}-${_region}${az}"
                   }
                   spec: {
                       deletionPolicy: _dp
@@ -362,8 +377,10 @@ spec:
                   apiVersion: "ec2.aws.upbound.io/v1beta1"
                   kind: "Route"
                   metadata: {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name" = "igw-rt-${i}"
+                      }
                       labels: {availabilityZone: az} | _labels
-                      name: "${_appName}-igw-${i}-${_region}${az}"
                   }
                   spec: {
                       deletionPolicy: _dp
@@ -390,8 +407,10 @@ spec:
                   apiVersion: "ec2.aws.upbound.io/v1beta1"
                   kind: "VPCPeeringConnection"
                   metadata: {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name" = "peering-${x.name}"
+                      }
                       labels: _labels | {vpcName: x.name}
-                      name: "${_appName}-${_region}-${x.name}"
                   }
                   spec: {
                       deletionPolicy: _dp
@@ -485,8 +504,10 @@ spec:
                   apiVersion: "ec2.aws.upbound.io/v1beta1"
                   kind: "Route"
                   metadata: {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name" = "peering-rt-${i}"
+                      }
                       labels: _labels
-                      name: "${_appName}-route-${i}"
                   }
                   spec: {
                       deletionPolicy: _dp
@@ -535,23 +556,8 @@ spec:
           _oxr = option("params").oxr
           _ocs = option("params").ocds
 
-          _o = {
+          {
               **_oxr
-              **{
-                "status": {
-                    vpcs: {
-                        self: {
-                            publicRouteTables = []
-                            publicSubnets = []
-                            privateRouteTables = []
-                            privateSubnets = []
-                        }
-                    }
-                }
-              }
-          }
-          dxr = {
-              **_o
               **{
                   "status": {
                       vpcs: {
@@ -561,6 +567,11 @@ spec:
                                   s.prefix
                                   for s in _oxr.spec.subnetsets.cidrs[1:]
                               ]
+                              publicRouteTables = []
+                              publicSubnets = []
+                              privateRouteTables = []
+                              privateSubnets = []
+
                           }
                       }
                   }
@@ -594,16 +605,15 @@ spec:
                   "status":{
                       vpcs: {
                           self: {
-                              natGateways: {
-                                  name = item.Resource.status.atProvider.id
+                              natGateways = {
+                                  name: item.Resource.status.atProvider.id
                               }
                           }
                       }
                   }
-                  for name, item in _ocs if _ocs and item.Resource.kind == "NATGateway"
+              for name, item in _ocs if _ocs and item.Resource.kind == "NATGateway"
               }
           }
-          items = [dxr]
         target: ""
     step: function-kcl-patch-xr
   - functionRef:

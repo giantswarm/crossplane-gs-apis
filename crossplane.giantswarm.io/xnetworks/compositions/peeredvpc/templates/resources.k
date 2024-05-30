@@ -1,3 +1,4 @@
+import regex
 _oxr = option("params").oxr
 _dxr = option("params").dxr
 _ocs = option("params").ocds
@@ -81,7 +82,6 @@ chunksplit = lambda size: int subnets: [] -> [] {
     [] if not subnets or subnets == Undefined else [
         subnets[i:i + size:]
         for i in range(0, len(subnets), size)
-        if subnets != Undefined
     ]
 }
 
@@ -95,6 +95,7 @@ _subnetsets = [
         _subnets = chunksplit(len(_zones), _calculatedCidrs[s.prefix])
         _visibility = "public" if i < s.public.count else "private"
         _index = i if _visibility == "public" else i - s.public.count
+        _suffix = regex.split(regex.replace(_subnets[i][0], "\.", "-"), "/")[0] + "-" + regex.split(regex.split(_subnets[i][0], "\.")[3], "/")[0]
         _snlbtag = {Name: "${_appName}-${_visibility}-subnet-${_index}"} | {
             **_clusterTags
             "kubernetes.io/role/elb": "1"
@@ -105,26 +106,28 @@ _subnetsets = [
         apiVersion: "xnetworks.crossplane.giantswarm.io/v1alpha1"
         kind: "SubnetSet"
         metadata: {
-            name: "${_appName}-${_visibility}-subnet-${_index}"
+            annotations: {
+                "krm.kcl.dev/composition-resource-name" = "subnnetset-${_suffix}-${_visibility}-${_index}"
+            }
             labels: _labels
         }
         spec: {
-            appIndex: _index
+            appIndex: _suffix
             claimRef: _claimRef
             deletionPolicy: _dp
             region: _region
             providerConfigRef: _pcr
             subnets: {
                 a: {
-                    cidrBlock: _subnets[i][0] if len(_subnets) > 0 and len(_subnets[i]) > 0 else ""
+                    cidrBlock: _subnets[i][0]
                     zone: _zones[0]
                 }
                 b: {
-                    cidrBlock: _subnets[i][1] if len(_subnets) > 0 and len(_subnets[i]) > 1 else ""
+                    cidrBlock: _subnets[i][1]
                     zone: _zones[1]
                 }
                 c: {
-                    cidrBlock: _subnets[i][2] if len(_subnets) > 0 and len(_subnets[i]) > 2 else ""
+                    cidrBlock: _subnets[i][2]
                     zone: _zones[2]
                 }
             }
@@ -147,7 +150,9 @@ _acs = [
         kind: "VPCIPv4CidrBlockAssociation"
         metadata: {
             labels: _labels
-            name: "${_appName}-${i}"
+            annotations: {
+                "krm.kcl.dev/composition-resource-name" = "cidrassoc-${i}"
+            }
         }
         spec: {
             deletionPolicy: _dp
@@ -172,11 +177,13 @@ _eips = [
         apiVersion: "ec2.aws.upbound.io/v1beta1"
         kind: "EIP"
         metadata: {
+            annotations: {
+                "krm.kcl.dev/composition-resource-name" = "eip-${i}"
+            }
             labels: _labels | {
                 availabilityZone: az
                 utilization: "nat-gateway"
             }
-            name: "${_appName}-${_region}${az}-${i}"
         }
         spec: {
             deletionPolicy: _dp
@@ -195,14 +202,16 @@ _eips = [
 #
 # One NatGateway per availability zone is created and attached
 # to the first available public subnet set
-_keys = [k for k in _pubsn[0] if len(_pubsn) > 0]
+_keys = [k for k in _pubsn[0]] if len(_pubsn) > 0 and len(_pubsn[0]) == len(_zones) else []
 _natgateways = [
     {
         apiVersion: "ec2.aws.upbound.io/v1beta1"
         kind: "NATGateway"
         metadata: {
+            annotations: {
+                "krm.kcl.dev/composition-resource-name" = "ngw-${i}"
+            }
             labels: {availabilityZone: az} | _labels
-            name: "${_appName}-${_region}${az}"
         }
         spec: {
             deletionPolicy: _dp
@@ -230,8 +239,10 @@ _ngwRoutes = [
         apiVersion: "ec2.aws.upbound.io/v1beta1"
         kind: "Route"
         metadata: {
+            annotations: {
+                "krm.kcl.dev/composition-resource-name" = "ngw-rt-${i}"
+            }
             labels: {availabilityZone: az} | _labels
-            name: "${_appName}-ngw-${i}-${_region}${az}"
         }
         spec: {
             deletionPolicy: _dp
@@ -260,8 +271,10 @@ _igwRoutes = [
         apiVersion: "ec2.aws.upbound.io/v1beta1"
         kind: "Route"
         metadata: {
+            annotations: {
+                "krm.kcl.dev/composition-resource-name" = "igw-rt-${i}"
+            }
             labels: {availabilityZone: az} | _labels
-            name: "${_appName}-igw-${i}-${_region}${az}"
         }
         spec: {
             deletionPolicy: _dp
@@ -288,8 +301,10 @@ _peering = [
         apiVersion: "ec2.aws.upbound.io/v1beta1"
         kind: "VPCPeeringConnection"
         metadata: {
+            annotations: {
+                "krm.kcl.dev/composition-resource-name" = "peering-${x.name}"
+            }
             labels: _labels | {vpcName: x.name}
-            name: "${_appName}-${_region}-${x.name}"
         }
         spec: {
             deletionPolicy: _dp
@@ -383,8 +398,10 @@ _peeringRoutes = [
         apiVersion: "ec2.aws.upbound.io/v1beta1"
         kind: "Route"
         metadata: {
+            annotations: {
+                "krm.kcl.dev/composition-resource-name" = "peering-rt-${i}"
+            }
             labels: _labels
-            name: "${_appName}-route-${i}"
         }
         spec: {
             deletionPolicy: _dp
