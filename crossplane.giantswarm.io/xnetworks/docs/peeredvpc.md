@@ -149,3 +149,26 @@ The composition is made up of 5 main parts:
 
 For a YAML version of the composition that can be applied to the cluster see
 [peered-vpc-network.yaml](../package/compositions/peered-vpc-network.yaml)
+
+## Building
+
+To build the `go` code into consumable YAML, the fork of `crossbuilder` found
+at [mproffitt/crossbuilder](https://github.com/mproffitt/crossbuilder) is
+required.
+
+Clone the crossbuilder repo first and run `docker build . -t xrdtools` inside it
+
+Next, enter the directory [xnetworks](../) and execute the following command
+
+```bash
+docker run -v $(pwd):/crossbuilder/apis:rw xrdtools
+```
+
+You do not need to give a command to docker, just the name of the container.
+
+This will run `go generate ./...` and then build any/all compositions under
+[compositions](../compositions) folder by first compiling the `xrc-gen` command
+and executing it which will in turn build any/all compositions as plugins and
+execute them to generate the manifests.
+
+Output from this command is written to the `package` folder.
