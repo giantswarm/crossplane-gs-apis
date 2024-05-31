@@ -40,7 +40,7 @@ In addition to the crossplane parameters, the claim requires the following:
 - `peering` Details about peering connections that need to be created
   - `allowPublic` Allow peering connections from the public subnets in the local
     vpc. Default `true`
-  - `enabled` Whether to enable or disable peering defdault: `true`
+  - `enabled` Whether to enable or disable peering default: `true`
   - `remoteVpcs` A list of remote VPCs to create peering connections to
     - `name` The name of the VPC
     - `region` The region the VPC is in
@@ -61,7 +61,7 @@ peering:
     allowPublic: false
 ```
 
-- `subnetsets` specify how to slice the VPC Cidr blocks
+- `subnetsets` specify how to slice the VPC CIDR blocks
   - `availabilityZones` a list of single characters identifying the availability
     zones to build the VPC resources in
   - `cidrs` A list of prefixes and details on how to slice them. The first entry
@@ -126,11 +126,11 @@ The `go` code version of the composition can be found at [../compositions/peered
 
 The composition is made up of 5 main parts:
 
-- Network discovery. Finds information about any VPCs requested for peering
-- subnet-bits - KCL language script to calculates subnet bits from CIDR masks.
+- Network discovery. Find information about any VPCs requested for peering
+- subnet-bits - KCL language script to calculate subnet bits from CIDR masks.
   Uses [subnets.k](../compositions/peeredvpc/templates/subnets.k)
 - CIDR splitting using [`function-cidr`]
-- Create Resources. A KCL script to create complex and repetative resources.
+- Create Resources. A KCL script to create complex and repetitive resources.
   Uses [resources.k](../compositions/peeredvpc/templates/resources.k)
 - Dynamic Patching with KCL for patches that cannot be done with
   [function-patch-and-transform].
