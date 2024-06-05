@@ -1,0 +1,293 @@
+package v1alpha1
+
+import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+)
+
+// +kubebuilder:object:root=true
+// +kubebuilder:storageversion
+// +genclient
+// +genclient:nonNamespaced
+//
+// +kubebuilder:resource:scope=Cluster,categories=crossplane
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:shortName=mazdb
+// +crossbuilder:generate:xrd:claimNames:kind=MultiAzClaim,plural=multiazs
+// +crossbuilder:generate:xrd:defaultCompositionRef:name=multi-az-postgresdb
+// +crossbuilder:generate:xrd:enforcedCompositionRef:name=multi-az-postgresdb
+type MultiAzDb struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   MultiAzDbSpec   `json:"spec"`
+	Status MultiAzDbStatus `json:"status,omitempty"`
+}
+
+type MultiAzDbSpec struct {
+	xpv1.ResourceSpec          `json:",inline"`
+	MultiAzDbClusterParameters `json:",inline"`
+}
+
+type MultiAzDbInstance struct {
+	// ApplyImmediately is whether changes should be applied immediately.
+	//
+	// +optional
+	// +nullable
+	ApplyImmediately *bool `json:"applyImmediately"`
+
+	// AutoMinorVersionUpgrade is whether minor version upgrades are applied
+	// automatically.
+	//
+	// +optional
+	// +nullable
+	AutoMinorVersionUpgrade *bool `json:"autoMinorVersionUpgrade"`
+
+	// AvailabilityZone is the availability zone to use.
+	//
+	// +optional
+	// +nullable
+	AvailabilityZone *string `json:"availabilityZone"`
+
+	// ClusterIdentifier is the identifier of the DB cluster.
+	//
+	// +optional
+	ClusterIdentifier string `json:"clusterIdentifier,omitempty"`
+
+	// CopyTagsToSnapshot is whether tags should be copied to snapshots.
+	//
+	// +optional
+	// +default=false
+	CopyTagsToSnapshot bool `json:"copyTagsToSnapshot,omitempty"`
+
+	// DbParameterGroupName is the name of the DB parameter group to associate
+	// with this DB instance.
+	//
+	// +optional
+	DbParameterGroupName string `json:"dbParameterGroupName,omitempty"`
+
+	// DbSubnetGroupName is the name of the DB subnet group to associate with
+	// this DB instance.
+	//
+	// +optional
+	DbSubnetGroupName string `json:"dbSubnetGroupName,omitempty"`
+
+	// InstanceClass is the instance class to use.
+	//
+	// +optional
+	InstanceClass string `json:"instanceClass,omitempty"`
+
+	// MonitoringInterval is the interval, in seconds, between points when
+	// Enhanced Monitoring metrics are collected for the DB instance.
+	//
+	// +optional
+	MonitoringInterval int64 `json:"monitoringInterval,omitempty"`
+
+	// PerformanceInsightsEnabled is whether Performance Insights is enabled.
+	//
+	// +optional
+	// +default=false
+	PerformanceInsightsEnabled bool `json:"performanceInsightsEnabled,omitempty"`
+
+	// PerformanceInsightsKMSKeyID is the AWS KMS key identifier for encryption
+	// of Performance Insights data.
+	//
+	// +optional
+	PerformanceInsightsKMSKeyID string `json:"performanceInsightsKMSKeyID,omitempty"`
+
+	// PerformanceInsightsRetentionPeriod is the amount of time, in days, to
+	// retain Performance Insights data.
+	//
+	// +optional
+	PerformanceInsightsRetentionPeriod int64 `json:"performanceInsightsRetentionPeriod,omitempty"`
+
+	// PromotionTier is the order in which to promote an Aurora replica to the
+	// primary instance.
+	//
+	// +optional
+	PromotionTier int64 `json:"promotionTier,omitempty"`
+
+	// PubliclyAccessible is whether the DB instance is publicly accessible.
+	//
+	// +optional
+	// +default=false
+	PubliclyAccessible bool `json:"publiclyAccessible,omitempty"`
+
+	// PreferredMaintenanceWindow is the preferred maintenance window.
+	//
+	// +optional
+	PreferredMaintenanceWindow string `json:"preferredMaintenanceWindow,omitempty"`
+}
+
+type MultiAzDbClusterParameters struct {
+	// AllocatedStorage is the size of the database.
+	// +optional
+	// +default=10
+	AllocatedStorage int64 `json:"allocatedStorage,omitempty"`
+
+	// AllowMajorVersionUpgrade is whether major version upgrades are allowed.
+	// +optional
+	// +default=false
+	AllowMajorVersionUpgrade bool `json:"allowMajorVersionUpgrade,omitempty"`
+
+	// AutoMinorVersionUpgrade is whether minor version upgrades are applied automatically.
+	// +optional
+	// +default=true
+	AutoMinorVersionUpgrade bool `json:"autoMinorVersionUpgrade,omitempty"`
+
+	// ApplyImmediately is whether changes should be applied immediately.
+	// +optional
+	// +default=false
+	ApplyImmediately bool `json:"applyImmediately,omitempty"`
+
+	// AvailabilityZones is a list of availability zone to use.
+	// +optional
+	AvailabilityZones []string `json:"availabilityZones,omitempty"`
+
+	// BackupRetentionPeriod is the number of days to retain backups for.
+	// +optional
+	// +default=0
+	BackupRetentionPeriod int64 `json:"backupRetentionPeriod,omitempty"`
+
+	// BacktrackWindow is the target backtrack window, in seconds.
+	// Only available for Aurora engine. To disable backtracking, set this value to 0.
+	// +optional
+	// +default=0
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Maximum=259200
+	BacktrackWindow int64 `json:"backtrackWindow,omitempty"`
+
+	// DbClusterInstanceClass is the instance class to use.
+	// +optional
+	// +default="db.t3.small"
+	DbClusterInstanceClass string `json:"dbClusterInstanceClass,omitempty"`
+
+	// DbClusterParameterGroupName is the name of the DB cluster parameter group to associate with this DB cluster.
+	// +optional
+	DbClusterParameterGroupName string `json:"dbClusterParameterGroupName,omitempty"`
+
+	// DbInstanceParameterGroupName is the name of the DB parameter group to associate with this DB instance.
+	// This is only valid in combination with `allowMajorVersionUpgrade=true`
+	// +optional
+	DbInstanceParameterGroupName string `json:"dbInstanceParameterGroupName,omitempty"`
+
+	// DbSubnetGroupName is the name of the DB subnet group to associate with this DB cluster.
+	// +optional
+	DbSubnetGroupName string `json:"dbSubnetGroupName,omitempty"`
+
+	// DeleteAutomatedBackups is whether automated backups should be deleted.
+	// +optional
+	// +default=false
+	DeleteAutomatedBackups bool `json:"deleteAutomatedBackups,omitempty"`
+
+	// DeletionProtection is whether deletion protection is enabled.
+	// +optional
+	// +default=false
+	DeletionProtection bool `json:"deletionProtection,omitempty"`
+
+	// Domain is the domain to use.
+	// +optional
+	Domain string `json:"domain,omitempty"`
+
+	// DomainIAMRoleName is the name of the IAM role to use.
+	// +optional
+	DomainIAMRoleName string `json:"domainIAMRoleName,omitempty"`
+
+	// EnableGlobalWriteForwarding is whether global write forwarding is enabled.
+	// +optional
+	// +default=false
+	EnableGlobalWriteForwarding bool `json:"enableGlobalWriteForwarding,omitempty"`
+
+	// EnableHttpEndpoint is whether the HTTP endpoint is enabled.
+	// +optional
+	// +default=false
+	EnableHttpEndpoint bool `json:"enableHttpEndpoint,omitempty"`
+
+	// EnableLocalWriteForwarding is whether local write forwarding is enabled.
+	// +optional
+	// +default=false
+	EnableLocalWriteForwarding bool `json:"enableLocalWriteForwarding,omitempty"`
+
+	// EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Logs.
+	// +optional
+	EnabledCloudwatchLogsExports []string `json:"enabledCloudwatchLogsExports,omitempty"`
+
+	// Engine is the database engine to use.
+	// +required
+	Engine string `json:"engine,omitempty"`
+
+	// EngineMode is the database engine mode to use.
+	// +optional
+	// +default="provisioned"
+	// +kubebuilder:validation:Enum=parallelquery;provisioned;serverless
+	EngineMode string `json:"engineMode,omitempty"`
+
+	// EngineVersion is the version of the database engine to use.
+	// +required
+	EngineVersion string `json:"version,omitempty"`
+
+	// GlobalClusterIdentifier is the global cluster identifier for an Aurora global database.
+	// +optional
+	GlobalClusterIdentifier string `json:"globalClusterIdentifier,omitempty"`
+
+	// IAMDatabaseAuthenticationEnabled is whether IAM database authentication is enabled.
+	// +optional
+	// +default=false
+	IAMDatabaseAuthenticationEnabled bool `json:"iamDatabaseAuthenticationEnabled,omitempty"`
+
+	// Iops is the amount of provisioned IOPS.
+	// +optional
+	Iops int64 `json:"iops,omitempty"`
+
+	// Instances is a list of instances to create.
+	Instances []MultiAzDbInstance `json:"instances,omitempty"`
+
+	// MasterUsername is the master username to use.
+	// +required
+	MasterUsername string `json:"masterUsername,omitempty"`
+
+	// PreferredBackupWindow is the preferred backup window.
+	// +optional
+	PreferredBackupWindow string `json:"preferredBackupWindow,omitempty"`
+
+	// PreferredMaintenanceWindow is the preferred maintenance window.
+	// +optional
+	PreferredMaintenanceWindow string `json:"preferredMaintenanceWindow,omitempty"`
+
+	// Region is the region to use.
+	// +required
+	Region string `json:"region,omitempty"`
+
+	// ReplicationSourceIdentifier ARN of a source DB cluster or DB instance if
+	// this DB cluster is to be created as a Read Replica
+	// +optional
+	ReplicationSourceIdentifier string `json:"replicationSourceIdentifier,omitempty"`
+
+	// StorageType specifies the storage type to be associated with the cluster
+	// +optional
+	StorageType string `json:"storageType,omitempty"`
+}
+
+type MultiAzDbStatus struct {
+	xpv1.ConditionedStatus `json:",inline"`
+
+	// KmsKeyID is the ID of the KMS key.
+	// +optional
+	KmsKeyID string `json:"kmsKeyID,omitempty"`
+
+	// port is the port of the database.
+	// +optional
+	Port int64 `json:"port,omitempty"`
+
+	// VpcSecurityGroupIds A list of VPC security group IDs for the cluster
+	// +optional
+	VpcSecurityGroupIds []string `json:"vpcSecurityGroupIds,omitempty"`
+}
+
+// +kubebuilder:object:root=true
+type MultiAzDbList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []MultiAzDb `json:"items"`
+}
