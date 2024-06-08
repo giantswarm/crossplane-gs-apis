@@ -381,9 +381,6 @@ spec:
                   x-kubernetes-map-type: atomic
                 type: array
                 x-kubernetes-list-type: atomic
-              providerConfig:
-                description: The provider config used to look up this VPC
-                type: string
               publicRouteTables:
                 description: A map of public route tables defined in this VPC
                 items:

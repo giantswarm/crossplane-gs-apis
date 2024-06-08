@@ -340,6 +340,7 @@ _cloudwatchLogGroups = [
                 retentionInDays: get(item, "spec.cloudwatchLogGroupParameters.retentionInDays", 0),
                 kmsKeyId: get(_oxr, "status.kmsKeyId", None),
                 skipDestroy: get(item, "spec.cloudwatchLogGroupParameters.skipDestroy", False),
+                region: _region,
                 tags: _tags | get(item, "spec.tags", {})
             }
         }
@@ -367,7 +368,7 @@ _clusterActivityStream = [
                 tags: _tags
             }
         }
-    }
+    } if get(_oxr, "spec.activityStream.enabled", False) else {}
 ]
 
 _secretRotation = [
@@ -393,7 +394,7 @@ _secretRotation = [
                 },
             }
         }
-    }
+    } if get(_oxr, "spec.secretRotation.enabled", False) else {}
 ]
 
 _items = [

@@ -45,66 +45,67 @@ type MultiAzDbStatus struct {
 	// AccountId is the account ID of the DB cluster.
 	//
 	// +optional
-	AccountId string `json:"accountId,omitempty"`
+	AccountId *string `json:"accountId,omitempty"`
 
 	// ClusterIdentifier is the identifier of the DB cluster.
 	//
 	// +optional
-	ClusterIdentifier string `json:"clusterIdentifier,omitempty"`
+	ClusterIdentifier *string `json:"clusterIdentifier,omitempty"`
 
 	// ClusterArn is the ARN of the DB cluster.
 	//
 	// +optional
-	ClusterArn string `json:"clusterArn,omitempty"`
+	ClusterArn *string `json:"clusterArn,omitempty"`
 
 	// DbParameterGroupName is the name of the DB parameter group to associate
 	// with this DB instance.
 	//
 	// +optional
-	DbParameterGroupName string `json:"dbParameterGroupName,omitempty"`
+	DbParameterGroupName *string `json:"dbParameterGroupName,omitempty"`
 
 	// DbSubnetGroupName is the name of the DB subnet group to associate with
 	// this DB instance.
 	//
 	// +optional
-	DbSubnetGroupName string `json:"dbSubnetGroupName,omitempty"`
+	DbSubnetGroupName *string `json:"dbSubnetGroupName,omitempty"`
 
 	// Endpoint is the endpoint of the DB cluster.
 	//
 	// +optional
-	Endpoint string `json:"endpoint,omitempty"`
+	Endpoint *string `json:"endpoint,omitempty"`
 
 	// KmsKeyID is the ID of the KMS key.
 	//
 	// +optional
-	KmsKeyID string `json:"kmsKeyID,omitempty"`
+	KmsKeyID *string `json:"kmsKeyID,omitempty"`
 
 	// MonitoringRoleArn is the ARN of the monitoring role.
 	//
 	// +optional
-	MonitoringRoleArn string `json:"monitoringRoleArn,omitempty"`
+	MonitoringRoleArn *string `json:"monitoringRoleArn,omitempty"`
 
 	// port is the port of the database.
 	//
 	// +optional
-	Port int64 `json:"port,omitempty"`
+	Port *int64 `json:"port,omitempty"`
 
 	// SecurityGroupIds A list of VPC security group IDs for the cluster
 	//
 	// +optional
-	SecurityGroupIds []string `json:"securityGroupIds,omitempty"`
+	// +listType=set
+	SecurityGroupIds []*string `json:"securityGroupIds,omitempty"`
 }
 
 type MultiAzDbRole struct {
 	// FeatureName is the name of the feature.
 	//
 	// +optional
-	FeatureName string `json:"featureName,omitempty"`
+	FeatureName *string `json:"featureName,omitempty"`
 
 	// RoleArn is the ARN of the role.
 	//
 	// +optional
-	RoleArn string `json:"roleArn,omitempty"`
+	RoleArn *string `json:"roleArn,omitempty"`
 }
 
 type ActivityStream struct {
@@ -112,21 +113,21 @@ type ActivityStream struct {
 	//
 	// +optional
 	// +default=false
-	Enabled bool `json:"enabled,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
 
 	// EngineNativeAuditFieldsIncluded is whether engine native audit fields are
 	// included. This option only applies to Oracle databases.
 	//
 	// +optional
 	// +default=false
-	EngineNativeAuditFieldsIncluded bool `json:"engineNativeAuditFieldsIncluded,omitempty"`
+	EngineNativeAuditFieldsIncluded *bool `json:"engineNativeAuditFieldsIncluded,omitempty"`
 
 	// Mode is the mode of the activity stream. Valid values are `sync` and `async`.
 	//
 	// +optional
 	// +default="sync"
 	// +kubebuilder:validation:Enum=sync;async
-	Mode string `json:"mode,omitempty"`
+	Mode *string `json:"mode,omitempty"`
 }
 
 type Autoscaling struct {
@@ -134,52 +135,52 @@ type Autoscaling struct {
 	//
 	// +optional
 	// +default=false
-	Enabled bool `json:"enabled,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
 
 	// MaxCapacity is the maximum capacity for autoscaling.
 	//
 	// +optional
 	// +default=2
-	MaxCapacity int64 `json:"maxCapacity,omitempty"`
+	MaxCapacity *int64 `json:"maxCapacity,omitempty"`
 
 	// MinCapacity is the minimum capacity for autoscaling.
 	//
 	// +optional
 	// +default=0
-	MinCapacity int64 `json:"minCapacity,omitempty"`
+	MinCapacity *int64 `json:"minCapacity,omitempty"`
 
 	// MetricType is the type of metric to use for autoscaling.
 	//
 	// +optional
 	// +default="RDSReaderAverageCPUUtilization"
 	// +kubebuilder:validation:Enum=RDSReaderAverageCPUUtilization;RDSReaderAverageDatabaseConnections
-	MetricType string `json:"metricType,omitempty"`
+	MetricType *string `json:"metricType,omitempty"`
 
 	// PolicyName is the name of the autoscaling policy.
 	//
 	// +optional
 	// +default="target-metric"
-	PolicyName string `json:"policyName,omitempty"`
+	PolicyName *string `json:"policyName,omitempty"`
 
 	// ScaleInCooldown is the amount of time, in seconds, after a scaling in
 	// activity completes before another scaling activity can start.
 	//
 	// +optional
 	// +default=300
-	ScaleInCooldown int64 `json:"scaleInCooldown,omitempty"`
+	ScaleInCooldown *int64 `json:"scaleInCooldown,omitempty"`
 
 	// ScaleOutCooldown is the amount of time, in seconds, after a scaling out
 	// activity completes before another scaling activity can start.
 	//
 	// +optional
 	// +default=300
-	ScaleOutCooldown int64 `json:"scaleOutCooldown,omitempty"`
+	ScaleOutCooldown *int64 `json:"scaleOutCooldown,omitempty"`
 
 	// TargetCPU is CPU threshold which will initiate autoscaling.
 	//
 	// +optional
 	// +default=70
-	TargetCPU int64 `json:"targetCPU,omitempty"`
+	TargetCPU *int64 `json:"targetCPU,omitempty"`
 
 	// TargetConnections is the average number of connections threshold which
 	// will initiate autoscaling. Default value is 70% of db.r4/r5/r6g.large's
@@ -187,7 +188,7 @@ type Autoscaling struct {
 	//
 	// +optional
 	// +default=700
-	TargetConnections int64 `json:"targetConnections,omitempty"`
+	TargetConnections *int64 `json:"targetConnections,omitempty"`
 }
 
 type CloudwatchLogGroup struct {
@@ -196,25 +197,25 @@ type CloudwatchLogGroup struct {
 	//
 	// +optional
 	// +kube:validation:Enum=STANDARD;INFREQUENT_ACCESS
-	Class string `json:"class,omitempty"`
+	Class *string `json:"class,omitempty"`
 
 	// Create is whether the log group is to be created.
 	//
 	// +optional
 	// +default=false
-	Create bool `json:"create,omitempty"`
+	Create *bool `json:"create,omitempty"`
 
 	// RetentionInDays is the number of days to retain logs for.
 	//
 	// +optional
 	// +default=0
-	RetentionInDays int64 `json:"retentionInDays,omitempty"`
+	RetentionInDays *int64 `json:"retentionInDays,omitempty"`
 
 	// SkipDestroy is whether the log group should be skipped during destroy.
 	//
 	// +optional
 	// +default=false
-	SkipDestroy bool `json:"skipDestroy,omitempty"`
+	SkipDestroy *bool `json:"skipDestroy,omitempty"`
 }
 
 type ClusterInstance struct {
@@ -314,7 +315,7 @@ type ClusterInstance struct {
 	// +optional
 	// +nullable
 	// +kubebuilder:validation:MaxProperties=50
-	Tags map[string]string `json:"tags,omitempty"`
+	Tags map[string]*string `json:"tags,omitempty"`
 }
 
 type ClusterParameterGroup struct {
@@ -325,89 +326,89 @@ type ClusterParameterGroup struct {
 	// +optional
 	// +default="immediate"
 	// +kubebuilder:validation:Enum=immediate;pending-reboot
-	ApplyMethod string `json:"applyMethod,omitempty"`
+	ApplyMethod *string `json:"applyMethod,omitempty"`
 
 	// Description is the description of the parameter group.
 	//
 	// +optional
-	Description string `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
 
 	// Create is whether the parameter group is to be created.
 	//
 	// +optional
 	// +default=false
-	Create bool `json:"create,omitempty"`
+	Create *bool `json:"create,omitempty"`
 
 	// Family is the family of the parameter group.
 	//
 	// +optional
-	Family string `json:"family,omitempty"`
+	Family *string `json:"family,omitempty"`
 
 	// Name is the name of the parameter group.
 	//
 	// +optional
-	Name string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 
 	// Parameters is a list of parameters to associate with the parameter group.
 	// Note that parameters may differ between families
 	//
 	// +optional
-	Parameters []Parameter `json:"parameters,omitempty"`
+	Parameters []*Parameter `json:"parameters,omitempty"`
 
 	// Tags is a set of tags to associate with the parameter group.
 	//
 	// +optional
 	// +kubebuilder:mapType=granular
 	// +kubebuilder:validation:MaxProperties=50
-	Tags map[string]string `json:"tags,omitempty"`
+	Tags map[string]*string `json:"tags,omitempty"`
 }
 
 type ClusterParameters struct {
 	// ActivityStream is the activity stream configuration.
 	//
 	// +optional
-	ActivityStream ActivityStream `json:"activityStream,omitempty"`
+	ActivityStream *ActivityStream `json:"activityStream,omitempty"`
 
 	// AllocatedStorage is the size of the database.
 	//
 	// +optional
 	// +default=10
-	AllocatedStorage int64 `json:"allocatedStorage,omitempty"`
+	AllocatedStorage *int64 `json:"allocatedStorage,omitempty"`
 
 	// AllowMajorVersionUpgrade is whether major version upgrades are allowed.
 	//
 	// +optional
 	// +default=false
-	AllowMajorVersionUpgrade bool `json:"allowMajorVersionUpgrade,omitempty"`
+	AllowMajorVersionUpgrade *bool `json:"allowMajorVersionUpgrade,omitempty"`
 
 	// ApplyImmediately is whether changes should be applied immediately.
 	//
 	// +optional
 	// +default=false
-	ApplyImmediately bool `json:"applyImmediately,omitempty"`
+	ApplyImmediately *bool `json:"applyImmediately,omitempty"`
 
 	// AutoMinorVersionUpgrade is whether minor version upgrades are applied
 	// automatically. This value can be overridden on a per instance basis.
 	//
 	// +optional
 	// +default=true
-	AutoMinorVersionUpgrade bool `json:"autoMinorVersionUpgrade,omitempty"`
+	AutoMinorVersionUpgrade *bool `json:"autoMinorVersionUpgrade,omitempty"`
 
 	// Autoscaling is the autoscaling configuration.
 	//
 	// +optional
-	Autoscaling Autoscaling `json:"autoscaling,omitempty"`
+	Autoscaling *Autoscaling `json:"autoscaling,omitempty"`
 
 	// AvailabilityZones is a list of availability zone to use.
 	//
 	// +optional
-	AvailabilityZones []string `json:"availabilityZones,omitempty"`
+	AvailabilityZones []*string `json:"availabilityZones,omitempty"`
 
 	// BackupRetentionPeriod is the number of days to retain backups for.
 	//
 	// +optional
 	// +default=0
-	BackupRetentionPeriod int64 `json:"backupRetentionPeriod,omitempty"`
+	BackupRetentionPeriod *int64 `json:"backupRetentionPeriod,omitempty"`
 
 	// BacktrackWindow is the target backtrack window, in seconds.
 	// Only available for Aurora engine. To disable backtracking, set this value to 0.
@@ -416,212 +417,212 @@ type ClusterParameters struct {
 	// +default=0
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=259200
-	BacktrackWindow int64 `json:"backtrackWindow,omitempty"`
+	BacktrackWindow *int64 `json:"backtrackWindow,omitempty"`
 
 	// CidrBlocks is a list of CIDRs that are allowed to connect to the DB.
 	//
 	// +required
-	CidrBlocks []string `json:"cidrBlocks"`
+	CidrBlocks []*string `json:"cidrBlocks"`
 
 	// CopyTagsToSnapshot is whether tags should be copied to snapshots.
 	//
 	// +optional
 	// +default=false
-	CopyTagsToSnapshot bool `json:"copyTagsToSnapshot,omitempty"`
+	CopyTagsToSnapshot *bool `json:"copyTagsToSnapshot,omitempty"`
 
 	// DbClusterInstanceClass is the instance class to use.
 	//
 	// +optional
 	// +default="db.t3.medium"
-	DbClusterInstanceClass string `json:"dbClusterInstanceClass,omitempty"`
+	DbClusterInstanceClass *string `json:"dbClusterInstanceClass,omitempty"`
 
 	// DbClusterParameterGroup defines the parameters for the DB cluster.
 	//
 	// +required
-	DbClusterParameterGroup ClusterParameterGroup `json:"dbClusterParameterGroup"`
+	DbClusterParameterGroup *ClusterParameterGroup `json:"dbClusterParameterGroup"`
 
 	// DbParameterGroup defines the parameters for the DB instance.
 	//
 	// +optional
-	DbParameterGroup DbParameterGroup `json:"dbParameterGroup,omitempty"`
+	DbParameterGroup *DbParameterGroup `json:"dbParameterGroup,omitempty"`
 
 	// DbSubnetGroupName is the name of the DB subnet group to associate with this DB cluster.
 	//
 	// +optional
-	DbSubnetGroupName string `json:"dbSubnetGroupName,omitempty"`
+	DbSubnetGroupName *string `json:"dbSubnetGroupName,omitempty"`
 
 	// DeleteAutomatedBackups is whether automated backups should be deleted.
 	//
 	// +optional
 	// +default=false
-	DeleteAutomatedBackups bool `json:"deleteAutomatedBackups,omitempty"`
+	DeleteAutomatedBackups *bool `json:"deleteAutomatedBackups,omitempty"`
 
 	// DeletionProtection is whether deletion protection is enabled.
 	//
 	// +optional
 	// +default=false
-	DeletionProtection bool `json:"deletionProtection,omitempty"`
+	DeletionProtection *bool `json:"deletionProtection,omitempty"`
 
 	// Domain is the domain to use.
 	//
 	// +optional
-	Domain string `json:"domain,omitempty"`
+	Domain *string `json:"domain,omitempty"`
 
 	// DomainIAMRoleName is the name of the IAM role to use.
 	//
 	// +optional
-	DomainIAMRoleName string `json:"domainIAMRoleName,omitempty"`
+	DomainIAMRoleName *string `json:"domainIAMRoleName,omitempty"`
 
 	// EnableGlobalWriteForwarding is whether global write forwarding is enabled.
 	//
 	// +optional
 	// +default=false
-	EnableGlobalWriteForwarding bool `json:"enableGlobalWriteForwarding,omitempty"`
+	EnableGlobalWriteForwarding *bool `json:"enableGlobalWriteForwarding,omitempty"`
 
 	// EnableHttpEndpoint is whether the HTTP endpoint is enabled.
 	//
 	// +optional
 	// +default=false
-	EnableHttpEndpoint bool `json:"enableHttpEndpoint,omitempty"`
+	EnableHttpEndpoint *bool `json:"enableHttpEndpoint,omitempty"`
 
 	// EnableLocalWriteForwarding is whether local write forwarding is enabled.
 	//
 	// +optional
 	// +default=false
-	EnableLocalWriteForwarding bool `json:"enableLocalWriteForwarding,omitempty"`
+	EnableLocalWriteForwarding *bool `json:"enableLocalWriteForwarding,omitempty"`
 
 	// EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Logs.
 	//
 	// +optional
-	EnabledCloudwatchLogsExports []LogGroup `json:"enabledCloudwatchLogsExports,omitempty"`
+	EnabledCloudwatchLogsExports []*LogGroup `json:"enabledCloudwatchLogsExports,omitempty"`
 
 	// EnhancedMonitoring is the enhanced monitoring configuration.
 	//
 	// +optional
-	EnhancedMonitoring EnhancedMonitoring `json:"enhancedMonitoring,omitempty"`
+	EnhancedMonitoring *EnhancedMonitoring `json:"enhancedMonitoring,omitempty"`
 
 	// Endpoints is a list of custom endpoints to create.
 	//
 	// +optional
-	Endpoints []Endpoint `json:"endpoints,omitempty"`
+	Endpoints []*Endpoint `json:"endpoints,omitempty"`
 
 	// Engine is the database engine to use.
 	//
 	// +required
-	Engine string `json:"engine,omitempty"`
+	Engine *string `json:"engine,omitempty"`
 
 	// EngineMode is the database engine mode to use.
 	//
 	// +optional
 	// +default="provisioned"
 	// +kubebuilder:validation:Enum=parallelquery;provisioned;serverless
-	EngineMode string `json:"engineMode,omitempty"`
+	EngineMode *string `json:"engineMode,omitempty"`
 
 	// EngineVersion is the version of the database engine to use.
 	//
 	// +required
-	EngineVersion string `json:"version,omitempty"`
+	EngineVersion *string `json:"version,omitempty"`
 
 	// GlobalClusterIdentifier is the global cluster identifier for an Aurora global database.
 	//
 	// +optional
-	GlobalClusterIdentifier string `json:"globalClusterIdentifier,omitempty"`
+	GlobalClusterIdentifier *string `json:"globalClusterIdentifier,omitempty"`
 
 	// IAMDatabaseAuthenticationEnabled is whether IAM database authentication is enabled.
 	//
 	// +optional
 	// +default=false
-	IAMDatabaseAuthenticationEnabled bool `json:"iamDatabaseAuthenticationEnabled,omitempty"`
+	IAMDatabaseAuthenticationEnabled *bool `json:"iamDatabaseAuthenticationEnabled,omitempty"`
 
 	// IamRoles is a list of IAM roles to associate with the DB cluster.
 	//
 	// +optional
-	IamRoles []MultiAzDbRole `json:"iamRoles,omitempty"`
+	IamRoles []*MultiAzDbRole `json:"iamRoles,omitempty"`
 
 	// Iops is the amount of provisioned IOPS.
 	//
 	// +optional
 	// +default=0
-	Iops int64 `json:"iops,omitempty"`
+	Iops *int64 `json:"iops,omitempty"`
 
 	// Instances is a list of instances to create.
 	//
 	// +required
 	// +kubebuilder:validation:MinItems=1
-	Instances []ClusterInstance `json:"instances,omitempty"`
+	Instances []*ClusterInstance `json:"instances,omitempty"`
 
 	// InstanceClass is the instance class to use.
 	//
 	// +optional
-	InstanceClass string `json:"instanceClass,omitempty"`
+	InstanceClass *string `json:"instanceClass,omitempty"`
 
 	// CloudwatchLogGroup defines the parameters for the log groups
 	//
 	// +optional
-	CloudwatchLogGroupParameters CloudwatchLogGroup `json:"cloudwatchLogGroupParameters,omitempty"`
+	CloudwatchLogGroupParameters *CloudwatchLogGroup `json:"cloudwatchLogGroupParameters,omitempty"`
 
 	// MasterUsername is the master username to use.
 	//
 	// +required
-	MasterUsername string `json:"masterUsername,omitempty"`
+	MasterUsername *string `json:"masterUsername,omitempty"`
 
 	// MultiAZ is whether the DB instance is a Multi-AZ deployment.
 	//
 	// +optional
 	// +default=false
-	MultiAZ bool `json:"multiAZ,omitempty"`
+	MultiAZ *bool `json:"multiAZ,omitempty"`
 
 	// PerformanceInsightsEnabled is whether Performance Insights is enabled.
 	//
 	// +optional
-	PerformanceInsightsEnabled bool `json:"performanceInsightsEnabled,omitempty"`
+	PerformanceInsightsEnabled *bool `json:"performanceInsightsEnabled,omitempty"`
 
 	// PerformanceInsightsKMSKeyID is the AWS KMS key identifier for encryption of Performance Insights data.
 	//
 	// +optional
-	PerformanceInsightsKMSKeyID string `json:"performanceInsightsKMSKeyID,omitempty"`
+	PerformanceInsightsKMSKeyID *string `json:"performanceInsightsKMSKeyID,omitempty"`
 
 	// PerformanceInsightsRetentionPeriod is the amount of time, in days, to retain Performance Insights data.
 	//
 	// +optional
-	PerformanceInsightsRetentionPeriod int64 `json:"performanceInsightsRetentionPeriod,omitempty"`
+	PerformanceInsightsRetentionPeriod *int64 `json:"performanceInsightsRetentionPeriod,omitempty"`
 
 	// PreferredBackupWindow is the preferred backup window.
 	//
 	// +optional
-	PreferredBackupWindow string `json:"preferredBackupWindow,omitempty"`
+	PreferredBackupWindow *string `json:"preferredBackupWindow,omitempty"`
 
 	// PreferredMaintenanceWindow is the preferred maintenance window.
 	//
 	// +optional
-	PreferredMaintenanceWindow string `json:"preferredMaintenanceWindow,omitempty"`
+	PreferredMaintenanceWindow *string `json:"preferredMaintenanceWindow,omitempty"`
 
 	// PubliclyAccessible is whether the DB instance is publicly accessible.
 	//
 	// +optional
 	// +default=false
-	PubliclyAccessible bool `json:"publiclyAccessible,omitempty"`
+	PubliclyAccessible *bool `json:"publiclyAccessible,omitempty"`
 
 	// Region is the region to use.
 	//
 	// +required
-	Region string `json:"region,omitempty"`
+	Region *string `json:"region,omitempty"`
 
 	// ReplicationSourceIdentifier ARN of a source DB cluster or DB instance if
 	// this DB cluster is to be created as a Read Replica
 	//
 	// +optional
-	ReplicationSourceIdentifier string `json:"replicationSourceIdentifier,omitempty"`
+	ReplicationSourceIdentifier *string `json:"replicationSourceIdentifier,omitempty"`
 
 	// SecretRotation is the secret rotation configuration.
 	//
 	// +optional
-	SecretRotation SecretRotation `json:"secretRotation,omitempty"`
+	SecretRotation *SecretRotation `json:"secretRotation,omitempty"`
 
 	// StorageType specifies the storage type to be associated with the cluster
 	//
 	// +optional
-	StorageType string `json:"storageType,omitempty"`
+	StorageType *string `json:"storageType,omitempty"`
 }
 
 type Endpoint struct {
@@ -630,25 +631,25 @@ type Endpoint struct {
 	// +optional
 	// +kubebuilder:validation:Enum=READER;ANY
 	// +default=ANY
-	CustomEndpointType string `json:"customEndpointType,omitempty"`
+	CustomEndpointType *string `json:"customEndpointType,omitempty"`
 
 	// ExcludedMembers is a list of DB instances that aren't part of the custom
 	// endpoint group.
 	//
 	// +optional
-	ExcludedMembers []string `json:"excludedMembers,omitempty"`
+	ExcludedMembers []*string `json:"excludedMembers,omitempty"`
 
 	// StaticMembers is a list of DB instances that are part of the custom
 	// endpoint group.
 	//
 	// +optional
-	StaticMembers []string `json:"staticMembers,omitempty"`
+	StaticMembers []*string `json:"staticMembers,omitempty"`
 
 	// Tags is a set of tags to associate with the custom endpoint.
 	//
 	// +optional
 	// +kubebuilder:validation:MaxProperties=50
-	Tags map[string]string `json:"tags,omitempty"`
+	Tags map[string]*string `json:"tags,omitempty"`
 }
 
 type EnhancedMonitoring struct {
@@ -656,79 +657,79 @@ type EnhancedMonitoring struct {
 	// Description is the description of the monitoring role.
 	//
 	// +optional
-	Description string `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
 
 	// Enabled is whether enhanced monitoring is enabled.
 	//
 	// +optional
 	// +default=false
-	Enabled bool `json:"enabled,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
 
 	// ForceDetachPolicies Whether to force detaching any policies the monitoring role has before destroying it
 	//
 	// +optional
 	// +default=false
-	ForceDetachPolicies bool `json:"forceDetachPolicies,omitempty"`
+	ForceDetachPolicies *bool `json:"forceDetachPolicies,omitempty"`
 
 	// ManagedPolicyArns is a list of ARNs for managed policies to attach to the monitoring role.
 	//
 	// +optional
-	ManagedPolicyArns []string `json:"managedPolicyArns,omitempty"`
+	ManagedPolicyArns []*string `json:"managedPolicyArns,omitempty"`
 
 	// PermissionsBoundary is the ARN of the policy that is used to set the permissions boundary for the monitoring role.
 	//
 	// +optional
-	PermissionsBoundary string `json:"permissionsBoundary,omitempty"`
+	PermissionsBoundary *string `json:"permissionsBoundary,omitempty"`
 
 	// MaxSessionDuration is the maximum session duration (in seconds) that you want to set for the monitoring role.
 	//
 	// +optional
-	MaxSessionDuration int64 `json:"maxSessionDuration,omitempty"`
+	MaxSessionDuration *int64 `json:"maxSessionDuration,omitempty"`
 
 	// MonitoringInterval is the interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance.
 	//
 	// +optional
-	MonitoringInterval int64 `json:"monitoringInterval,omitempty"`
+	MonitoringInterval *int64 `json:"monitoringInterval,omitempty"`
 
 	// Path is the path of the monitoring role.
 	//
 	// +optional
-	Path string `json:"path,omitempty"`
+	Path *string `json:"path,omitempty"`
 }
 
 type DbParameterGroup struct {
 	// Description is the description of the parameter group.
 	//
 	// +optional
-	Description string `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
 
 	// Create is whether the parameter group is created.
 	//
 	// +optional
 	// +default=false
-	Create bool `json:"create,omitempty"`
+	Create *bool `json:"create,omitempty"`
 
 	// Family is the family of the parameter group.
 	//
 	// +optional
-	Family string `json:"family,omitempty"`
+	Family *string `json:"family,omitempty"`
 
 	// Name is the name of the parameter group.
 	//
 	// +required
-	Name string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 
 	// Parameters is a list of parameters to associate with the parameter group.
 	// Note that parameters may differ between families
 	//
 	// +optional
-	Parameters []Parameter `json:"parameters,omitempty"`
+	Parameters []*Parameter `json:"parameters,omitempty"`
 
 	// Tags is a set of tags to associate with the parameter group.
 	//
 	// +optional
 	// +kubebuilder:validation:MaxProperties=50
-	Tags map[string]string `json:"tags,omitempty"`
+	Tags map[string]*string `json:"tags,omitempty"`
 }
 
 // LogGroup is the name of a log group.
@@ -747,22 +748,22 @@ type SecretRotation struct {
 	//
 	// +optional
 	// +default=false
-	Enabled bool `json:"enabled,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
 
 	// AutomaticallyAfterDays is the number of days after which the secret is
 	// rotated automatically.
 	//
 	// +optional
-	AutomaticallyAfterDays int64 `json:"automaticallyAfterDays,omitempty"`
+	AutomaticallyAfterDays *int64 `json:"automaticallyAfterDays,omitempty"`
 
 	// RotateImmediately is whether the secret should be rotated immediately.
 	//
 	// +optional
 	// +default=true
-	RotateImmediately bool `json:"rotateImmediately,omitempty"`
+	RotateImmediately *bool `json:"rotateImmediately,omitempty"`
 
 	// ScheduleExpression is the schedule expression for secret rotation.
 	//
 	// +optional
-	ScheduleExpression string `json:"scheduleExpression,omitempty"`
+	ScheduleExpression *string `json:"scheduleExpression,omitempty"`
 }
