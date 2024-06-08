@@ -41,7 +41,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		err                  error
 	)
 
-	kclResourcesTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/resources.k")
+	kclResourcesTemplate, err = build.LoadTemplate("compositions/multiaz-postgres/templates/resources.k")
 	if err != nil {
 		panic(err)
 	}
