@@ -8,9 +8,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func createPostgresClusterResource() xpt.ComposedTemplate {
+func createClusterResource() xpt.ComposedTemplate {
 	return xpt.ComposedTemplate{
-		Name: "rds-postgres-cluster",
+		Name: "rds-cluster",
 		Base: &runtime.RawExtension{
 			Object: &rdsv1beta1.Cluster{
 				TypeMeta: metav1.TypeMeta{
@@ -37,7 +37,7 @@ func createPostgresClusterResource() xpt.ComposedTemplate {
 			cb.FromPatch("spec.backtrackWindow", "spec.forProvider.backtrackWindow"),
 			cb.FromPatch("spec.clusterMembers", "spec.forProvider.clusterMembers"),
 			cb.FromPatch("spec.dbClusterInstanceClass", "spec.forProvider.dbClusterInstanceClass"),
-			cb.FromPatch("spec.dbClusterParameterGroupName", "spec.forProvider.dbClusterParameterGroupName"),
+			cb.FromPatch("spec.dbClusterParameterGroup.name", "spec.forProvider.dbClusterParameterGroupName"),
 			cb.FromPatch("spec.dbInstanceParameterGroupName", "spec.forProvider.dbInstanceParameterGroupName"),
 			cb.FromPatch("spec.dbSubnetGroupName", "spec.forProvider.dbSubnetGroupName"),
 			cb.FromPatch("spec.deleteAutomatedBackups", "spec.forProvider.deleteAutomatedBackups"),
@@ -56,7 +56,6 @@ func createPostgresClusterResource() xpt.ComposedTemplate {
 			cb.FromPatch("spec.iops", "spec.forProvider.iops"),
 			cb.FromPatch("status.kmsKeyID", "spec.forProvider.kmsKeyID"),
 			cb.FromPatch("spec.masterUsername", "spec.forProvider.masterUsername"),
-			cb.FromPatch("status.port", "spec.forProvider.port"),
 			cb.FromPatch("spec.preferredBackupWindow", "spec.forProvider.preferredBackupWindow"),
 			cb.FromPatch("spec.preferredMaintenanceWindow", "spec.forProvider.preferredMaintenanceWindow"),
 			cb.FromPatch("spec.region", "spec.forProvider.region"),
@@ -76,12 +75,18 @@ func createPostgresClusterResource() xpt.ComposedTemplate {
 				Type:         xpt.PatchTypePatchSet,
 				PatchSetName: cb.StrPtr("metadata"),
 			},
+
 			combineNameRegionPatch("spec.forProvider.tags.Name", ""),
 			cb.FromPatch("spec.claimRef.name", "spec.forProvider.tags.Name"),
 			cb.FromPatchMergeObjects("spec.tags.rds", "spec.forProvider.tags"),
 			cb.FromPatchMergeObjects("spec.tags.common", "spec.forProvider.tags"),
 			combineNameRegionPatch("spec.writeConnectionSecretToRef.name", "-rds"),
 			cb.FromPatch("spec.claimRef.namespace", "spec.writeConnectionSecretToRef.namespace"),
+
+			cb.ToPatch("status.clusterIdentifier", "status.atProvider.clusterIdentifier"),
+			cb.ToPatch("status.clusterArn", "status.atProvider.arn"),
+			cb.ToPatch("status.endpoint", "status.atProvider.endpoint"),
+			cb.ToPatch("status.port", "status.atProvider.port"),
 
 			// The following will come from KCL
 			//

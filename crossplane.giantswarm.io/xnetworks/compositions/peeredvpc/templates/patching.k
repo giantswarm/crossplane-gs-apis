@@ -84,6 +84,6 @@ _blank = {a: "", aName: "a", b: "", bName: "b", c: "", cName: "c"}
                 }
             }
         }
-    for name, item in _ocs if _ocs and item.Resource.kind == "NATGateway"
+        for name, item in _ocs if _ocs and item.Resource.kind == "NATGateway"
     }
 }

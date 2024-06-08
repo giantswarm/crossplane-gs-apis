@@ -23,5 +23,5 @@ var (
 )
 
 func init() {
-	SchemeBuilder.Register(&MultiAzDb{}, &MultiAzDbList{})
+	SchemeBuilder.Register(&MultiAzDbCluster{}, &MultiAzDbList{})
 }

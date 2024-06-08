@@ -59,10 +59,9 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 func createResources() []xpt.ComposedTemplate {
 	return []xpt.ComposedTemplate{
 		createSubnetGroup(),
-		createPostgresClusterResource(),
+		createClusterResource(),
 		createKmsResource(),
 		createSecurityGroup(),
-		createCidrsSecurityGroupRule(),
 	}
 }
 
