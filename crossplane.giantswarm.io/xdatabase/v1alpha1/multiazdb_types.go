@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 )
@@ -902,3 +903,14 @@ type ServerlessV2ScalingConfiguration struct {
 	// +optional
 	MinCapacity *int64 `json:"minCapacity,omitempty"`
 }
+
+// Repository type metadata.
+var (
+	MultiAzDbClusterKind      = "MultiAzDbCluster"
+	MultiAzDbClusterGroupKind = schema.GroupKind{
+		Group: XRDGroup,
+		Kind:  MultiAzDbClusterKind,
+	}.String()
+	MultiAzDbClusterKindAPIVersion   = MultiAzDbClusterKind + "." + GroupVersion.String()
+	MultiAzDbClusterGroupVersionKind = GroupVersion.WithKind(MultiAzDbClusterKind)
+)
