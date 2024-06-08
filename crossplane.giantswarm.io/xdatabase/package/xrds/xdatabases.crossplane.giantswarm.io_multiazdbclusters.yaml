@@ -495,7 +495,6 @@ spec:
                       nullable: true
                       type: object
                   type: object
-                minItems: 1
                 type: array
               iops:
                 description: Iops is the amount of provisioned IOPS.

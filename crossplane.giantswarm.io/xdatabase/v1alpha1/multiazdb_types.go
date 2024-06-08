@@ -547,8 +547,7 @@ type ClusterParameters struct {
 
 	// Instances is a list of instances to create.
 	//
-	// +required
-	// +kubebuilder:validation:MinItems=1
+	// +optional
 	Instances []*ClusterInstance `json:"instances,omitempty"`
 
 	// InstanceClass is the instance class to use.
