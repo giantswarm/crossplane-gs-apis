@@ -21,16 +21,36 @@ _monitoringRoleArn = get(_oxr, "status.monitoringRoleArn", None)
 _dbSubnetGroupName = get(_oxr, "status.dbSubnetGroupName", None)
 _region = get(_oxr, "spec.region", "eu-central-1")
 
-_accountId = get(_oxr, "status.accountId", "")
+_partition = get(_oxr, "spec.partition", "aws")
 _labels = {}
 _tags = {}
 
-_ipgn = get(_oxr, "spec.dbParameterGroup.name", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else ""
+_ipgn = get(_oxr, "spec.dbParameterGroup.name", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else None
+
+_restoreToPointInTime = {
+    sourceDbClusterIdentifier = get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
+    restoreType = get(_oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
+} | {
+    restoreToTime = get(_oxr, "spec.restoreToPointInTime.restoreToTime", None),
+} if get(_oxr, "spec.restoreToPointInTime.restoreToTime", False) else {
+    useLatestRestorableTime = get(_oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True),
+}
+
+_serverless = get(_oxr, "spec.engineMode", "provisioned") == "serverless"
+_provisioned = get(_oxr, "spec.engineMode", "provisioned") == "provisioned"
+
+_scalingConfiguration = get(_oxr, "spec.scalingConfiguration", None) if _serverless else None
+_serverlessv2scaling = get(_oxr, "spec.serverlessv2scalingConfiguration", None) if _provisioned else None
+_s3import = get(_oxr, "spec.s3Import", None)
 
 _cluster = _dcds["rds-cluster"].Resource | {
     spec = {
         forProvider = {
             dbInstanceParameterGroupName = _ipgn,
+            restoreToPointInTime: _restoreToPointInTime if get(_oxr, "spec.restoreToPointInTime", False) else {},
+            s3import: [_s3import] if _s3import != None else None,
+            scalingConfiguration: [_scalingConfiguration] if _scalingConfiguration != None else None,
+            serverlessv2ScalingConfiguration: [_serverlessv2scaling] if _serverlessv2scaling != None else None,
         }
     }
 }
@@ -175,7 +195,7 @@ _monitoringRole = [
         }
         spec: {
             forProvider: {
-                policyArn: "arn:${_accountId}:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole",
+                policyArn: "arn:${_partition}:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole",
                 role: "rds-monitoring-role",
                 tags: _tags
             }
@@ -398,7 +418,7 @@ _secretRotation = [
 ]
 
 _items = [
-    _cluster, _instances, _endpoints, _iam_roles, _monitoringRole,
+    [_cluster], _instances, _endpoints, _iam_roles, _monitoringRole,
     _autoscaling, _securityGroupRules, _clusterParameterGroup,
     _dbParameterGroup, _cloudwatchLogGroups, _clusterActivityStream,
     _secretRotation,

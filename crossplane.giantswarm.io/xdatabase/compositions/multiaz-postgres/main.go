@@ -6,6 +6,7 @@ import (
 	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 
 	xgt "github.com/crossplane-contrib/function-go-templating/input/v1beta1"
+	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 	xpt "github.com/crossplane-contrib/function-patch-and-transform/input/v1beta1"
 
 	xapiextv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
@@ -35,8 +36,32 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		})
 
 	var (
-		resources []xpt.ComposedTemplate = createResources()
+		resources            []xpt.ComposedTemplate = createResources()
+		kclResourcesTemplate string
+		err                  error
 	)
+
+	kclResourcesTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/resources.k")
+	if err != nil {
+		panic(err)
+	}
+
+	c.NewPipelineStep("function-kcl-create-resources").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: kclResourcesTemplate,
+				},
+			},
+		})
+
 	c.NewPipelineStep("patch-and-transform").
 		WithFunctionRef(xapiextv1.FunctionReference{
 			Name: "function-patch-and-transform",

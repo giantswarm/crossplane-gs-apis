@@ -534,6 +534,13 @@ spec:
               multiAZ:
                 description: MultiAZ is whether the DB instance is a Multi-AZ deployment.
                 type: boolean
+              partition:
+                description: Partition is the AWS partition to use.
+                enum:
+                - aws
+                - aws-cn
+                - aws-us-gov
+                type: string
               performanceInsightsEnabled:
                 description: PerformanceInsightsEnabled is whether Performance Insights
                   is enabled.
@@ -682,6 +689,73 @@ spec:
                   ReplicationSourceIdentifier ARN of a source DB cluster or DB instance if
                   this DB cluster is to be created as a Read Replica
                 type: string
+              restoreToPointInTime:
+                description: RestoreToPointInTime is the point in time to restore
+                  to.
+                properties:
+                  restoreToTime:
+                    description: RestoreToTime is the time to restore to.
+                    format: date-time
+                    type: string
+                  restoreType:
+                    description: RestoreType is the type of restore to perform.
+                    enum:
+                    - full-copy
+                    - copy-on-write
+                    type: string
+                  sourceDbClusterIdentifier:
+                    description: SourceDbClusterIdentifier is the identifier of the
+                      source DB cluster.
+                    type: string
+                  useLatestRestorableTime:
+                    description: UseLatestRestorableTime is whether to use the latest
+                      restorable time.
+                    type: boolean
+                type: object
+              s3Import:
+                description: S3Import is the S3 import configuration.
+                properties:
+                  bucketName:
+                    description: BucketName is the name of the S3 bucket.
+                    type: string
+                  bucketPrefix:
+                    description: |-
+                      BucketPrefix is the prefix of the S3 bucket. Can be blank but is the path
+                      within the bucket where the data is located.
+                    type: string
+                  ingestionRole:
+                    description: IngestionRole is the role to use for ingestion.
+                    type: string
+                  sourceEngine:
+                    description: SourceEngine is the source engine to use.
+                    type: string
+                  sourceEngineVersion:
+                    description: SourceEngineVersion is the source engine version
+                      to use.
+                    type: string
+                type: object
+              scalingConfiguration:
+                description: ScalingConfiguration is the scaling configuration.
+                properties:
+                  autoPause:
+                    description: AutoPause is whether the database should automatically
+                      pause.
+                    type: boolean
+                  maxCapacity:
+                    description: MaxCapacity is the maximum capacity for the database.
+                    format: int64
+                    type: integer
+                  minCapacity:
+                    description: MinCapacity is the minimum capacity for the database.
+                    format: int64
+                    type: integer
+                  secondsUntilAutoPause:
+                    description: |-
+                      SecondsUntilAutoPause is the number of seconds until the database
+                      automatically pauses.
+                    format: int64
+                    type: integer
+                type: object
               secretRotation:
                 description: SecretRotation is the secret rotation configuration.
                 properties:
@@ -703,13 +777,41 @@ spec:
                       secret rotation.
                     type: string
                 type: object
+              serverlessV2ScalingConfiguration:
+                description: ServerlessV2ScalingConfiguration is the serverless v2
+                  scaling configuration.
+                properties:
+                  maxCapacity:
+                    description: MaxCapacity is the maximum capacity for the database.
+                    format: int64
+                    type: integer
+                  minCapacity:
+                    description: MinCapacity is the minimum capacity for the database.
+                    format: int64
+                    type: integer
+                type: object
               storageType:
                 description: StorageType specifies the storage type to be associated
                   with the cluster
                 type: string
+              subnetIds:
+                description: SubnetIds is a list of subnet IDs to use for the subnet
+                  group.
+                items:
+                  type: string
+                type: array
+              tags:
+                additionalProperties:
+                  type: string
+                description: Tags is a set of tags to associate with the DB cluster.
+                maxProperties: 50
+                type: object
               version:
                 description: EngineVersion is the version of the database engine to
                   use.
+                type: string
+              vpcId:
+                description: VpcId is the VPC ID to use.
                 type: string
               writeConnectionSecretToRef:
                 description: |-
@@ -735,6 +837,8 @@ spec:
             required:
             - cidrBlocks
             - dbClusterParameterGroup
+            - subnetIds
+            - vpcId
             type: object
           status:
             description: Defines the status of a RDS cluster

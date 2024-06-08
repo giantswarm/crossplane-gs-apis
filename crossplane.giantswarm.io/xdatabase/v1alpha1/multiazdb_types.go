@@ -433,7 +433,7 @@ type ClusterParameters struct {
 	// DbClusterInstanceClass is the instance class to use.
 	//
 	// +optional
-	// +default="db.t3.medium"
+	// +default="db.t4g.medium"
 	DbClusterInstanceClass *string `json:"dbClusterInstanceClass,omitempty"`
 
 	// DbClusterParameterGroup defines the parameters for the DB cluster.
@@ -572,6 +572,13 @@ type ClusterParameters struct {
 	// +default=false
 	MultiAZ *bool `json:"multiAZ,omitempty"`
 
+	// Partition is the AWS partition to use.
+	//
+	// +optional
+	// +default="aws"
+	// +kubebuilder:validation:Enum=aws;aws-cn;aws-us-gov
+	Partition *string `json:"partition,omitempty"`
+
 	// PerformanceInsightsEnabled is whether Performance Insights is enabled.
 	//
 	// +optional
@@ -614,15 +621,51 @@ type ClusterParameters struct {
 	// +optional
 	ReplicationSourceIdentifier *string `json:"replicationSourceIdentifier,omitempty"`
 
+	// RestoreToPointInTime is the point in time to restore to.
+	//
+	// +optional
+	RestoreToPointInTime *RestoreToPointInTime `json:"restoreToPointInTime,omitempty"`
+
+	// S3Import is the S3 import configuration.
+	//
+	// +optional
+	S3Import *S3Import `json:"s3Import,omitempty"`
+
+	// ScalingConfiguration is the scaling configuration.
+	//
+	// +optional
+	ScalingConfiguration *ScalingConfiguration `json:"scalingConfiguration,omitempty"`
+
 	// SecretRotation is the secret rotation configuration.
 	//
 	// +optional
 	SecretRotation *SecretRotation `json:"secretRotation,omitempty"`
 
+	// ServerlessV2ScalingConfiguration is the serverless v2 scaling configuration.
+	//
+	// +optional
+	ServerlessV2ScalingConfiguration *ServerlessV2ScalingConfiguration `json:"serverlessV2ScalingConfiguration,omitempty"`
+
 	// StorageType specifies the storage type to be associated with the cluster
 	//
 	// +optional
 	StorageType *string `json:"storageType,omitempty"`
+
+	// SubnetIds is a list of subnet IDs to use for the subnet group.
+	//
+	// +required
+	SubnetIds []*string `json:"subnetIds"`
+
+	// Tags is a set of tags to associate with the DB cluster.
+	//
+	// +optional
+	// +kubebuilder:validation:MaxProperties=50
+	Tags map[string]*string `json:"tags,omitempty"`
+
+	// VpcId is the VPC ID to use.
+	//
+	// +required
+	VpcId *string `json:"vpcId"`
 }
 
 type Endpoint struct {
@@ -743,6 +786,62 @@ type LogGroup string
 // +kubebuilder:validation:Pattern=^[a-zA-Z0-9_]*$
 type Parameter string
 
+// RestoreToPointInTime is the point in time to restore to.
+type RestoreToPointInTime struct {
+	// RestoreToTime is the time to restore to.
+	//
+	// +optional
+	RestoreToTime *metav1.Time `json:"restoreToTime,omitempty"`
+
+	// UseLatestRestorableTime is whether to use the latest restorable time.
+	//
+	// +optional
+	// +default=false
+	UseLatestRestorableTime *bool `json:"useLatestRestorableTime,omitempty"`
+
+	// RestoreType is the type of restore to perform.
+	//
+	// +optional
+	// +default="full-copy"
+	// +kubebuilder:validation:Enum=full-copy;copy-on-write
+	RestoreType *string `json:"restoreType,omitempty"`
+
+	// SourceDbClusterIdentifier is the identifier of the source DB cluster.
+	//
+	// +optional
+	SourceDbClusterIdentifier *string `json:"sourceDbClusterIdentifier,omitempty"`
+}
+
+// S3Import is the S3 import configuration.
+type S3Import struct {
+	// BucketName is the name of the S3 bucket.
+	//
+	// +optional
+	BucketName *string `json:"bucketName,omitempty"`
+
+	// BucketPrefix is the prefix of the S3 bucket. Can be blank but is the path
+	// within the bucket where the data is located.
+	//
+	// +optional
+	BucketPrefix *string `json:"bucketPrefix,omitempty"`
+
+	// IngestionRole is the role to use for ingestion.
+	//
+	// +optional
+	IngestionRole *string `json:"ingestionRole,omitempty"`
+
+	// SourceEngine is the source engine to use.
+	//
+	// +optional
+	SourceEngine *string `json:"sourceEngine,omitempty"`
+
+	// SourceEngineVersion is the source engine version to use.
+	//
+	// +optional
+	SourceEngineVersion *string `json:"sourceEngineVersion,omitempty"`
+}
+
+// SecretRotation is the secret rotation configuration.
 type SecretRotation struct {
 	// Enabled is whether secret rotation is enabled.
 	//
@@ -766,4 +865,41 @@ type SecretRotation struct {
 	//
 	// +optional
 	ScheduleExpression *string `json:"scheduleExpression,omitempty"`
+}
+
+// ScalingConfiguration is the scaling configuration for serverless databases.
+type ScalingConfiguration struct {
+	// AutoPause is whether the database should automatically pause.
+	//
+	// +optional
+	AutoPause *bool `json:"autoPause,omitempty"`
+
+	// MaxCapacity is the maximum capacity for the database.
+	//
+	// +optional
+	MaxCapacity *int64 `json:"maxCapacity,omitempty"`
+
+	// MinCapacity is the minimum capacity for the database.
+	//
+	// +optional
+	MinCapacity *int64 `json:"minCapacity,omitempty"`
+
+	// SecondsUntilAutoPause is the number of seconds until the database
+	// automatically pauses.
+	//
+	// +optional
+	SecondsUntilAutoPause *int64 `json:"secondsUntilAutoPause,omitempty"`
+}
+
+// ServerlessV2ScalingConfiguration is the scaling configuration for serverless databases.
+type ServerlessV2ScalingConfiguration struct {
+	// MaxCapacity is the maximum capacity for the database.
+	//
+	// +optional
+	MaxCapacity *int64 `json:"maxCapacity,omitempty"`
+
+	// MinCapacity is the minimum capacity for the database.
+	//
+	// +optional
+	MinCapacity *int64 `json:"minCapacity,omitempty"`
 }

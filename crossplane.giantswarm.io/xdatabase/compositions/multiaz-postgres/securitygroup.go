@@ -25,20 +25,8 @@ func createSecurityGroup() xpt.ComposedTemplate {
 			},
 		},
 		Patches: []xpt.ComposedPatch{
-			{
-				Type: xpt.PatchTypeFromCompositeFieldPath,
-				Patch: xpt.Patch{
-					FromFieldPath: cb.StrPtr("spec.vpcId"),
-					ToFieldPath:   cb.StrPtr("spec.forProvider.vpcId"),
-				},
-			},
-			{
-				Type: xpt.PatchTypeFromCompositeFieldPath,
-				Patch: xpt.Patch{
-					FromFieldPath: cb.StrPtr("spec.region"),
-					ToFieldPath:   cb.StrPtr("spec.forProvider.region"),
-				},
-			},
+			cb.FromPatch("spec.vpcId", "spec.forProvider.vpcId"),
+			cb.FromPatch("spec.region", "spec.forProvider.region"),
 			{
 				Type:         xpt.PatchTypePatchSet,
 				PatchSetName: cb.StrPtr("commontags"),

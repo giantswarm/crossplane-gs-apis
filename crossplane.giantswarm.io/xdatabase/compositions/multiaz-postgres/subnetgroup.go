@@ -23,20 +23,8 @@ func createSubnetGroup() xpt.ComposedTemplate {
 			},
 		},
 		Patches: []xpt.ComposedPatch{
-			{
-				Type: xpt.PatchTypeFromCompositeFieldPath,
-				Patch: xpt.Patch{
-					FromFieldPath: cb.StrPtr("spec.region"),
-					ToFieldPath:   cb.StrPtr("spec.forProvider.region"),
-				},
-			},
-			{
-				Type: xpt.PatchTypeFromCompositeFieldPath,
-				Patch: xpt.Patch{
-					FromFieldPath: cb.StrPtr("spec.subnetIds"),
-					ToFieldPath:   cb.StrPtr("spec.forProvider.subnetIds"),
-				},
-			},
+			cb.FromPatch("spec.region", "spec.forProvider.region"),
+			cb.FromPatch("spec.subnetIds", "spec.forProvider.subnetIds"),
 			{
 				Type:         xpt.PatchTypePatchSet,
 				PatchSetName: cb.StrPtr("commontags"),
@@ -45,20 +33,7 @@ func createSubnetGroup() xpt.ComposedTemplate {
 				Type:         xpt.PatchTypePatchSet,
 				PatchSetName: cb.StrPtr("metadata"),
 			},
-			{
-				Type: xpt.PatchTypeToCompositeFieldPath,
-				Patch: xpt.Patch{
-					ToFieldPath:   cb.StrPtr("status.dbSubnetGroupName"),
-					FromFieldPath: cb.StrPtr("status.atProvider.id"),
-				},
-			},
-			{
-				Type: xpt.PatchTypeFromCompositeFieldPath,
-				Patch: xpt.Patch{
-					FromFieldPath: cb.StrPtr("spec.subnetIds"),
-					ToFieldPath:   cb.StrPtr("spec.forProvider.subnetIds"),
-				},
-			},
+			cb.ToPatch("status.dbSubnetGroupName", "status.atProvider.id"),
 			{
 				Type: xpt.PatchTypeCombineFromComposite,
 				Patch: xpt.Patch{
