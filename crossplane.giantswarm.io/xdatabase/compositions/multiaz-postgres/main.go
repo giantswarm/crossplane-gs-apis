@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xdatabase/v1alpha1"
+	"crossbuilder/v1alpha1"
 
 	xgt "github.com/crossplane-contrib/function-go-templating/input/v1beta1"
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
@@ -27,7 +27,7 @@ func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 }
 
 func (b *builder) Build(c build.CompositionSkeleton) {
-	c.WithName("multi-az-postgresdb").
+	c.WithName("rds-cluster").
 		WithMode(xapiextv1.CompositionModePipeline).
 		WithLabels(map[string]string{
 			"provider":  "aws",
@@ -36,9 +36,10 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		})
 
 	var (
-		resources            []xpt.ComposedTemplate = createResources()
-		kclResourcesTemplate string
-		err                  error
+		resources               []xpt.ComposedTemplate = createResources()
+		kclPatchClusterTemplate string
+		kclResourcesTemplate    string
+		err                     error
 	)
 
 	kclResourcesTemplate, err = build.LoadTemplate("compositions/multiaz-postgres/templates/resources.k")
@@ -46,21 +47,10 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		panic(err)
 	}
 
-	c.NewPipelineStep("function-kcl-create-resources").
-		WithFunctionRef(xapiextv1.FunctionReference{
-			Name: "function-kcl",
-		}).
-		WithInput(build.ObjectKindReference{
-			Object: &xkcl.KCLInput{
-				TypeMeta: metav1.TypeMeta{
-					APIVersion: "krm.kcl.dev/v1alpha1",
-					Kind:       "KCLInput",
-				},
-				Spec: xkcl.RunSpec{
-					Source: kclResourcesTemplate,
-				},
-			},
-		})
+	kclPatchClusterTemplate, err = build.LoadTemplate("compositions/multiaz-postgres/templates/patch-cluster.k")
+	if err != nil {
+		panic(err)
+	}
 
 	c.NewPipelineStep("patch-and-transform").
 		WithFunctionRef(xapiextv1.FunctionReference{
@@ -79,13 +69,45 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				Resources: resources,
 			},
 		})
+
+	c.NewPipelineStep("function-kcl-patch-cluster").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: kclPatchClusterTemplate,
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-kcl-create-resources").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: kclResourcesTemplate,
+				},
+			},
+		})
 }
 
 func createResources() []xpt.ComposedTemplate {
 	return []xpt.ComposedTemplate{
+		createKmsResource(),
 		createSubnetGroup(),
 		createClusterResource(),
-		createKmsResource(),
 		createSecurityGroup(),
 	}
 }

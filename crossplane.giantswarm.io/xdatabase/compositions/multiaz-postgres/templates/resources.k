@@ -16,6 +16,7 @@ get = lambda x: any, y: str, d: any -> any {
     x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
 }
 
+_appName = get(_oxr, "spec.claimRef.name", "")
 _clusterIdentifier = get(_oxr, "status.clusterIdentifier", None)
 _monitoringRoleArn = get(_oxr, "status.monitoringRoleArn", None)
 _dbSubnetGroupName = get(_oxr, "status.dbSubnetGroupName", None)
@@ -25,35 +26,7 @@ _partition = get(_oxr, "spec.partition", "aws")
 _labels = {}
 _tags = {}
 
-_ipgn = get(_oxr, "spec.dbParameterGroup.name", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else None
-
-_restoreToPointInTime = {
-    sourceDbClusterIdentifier = get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
-    restoreType = get(_oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
-} | {
-    restoreToTime = get(_oxr, "spec.restoreToPointInTime.restoreToTime", None),
-} if get(_oxr, "spec.restoreToPointInTime.restoreToTime", False) else {
-    useLatestRestorableTime = get(_oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True),
-}
-
-_serverless = get(_oxr, "spec.engineMode", "provisioned") == "serverless"
-_provisioned = get(_oxr, "spec.engineMode", "provisioned") == "provisioned"
-
-_scalingConfiguration = get(_oxr, "spec.scalingConfiguration", None) if _serverless else None
-_serverlessv2scaling = get(_oxr, "spec.serverlessv2scalingConfiguration", None) if _provisioned else None
-_s3import = get(_oxr, "spec.s3Import", None)
-
-_cluster = _dcds["rds-cluster"].Resource | {
-    spec = {
-        forProvider = {
-            dbInstanceParameterGroupName = _ipgn,
-            restoreToPointInTime: _restoreToPointInTime if get(_oxr, "spec.restoreToPointInTime", False) else {},
-            s3import: [_s3import] if _s3import != None else None,
-            scalingConfiguration: [_scalingConfiguration] if _scalingConfiguration != None else None,
-            serverlessv2ScalingConfiguration: [_serverlessv2scaling] if _serverlessv2scaling != None else None,
-        }
-    }
-}
+_keyId = get(_oxr, "status.kmsKeyId", False)
 
 _instances = [
     {
@@ -66,30 +39,43 @@ _instances = [
             labels: _labels
         }
 
+        _az = get(item, "spec.availabilityZone", False)
+        _cacert = get(_oxr, "status.caCertIdentifier", False),
+        _pt = get(item, "spec.promotionTier", False)
+        _dbp = get(item, "spec.parameterGroupName", get(_oxr, "spec.parameterGroup.name", False)),
+
         spec: {
             forProvider: {
                 applyImmediately: get(item, "spec.applyImmediately", get(_oxr, "spec.applyImmediately", True)),
                 autoMinorVersionUpgrade: get(item, "spec.autoMinorVersionUpgrade", get(_oxr, "spec.autoMinorVersionUpgrade", True)),
-                availabilityZone: get(item, "spec.availabilityZone", None),
-                caCertIdentifier: get(_oxr, "status.caCertIdentifier", None),
+                if _az:
+                    availabilityZone: _az if _az != "" else None,
+                if _cacert:
+                    caCertIdentifier: _cacert
                 clusterIdentifier: _clusterIdentifier,
                 copyTagsToSnapshot: get(item, "spec.copyTagsToSnapshot", get(_oxr, "spec.copyTagsToSnapshot", True)),
-                dbParameterGroupName: get(item, "spec.parameterGroupName", get(_oxr, "spec.parameterGroup.name", "")),
+
+                if _dbp:
+                    dbParameterGroupName: _dbp
                 dbSubnetGroupName: _dbSubnetGroupName,
                 engine: get(_oxr, "spec.engine", "postgres"),
                 engineVersion: get(_oxr, "spec.engineVersion", "14.0"),
-                instanceClass: get(item, "spec.instanceClass", get(_oxr, "spec.instanceClass", "db.t3.medium")),
+                instanceClass: get(item, "spec.instanceClass", get(_oxr, "spec.dbClusterInstanceClass", "db.t3.medium")),
                 monitoringInterval: get(item, "spec.monitoringInterval", get(_oxr, "spec.enhancedMonitoring.monitoringInterval", 0)),
-                monitoringRoleArn: _monitoringRoleArn,
-                multiAz: get(item, "spec.multiAz", get(_oxr, "spec.multiAz", False)),
+                if _monitoringRoleArn:
+                    monitoringRoleArn: _monitoringRoleArn,
                 performanceInsightsEnabled: get(item, "spec.performanceInsightsEnabled", get(_oxr, "spec.performanceInsightsEnabled", False)),
-                performanceInsightsKmsKeyId: get(item, "spec.performanceInsightsKmsKeyId", get(_oxr, "spec.performanceInsightsKmsKeyId", None)),
+                performanceInsightsKmsKeyId: get(item, "spec.performanceInsightsKmsKeyId", get(_oxr, "spec.performanceInsightsKmsKeyId", get(_oxr, "status.kmsKeyId", None))),
                 performanceInsightsRetentionPeriod: get(item, "spec.performanceInsightsRetentionPeriod", get(_oxr, "spec.performanceInsightsRetentionPeriod", 7)),
                 preferredMaintenanceWindow: get(item, "spec.preferredMaintenanceWindow", get(_oxr, "spec.preferredMaintenanceWindow", "sun:05:00-sun:06:00")),
-                promotionTier: get(item, "spec.promotionTier", None),
+                if _pt:
+                    promotionTier: _pt,
+
                 publiclyAccessible: get(item, "spec.publiclyAccessible", get(_oxr, "spec.publiclyAccessible", False)),
                 region: _region,
-                tags: _tags | get(item, "spec.tags", {}),
+                tags: _tags | get(item, "spec.tags", {}) | {
+                    "Name": "${_appName}-${_region}${_az}-${i}"
+                },
             }
         }
     }
@@ -115,7 +101,9 @@ _endpoints = [
                 excludeMembers: get(item, "spec.excludeMembers", []),
                 staticMembers: get(item, "spec.staticMembers", []),
                 region: _region,
-                tags: _tags | get(item, "spec.tags", {})
+                tags: _tags | get(item, "spec.tags", {}) | {
+                    "Name": "${_appName}-${_region}-${i}"
+                }
             }
         }
     }
@@ -139,7 +127,9 @@ _iam_roles = [
                 featureName: get(item, "spec.featureName", "s3Import"),
                 roleArn: get(item, "spec.roleArn", ""),
                 region: _region,
-                tags: _tags
+                tags: _tags | get(item, "spec.tags", {}) | {
+                    "Name": "${_appName}-${_region}-${i}"
+                }
             }
         }
     }
@@ -179,7 +169,9 @@ _monitoringRole = [
                 maxSessionDuration: get(_oxr, "spec.enhancedMonitoring.maxSessionDuration", None),
                 path: get(_oxr, "spec.enhancedMonitoring.path", "/"),
                 name: "rds-monitoring-role",
-                tags: _tags
+                tags: _tags | get(_oxr, "spec.enhancedMonitoring.tags", {}) | {
+                    "Name": "${_appName}-monitoring-role"
+                }
             }
         }
     } if _createMonitoringRole else {}
@@ -197,7 +189,9 @@ _monitoringRole = [
             forProvider: {
                 policyArn: "arn:${_partition}:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole",
                 role: "rds-monitoring-role",
-                tags: _tags
+                tags: _tags | {
+                    "Name": "${_appName}-monitoring-role-attachment"
+                }
             }
         }
     } if _createMonitoringRole else {}
@@ -215,8 +209,6 @@ _autoscalingTarget = [
         }
         spec: {
             forProvider: {
-                clusterIdentifier: _clusterIdentifier,
-                enabled: get(_oxr, "spec.autoscaling.enabled", False),
                 maxCapacity: get(_oxr, "spec.autoscaling.maxCapacity", 2),
                 minCapacity: get(_oxr, "spec.autoscaling.minCapacity", 2),
                 resourceId: "cluster:${_clusterIdentifier}",
@@ -226,7 +218,9 @@ _autoscalingTarget = [
             }
 
             initProvider: {
-                tags: _tags
+                tags: _tags | get(_oxr, "spec.autoscaling.tags", {}) | {
+                    "Name": "${_appName}-autoscaling"
+                }
             }
         }
     } if _clusterIdentifier != None and get(_oxr, "spec.autoscaling.enabled", False) else {}
@@ -247,20 +241,23 @@ _autoscalingPolicy = [
         }
         spec: {
             forProvider: {
-                policyName: get(_oxr, "spec.autoscaling.policyName", "rds-autoscaling-policy"),
                 policyType: "TargetTrackingScaling",
                 resourceId: "cluster:${_clusterIdentifier}",
                 scalableDimension: "rds:cluster:ReadReplicaCount",
                 serviceNamespace: "rds",
-                targetTrackingScalingPolicyConfiguration: {
-                    predefinedMetricSpecification: {
-                        predefinedMetricType: _tc
+                targetTrackingScalingPolicyConfiguration: [
+                    {
+                        predefinedMetricSpecification: [
+                            {
+                                predefinedMetricType: _tc,
+                            },
+                        ],
+                        disableScaleIn: get(_oxr, "spec.autoscaling.disableScaleIn", False),
+                        scaleInCooldown: get(_oxr, "spec.autoscaling.scaleInCooldown", 60),
+                        scaleOutCooldown: get(_oxr, "spec.autoscaling.scaleOutCooldown", 60),
+                        targetValue: _tv
                     },
-                    disableScaleIn: get(_oxr, "spec.autoscaling.disableScaleIn", False),
-                    scaleInCooldown: get(_oxr, "spec.autoscaling.scaleInCooldown", 60),
-                    scaleOutCooldown: get(_oxr, "spec.autoscaling.scaleOutCooldown", 60),
-                    targetValue: _tv
-                },
+                ],
                 region: _region,
             }
         }
@@ -270,7 +267,7 @@ _autoscalingPolicy = [
 _autoscaling = _autoscalingTarget + _autoscalingPolicy
 
 _engine = get(_oxr, "spec.engine", "postgres")
-_port = get(_oxr, "status.port", 5432 if _engine in ["aurora-postgres", "postgres"] else 3306)
+_port = get(_oxr, "status.port", False)
 _securityGroupRules = [
     {
         apiVersion: "ec2.aws.upbound.io/v1beta1"
@@ -284,15 +281,16 @@ _securityGroupRules = [
         spec: {
             forProvider: {
                 securityGroupId: get(_oxr, "status.securityGroupId", ""),
-                cidrBlocks: cidr,
+                cidrBlocks: [cidr],
                 fromPort: _port,
-                toPort: _port,
                 protocol: "tcp",
                 region: _region,
+                toPort: _port,
+                type: "ingress",
             }
         }
     }
-    for i, cidr in get(_oxr, "spec.cidrBlocks", [])
+    for i, cidr in get(_oxr, "spec.cidrBlocks", []) if _port
 ]
 
 _clusterParameterGroup = [
@@ -312,7 +310,9 @@ _clusterParameterGroup = [
                 family: get(_oxr, "spec.parameterGroup.family", "aurora-postgresql11"),
                 parameter: get(_oxr, "spec.parameterGroup.parameters", {}),
                 region: _region,
-                tags: _tags
+                tags: _tags | {
+                    "Name": "${_appName}-cluster-parameter-group"
+                }
             }
         }
     } if get(_oxr, "spec.dbClusterParameterGroup.create", False) else {}
@@ -335,7 +335,9 @@ _dbParameterGroup = [
                 family: get(_oxr, "spec.parameterGroup.family", "aurora-postgresql11"),
                 parameter: get(_oxr, "spec.parameterGroup.parameters", {}),
                 region: _region,
-                tags: _tags
+                tags: _tags | {
+                    "Name": "${_appName}-db-parameter-group"
+                }
             }
         }
     } if get(_oxr, "spec.dbParameterGroup.create", False) else {}
@@ -361,11 +363,13 @@ _cloudwatchLogGroups = [
                 kmsKeyId: get(_oxr, "status.kmsKeyId", None),
                 skipDestroy: get(item, "spec.cloudwatchLogGroupParameters.skipDestroy", False),
                 region: _region,
-                tags: _tags | get(item, "spec.tags", {})
+                tags: _tags | get(item, "spec.tags", {}) | {
+                    "Name": "${_appName}-log-group-${i}"
+                }
             }
         }
     }
-    for i, item in _logGroups if _lgEnabled
+    for i, item in _logGroups if _lgEnabled and _keyId
 ]
 
 _clusterActivityStream = [
@@ -385,7 +389,9 @@ _clusterActivityStream = [
                 kmsKeyId: get(_oxr, "status.kmsKeyId", None),
                 mode: get(_oxr, "spec.activityStream.mode", "sync"),
                 region: _region,
-                tags: _tags
+                tags: _tags | {
+                    "Name": "${_appName}-activity-stream"
+                }
             }
         }
     } if get(_oxr, "spec.activityStream.enabled", False) else {}
@@ -404,21 +410,24 @@ _secretRotation = [
         spec: {
             forProvider: {
                 secretId: get(_oxr, "status.secretId", ""),
+                region: _region,
                 rotateImmediately: get(_oxr, "spec.secretRotation.rotateImmediately", False),
-                rotationRules: {
-                    duration: get(_oxr, "spec.secretRotation.duration", 0),
-                } | {
-                    automaticallyAfterDays: get(_oxr, "spec.secretRotation.afterDays", 30),
-                } if get(_oxr, "spec.secretRotation.afterDays", False) != False else {
-                    scheduleExpression: get(_oxr, "spec.secretRotation.scheduleExpression", "")
-                },
+                rotationRules: [
+                    {
+                        duration: get(_oxr, "spec.secretRotation.duration", 0),
+                    } | {
+                        automaticallyAfterDays: get(_oxr, "spec.secretRotation.afterDays", 30),
+                    } if get(_oxr, "spec.secretRotation.afterDays", False) != False else {
+                        scheduleExpression: get(_oxr, "spec.secretRotation.scheduleExpression", "")
+                    }
+                ],
             }
         }
     } if get(_oxr, "spec.secretRotation.enabled", False) else {}
 ]
 
 _items = [
-    [_cluster], _instances, _endpoints, _iam_roles, _monitoringRole,
+    _instances, _endpoints, _iam_roles, _monitoringRole,
     _autoscaling, _securityGroupRules, _clusterParameterGroup,
     _dbParameterGroup, _cloudwatchLogGroups, _clusterActivityStream,
     _secretRotation,

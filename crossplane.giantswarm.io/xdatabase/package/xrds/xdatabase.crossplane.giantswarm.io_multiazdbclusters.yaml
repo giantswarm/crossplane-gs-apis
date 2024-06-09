@@ -5,7 +5,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: (devel)
   creationTimestamp: null
-  name: multiazdbclusters.xdatabases.crossplane.giantswarm.io
+  name: multiazdbclusters.xdatabase.crossplane.giantswarm.io
 spec:
   claimNames:
     kind: MultiAzClusterClaim
@@ -14,7 +14,7 @@ spec:
     name: rds-cluster
   enforcedCompositionRef:
     name: rds-cluster
-  group: xdatabases.crossplane.giantswarm.io
+  group: xdatabase.crossplane.giantswarm.io
   names:
     kind: MultiAzDbCluster
     listKind: MultiAzDbClusterList
@@ -241,10 +241,6 @@ spec:
                     maxProperties: 50
                     type: object
                 type: object
-              dbSubnetGroupName:
-                description: DbSubnetGroupName is the name of the DB subnet group
-                  to associate with this DB cluster.
-                type: string
               deleteAutomatedBackups:
                 description: DeleteAutomatedBackups is whether automated backups should
                   be deleted.
@@ -341,6 +337,10 @@ spec:
                 - provisioned
                 - serverless
                 type: string
+              engineVersion:
+                description: EngineVersion is the version of the database engine to
+                  use.
+                type: string
               enhancedMonitoring:
                 description: EnhancedMonitoring is the enhanced monitoring configuration.
                 properties:
@@ -401,9 +401,6 @@ spec:
                       type: string
                   type: object
                 type: array
-              instanceClass:
-                description: InstanceClass is the instance class to use.
-                type: string
               instances:
                 description: Instances is a list of instances to create.
                 items:
@@ -456,9 +453,9 @@ spec:
                         Insights is enabled.
                       nullable: true
                       type: boolean
-                    performanceInsightsKMSKeyID:
+                    performanceInsightsKmsKeyID:
                       description: |-
-                        PerformanceInsightsKMSKeyID is the AWS KMS key identifier for encryption
+                        PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption
                         of Performance Insights data.
                       nullable: true
                       type: string
@@ -544,8 +541,8 @@ spec:
                 description: PerformanceInsightsEnabled is whether Performance Insights
                   is enabled.
                 type: boolean
-              performanceInsightsKMSKeyID:
-                description: PerformanceInsightsKMSKeyID is the AWS KMS key identifier
+              performanceInsightsKmsKeyID:
+                description: PerformanceInsightsKmsKeyID is the AWS KMS key identifier
                   for encryption of Performance Insights data.
                 type: string
               performanceInsightsRetentionPeriod:
@@ -805,10 +802,6 @@ spec:
                 description: Tags is a set of tags to associate with the DB cluster.
                 maxProperties: 50
                 type: object
-              version:
-                description: EngineVersion is the version of the database engine to
-                  use.
-                type: string
               vpcId:
                 description: VpcId is the VPC ID to use.
                 type: string
@@ -835,7 +828,6 @@ spec:
                 type: object
             required:
             - cidrBlocks
-            - dbClusterParameterGroup
             - subnetIds
             - vpcId
             type: object
@@ -903,8 +895,8 @@ spec:
               endpoint:
                 description: Endpoint is the endpoint of the DB cluster.
                 type: string
-              kmsKeyID:
-                description: KmsKeyID is the ID of the KMS key.
+              kmsKeyId:
+                description: KmsKeyId is the ID of the KMS key.
                 type: string
               monitoringRoleArn:
                 description: MonitoringRoleArn is the ARN of the monitoring role.
@@ -913,13 +905,9 @@ spec:
                 description: port is the port of the database.
                 format: int64
                 type: integer
-              securityGroupIds:
-                description: SecurityGroupIds A list of VPC security group IDs for
-                  the cluster
-                items:
-                  type: string
-                type: array
-                x-kubernetes-list-type: set
+              securityGroupId:
+                description: SecurityGroupId The security group ID of the DB cluster.
+                type: string
             type: object
         required:
         - spec

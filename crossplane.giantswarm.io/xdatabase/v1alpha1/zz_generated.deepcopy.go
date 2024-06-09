@@ -181,8 +181,8 @@ func (in *ClusterInstance) DeepCopyInto(out *ClusterInstance) {
 		*out = new(bool)
 		**out = **in
 	}
-	if in.PerformanceInsightsKMSKeyID != nil {
-		in, out := &in.PerformanceInsightsKMSKeyID, &out.PerformanceInsightsKMSKeyID
+	if in.PerformanceInsightsKmsKeyID != nil {
+		in, out := &in.PerformanceInsightsKmsKeyID, &out.PerformanceInsightsKmsKeyID
 		*out = new(string)
 		**out = **in
 	}
@@ -386,11 +386,6 @@ func (in *ClusterParameters) DeepCopyInto(out *ClusterParameters) {
 		*out = new(DbParameterGroup)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.DbSubnetGroupName != nil {
-		in, out := &in.DbSubnetGroupName, &out.DbSubnetGroupName
-		*out = new(string)
-		**out = **in
-	}
 	if in.DeleteAutomatedBackups != nil {
 		in, out := &in.DeleteAutomatedBackups, &out.DeleteAutomatedBackups
 		*out = new(bool)
@@ -505,11 +500,6 @@ func (in *ClusterParameters) DeepCopyInto(out *ClusterParameters) {
 			}
 		}
 	}
-	if in.InstanceClass != nil {
-		in, out := &in.InstanceClass, &out.InstanceClass
-		*out = new(string)
-		**out = **in
-	}
 	if in.CloudwatchLogGroupParameters != nil {
 		in, out := &in.CloudwatchLogGroupParameters, &out.CloudwatchLogGroupParameters
 		*out = new(CloudwatchLogGroup)
@@ -535,8 +525,8 @@ func (in *ClusterParameters) DeepCopyInto(out *ClusterParameters) {
 		*out = new(bool)
 		**out = **in
 	}
-	if in.PerformanceInsightsKMSKeyID != nil {
-		in, out := &in.PerformanceInsightsKMSKeyID, &out.PerformanceInsightsKMSKeyID
+	if in.PerformanceInsightsKmsKeyID != nil {
+		in, out := &in.PerformanceInsightsKmsKeyID, &out.PerformanceInsightsKmsKeyID
 		*out = new(string)
 		**out = **in
 	}
@@ -960,8 +950,8 @@ func (in *MultiAzDbStatus) DeepCopyInto(out *MultiAzDbStatus) {
 		*out = new(string)
 		**out = **in
 	}
-	if in.KmsKeyID != nil {
-		in, out := &in.KmsKeyID, &out.KmsKeyID
+	if in.KmsKeyId != nil {
+		in, out := &in.KmsKeyId, &out.KmsKeyId
 		*out = new(string)
 		**out = **in
 	}
@@ -975,16 +965,10 @@ func (in *MultiAzDbStatus) DeepCopyInto(out *MultiAzDbStatus) {
 		*out = new(int64)
 		**out = **in
 	}
-	if in.SecurityGroupIds != nil {
-		in, out := &in.SecurityGroupIds, &out.SecurityGroupIds
-		*out = make([]*string, len(*in))
-		for i := range *in {
-			if (*in)[i] != nil {
-				in, out := &(*in)[i], &(*out)[i]
-				*out = new(string)
-				**out = **in
-			}
-		}
+	if in.SecurityGroupId != nil {
+		in, out := &in.SecurityGroupId, &out.SecurityGroupId
+		*out = new(string)
+		**out = **in
 	}
 }
 

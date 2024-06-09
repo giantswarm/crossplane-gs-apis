@@ -75,10 +75,10 @@ type MultiAzDbStatus struct {
 	// +optional
 	Endpoint *string `json:"endpoint,omitempty"`
 
-	// KmsKeyID is the ID of the KMS key.
+	// KmsKeyId is the ID of the KMS key.
 	//
 	// +optional
-	KmsKeyID *string `json:"kmsKeyID,omitempty"`
+	KmsKeyId *string `json:"kmsKeyId,omitempty"`
 
 	// MonitoringRoleArn is the ARN of the monitoring role.
 	//
@@ -90,11 +90,10 @@ type MultiAzDbStatus struct {
 	// +optional
 	Port *int64 `json:"port,omitempty"`
 
-	// SecurityGroupIds A list of VPC security group IDs for the cluster
+	// SecurityGroupId The security group ID of the DB cluster.
 	//
 	// +optional
-	// +listType=set
-	SecurityGroupIds []*string `json:"securityGroupIds,omitempty"`
+	SecurityGroupId *string `json:"securityGroupId,omitempty"`
 }
 
 type MultiAzDbRole struct {
@@ -278,12 +277,12 @@ type ClusterInstance struct {
 	// +nullable
 	PerformanceInsightsEnabled *bool `json:"performanceInsightsEnabled,omitempty"`
 
-	// PerformanceInsightsKMSKeyID is the AWS KMS key identifier for encryption
+	// PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption
 	// of Performance Insights data.
 	//
 	// +optional
 	// +nullable
-	PerformanceInsightsKMSKeyID *string `json:"performanceInsightsKMSKeyID,omitempty"`
+	PerformanceInsightsKmsKeyID *string `json:"performanceInsightsKmsKeyID,omitempty"`
 
 	// PerformanceInsightsRetentionPeriod is the amount of time, in days, to
 	// retain Performance Insights data.
@@ -439,18 +438,13 @@ type ClusterParameters struct {
 
 	// DbClusterParameterGroup defines the parameters for the DB cluster.
 	//
-	// +required
+	// +optional
 	DbClusterParameterGroup *ClusterParameterGroup `json:"dbClusterParameterGroup"`
 
 	// DbParameterGroup defines the parameters for the DB instance.
 	//
 	// +optional
 	DbParameterGroup *DbParameterGroup `json:"dbParameterGroup,omitempty"`
-
-	// DbSubnetGroupName is the name of the DB subnet group to associate with this DB cluster.
-	//
-	// +optional
-	DbSubnetGroupName *string `json:"dbSubnetGroupName,omitempty"`
 
 	// DeleteAutomatedBackups is whether automated backups should be deleted.
 	//
@@ -522,7 +516,7 @@ type ClusterParameters struct {
 	// EngineVersion is the version of the database engine to use.
 	//
 	// +required
-	EngineVersion *string `json:"version,omitempty"`
+	EngineVersion *string `json:"engineVersion,omitempty"`
 
 	// GlobalClusterIdentifier is the global cluster identifier for an Aurora global database.
 	//
@@ -550,11 +544,6 @@ type ClusterParameters struct {
 	//
 	// +optional
 	Instances []*ClusterInstance `json:"instances,omitempty"`
-
-	// InstanceClass is the instance class to use.
-	//
-	// +optional
-	InstanceClass *string `json:"instanceClass,omitempty"`
 
 	// CloudwatchLogGroup defines the parameters for the log groups
 	//
@@ -584,10 +573,10 @@ type ClusterParameters struct {
 	// +optional
 	PerformanceInsightsEnabled *bool `json:"performanceInsightsEnabled,omitempty"`
 
-	// PerformanceInsightsKMSKeyID is the AWS KMS key identifier for encryption of Performance Insights data.
+	// PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption of Performance Insights data.
 	//
 	// +optional
-	PerformanceInsightsKMSKeyID *string `json:"performanceInsightsKMSKeyID,omitempty"`
+	PerformanceInsightsKmsKeyID *string `json:"performanceInsightsKmsKeyID,omitempty"`
 
 	// PerformanceInsightsRetentionPeriod is the amount of time, in days, to retain Performance Insights data.
 	//

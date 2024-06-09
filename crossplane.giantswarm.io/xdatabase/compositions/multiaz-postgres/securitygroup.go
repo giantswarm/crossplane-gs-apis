@@ -55,6 +55,7 @@ func createSecurityGroup() xpt.ComposedTemplate {
 					ToFieldPath: cb.StrPtr("spec.forProvider.description"),
 				},
 			},
+			cb.ToPatch("status.securityGroupId", "status.atProvider.id"),
 		},
 	}
 }

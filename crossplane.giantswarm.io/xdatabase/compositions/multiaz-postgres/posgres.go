@@ -54,12 +54,12 @@ func createClusterResource() xpt.ComposedTemplate {
 			cb.FromPatch("spec.globalClusterIdentifier", "spec.forProvider.globalClusterIdentifier"),
 			cb.FromPatch("spec.iamDatabaseAuthenticationEnabled", "spec.forProvider.iamDatabaseAuthenticationEnabled"),
 			cb.FromPatch("spec.iops", "spec.forProvider.iops"),
-			cb.FromPatch("status.kmsKeyID", "spec.forProvider.kmsKeyID"),
+			cb.FromPatch("status.kmsKeyId", "spec.forProvider.kmsKeyId"),
 			cb.FromPatch("spec.masterUsername", "spec.forProvider.masterUsername"),
 			cb.FromPatch("spec.preferredBackupWindow", "spec.forProvider.preferredBackupWindow"),
 			cb.FromPatch("spec.preferredMaintenanceWindow", "spec.forProvider.preferredMaintenanceWindow"),
 			cb.FromPatch("spec.region", "spec.forProvider.region"),
-			cb.FromPatch(("status.vpcSecurityGroupIDs"), "spec.forProvider.vpcSecurityGroupIDs"),
+			cb.FromPatch(("status.securityGroupId"), "spec.forProvider.vpcSecurityGroupIds[0]"),
 
 			// Init provider settings
 			cb.FromPatch("spec.engineVersion", "spec.initProvider.engineVersion"),
@@ -83,7 +83,7 @@ func createClusterResource() xpt.ComposedTemplate {
 			combineNameRegionPatch("spec.writeConnectionSecretToRef.name", "-rds"),
 			cb.FromPatch("spec.claimRef.namespace", "spec.writeConnectionSecretToRef.namespace"),
 
-			cb.ToPatch("status.clusterIdentifier", "status.atProvider.clusterIdentifier"),
+			cb.ToPatch("status.clusterIdentifier", "status.atProvider.id"),
 			cb.ToPatch("status.clusterArn", "status.atProvider.arn"),
 			cb.ToPatch("status.endpoint", "status.atProvider.endpoint"),
 			cb.ToPatch("status.port", "status.atProvider.port"),

@@ -2,7 +2,7 @@
 apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
 kind: MultiAzClusterClaim
 metadata:
-  name: myapp-multiaz-rds
+  name: myapp-multiaz-rds-autoscaling
   namespace: default
   labels:
     owner: honeybadger
@@ -14,6 +14,11 @@ metadata:
 spec:
   availabilityZones: ["a", "b", "c"]
   allocatedStorage: 20
+
+  autoscaling:
+    enabled: true
+    minCapacity: 2
+    maxCapacity: 4
 
   cidrBlocks:
   - 10.8.0.0/24
@@ -36,10 +41,10 @@ spec:
 
   dbClusterInstanceClass: db.t3.medium
 
-  iops: 1000
-
   instances:
     - {}
+
+  iops: 1000
 
   masterUsername: admin
   providerConfigRef:
