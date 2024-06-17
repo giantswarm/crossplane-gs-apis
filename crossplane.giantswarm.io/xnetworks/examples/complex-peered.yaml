@@ -1,0 +1,86 @@
+apiVersion: xnetworks.crossplane.giantswarm.io/v1alpha1
+kind: PeeredVpcNetworkClaim
+metadata:
+  labels:
+    owner: honeybadger
+    provider: aws
+    app.kubernetes.io/name: my-peered-vpc
+    app.kubernetes.io/instance: complex-peered-network
+    app.kubernetes.io/part-of: my-peered-vpc
+    app.kubernetes.io/managed-by: crossplane
+  name: complex-peered-network
+  namespace: default
+spec:
+  compositionSelector:
+    matchLabels:
+      provider: aws
+      component: network
+  deletionPolicy: Delete
+  region: eu-central-1
+  providerConfigRef:
+    name: default
+  peering:
+    remoteVpcs:
+    - name: basic-no-peering
+      allowPublic: true
+    - name: basic-peered
+      allowPublic: true
+    groupBy: "giantswarm.io/subnetset"
+    enabled: true
+    allowPublic: true
+  subnetsets:
+    cidrs:
+    - prefix: '10.20.0.0/19'
+      public:
+        mask: /24
+        count: 2
+        lbSetIndex: 0
+      private:
+        mask: /24
+        count: 3
+        lbSetIndex: 2
+    - prefix: '10.20.32.0/19'
+      public:
+        mask: /24
+        count: 2
+        lbSetIndex: 0
+      private:
+        mask: /24
+        count: 3
+        lbSetIndex: 2
+    - prefix: '10.20.64.0/19'
+      public:
+        mask: /24
+        count: 2
+        lbSetIndex: 0
+      private:
+        mask: /24
+        count: 3
+        lbSetIndex: 2
+    - prefix: '10.20.96.0/19'
+      public:
+        mask: /24
+        count: 2
+        lbSetIndex: 0
+      private:
+        mask: /24
+        count: 3
+        lbSetIndex: 2
+    - prefix: '10.20.128.0/19'
+      public:
+        mask: /24
+        count: 2
+        lbSetIndex: 0
+      private:
+        mask: /24
+        count: 3
+        lbSetIndex: 2
+    availabilityZones:
+    - a
+    - b
+    - c
+  tags:
+    common:
+      giantswarm.io/owner: honeybadger
+      giantswarm.io/managed-by: crossplane
+      giantswarm.io/part-of: my-peered-vpc

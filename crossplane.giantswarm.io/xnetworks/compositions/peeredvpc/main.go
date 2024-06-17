@@ -72,6 +72,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 				Spec: &xnd.Spec{
 					EnabledRef:        "spec.peering.enabled",
+					GroupByRef:        "spec.peering.groupBy",
 					ProviderConfigRef: "spec.providerConfigRef.name",
 					RegionRef:         "spec.region",
 					VpcNameRef:        "spec.peering.remoteVpcs",

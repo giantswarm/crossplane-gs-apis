@@ -114,6 +114,10 @@ spec:
                       this VPC.
                       Defaults to false
                     type: boolean
+                  groupBy:
+                    description: GroupBy specifies the key to group the remote subnets
+                      by
+                    type: string
                   remoteVpcs:
                     description: RemoteVpcs is a list of VPCs to peer with.
                     items:
@@ -419,6 +423,7 @@ spec:
                 - namespace
                 type: object
             required:
+            - peering
             - region
             - subnetsets
             type: object
@@ -550,6 +555,9 @@ spec:
                         x-kubernetes-map-type: atomic
                       type: array
                       x-kubernetes-list-type: atomic
+                    providerConfig:
+                      description: The provider config used to look up this VPC
+                      type: string
                     publicRouteTables:
                       description: A map of public route tables defined in this VPC
                       items:

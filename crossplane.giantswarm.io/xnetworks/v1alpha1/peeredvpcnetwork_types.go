@@ -48,8 +48,18 @@ type PeeredVpcNetwork struct {
 }
 
 type PeeredVpcNetworkSpec struct {
-	xpv1.ResourceSpec          `json:",inline"`
+	xpv1.ResourceSpec `json:",inline"`
+
+	// PeeredVpcNetworkParameters defines the parameters for creating a VPC with
+	// the option of peered subnets.
+	//
+	// +required
 	PeeredVpcNetworkParameters `json:",inline"`
+
+	// Region is the region in which the VPC will be created.
+	//
+	// +required
+	Region string `json:"region"`
 }
 
 // PeeredVpcTags defines the tags to apply to the VPC and subnets.
@@ -95,7 +105,7 @@ type PeeredVpcNetworkParameters struct {
 
 	// Peering is the VPC to peer with.
 	//
-	// +optional
+	// +required
 	Peering VpcPeering `json:"peering"`
 }
 
@@ -118,6 +128,11 @@ type VpcPeering struct {
 	// +optional
 	// +default=false
 	Enabled bool `json:"enabled"`
+
+	// GroupBy specifies the key to group the remote subnets by
+	//
+	// +optional
+	GroupBy string `json:"groupBy"`
 
 	// RemoteVpcs is a list of VPCs to peer with.
 	//

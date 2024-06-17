@@ -1,4 +1,5 @@
 _oxr = option("params").oxr
+_dxr = option("params").dxr
 _azl = len(_oxr.spec.subnetsets.availabilityZones)
 
 m = lambda x: str -> int {
@@ -17,11 +18,11 @@ cb = lambda x: str, s: int, c: int -> [] {
     :param s: The size of the vpc prefix
     :param c: The number of subnets requested
     """
-    [m(x) - s for _ in range(_azl) for _ in range(c) if c > 0 and x != ""]
+    [m(x) - s for _ in range(_azl) for _ in range(c) if c > 0 and x]
 }
 
 {
-    **_oxr
+    **_dxr
     status.subnetBits = [
         {
             _vpcSize = s.prefix.split("/")[1]
@@ -30,7 +31,7 @@ cb = lambda x: str, s: int, c: int -> [] {
             _x = int(_vpcSize)
 
             prefix = s.prefix
-            offset = m(s.offset) - _x
+            offset = m(s.offset) - _x if s.offset else 0
             newBits = cb(s.public.mask, _x, s.public.count) + cb(s.private.mask, _x, s.private.count)
         }
         for s in _oxr.spec.subnetsets.cidrs
