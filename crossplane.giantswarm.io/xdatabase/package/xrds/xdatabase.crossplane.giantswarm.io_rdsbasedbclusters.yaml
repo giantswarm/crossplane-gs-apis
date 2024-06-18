@@ -1030,9 +1030,7 @@ spec:
                 - namespace
                 type: object
             required:
-            - cidrBlocks
             - region
-            - subnetIds
             - vpcId
             type: object
           status:

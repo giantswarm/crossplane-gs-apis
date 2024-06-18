@@ -96,5 +96,10 @@ _publicSubnets = [
                 }
             }
         }
-    } if all_true([_publicRouteTables, _publicSubnets, _privateRouteTables, _privateSubnets]) else {}
+    } if any_true([
+        _publicRouteTables,
+        _publicSubnets,
+        _privateRouteTables,
+        _privateSubnets
+    ]) else {}
 }

@@ -37,7 +37,7 @@ type SubnetGroupIndexes struct {
 	// Cache is the subnet group index to use for the cache
 	//
 	// +required
-	Cache string `json:"cache"`
+	Cache int `json:"cache"`
 }
 
 // RdsCacheClusterSpec contains the structure required for building the

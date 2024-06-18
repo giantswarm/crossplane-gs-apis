@@ -102,6 +102,8 @@ spec:
           toFieldPath: spec.forProvider.region
           type: FromCompositeFieldPath
         - fromFieldPath: spec.subnetIds
+          policy:
+            fromFieldPath: Required
           toFieldPath: spec.forProvider.subnetIds
           type: FromCompositeFieldPath
         - patchSetName: commontags
@@ -562,7 +564,13 @@ spec:
                       providerConfigRef: _oxr.spec.providerConfigRef
                   }
               }
-              for i, item in _buildInstances if ((_createCluster and _clusterIdentifier != None) or not _createCluster) and _keyId
+              for i, item in _buildInstances if all_true([
+                  any_true([
+                      (_createCluster and _clusterIdentifier != None), not _createCluster
+                  ]),
+                  _keyId,
+                  _dbSubnetGroupName
+              ])
           ]
 
           ##
@@ -641,7 +649,7 @@ spec:
                       providerConfigRef: _oxr.spec.providerConfigRef
                   }
               }
-              for i, item in get(_oxr, "spec.endpoints", []) if all_true([createCluster, _clusterIdentifier != None])
+              for i, item in get(_oxr, "spec.endpoints", []) if all_true([_createCluster, _clusterIdentifier != None])
           ]
 
           ##
@@ -1071,3 +1079,6 @@ spec:
           items = [i for x in _items for i in x if i]
         target: ""
     step: function-kcl-create-resources
+  - functionRef:
+      name: function-auto-ready
+    step: function-auto-ready

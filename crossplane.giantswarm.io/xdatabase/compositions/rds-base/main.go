@@ -100,6 +100,12 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 			},
 		})
+
+	c.NewPipelineStep("function-auto-ready").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-auto-ready",
+		})
+
 }
 
 func createResources() []xpt.ComposedTemplate {

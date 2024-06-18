@@ -18,6 +18,10 @@ spec:
       component: database
       type: rds-cluster
 
+  subnetGroupIndexes:
+    cache: 0
+    database: 1
+
   database:
     availabilityZones: ["a", "b", "c"]
     allocatedStorage: 20
@@ -65,3 +69,8 @@ spec:
       - a
       - b
       - c
+    tags:
+      common:
+        giantswarm.io/owner: honeybadger
+        giantswarm.io/managed-by: crossplane
+        giantswarm.io/part-of: myapp

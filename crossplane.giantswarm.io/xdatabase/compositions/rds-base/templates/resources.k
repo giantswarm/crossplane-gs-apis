@@ -197,7 +197,13 @@ _instances = [
             providerConfigRef: _oxr.spec.providerConfigRef
         }
     }
-    for i, item in _buildInstances if ((_createCluster and _clusterIdentifier != None) or not _createCluster) and _keyId
+    for i, item in _buildInstances if all_true([
+        any_true([
+            (_createCluster and _clusterIdentifier != None), not _createCluster
+        ]),
+        _keyId,
+        _dbSubnetGroupName
+    ])
 ]
 
 ##
@@ -276,7 +282,7 @@ _endpoints = [
             providerConfigRef: _oxr.spec.providerConfigRef
         }
     }
-    for i, item in get(_oxr, "spec.endpoints", []) if all_true([createCluster, _clusterIdentifier != None])
+    for i, item in get(_oxr, "spec.endpoints", []) if all_true([_createCluster, _clusterIdentifier != None])
 ]
 
 ##

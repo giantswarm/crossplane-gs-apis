@@ -1018,7 +1018,7 @@ spec:
                 properties:
                   cache:
                     description: Cache is the subnet group index to use for the cache
-                    type: string
+                    type: integer
                   database:
                     description: Database is the subnet group index to use for the
                       database
@@ -1084,9 +1084,6 @@ spec:
                         type: array
                         x-kubernetes-list-type: atomic
                     type: object
-                  region:
-                    description: Region is the region in which the VPC will be created.
-                    type: string
                   subnetsets:
                     description: PeeredSubnets defines how many public and private
                       subnet sets to create.
@@ -1219,7 +1216,6 @@ spec:
                     x-kubernetes-map-type: granular
                 required:
                 - peering
-                - region
                 - subnetsets
                 type: object
               writeConnectionSecretToRef:

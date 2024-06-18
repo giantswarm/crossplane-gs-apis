@@ -277,7 +277,7 @@ spec:
                       }
                       type: _visibility
                       tags: {
-                          "all": _tags | _oxr.spec.tags.subnet
+                          "all": _tags | get(_oxr, "spec.tags.subnet", {})
                           "subnet": _snlbtag
                       }
                       vpcId: _self.id
@@ -756,7 +756,12 @@ spec:
                           }
                       }
                   }
-              } if all_true([_publicRouteTables, _publicSubnets, _privateRouteTables, _privateSubnets]) else {}
+              } if any_true([
+                  _publicRouteTables,
+                  _publicSubnets,
+                  _privateRouteTables,
+                  _privateSubnets
+              ]) else {}
           }
         target: ""
     step: function-kcl-patch-xr

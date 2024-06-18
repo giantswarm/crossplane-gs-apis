@@ -169,7 +169,7 @@ _subnetsets = [
             }
             type: _visibility
             tags: {
-                "all": _tags | _oxr.spec.tags.subnet
+                "all": _tags | get(_oxr, "spec.tags.subnet", {})
                 "subnet": _snlbtag
             }
             vpcId: _self.id

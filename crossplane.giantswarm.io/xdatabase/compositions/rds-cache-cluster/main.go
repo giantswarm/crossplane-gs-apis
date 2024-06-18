@@ -78,9 +78,16 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 			},
 		})
+
+	c.NewPipelineStep("function-auto-ready").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-auto-ready",
+		})
+
 }
 
 func createResources() []xpt.ComposedTemplate {
+	required := xpt.FromFieldPathPolicyRequired
 	return []xpt.ComposedTemplate{
 		{
 			Name: "peered-vpc-network",
@@ -93,6 +100,8 @@ func createResources() []xpt.ComposedTemplate {
 				},
 			},
 			Patches: []xpt.ComposedPatch{
+				cb.FromPatch("spec.vpc", "spec"),
+				cb.FromPatch("spec.claimRef", "spec.claimRef"),
 				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
 				cb.FromPatch("spec.region", "spec.region"),
 				cb.FromPatch(("spec.providerConfigRef"), "spec.providerConfigRef"),
@@ -104,16 +113,27 @@ func createResources() []xpt.ComposedTemplate {
 			Base: &runtime.RawExtension{
 				Object: &v1alpha1.RdsBaseDbCluster{
 					TypeMeta: metav1.TypeMeta{
-						APIVersion: "xdatabases.crossplane.giantswarm.io/v1alpha1",
-						Kind:       "RdsBaseClaim",
+						APIVersion: "xdatabase.crossplane.giantswarm.io/v1alpha1",
+						Kind:       "RdsBaseDbCluster",
 					},
 				},
 			},
 			Patches: []xpt.ComposedPatch{
 				cb.FromPatch("spec.database", "spec"),
+				cb.FromPatch("spec.claimRef", "spec.claimRef"),
 				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
 				cb.FromPatch(("spec.providerConfigRef"), "spec.providerConfigRef"),
 				cb.FromPatch("spec.region", "spec.region"),
+				{
+					Type: xpt.PatchTypeFromCompositeFieldPath,
+					Patch: xpt.Patch{
+						FromFieldPath: cb.StrPtr("status.vpc.id"),
+						ToFieldPath:   cb.StrPtr("spec.vpcId"),
+						Policy: &xpt.PatchPolicy{
+							FromFieldPath: &required,
+						},
+					},
+				},
 			},
 		},
 	}

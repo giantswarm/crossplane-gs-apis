@@ -47,12 +47,12 @@ type RdsBaseDbSpec struct {
 
 	// CidrBlocks is a list of CIDRs that are allowed to connect to the DB.
 	//
-	// +required
+	// +optional
 	CidrBlocks []*string `json:"cidrBlocks"`
 
 	// SubnetIds is a list of subnet IDs to use for the subnet group.
 	//
-	// +required
+	// +optional
 	SubnetIds []*string `json:"subnetIds"`
 
 	// VpcId is the VPC ID to use.

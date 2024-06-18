@@ -9,6 +9,7 @@ import (
 )
 
 func createSubnetGroup() xpt.ComposedTemplate {
+	required := xpt.FromFieldPathPolicyRequired
 	return xpt.ComposedTemplate{
 		Name: "subnetgroup",
 		Base: &runtime.RawExtension{
@@ -24,7 +25,16 @@ func createSubnetGroup() xpt.ComposedTemplate {
 		},
 		Patches: []xpt.ComposedPatch{
 			cb.FromPatch("spec.region", "spec.forProvider.region"),
-			cb.FromPatch("spec.subnetIds", "spec.forProvider.subnetIds"),
+			{
+				Type: xpt.PatchTypeFromCompositeFieldPath,
+				Patch: xpt.Patch{
+					FromFieldPath: cb.StrPtr("spec.subnetIds"),
+					ToFieldPath:   cb.StrPtr("spec.forProvider.subnetIds"),
+					Policy: &xpt.PatchPolicy{
+						FromFieldPath: &required,
+					},
+				},
+			},
 			{
 				Type:         xpt.PatchTypePatchSet,
 				PatchSetName: cb.StrPtr("commontags"),
