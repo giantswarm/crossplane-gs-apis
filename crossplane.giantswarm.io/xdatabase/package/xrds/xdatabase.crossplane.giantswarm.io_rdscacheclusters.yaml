@@ -139,12 +139,6 @@ spec:
                       backups for.
                     format: int64
                     type: integer
-                  cidrBlocks:
-                    description: CidrBlocks is a list of CIDRs that are allowed to
-                      connect to the DB.
-                    items:
-                      type: string
-                    type: array
                   cloudwatchLogGroupParameters:
                     description: CloudwatchLogGroup defines the parameters for the
                       log groups
@@ -850,27 +844,13 @@ spec:
                     description: StorageType specifies the storage type to be associated
                       with the cluster
                     type: string
-                  subnetIds:
-                    description: SubnetIds is a list of subnet IDs to use for the
-                      subnet group.
-                    items:
-                      type: string
-                    type: array
                   tags:
                     additionalProperties:
                       type: string
                     description: Tags is a set of tags to associate with the DB cluster.
                     maxProperties: 50
                     type: object
-                  vpcId:
-                    description: VpcId is the VPC ID to use.
-                    type: string
-                required:
-                - cidrBlocks
-                - subnetIds
-                - vpcId
                 type: object
-                x-kubernetes-embedded-resource: true
               deletionPolicy:
                 default: Delete
                 description: |-
@@ -1065,6 +1045,10 @@ spec:
                           this VPC.
                           Defaults to false
                         type: boolean
+                      groupBy:
+                        description: GroupBy specifies the key to group the remote
+                          subnets by
+                        type: string
                       remoteVpcs:
                         description: RemoteVpcs is a list of VPCs to peer with.
                         items:
@@ -1238,7 +1222,6 @@ spec:
                 - region
                 - subnetsets
                 type: object
-                x-kubernetes-embedded-resource: true
               writeConnectionSecretToRef:
                 description: |-
                   WriteConnectionSecretToReference specifies the namespace and name of a
@@ -1330,9 +1313,104 @@ spec:
                 items:
                   type: string
                 type: array
-              vpcId:
-                description: VpcId is the ID of the VPC
-                type: string
+              vpc:
+                description: Vpc is a VPC configuration to bind the cluster to
+                properties:
+                  additionalCidrBlocks:
+                    description: A list of additional VPC CIDR blocks defined in this
+                      VPC
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  cidrBlock:
+                    description: The Ipv4 cidr block defined for this VPC
+                    type: string
+                  id:
+                    description: ID The VPC ID
+                    type: string
+                  internetGateway:
+                    description: The internet gateway defined in this VPC
+                    type: string
+                  natGateways:
+                    additionalProperties:
+                      type: string
+                    description: A map of NAT gateways defined in this VPC
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  privateRouteTables:
+                    description: A map of private route tables defined in this VPC
+                    items:
+                      additionalProperties:
+                        type: string
+                      description: StatusRouteTables is a map of route tables and
+                        their status
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  privateSubnets:
+                    description: A map of private subnets defined in this VPC
+                    items:
+                      additionalProperties:
+                        type: string
+                      description: StatusSubnets is a map of subnets and their status
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  providerConfig:
+                    description: The provider config used to look up this VPC
+                    type: string
+                  publicRouteTables:
+                    description: A map of public route tables defined in this VPC
+                    items:
+                      additionalProperties:
+                        type: string
+                      description: StatusRouteTables is a map of route tables and
+                        their status
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  publicSubnets:
+                    description: A list of maps of public subnets defined in this
+                      VPC
+                    items:
+                      additionalProperties:
+                        type: string
+                      description: StatusSubnets is a map of subnets and their status
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  region:
+                    description: The region this VPC is located in
+                    type: string
+                  securityGroups:
+                    additionalProperties:
+                      type: string
+                    description: A map of security groups defined in this VPC
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  transitGateways:
+                    additionalProperties:
+                      type: string
+                    description: A map of transit gateways defined in this VPC
+                    nullable: true
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  vpcPeeringConnections:
+                    additionalProperties:
+                      type: string
+                    description: A map of VPC peering connections defined in this
+                      VPC
+                    nullable: true
+                    type: object
+                    x-kubernetes-map-type: atomic
+                required:
+                - id
+                type: object
             type: object
         required:
         - spec

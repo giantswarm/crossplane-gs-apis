@@ -1,6 +1,7 @@
 package v1alpha1
 
 import (
+	nd "github.com/giantswarm/crossplane-fn-network-discovery/pkg/composite/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
@@ -47,7 +48,6 @@ type RdsCacheClusterSpec struct {
 	// Database defines the database settings
 	//
 	// +required
-	// +kubebuilder:validation:EmbeddedResource
 	Database ClusterParameters `json:"database"`
 
 	// SubnetGroupIndexes is a map of service name to subnet set indexes
@@ -63,7 +63,6 @@ type RdsCacheClusterSpec struct {
 	// Vpc defines the VPC settings
 	//
 	// +required
-	// +kubebuilder:validation:EmbeddedResource
 	Vpc xnet.PeeredVpcNetworkParameters `json:"vpc"`
 }
 
@@ -101,10 +100,10 @@ type RdsClusterStatus struct {
 	// +optional
 	DatabaseSubnets []string `json:"databaseSubnets,omitempty"`
 
-	// VpcId is the ID of the VPC
+	// Vpc is a VPC configuration to bind the cluster to
 	//
 	// +optional
-	VpcId string `json:"vpcId,omitempty"`
+	Vpc nd.Vpc `json:"vpc,omitempty"`
 }
 
 // Repository type metadata.

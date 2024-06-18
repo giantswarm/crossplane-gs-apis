@@ -44,6 +44,21 @@ type RdsBaseDbSpec struct {
 	//
 	// +required
 	Region *string `json:"region"`
+
+	// CidrBlocks is a list of CIDRs that are allowed to connect to the DB.
+	//
+	// +required
+	CidrBlocks []*string `json:"cidrBlocks"`
+
+	// SubnetIds is a list of subnet IDs to use for the subnet group.
+	//
+	// +required
+	SubnetIds []*string `json:"subnetIds"`
+
+	// VpcId is the VPC ID to use.
+	//
+	// +required
+	VpcId *string `json:"vpcId"`
 }
 
 // Defines the status of a RDS cluster
@@ -588,11 +603,6 @@ type ClusterParameters struct {
 	// +kubebuilder:validation:Maximum=259200
 	BacktrackWindow *int64 `json:"backtrackWindow,omitempty"`
 
-	// CidrBlocks is a list of CIDRs that are allowed to connect to the DB.
-	//
-	// +required
-	CidrBlocks []*string `json:"cidrBlocks"`
-
 	// CopyTagsToSnapshot is whether tags should be copied to snapshots.
 	//
 	// +optional
@@ -818,21 +828,11 @@ type ClusterParameters struct {
 	// +optional
 	StorageType *string `json:"storageType,omitempty"`
 
-	// SubnetIds is a list of subnet IDs to use for the subnet group.
-	//
-	// +required
-	SubnetIds []*string `json:"subnetIds"`
-
 	// Tags is a set of tags to associate with the DB cluster.
 	//
 	// +optional
 	// +kubebuilder:validation:MaxProperties=50
 	Tags map[string]*string `json:"tags,omitempty"`
-
-	// VpcId is the VPC ID to use.
-	//
-	// +required
-	VpcId *string `json:"vpcId"`
 }
 
 type Endpoint struct {

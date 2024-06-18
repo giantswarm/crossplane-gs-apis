@@ -86,12 +86,6 @@ type PeeredVpcTags struct {
 // PeeredVpcNetworkParameters defines the parameters for creating a VPC with
 // the option of peered subnets.
 type PeeredVpcNetworkParameters struct {
-
-	// Region is the region in which the VPC will be created.
-	//
-	// +required
-	Region string `json:"region"`
-
 	// PeeredSubnets defines how many public and private subnet sets to create.
 	//
 	// +required

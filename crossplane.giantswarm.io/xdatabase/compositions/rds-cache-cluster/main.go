@@ -51,6 +51,14 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		}).
 		WithInput(build.ObjectKindReference{
 			Object: &xpt.Resources{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "pt.crossplane.io/v1beta1",
+					Kind:       "Resources",
+				},
+				PatchSets: []xpt.PatchSet{
+					metadataPatchSet(),
+					commonPatchSet(),
+				},
 				Resources: resources,
 			},
 		})
@@ -85,9 +93,10 @@ func createResources() []xpt.ComposedTemplate {
 				},
 			},
 			Patches: []xpt.ComposedPatch{
-				cb.FromPatch("spec.vpc", "spec"),
+				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
 				cb.FromPatch("spec.region", "spec.region"),
-				cb.ToPatch("status.vpcId", "status.atProvider.vpcId"),
+				cb.FromPatch(("spec.providerConfigRef"), "spec.providerConfigRef"),
+				cb.ToPatch("status.vpc", "status.vpcs.self"),
 			},
 		},
 		{
@@ -102,6 +111,8 @@ func createResources() []xpt.ComposedTemplate {
 			},
 			Patches: []xpt.ComposedPatch{
 				cb.FromPatch("spec.database", "spec"),
+				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
+				cb.FromPatch(("spec.providerConfigRef"), "spec.providerConfigRef"),
 				cb.FromPatch("spec.region", "spec.region"),
 			},
 		},

@@ -16,8 +16,42 @@ spec:
   - functionRef:
       name: function-patch-and-transform
     input:
+      apiVersion: pt.crossplane.io/v1beta1
+      kind: Resources
       metadata:
         creationTimestamp: null
+      patchSets:
+      - name: metadata
+        patches:
+        - fromFieldPath: metadata.labels
+          policy:
+            toFieldPath: MergeObjects
+          toFieldPath: metadata.labels
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.region
+          toFieldPath: metadata.labels.region
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.providerConfigRef
+          toFieldPath: spec.providerConfigRef
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.deletionPolicy
+          toFieldPath: spec.deletionPolicy
+          type: FromCompositeFieldPath
+      - name: commontags
+        patches:
+        - fromFieldPath: spec.tags
+          policy:
+            toFieldPath: MergeObjects
+          toFieldPath: spec.forProvider.tags
+          type: FromCompositeFieldPath
+        - fromFieldPath: metadata.labels
+          policy:
+            toFieldPath: MergeObjects
+          toFieldPath: spec.forProvider.tags
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.region
+          toFieldPath: spec.forProvider.tags.region
+          type: FromCompositeFieldPath
       resources:
       - base:
           apiVersion: xnetworks.crossplane.giantswarm.io/v1alpha1
@@ -28,6 +62,7 @@ spec:
             peering:
               allowPublic: false
               enabled: false
+              groupBy: ""
               remoteVpcs: null
             region: ""
             subnetsets:
@@ -40,14 +75,17 @@ spec:
             subnetBits: null
         name: peered-vpc-network
         patches:
-        - fromFieldPath: spec.vpc
-          toFieldPath: spec
+        - fromFieldPath: spec.deletionPolicy
+          toFieldPath: spec.deletionPolicy
           type: FromCompositeFieldPath
         - fromFieldPath: spec.region
           toFieldPath: spec.region
           type: FromCompositeFieldPath
-        - fromFieldPath: status.atProvider.vpcId
-          toFieldPath: status.vpcId
+        - fromFieldPath: spec.providerConfigRef
+          toFieldPath: spec.providerConfigRef
+          type: FromCompositeFieldPath
+        - fromFieldPath: status.vpcs.self
+          toFieldPath: status.vpc
           type: ToCompositeFieldPath
       - base:
           apiVersion: xdatabases.crossplane.giantswarm.io/v1alpha1
@@ -65,6 +103,12 @@ spec:
         patches:
         - fromFieldPath: spec.database
           toFieldPath: spec
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.deletionPolicy
+          toFieldPath: spec.deletionPolicy
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.providerConfigRef
+          toFieldPath: spec.providerConfigRef
           type: FromCompositeFieldPath
         - fromFieldPath: spec.region
           toFieldPath: spec.region
