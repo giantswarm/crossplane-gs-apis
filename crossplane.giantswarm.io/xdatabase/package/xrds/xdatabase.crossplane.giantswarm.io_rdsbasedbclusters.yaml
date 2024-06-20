@@ -410,6 +410,16 @@ spec:
                       type: string
                   type: object
                 type: array
+              instanceCount:
+                description: |-
+                  InstanceCount is the number of instances to create.
+
+
+                  If set, this value will create the requested number of instances using
+                  defaults from the cluster configuration. If `instances` are specified,
+                  this value is ignored.
+                format: int64
+                type: integer
               instances:
                 description: Instances is a list of instances to create.
                 items:

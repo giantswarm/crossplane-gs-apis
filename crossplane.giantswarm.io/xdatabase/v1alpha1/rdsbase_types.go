@@ -36,6 +36,10 @@ type RdsBaseDbList struct {
 // Defines the spec of a RDS cluster
 type RdsBaseDbSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
+	// AvailabilityZones is a list of availability zone to use.
+	//
+	// +optional
+	AvailabilityZones []*string `json:"availabilityZones,omitempty"`
 
 	// ClusterParameters is the parameters for the RDS cluster.
 	ClusterParameters `json:",inline"`
@@ -583,11 +587,6 @@ type ClusterParameters struct {
 	// +optional
 	Autoscaling *Autoscaling `json:"autoscaling,omitempty"`
 
-	// AvailabilityZones is a list of availability zone to use.
-	//
-	// +optional
-	AvailabilityZones []*string `json:"availabilityZones,omitempty"`
-
 	// BackupRetentionPeriod is the number of days to retain backups for.
 	//
 	// +optional
@@ -732,6 +731,15 @@ type ClusterParameters struct {
 	// +optional
 	// +default=0
 	Iops *int64 `json:"iops,omitempty"`
+
+	// InstanceCount is the number of instances to create.
+	//
+	// If set, this value will create the requested number of instances using
+	// defaults from the cluster configuration. If `instances` are specified,
+	// this value is ignored.
+	//
+	// +optional
+	InstanceCount *int64 `json:"instanceCount,omitempty"`
 
 	// Instances is a list of instances to create.
 	//

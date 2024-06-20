@@ -24,7 +24,7 @@ func createKmsResource() xpt.ComposedTemplate {
 		},
 		Patches: []xpt.ComposedPatch{
 			cb.FromPatch("spec.region", "spec.forProvider.region"),
-			cb.ToPatch("status.kmsKeyId", "status.atProvider.id"),
+			cb.ToPatch("status.kmsKeyId", "status.atProvider.arn"),
 
 			combineNameRegionPatch("spec.forProvider.tags.Name", ""),
 			{

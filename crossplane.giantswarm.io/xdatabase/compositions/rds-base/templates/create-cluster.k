@@ -154,7 +154,7 @@ _cluster = {
             if _ipgn:
                 dbInstanceParameterGroupName: _ipgn
         }
-        providerConfigRef: _oxr.providerConfigRef
+        providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
         writeConnectionSecretToRef: {
             name: "${_oxr.spec.claimRef.name}-${_region}-cluster"
             namespace: _oxr.spec.claimRef.namespace

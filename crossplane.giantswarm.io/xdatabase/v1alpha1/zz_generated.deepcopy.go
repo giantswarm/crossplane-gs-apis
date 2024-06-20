@@ -430,17 +430,6 @@ func (in *ClusterParameters) DeepCopyInto(out *ClusterParameters) {
 		*out = new(Autoscaling)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.AvailabilityZones != nil {
-		in, out := &in.AvailabilityZones, &out.AvailabilityZones
-		*out = make([]*string, len(*in))
-		for i := range *in {
-			if (*in)[i] != nil {
-				in, out := &(*in)[i], &(*out)[i]
-				*out = new(string)
-				**out = **in
-			}
-		}
-	}
 	if in.BackupRetentionPeriod != nil {
 		in, out := &in.BackupRetentionPeriod, &out.BackupRetentionPeriod
 		*out = new(int64)
@@ -581,6 +570,11 @@ func (in *ClusterParameters) DeepCopyInto(out *ClusterParameters) {
 	}
 	if in.Iops != nil {
 		in, out := &in.Iops, &out.Iops
+		*out = new(int64)
+		**out = **in
+	}
+	if in.InstanceCount != nil {
+		in, out := &in.InstanceCount, &out.InstanceCount
 		*out = new(int64)
 		**out = **in
 	}
@@ -1054,6 +1048,17 @@ func (in *RdsBaseDbRole) DeepCopy() *RdsBaseDbRole {
 func (in *RdsBaseDbSpec) DeepCopyInto(out *RdsBaseDbSpec) {
 	*out = *in
 	in.ResourceSpec.DeepCopyInto(&out.ResourceSpec)
+	if in.AvailabilityZones != nil {
+		in, out := &in.AvailabilityZones, &out.AvailabilityZones
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	in.ClusterParameters.DeepCopyInto(&out.ClusterParameters)
 	if in.Region != nil {
 		in, out := &in.Region, &out.Region
@@ -1203,6 +1208,11 @@ func (in *RdsCacheClusterSpec) DeepCopyInto(out *RdsCacheClusterSpec) {
 	in.ResourceSpec.DeepCopyInto(&out.ResourceSpec)
 	in.Database.DeepCopyInto(&out.Database)
 	out.SubnetGroupIndexes = in.SubnetGroupIndexes
+	if in.AvailabilityZones != nil {
+		in, out := &in.AvailabilityZones, &out.AvailabilityZones
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	in.Vpc.DeepCopyInto(&out.Vpc)
 }
 

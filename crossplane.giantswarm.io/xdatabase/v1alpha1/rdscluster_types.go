@@ -60,6 +60,13 @@ type RdsCacheClusterSpec struct {
 	// +required
 	Region string `json:"region"`
 
+	// AvailabilityZones is the list of availability zones to be used by the cluster
+	//
+	// +required
+	// +kubebuilder:validation:MinItems=3
+	// +kubebuilder:validation:MaxItems=3
+	AvailabilityZones []string `json:"availabilityZones"`
+
 	// Vpc defines the VPC settings
 	//
 	// +required

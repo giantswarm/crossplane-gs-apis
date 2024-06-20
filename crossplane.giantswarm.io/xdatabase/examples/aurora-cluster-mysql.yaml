@@ -1,0 +1,80 @@
+---
+apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
+kind: RdsCacheClusterClaim
+metadata:
+  name: cloudtest-rds-aurora-cluster
+  namespace: default
+  labels:
+    owner: honeybadger
+    provider: aws
+    app.kubernetes.io/name: myapp
+    app.kubernetes.io/instance: myapp-elasticache-aurora-cluster
+    app.kubernetes.io/part-of: myapp
+    app.kubernetes.io/managed-by: crossplane
+spec:
+  compositionSelector:
+    matchLabels:
+      provider: aws
+      component: database
+      type: rds-cluster
+
+  subnetGroupIndexes:
+    cache: 0
+    database: 1
+
+  availabilityZones: ["a", "b", "c"]
+
+  database:
+    createCluster: true
+    enabledCloudwatchLogsExports:
+      - audit
+      - error
+      - general
+      - slowquery
+    cloudwatchLogGroupParameters:
+      retentionInDays: 7
+      class: standard
+      create: false
+    engine: aurora-mysql
+    engineVersion: "8.0.mysql_aurora.3.06.0"
+    instances:
+      - {}
+      - {}
+      - {}
+    masterUsername: giantswarm
+    secretRotation:
+      enabled: false
+    storageType: aurora
+
+  deletionPolicy: Delete
+  providerConfigRef:
+    name: aws-golem
+  region: eu-west-2
+
+  vpc:
+    availabilityZones:
+    - a
+    - b
+    - c
+    peering:
+      remoteVpcs:
+      - name: golem-vpc
+        region: eu-west-2
+        allowPublic: true
+      enabled: true
+    subnetsets:
+      cidrs:
+      - prefix: '10.16.0.0/24'
+        public:
+          mask: ""
+          count: 0
+          lbSetIndex: -1
+        private:
+          mask: /28
+          count: 2
+          lbSetIndex: -1
+    tags:
+      common:
+        giantswarm.io/owner: honeybadger
+        giantswarm.io/managed-by: crossplane
+        giantswarm.io/part-of: myapp

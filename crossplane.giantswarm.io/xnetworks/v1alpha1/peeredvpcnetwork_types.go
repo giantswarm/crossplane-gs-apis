@@ -50,6 +50,16 @@ type PeeredVpcNetwork struct {
 type PeeredVpcNetworkSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
 
+	// AvailabilityZones is a list of availability zones in the region. The
+	// number of availability zones must match the number of bits x the number
+	// of subnetsets (public + private). The VPC Cidr must be big enough to
+	// encompass all the subnet CIDR blocks.
+	//
+	// +required
+	// +kubebuilder:validation:MinItems=3
+	// +kubebuilder:validation:MaxItems=3
+	AvailabilityZones []string `json:"availabilityZones"`
+
 	// PeeredVpcNetworkParameters defines the parameters for creating a VPC with
 	// the option of peered subnets.
 	//
@@ -237,16 +247,6 @@ type PeeredSubnets struct {
 	// +kubebuilder:validation:MaxItems=5
 	// +listType=atomic
 	Cidrs []PeeredSubnetSet `json:"cidrs"`
-
-	// AvailabilityZones is a list of availability zones in the region. The
-	// number of availability zones must match the number of bits x the number
-	// of subnetsets (public + private). The VPC Cidr must be big enough to
-	// encompass all the subnet CIDR blocks.
-	//
-	// +required
-	// +kubebuilder:validation:MinItems=3
-	// +kubebuilder:validation:MaxItems=3
-	AvailabilityZones []string `json:"availabilityZones"`
 
 	// Function defines the function to use to calculate the CIDR blocks for the
 	// subnets. The default is "multiprefixloop" which will split multiple CIDRs

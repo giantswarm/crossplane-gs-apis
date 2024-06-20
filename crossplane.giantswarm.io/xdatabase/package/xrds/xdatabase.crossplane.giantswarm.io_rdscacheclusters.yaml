@@ -33,6 +33,14 @@ spec:
               RdsCacheClusterSpec contains the structure required for building the
               infrastructure for an RDS + Elasticache Cluster.
             properties:
+              availabilityZones:
+                description: AvailabilityZones is the list of availability zones to
+                  be used by the cluster
+                items:
+                  type: string
+                maxItems: 3
+                minItems: 3
+                type: array
               database:
                 description: Database defines the database settings
                 properties:
@@ -120,12 +128,6 @@ spec:
                         format: int64
                         type: integer
                     type: object
-                  availabilityZones:
-                    description: AvailabilityZones is a list of availability zone
-                      to use.
-                    items:
-                      type: string
-                    type: array
                   backtrackWindow:
                     description: |-
                       BacktrackWindow is the target backtrack window, in seconds.
@@ -405,6 +407,16 @@ spec:
                           type: string
                       type: object
                     type: array
+                  instanceCount:
+                    description: |-
+                      InstanceCount is the number of instances to create.
+
+
+                      If set, this value will create the requested number of instances using
+                      defaults from the cluster configuration. If `instances` are specified,
+                      this value is ignored.
+                    format: int64
+                    type: integer
                   instances:
                     description: Instances is a list of instances to create.
                     items:
@@ -1240,6 +1252,7 @@ spec:
                 - namespace
                 type: object
             required:
+            - availabilityZones
             - database
             - region
             - vpc

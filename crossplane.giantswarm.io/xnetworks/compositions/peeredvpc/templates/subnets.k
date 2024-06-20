@@ -1,6 +1,6 @@
 _oxr = option("params").oxr
 _dxr = option("params").dxr
-_azl = len(_oxr.spec.subnetsets.availabilityZones)
+_azl = len(_oxr.spec.availabilityZones)
 
 m = lambda x: str -> int {
     """

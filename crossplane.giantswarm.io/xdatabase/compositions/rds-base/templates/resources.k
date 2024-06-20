@@ -46,6 +46,9 @@ _s3import = get(_oxr, "spec.s3Import", False)
 _masterInstance = get(_ocds, "instance-0.Resource.status.atProvider", {})
 _specInstances = get(_oxr, "spec.instances", [])
 
+if not _specInstances and get(_oxr, "spec.instanceCount", 0) > 0:
+    _specInstances = [{} for i in range(get(_oxr, "spec.instanceCount", 0))]
+
 # This will force the secondary (read) replicas to be built after the primary
 # instance has been built. This is to ensure that the primary instance is
 # available for binding.
@@ -96,7 +99,6 @@ _instances = [
             forProvider: {
                 if not _createCluster:
                     # These options are specific to the Instance kind
-                    allocatedStorage: get(item, "spec.allocatedStorage", get(_oxr, "spec.allocatedStorage", 20)),
                     allowMajorVersionUpgrade: get(item, "spec.allowMajorVersionUpgrade", get(_oxr, "spec.allowMajorVersionUpgrade", True)),
                     backupRetentionPeriod: get(item, "spec.backupRetentionPeriod", get(_oxr, "spec.backupRetentionPeriod", 7)),
                     backupWindow: get(item, "spec.preferredBackupWindow", get(_oxr, "spec.preferredBackupWindow", "03:00-04:00")),
@@ -112,23 +114,24 @@ _instances = [
                     iamDatabaseAuthenticationEnabled: get(item, "spec.iamDatabaseAuthenticationEnabled", get(_oxr, "spec.iamDatabaseAuthenticationEnabled", False)),
                     iops: get(item, "spec.iops", get(_oxr, "spec.iops", 0)),
                     kmsKeyId: _keyId,
-                    licenseModel: get(item, "spec.licenseModel", get(_oxr, "spec.licenseModel", "general-public-license")),
+                    if get(item, "spec.licenseModel", get(_oxr, "spec.licenseModel", False)):
+                        licenseModel: get(item, "spec.licenseModel", get(_oxr, "spec.licenseModel", "")),
                     maintenanceWindow: get(item, "spec.preferredMaintenanceWindow", get(_oxr, "spec.preferredMaintenanceWindow", "sun:05:00-sun:06:00")),
                     multiAz: _multiAz,
-                    networkType: get(item, "spec.networkType", get(_oxr, "spec.networkType", "standard")),
+                    networkType: get(item, "spec.networkType", get(_oxr, "spec.networkType", "ipv4")),
 
+                    identifierPrefix: _appName
                     # Option group is specific to non-postgresql instances but
                     # may be set for mysql and mssql instance types
                     if get(item, "spec.optionGroupName", get(_oxr, "spec.optionGroupName", False)):
                         optionGroupName: get(item, "spec.optionGroupName", get(_oxr, "spec.optionGroupName", None)),
 
                     if _restoreToPointInTime and get(_oxr, "spec.restoreToPointInTime.identifier", False):
-                        identifier: get(_oxr, "spec.restoreToPointInTime.identifier", None),
                         restoreToPointInTime: [_restoreToPointInTime],
-                    skipFinalSnapshot: get(item, "spec.skipFinalSnapshot", get(_oxr, "spec.skipFinalSnapshot", False)),
 
-                    if get(item, "spec.snapshotIdentifier", get(_oxr, "spec.snapshotIdentifier", False)):
-                        snapshotIdentifier: get(item, "spec.snapshotIdentifier", get(_oxr, "spec.snapshotIdentifier", None)),
+                    skipFinalSnapshot: get(item, "spec.skipFinalSnapshot", get(_oxr, "spec.skipFinalSnapshot", True)),
+                    if not get(item, "spec.skipFinalSnapshot", get(_oxr, "spec.skipFinalSnapshot", True)):
+                        snapshotIdentifier: get(item, "spec.snapshotIdentifier", get(_oxr, "spec.snapshotIdentifier", _appName)),
 
                     storageEncrypted: get(item, "spec.storageEncrypted", get(_oxr, "spec.storageEncrypted", True)),
                     if get(item, "spec.storageType", get(_oxr, "spec.storageType", "gp2")) == "gp3":
@@ -136,15 +139,28 @@ _instances = [
                     storageType: get(item, "spec.storageType", get(_oxr, "spec.storageType", "gp2")),
                     vpcSecurityGroupIds: [get(_oxr, "status.securityGroupId", "")],
 
+                    _managedMasterUserPassword: get(item, "spec.manageMasterUserPassword", get(_oxr, "spec.manageMasterUserPassword", False)),
+                    _autogeneratePassword: get(item, "spec.autoGeneratePassword", get(_oxr, "spec.autoGeneratePassword", True)),
+
                     # If this is the primary (non-cluster) instance, set
                     # the database name and master user password. Additionally,
                     # if s3Import has been defined, this is configured here.
                     if _isPrimaryInstance:
+                        if _autogeneratePassword and not _managedMasterUserPassword:
+                            autoGeneratePassword: get(item, "spec.autoGeneratePassword", get(_oxr, "spec.autoGeneratePassword", True)),
+                            passwordSecretRef: {
+                                key: "password",
+                                namespace: get(_oxr, "spec.claimRef.namespace", "default"),
+                                name: "${_appName}-pass",
+                            }
+
+                        allocatedStorage: get(item, "spec.allocatedStorage", get(_oxr, "spec.allocatedStorage", 20)),
                         _dbName = get(item, "spec.databaseName", get(_oxr, "spec.databaseName", False))
                         if _dbName:
                             dbName: _dbName,
-                        manageMasterUserPassword: get(item, "spec.manageMasterUserPassword", get(_oxr, "spec.manageMasterUserPassword", True)),
-                        masterUserSecretKmsKeyId: _keyId,
+                        if _managedMasterUserPassword:
+                            manageMasterUserPassword: _managedMasterUserPassword,
+                            masterUserSecretKmsKeyId: _keyId,
                         username: get(item, "spec.username", get(_oxr, "spec.masterUsername", None)),
                         if _s3import:
                             s3import: _s3import,
@@ -152,7 +168,7 @@ _instances = [
                     # If this is not the primary (non-cluster) instance, the
                     # replication source
                     if not _isPrimaryInstance and _masterInstance:
-                        replicateSourceDb: get(_masterInstance, "id", None),
+                        replicateSourceDb: get(_masterInstance, "arn", None),
                     if _dbp:
                         parameterGroupName: _dbp
 
@@ -163,9 +179,10 @@ _instances = [
                 monitoringInterval: get(item, "spec.monitoringInterval", get(_oxr, "spec.enhancedMonitoring.monitoringInterval", 0)),
                 if _monitoringRoleArn:
                     monitoringRoleArn: _monitoringRoleArn,
-                performanceInsightsEnabled: get(item, "spec.performanceInsightsEnabled", get(_oxr, "spec.performanceInsightsEnabled", False)),
-                performanceInsightsKmsKeyId: get(item, "spec.performanceInsightsKmsKeyId", get(_oxr, "spec.performanceInsightsKmsKeyId", _keyId)),
-                performanceInsightsRetentionPeriod: get(item, "spec.performanceInsightsRetentionPeriod", get(_oxr, "spec.performanceInsightsRetentionPeriod", 7)),
+                if get(item, "spec.performanceInsightsEnabled", get(_oxr, "spec.performanceInsightsEnabled", False)):
+                    performanceInsightsEnabled: get(item, "spec.performanceInsightsEnabled", get(_oxr, "spec.performanceInsightsEnabled", False)),
+                    performanceInsightsKmsKeyId: get(item, "spec.performanceInsightsKmsKeyId", get(_oxr, "spec.performanceInsightsKmsKeyId", _keyId)),
+                    performanceInsightsRetentionPeriod: get(item, "spec.performanceInsightsRetentionPeriod", get(_oxr, "spec.performanceInsightsRetentionPeriod", 7)),
                 applyImmediately: get(item, "spec.applyImmediately", get(_oxr, "spec.applyImmediately", True)),
                 autoMinorVersionUpgrade: get(item, "spec.autoMinorVersionUpgrade", get(_oxr, "spec.autoMinorVersionUpgrade", True)),
 
@@ -173,15 +190,15 @@ _instances = [
                 # or if the instance is not multi-AZ and an availability zone is
                 # provided
                 if (_createCluster or _instanceUseAz) and _az:
-                        availabilityZone: _az,
+                    availabilityZone: _az,
 
                 if _cacert:
                     caCertIdentifier: _cacert
 
                 if _createCluster:
                     clusterIdentifier: _clusterIdentifier,
-                    preferredBackupWindow: get(item, "spec.preferredBackupWindow", get(_oxr, "spec.preferredBackupWindow", "03:00-04:00")),
-                    preferredMaintenanceWindow: get(item, "spec.preferredMaintenanceWindow", get(_oxr, "spec.preferredMaintenanceWindow", "sun:05:00-sun:06:00")),
+                    # preferredBackupWindow: get(item, "spec.preferredBackupWindow", get(_oxr, "spec.preferredBackupWindow", "03:00-04:00")),
+                    # preferredMaintenanceWindow: get(item, "spec.preferredMaintenanceWindow", get(_oxr, "spec.preferredMaintenanceWindow", "sun:05:00-sun:06:00")),
                     if _pt:
                         promotionTier: _pt,
                     if _dbp:
@@ -195,6 +212,11 @@ _instances = [
                 },
             }
             providerConfigRef: _oxr.spec.providerConfigRef
+            if not _createCluster and _isPrimaryInstance:
+                writeConnectionSecretToRef: {
+                    namespace: get(_oxr, "spec.claimRef.namespace", "default")
+                    name: _appName,
+                }
         }
     }
     for i, item in _buildInstances if all_true([
@@ -499,7 +521,7 @@ _securityGroupRules = [
             forProvider: {
                 securityGroupId: get(_oxr, "status.securityGroupId", ""),
                 cidrBlocks: [cidr],
-                fromPort: -1,
+                fromPort: _port,
                 protocol: "tcp",
                 region: _region,
                 toPort: _port,

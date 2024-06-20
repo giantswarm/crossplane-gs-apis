@@ -39,7 +39,7 @@ _requestedSets = [
     for c in get(_oxr, "spec.subnetsets.cidrs", [])
 ]
 
-_zones = get(_oxr, "spec.subnetsets.availabilityZones", [ "a", "b", "c" ])
+_zones = get(_oxr, "spec.availabilityZones", [ "a", "b", "c" ])
 
 assert sum(_requestedSets)*len(_zones) < 200, """
     The number of subnet sets you are requesting will exceed the maximum number
@@ -398,9 +398,14 @@ _peering = [
         }
         spec: {
             deletionPolicy: _dp
+            _peerRegion = get(_vpcs, "${x.name}.region", _region)
             forProvider: {
-                autoAccept: True
-                peerVpcId: _vpcs[x.name].id
+                if _peerRegion == _region:
+                    autoAccept: True
+                if _peerRegion != _region:
+                    autoAccept: False
+                    peerRegion: _peerRegion
+                peerVpcId: get(_vpcs, "${x.name}.id", "")
                 region: _region
                 tags: {Name: "${_appName}-${_region}-${x.name}"} | _tags
                 vpcId: _self.id
@@ -414,6 +419,39 @@ _peering = [
         _vpcs[x.name],
         get(_oxr, "spec.peering.enabled", False),
         _self.id
+    ])
+]
+
+_accepters = [
+    {
+        apiVersion: "ec2.aws.upbound.io/v1beta1"
+        kind: "VPCPeeringConnectionAccepter"
+        metadata: {
+            annotations: {
+                "krm.kcl.dev/composition-resource-name" = "accepter-${x.name}"
+            }
+            labels: _labels | {vpcName: x.name}
+        }
+        spec: {
+            deletionPolicy: _dp
+            forProvider: {
+                autoAccept: True
+                accepter: [
+                    {
+                        allowRemoteVpcDnsResolution: True
+                    }
+                ]
+                region: x.region
+                vpcPeeringConnectionId: get(_ocs, "peering-${x.name}.Resource.status.atProvider.id", "")
+                tags: {Name: "${_appName}-${_region}-${x.name}"} | _tags
+            }
+            providerConfigRef: _pcr
+        }
+    }
+    for _, x in get(_oxr, "spec.peering.remoteVpcs", [])
+    if all_true([
+        get(x, "region", _region) != _region
+        get(_ocs, "peering-${x.name}.Resource.status.atProvider.id", False)
     ])
 ]
 
@@ -434,7 +472,7 @@ _peering = [
 # First lets build a mapping from our own CIDR blocks to every route table that
 # is not ours
 _rmtTables = [] if not _vpcs else [ # public route tables if requested
-    {"id" = id, "vpcCidr" = cidr, "selector" = name}
+    {"id" = id, "vpcCidr" = cidr, "selector" = name, "region" = get(vpc, "region", _region)}
     for cidr in [_self.cidrBlock] + _additionalCidrBlocks
     for name, vpc in _vpcs
     for id in [
@@ -464,6 +502,7 @@ _myRouteTables = [
         id = i,
         vpcCidr = cidr,
         selector = name
+        region = _region
     }
     for _, index in [
         r for r in _pubrtbls
@@ -505,7 +544,7 @@ _peeringRoutes = [
             forProvider: {
                 destinationCidrBlock: r.vpcCidr
                 routeTableId: r.id
-                region: _region
+                region: r.region
                 vpcPeeringConnectionIdSelector: {
                     matchControllerRef: True
                     matchLabels: {
@@ -530,7 +569,8 @@ _peeringRoutes = [
 # Create the list of items to return
 _items = [
     _subnetsets, _acs, _eips, _natgateways,
-    _ngwRoutes, _igwRoutes, _peering, _peeringRoutes
+    _ngwRoutes, _igwRoutes, _peering,
+    _accepters, _peeringRoutes
 ]
 
 # flatten items and exclude any empty elements

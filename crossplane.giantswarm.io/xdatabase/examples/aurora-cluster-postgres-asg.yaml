@@ -2,16 +2,18 @@
 apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
 kind: RdsCacheClusterClaim
 metadata:
-  name: example-rds-elasticache
+  name: cloudtest-rds-aurora-cluster
   namespace: default
   labels:
     owner: honeybadger
     provider: aws
     app.kubernetes.io/name: myapp
-    app.kubernetes.io/instance: myapp-elasticache-database
+    app.kubernetes.io/instance: myapp-elasticache-aurora-cluster
     app.kubernetes.io/part-of: myapp
     app.kubernetes.io/managed-by: crossplane
 spec:
+  availabilityZones: ["a", "b", "c"]
+
   compositionSelector:
     matchLabels:
       provider: aws
@@ -23,35 +25,35 @@ spec:
     database: 1
 
   database:
-    availabilityZones: ["a", "b", "c"]
-    allocatedStorage: 20
-    createCluster: false
-    enabledCloudwatchLogsExports: ["postgresql"]
+    autoscaling:
+      enabled: true
+      minCapacity: 2
+      maxCapacity: 4
+    createCluster: true
+    enabledCloudwatchLogsExports:
+      - postgresql
     cloudwatchLogGroupParameters:
       retentionInDays: 7
       class: standard
       create: false
-    engine: postgres
-    engineVersion: "14.5"
-    dbClusterInstanceClass: db.t3.medium
-    iops: 1000
-    instances:
-      - {} # master instance - if multiAz will create a hot standaby replica
-    masterUsername: admin
-    multiAz: true
+    engine: aurora-postgresql
+    engineVersion: "15.6"
+    instanceCount: 1
+    masterUsername: giantswarm
     secretRotation:
       enabled: false
-    storageType: io1
+    storageType: aurora
 
   deletionPolicy: Delete
   providerConfigRef:
-    name: default
-  region: eu-central-1
+    name: aws-golem
+  region: eu-west-2
 
   vpc:
     peering:
       remoteVpcs:
-      - name: basic-no-peering
+      - name: golem-vpc
+        region: eu-west-2
         allowPublic: true
       enabled: true
     subnetsets:
@@ -65,10 +67,6 @@ spec:
           mask: /28
           count: 2
           lbSetIndex: -1
-      availabilityZones:
-      - a
-      - b
-      - c
     tags:
       common:
         giantswarm.io/owner: honeybadger
