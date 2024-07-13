@@ -50,8 +50,9 @@ spec:
 
 
                   Valid values are:
-                  - rotate
-                  - set
+                  - ROTATE
+                  - SET
+                  - DELETE
                 enum:
                 - rotate
                 - set
@@ -99,6 +100,16 @@ spec:
                         AutoMinorVersionUpgrade specifies whether minor engine upgrades will be
                         applied automatically to the cluster during the maintenance window.
                       type: boolean
+                    availabilityZone:
+                      description: |-
+                        AvailabilityZone is the name of the Availability Zone in which the
+                        cluster will be created.
+
+
+                        If you want to create cache nodes in multi-az, use
+                        preferred_availability_zones instead.
+                        Default: System chosen Availability Zone.
+                      type: string
                     azMode:
                       description: |-
                         AzMode specifies the Availability Zone mode of the cluster.
@@ -158,7 +169,7 @@ spec:
                       type: string
                     logDeliveryConfigurations:
                       description: |-
-                        LogDeliveryConfigurations is a list of log delivery configurations for
+                        LogDeliveryConfiguration is a list of log delivery configurations for
                         the cluster.
 
 
@@ -296,16 +307,6 @@ spec:
                         PreferredOutpostArn is the Amazon Resource Name (ARN) of the outpost in
                         which the cache cluster will be created.
                       type: string
-                    replicationGroupId:
-                      description: |-
-                        ReplicationGroupId is the name of the replication group to which this
-                        cluster should belong. Required if Engine is not specified.
-
-
-                        If this is specified, the node will be added as a read replica. Otherwise
-                        the cluster will be a strandalone primary that is not part of a replication
-                        group.
-                      type: string
                     securityGroupIds:
                       description: |-
                         SecurityGroupIds is a list of security group IDs to associate with the
@@ -388,6 +389,20 @@ spec:
                   ClusterId is the group Identifier for the cluster. Elasticache converts
                   this name to lowercase.
                 type: string
+              clusterModeEnabled:
+                description: |-
+                  ClusterModeEnabled specifies whether cluster mode is enabled for the
+                  replication group.
+                type: boolean
+              createReplicationGroup:
+                description: |-
+                  CreateReplicationGroup specifies whether a replication group should be
+                  created.
+
+
+                  If set false, the replication group configuration will be used for
+                  creating a single cluster
+                type: boolean
               dataTieringEnabled:
                 description: |-
                   DataTieringEnabled specifies whether data tiering is enabled for the
@@ -410,14 +425,6 @@ spec:
                 - Orphan
                 - Delete
                 type: string
-              enabled:
-                description: |-
-                  Enabled is a flag that enables the replication group.
-
-
-                  If set false, the replication group configuration will be used for
-                  creating a single cluster
-                type: boolean
               engine:
                 description: |-
                   Engine is the name of the cache engine to be used for the clusters in
@@ -467,11 +474,6 @@ spec:
                       EngineVersion is the version number of the cache engine to be used for
                       the cluster. If not set this will default to the latest version.
                     type: string
-                  globalReplicationGroupIdSuffix:
-                    description: |-
-                      GlobalReplicationGroupIdSuffix is the suffix to append to the global
-                      replication group id.
-                    type: string
                   numNodeGroups:
                     description: NumNodeGroups is the number of node groups in the
                       replication group.
@@ -489,6 +491,11 @@ spec:
 
                       Specifying this parameter will result in an error if a major engine version
                       is not specified.
+                    type: string
+                  suffix:
+                    description: |-
+                      GlobalReplicationGroupIdSuffix is the suffix to append to the global
+                      replication group id.
                     type: string
                 type: object
               globalReplicationGroupId:
@@ -522,7 +529,7 @@ spec:
                 type: string
               logDeliveryConfigurations:
                 description: |-
-                  LogDeliveryConfigurations is a list of log delivery configurations for
+                  LogDeliveryConfiguration is a list of log delivery configurations for
                   the cluster.
 
 
@@ -911,6 +918,9 @@ spec:
             type: object
           status:
             properties:
+              clusterName:
+                description: ClusterName is the name of the cluster.
+                type: string
               conditions:
                 description: Conditions of the resource.
                 items:
@@ -950,6 +960,40 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              endpoint:
+                description: Endpoint is the DNS name of the endpoint for the cluster.
+                type: string
+              globalEndpoint:
+                description: |-
+                  GlobalEndpoint is the DNS name of the endpoint for the cluster at global
+                  scope
+                type: string
+              globalReplicationGroupId:
+                description: GlobalReplicationGroupId is the ID of the global replication
+                  group.
+                type: string
+              kmsKeyId:
+                description: |-
+                  kmsKeyId is the ID of the AWS Key Management Service (KMS) key used to
+                  encrypt the data in the cluster.
+                type: string
+              port:
+                description: |-
+                  Port is the port number on which each of the cache nodes will accept
+                  connections.
+                format: int64
+                type: integer
+              replicationGroupId:
+                description: ReplicationGroupId is the ID of the replication group.
+                type: string
+              securityGroupId:
+                description: SecurityGroupId is the ID of the security group for the
+                  cluster.
+                type: string
+              subnetGroupName:
+                description: SubnetGroupName is the name of the subnet group for the
+                  cluster.
+                type: string
             type: object
         required:
         - spec

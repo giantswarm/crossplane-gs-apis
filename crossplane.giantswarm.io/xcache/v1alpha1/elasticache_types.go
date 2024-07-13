@@ -3,6 +3,7 @@ package v1alpha1
 import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 // +kubebuilder:object:root=true
@@ -86,15 +87,43 @@ type ElasticacheStatus struct {
 	// +optional
 	Endpoint *string `json:"endpoint,omitempty"`
 
+	// GlobalEndpoint is the DNS name of the endpoint for the cluster at global
+	// scope
+	//
+	// +optional
+	GlobalEndpoint *string `json:"globalEndpoint,omitempty"`
+
 	// GlobalReplicationGroupId is the ID of the global replication group.
 	//
 	// +optional
 	GlobalReplicationGroupId *string `json:"globalReplicationGroupId,omitempty"`
 
+	// kmsKeyId is the ID of the AWS Key Management Service (KMS) key used to
+	// encrypt the data in the cluster.
+	//
+	// +optional
+	KmsKeyId *string `json:"kmsKeyId,omitempty"`
+
+	// Port is the port number on which each of the cache nodes will accept
+	// connections.
+	//
+	// +optional
+	Port *int64 `json:"port,omitempty"`
+
 	// ReplicationGroupId is the ID of the replication group.
 	//
 	// +optional
 	ReplicationGroupId *string `json:"replicationGroupId,omitempty"`
+
+	// SecurityGroupId is the ID of the security group for the cluster.
+	//
+	// +optional
+	SecurityGroupId *string `json:"securityGroupId,omitempty"`
+
+	// SubnetGroupName is the name of the subnet group for the cluster.
+	//
+	// +optional
+	SubnetGroupName *string `json:"subnetGroupName,omitempty"`
 }
 
 type Cluster struct {
@@ -748,3 +777,14 @@ type GlobalReplicationGroup struct {
 	// +optional
 	ParameterGroupName *string `json:"parameterGroupName,omitempty"`
 }
+
+// Repository type metadata.
+var (
+	ElasticacheClusterKind      = "ElasticacheCluster"
+	ElasticacheClusterGroupKind = schema.GroupKind{
+		Group: XRDGroup,
+		Kind:  ElasticacheClusterKind,
+	}.String()
+	ElasticacheClusterKindAPIVersion   = ElasticacheClusterKind + "." + GroupVersion.String()
+	ElasticacheClusterGroupVersionKind = GroupVersion.WithKind(ElasticacheClusterKind)
+)

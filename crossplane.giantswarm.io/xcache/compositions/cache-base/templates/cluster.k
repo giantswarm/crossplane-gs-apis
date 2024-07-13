@@ -33,7 +33,7 @@ _clusters = [
         kind: "Cluster"
         "metadata": {
             annotations: {
-                "krm.kcl.dev/composition-resource-name": "elasticache-cluster"
+                "krm.kcl.dev/composition-resource-name": "elasticache-cluster-${i}"
             }
         }
         "spec": {

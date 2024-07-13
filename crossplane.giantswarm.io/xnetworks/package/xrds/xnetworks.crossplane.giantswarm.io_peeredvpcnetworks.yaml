@@ -140,6 +140,24 @@ spec:
                             Disabled specifies if the peering connection should be disabled.
                             Defaults to true
                           type: boolean
+                        excludeFromPeering:
+                          description: |-
+                            MyExcludedSubnetsets specifies the indexes of subnetsets for this VPC to
+                            exclude from routing to the peering connection
+                          properties:
+                            private:
+                              description: private subnets to exclude from peering
+                              items:
+                                type: integer
+                              type: array
+                              x-kubernetes-list-type: atomic
+                            public:
+                              description: public subnets to exclude from peering
+                              items:
+                                type: integer
+                              type: array
+                              x-kubernetes-list-type: atomic
+                          type: object
                         name:
                           description: Name specifies the name of the VPC to peer
                             with.
@@ -157,6 +175,27 @@ spec:
                             If not defined, the region of the VPC will be assumed to be the same as
                             the region of the peered VPC.
                           type: string
+                        theirExcludeFromPeering:
+                          description: |-
+                            TheirExcludedSubnetsets specifies the indexes of subnetsets for the remote
+                            VPC to exclude from routing to the peering connection. If emmpty, all
+                            subnetsets will be included by default
+                          items:
+                            properties:
+                              private:
+                                description: private subnets to exclude from peering
+                                items:
+                                  type: integer
+                                type: array
+                                x-kubernetes-list-type: atomic
+                              public:
+                                description: public subnets to exclude from peering
+                                items:
+                                  type: integer
+                                type: array
+                                x-kubernetes-list-type: atomic
+                            type: object
+                          type: array
                       required:
                       - name
                       type: object

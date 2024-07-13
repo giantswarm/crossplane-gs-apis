@@ -21,8 +21,17 @@ _globalEnabled = all_true([
     get(_oxr, "spec.globalReplicationGroup.enabled", False)
 ])
 
+_globalEndpoint = get(_ocds, "elasticache-replication-group-global.Resource.status.endpoint", "") if _globalEnabled else ""
 _endpoint = get(_ocds, "elasticache-replication-group-local.Resource.status.endpoint", "") if _createReplicationGroup else ""
-_port = get(_ocds, "elasticache-replication-group-global.Resource.status.port", "") if _globalEnabled else get(_ocds, "elasticache-replication-group-local.Resource.status.port", "") if _createReplicationGroup else ""
+
+_port = 0
+if _globalEnabled:
+    _port = get(_ocds, "elasticache-replication-group-global.Resource.status.port", "")
+elif _createReplicationGroup:
+    _port = get(_ocds, "elasticache-replication-group-local.Resource.status.port", "")
+else:
+    _port = get(_ocds, "elasticache-cluster-0.Resource.status.port", "")
+    _endpoint = get(_ocds, "elasticache-cluster-0.Resource.status.endpoint", "")
 
 _globalReplicationId = get(_ocds, "elasticache-replication-group-global.Resource.status.id", "")
 _localReplicationId = get(_ocds, "elasticache-replication-group-local.Resource.status.id", "")
@@ -31,10 +40,12 @@ _newdxr = {
     **_oxr,
     **{
         "status": {
+            if _globalEndpoint:
+                globalEndpoint: _globalEndpoint,
             if _globalReplicationId:
                 globalReplicationGroupId: _globalReplicationId,
             if _localReplicationId:
-                localReplicationGroupId: _localReplicationId,
+                replicationGroupId: _localReplicationId,
             if _port:
                 port: _port,
             if _endpoint:
