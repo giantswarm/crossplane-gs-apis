@@ -12,6 +12,7 @@ metadata:
     app.kubernetes.io/part-of: myapp
     app.kubernetes.io/managed-by: crossplane
 spec:
+  availabilityZones: ["a", "b", "c"]
   compositionSelector:
     matchLabels:
       provider: aws
@@ -23,7 +24,6 @@ spec:
     database: 1
 
   database:
-    availabilityZones: ["a", "b", "c"]
     allocatedStorage: 100
     createCluster: false
     enabledCloudwatchLogsExports: ["postgresql"]
@@ -35,10 +35,7 @@ spec:
     engineVersion: "15.6"
     dbClusterInstanceClass: db.t3.medium
     iops: 1000
-    instances:
-      - {} # master instance
-      - {} # read replica 1 (hot standby?)
-      - {} # read replica 2
+    instanceCount: 3
     masterUsername: giantswarm
     multiAz: true
     secretRotation:
@@ -68,10 +65,6 @@ spec:
           mask: /28
           count: 2
           lbSetIndex: -1
-      availabilityZones:
-      - a
-      - b
-      - c
     tags:
       common:
         giantswarm.io/owner: honeybadger

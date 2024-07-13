@@ -101,6 +101,7 @@ func createResources() []xpt.ComposedTemplate {
 			},
 			Patches: []xpt.ComposedPatch{
 				cb.FromPatch("spec.vpc", "spec"),
+				cb.FromPatch("spec.availabilityZones", "spec.availabilityZones"),
 				cb.FromPatch("spec.claimRef", "spec.claimRef"),
 				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
 				cb.FromPatch("spec.region", "spec.region"),
@@ -120,6 +121,7 @@ func createResources() []xpt.ComposedTemplate {
 			},
 			Patches: []xpt.ComposedPatch{
 				cb.FromPatch("spec.database", "spec"),
+				cb.FromPatch("spec.availabilityZones", "spec.availabilityZones"),
 				cb.FromPatch("spec.claimRef", "spec.claimRef"),
 				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
 				cb.FromPatch(("spec.providerConfigRef"), "spec.providerConfigRef"),

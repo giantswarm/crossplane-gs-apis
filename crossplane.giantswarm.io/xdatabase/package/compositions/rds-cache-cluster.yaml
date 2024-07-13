@@ -59,6 +59,7 @@ spec:
           metadata:
             creationTimestamp: null
           spec:
+            availabilityZones: null
             peering:
               allowPublic: false
               enabled: false
@@ -66,7 +67,6 @@ spec:
               remoteVpcs: null
             region: ""
             subnetsets:
-              availabilityZones: null
               cidrs: null
               function: ""
             tags: {}
@@ -77,6 +77,9 @@ spec:
         patches:
         - fromFieldPath: spec.vpc
           toFieldPath: spec
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.availabilityZones
+          toFieldPath: spec.availabilityZones
           type: FromCompositeFieldPath
         - fromFieldPath: spec.claimRef
           toFieldPath: spec.claimRef
@@ -109,6 +112,9 @@ spec:
         patches:
         - fromFieldPath: spec.database
           toFieldPath: spec
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.availabilityZones
+          toFieldPath: spec.availabilityZones
           type: FromCompositeFieldPath
         - fromFieldPath: spec.claimRef
           toFieldPath: spec.claimRef

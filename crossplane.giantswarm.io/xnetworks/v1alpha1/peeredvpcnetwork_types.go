@@ -146,6 +146,20 @@ type VpcPeering struct {
 	RemoteVpcs []VpcPeer `json:"remoteVpcs"`
 }
 
+type SetExclusion struct {
+	// public subnets to exclude from peering
+	//
+	// +optional
+	// +listType=atomic
+	Public []int `json:"public"`
+
+	// private subnets to exclude from peering
+	//
+	// +optional
+	// +listType=atomic
+	Private []int `json:"private"`
+}
+
 // VpcPeer defines the parameters for peering with a VPC.
 type VpcPeer struct {
 	// Disabled specifies if the peering connection should be disabled.
@@ -155,10 +169,22 @@ type VpcPeer struct {
 	// +default=true
 	AllowPublic bool `json:"allowPublic"`
 
+	// MyExcludedSubnetsets specifies the indexes of subnetsets for this VPC to
+	// exclude from routing to the peering connection
+	//
+	// +optional
+	MyExcludedSubnetSets SetExclusion `json:"excludeFromPeering,omitempty"`
+
 	// Name specifies the name of the VPC to peer with.
 	//
 	// +required
 	Name string `json:"name"`
+
+	// ProviderConfigRef specifies the provider config to use for the peering
+	// connection.
+	//
+	// +optional
+	ProviderConfigRef string `json:"providerConfigRef"`
 
 	// Region specifies the region the VPC is found in.
 	//
@@ -168,11 +194,12 @@ type VpcPeer struct {
 	// +optional
 	Region string `json:"region"`
 
-	// ProviderConfigRef specifies the provider config to use for the peering
-	// connection.
+	// TheirExcludedSubnetsets specifies the indexes of subnetsets for the remote
+	// VPC to exclude from routing to the peering connection. If emmpty, all
+	// subnetsets will be included by default
 	//
 	// +optional
-	ProviderConfigRef string `json:"providerConfigRef"`
+	TheirExcludedSubnetSets []SetExclusion `json:"theirExcludeFromPeering,omitempty"`
 }
 
 // PeeredSubnetSet defines the parameters for creating a set of subnets with the
@@ -209,23 +236,11 @@ type PeeredSubnetSet struct {
 // If no offset is specified, the subnets will be created from the start of the
 // cidr range
 type PeeredSubnetBuilder struct {
-	// Mask is the CIDR mask to use for the subnet set
-	//
-	// +required
-	// +immutable
-	Mask string `json:"mask"`
-
 	// Count is the number of subnet sets to create with this mask
 	//
 	// +optional
 	// +default=0
 	Count int `json:"count"`
-
-	// Offset is the number of bits to offset the subnet mask by
-	//
-	// +optional
-	// +default=0
-	Offset int `json:"offset"`
 
 	// Determines which subnet set in this range to use for kubernetes load
 	// balancers. -1 means no load balancer tag is defined on this group
@@ -233,6 +248,18 @@ type PeeredSubnetBuilder struct {
 	// +optional
 	// +default=-1
 	LoadBalancerIndex int `json:"lbSetIndex"`
+
+	// Mask is the CIDR mask to use for the subnet set
+	//
+	// +required
+	// +immutable
+	Mask string `json:"mask"`
+
+	// Offset is the number of bits to offset the subnet mask by
+	//
+	// +optional
+	// +default=0
+	Offset int `json:"offset"`
 }
 
 // PeeredSubnets defines the parameters for creating a set of subnets with the

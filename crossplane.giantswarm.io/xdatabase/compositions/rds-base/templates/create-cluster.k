@@ -16,6 +16,7 @@ get = lambda x: any, y: str, d: any -> any {
     x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
 }
 
+_appName = get(_oxr, "spec.claimRef.name", "")
 _createCluster = get(_oxr, "spec.createCluster", True)
 
 _created = get(_ocds, "rds-cluster.Resource", {})
@@ -79,7 +80,7 @@ _cluster = {
             kmsKeyId: _keyId
             dbSubnetGroupName: _subnetGroup
             tags: _tags | {
-                Name: "${_oxr.spec.claimRef.name}-${_region}"
+                Name: "${_appName}-${_region}"
             }
 
             if get(_oxr, "spec.allocatedStorage", False):

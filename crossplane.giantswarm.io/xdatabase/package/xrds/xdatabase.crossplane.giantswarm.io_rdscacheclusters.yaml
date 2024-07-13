@@ -1100,17 +1100,6 @@ spec:
                     description: PeeredSubnets defines how many public and private
                       subnet sets to create.
                     properties:
-                      availabilityZones:
-                        description: |-
-                          AvailabilityZones is a list of availability zones in the region. The
-                          number of availability zones must match the number of bits x the number
-                          of subnetsets (public + private). The VPC Cidr must be big enough to
-                          encompass all the subnet CIDR blocks.
-                        items:
-                          type: string
-                        maxItems: 3
-                        minItems: 3
-                        type: array
                       cidrs:
                         description: |-
                           Cidrs is a list of PeeredSubnetSets to create in the VPC
@@ -1198,7 +1187,6 @@ spec:
                         - multiprefixloop
                         type: string
                     required:
-                    - availabilityZones
                     - cidrs
                     type: object
                   tags:

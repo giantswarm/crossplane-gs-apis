@@ -87,28 +87,19 @@ _ngw = [
 ]
 _natgatewaysCreated = len([ngw for ngw in _ngw if ngw]) == len(_zones)
 
-_blank = {a: "", aName: "a", b: "", bName: "b", c: "", cName: "c"}
+_pubRtblFilter = []
+_priRtblFilter = []
 
-# Separate out created public and private subnets and route tables
+# Separate out created public and private subnets
 _pubsn = [
     x
     for _, x in get(_self, "publicSubnets", [])
     if _self and get(_self, "publicSubnets", False)
 ]
-_pubrtbls = [
-    x
-    for _, x in get(_self, "publicRouteTables", [])
-    if _self and get(_self, "publicRouteTables", False)
-]
 _prisn = [
     x
     for _, x in get(_self, "privateSubnets", [])
     if _self and get(_self, "privateSubnets", False)
-]
-_prirtbls = [
-    x
-    for _, x in get(_self, "privateRouteTables", [])
-    if _self and get(_self, "privateRouteTables", False)
 ]
 
 # Create the SubnetSets
@@ -321,6 +312,12 @@ _natgateways = [
     ])
 ]
 
+_prirtbls = [
+    x
+    for _, x in get(_self, "privateRouteTables", [])
+    if _self and get(_self, "privateRouteTables", False)
+]
+
 # Nat Gateway Routes
 #
 # One route per private route table
@@ -351,6 +348,12 @@ _ngwRoutes = [
     for i, x in _prirtbls
     for _, rtbl in zip(_zones, [r for _, r in x])
     if _pubsn and _natgatewaysCreated
+]
+
+_pubrtbls = [
+    x
+    for _, x in get(_self, "publicRouteTables", [])
+    if _self and get(_self, "publicRouteTables", False)
 ]
 
 # Internet Gateway Routes
@@ -455,6 +458,32 @@ _accepters = [
     ])
 ]
 
+# Set up filters for the route tables.
+#
+# These are used to filter out subnets that should not be peered with
+# the remote VPCs
+_pubRtblFilter = [
+    c not in get(_oxr, "spec.subnetsets.${k}.public.excludeFromPeering", [])
+    for i, k in [k for k in get(_oxr, "spec.subnetsets", {})]
+    for c in range(get(_oxr, "spec.subnetsets.${k}.public.count", 0))
+]
+_peeringFilteredPubRtbls = [
+    x
+    for i, x in get(_self, "publicRouteTables", [])
+    if _self and get(_self, "publicRouteTables", False) and _peeringEnabled and _pubRtblFilter[i]
+]
+
+_priRtblFilter = [
+    c not in get(_oxr, "spec.subnetsets.${k}.private.excludeFromPeering", [])
+    for i, k in [k for k in get(_oxr, "spec.subnetsets", {})]
+    for c in range(get(_oxr, "spec.subnetsets.${k}.private.count", 0))
+]
+_peeringFilteredPriRtbls = [
+    x
+    for i, x in get(_self, "privateRouteTables", [])
+    if _self and get(_self, "privateRouteTables", False) and _peeringEnabled and _priRtblFilter[i]
+]
+
 # This is the most complicated part of the setup, adding the peering connections
 # to the route tables
 #
@@ -471,7 +500,7 @@ _accepters = [
 
 # First lets build a mapping from our own CIDR blocks to every route table that
 # is not ours
-_rmtTables = [] if not _vpcs else [ # public route tables if requested
+_rmtTables = [] if not _vpcs else [
     {"id" = id, "vpcCidr" = cidr, "selector" = name, "region" = get(vpc, "region", _region)}
     for cidr in [_self.cidrBlock] + _additionalCidrBlocks
     for name, vpc in _vpcs
@@ -505,11 +534,11 @@ _myRouteTables = [
         region = _region
     }
     for _, index in [
-        r for r in _pubrtbls
-        if get(_oxr, "spec.peering.allowPublic", False) and _pubrtbls
+        r for r in _peeringFilteredPubRtbls
+        if get(_oxr, "spec.peering.allowPublic", False) and _peeringFilteredPubRtbls
     ] + [
-        r for r in _prirtbls
-        if _prirtbls
+        r for r in _peeringFilteredPriRtbls
+        if _peeringFilteredPriRtbls
     ]
     for _, i in index
     for name, vpc in _vpcs
