@@ -654,6 +654,7 @@ spec:
                           type: string
                         description: Tags is a list of key-value pairs to associate
                           with the parameter group.
+                        maxProperties: 50
                         type: object
                     required:
                     - family
