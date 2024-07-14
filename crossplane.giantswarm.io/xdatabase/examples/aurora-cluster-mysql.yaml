@@ -24,6 +24,13 @@ spec:
 
   availabilityZones: ["a", "b", "c"]
 
+  cache:
+    createReplicationGroup: true
+    engine: redis
+    engineVersion: "7.1"
+    nodeType: cache.t3.micro
+    numCacheClusters: 3
+
   database:
     createCluster: true
     enabledCloudwatchLogsExports:
@@ -37,10 +44,7 @@ spec:
       create: false
     engine: aurora-mysql
     engineVersion: "8.0.mysql_aurora.3.06.0"
-    instances:
-      - {}
-      - {}
-      - {}
+    instanceCount: 3
     masterUsername: giantswarm
     secretRotation:
       enabled: false

@@ -15,7 +15,7 @@ require (
 	github.com/crossplane-contrib/function-patch-and-transform v0.5.0
 	github.com/crossplane/crossplane v1.16.0
 	github.com/crossplane/crossplane-runtime v1.16.0
-	github.com/giantswarm/crossplane-fn-network-discovery v0.2.0
+	github.com/giantswarm/crossplane-fn-network-discovery v0.2.4
 	github.com/mproffitt/crossbuilder v0.0.0-20240603170948-9d1c1d735d19
 	github.com/mproffitt/function-cidr v0.0.0-20240528204613-a5ff3a0e6daa
 	github.com/upbound/provider-aws v1.4.0

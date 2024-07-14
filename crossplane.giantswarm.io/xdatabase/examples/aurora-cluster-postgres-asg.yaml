@@ -24,6 +24,13 @@ spec:
     cache: 0
     database: 1
 
+  cache:
+    createReplicationGroup: true
+    engine: redis
+    engineVersion: "7.1"
+    nodeType: cache.t3.micro
+    numCacheClusters: 3
+
   database:
     autoscaling:
       enabled: true

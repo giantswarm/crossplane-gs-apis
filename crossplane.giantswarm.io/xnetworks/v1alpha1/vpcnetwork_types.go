@@ -92,7 +92,7 @@ type VpcNetworkStatus struct {
 
 	// Contains details of the created VPC
 	// +structType=atomic
-	nd.Vpc `json:",omitempty"`
+	nd.AwsVpc `json:",omitempty"`
 }
 
 type VpcNetworkSpec struct {

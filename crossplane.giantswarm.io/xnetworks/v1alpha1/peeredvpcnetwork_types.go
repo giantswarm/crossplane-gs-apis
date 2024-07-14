@@ -310,7 +310,7 @@ type PeeredVpcNetworkStatus struct {
 	//
 	// +optional
 	// +mapType=granular
-	Vpcs map[string]nd.Vpc `json:"vpcs,omitempty"`
+	Vpcs map[string]nd.AwsVpc `json:"vpcs,omitempty"`
 }
 
 // +kubebuilder:object:root=true
