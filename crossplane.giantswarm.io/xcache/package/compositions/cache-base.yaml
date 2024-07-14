@@ -528,7 +528,8 @@ spec:
                               get(cluster, "azMode", get(_oxr, "spec.azMode", False)),
                               get(cluster, "engine", get(_oxr, "spec.engine", False)) == "memcached",
                           ]):
-                              azMode: get(cluster, "azMode", get(_oxr, "spec.azMode", "single-az")),
+                              azMode: get(cluster, "azMode", get(_oxr, "spec.azMode", "cross-az")),
+                              numCacheNodes = get(cluster, "numCacheNodes", len(_azs)),
 
                           if get(cluster, "engine", get(_oxr, "spec.engine", False)):
                               engine = get(cluster, "engine", get(_oxr, "spec.engine", "redis")),
@@ -567,9 +568,6 @@ spec:
 
                           if get(cluster, "notificationTopicArn", get(_oxr, "spec.notificationTopicArn", False)):
                               notificationTopicArn = get(cluster, "notificationTopicArn", get(_oxr, "spec.notificationTopicArn", "")),
-
-                          if get(cluster, "numCacheNodes", get(_oxr, "spec.numCacheNodes", False)):
-                              numCacheNodes = get(cluster, "numCacheNodes", get(_oxr, "spec.numCacheNodes", 1)),
 
                           if all_true([
                               get(cluster, "outpostMode", get(_oxr, "spec.outpostMode", False)),
@@ -631,7 +629,6 @@ spec:
               if all_true([
                   get(_oxr, "status.subnetGroupName", False)
                   get(_oxr, "status.securityGroupId", False)
-                  get(_oxr, "status.kmsKeyId", False)
               ])
           ]
 
@@ -725,6 +722,7 @@ spec:
               get(_ocds, "elasticache-cluster-${i}.Resource.status.atProvider.clusterAddress", "")
               for i in range(_requiredClusters)
           ]
+          _eps = [e for e in _clusterEndpoints if e]
 
           _globalReplicationId = get(_ocds, "elasticache-replication-group-global.Resource.status.atProvider.id", "")
           _localReplicationId = get(_ocds, "elasticache-replication-group-local.Resource.status.atProvider.id", "")
@@ -733,12 +731,12 @@ spec:
           if get(_oxr, "spec.parameterGroupConfiguration", False):
               _ipgn = get(_oxr, "spec.parameterGroupConfiguration.name", "")
 
-          _newdxr = {
+          items = [{
               **_oxr,
               **{
                   "status": {
-                      if _clusterEndpoints:
-                          clusterEndpoints: _clusterEndpoints,
+                      if _eps:
+                          clusterEndpoints: _eps,
 
                       if _endpoint:
                           endpoint: _endpoint,
@@ -764,9 +762,7 @@ spec:
                           readerEndpoint: _readerep,
                   },
               }
-          }
-
-          items = [_newdxr]
+          }]
         target: ""
     step: function-kcl-dynamic-patching
   - functionRef:

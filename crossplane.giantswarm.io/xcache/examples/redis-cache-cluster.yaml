@@ -28,7 +28,7 @@ spec:
   engine: redis
   engineVersion: "7.1"
   nodeType: cache.t3.micro
-  numCacheClusters: 3
+  numCacheClusters: 1
   tags:
     giantswarm.io/owner: honeybadger
     giantswarm.io/managed-by: crossplane

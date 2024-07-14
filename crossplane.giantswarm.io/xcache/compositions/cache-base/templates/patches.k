@@ -41,6 +41,7 @@ _clusterEndpoints = [
     get(_ocds, "elasticache-cluster-${i}.Resource.status.atProvider.clusterAddress", "")
     for i in range(_requiredClusters)
 ]
+_eps = [e for e in _clusterEndpoints if e]
 
 _globalReplicationId = get(_ocds, "elasticache-replication-group-global.Resource.status.atProvider.id", "")
 _localReplicationId = get(_ocds, "elasticache-replication-group-local.Resource.status.atProvider.id", "")
@@ -49,12 +50,12 @@ _ipgn = get(_oxr, "spec.parameterGroupName", "")
 if get(_oxr, "spec.parameterGroupConfiguration", False):
     _ipgn = get(_oxr, "spec.parameterGroupConfiguration.name", "")
 
-_newdxr = {
+items = [{
     **_oxr,
     **{
         "status": {
-            if _clusterEndpoints:
-                clusterEndpoints: _clusterEndpoints,
+            if _eps:
+                clusterEndpoints: _eps,
 
             if _endpoint:
                 endpoint: _endpoint,
@@ -80,6 +81,4 @@ _newdxr = {
                 readerEndpoint: _readerep,
         },
     }
-}
-
-items = [_newdxr]
+}]

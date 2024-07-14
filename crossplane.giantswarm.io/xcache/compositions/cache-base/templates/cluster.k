@@ -54,7 +54,8 @@ _clusters = [
                     get(cluster, "azMode", get(_oxr, "spec.azMode", False)),
                     get(cluster, "engine", get(_oxr, "spec.engine", False)) == "memcached",
                 ]):
-                    azMode: get(cluster, "azMode", get(_oxr, "spec.azMode", "single-az")),
+                    azMode: get(cluster, "azMode", get(_oxr, "spec.azMode", "cross-az")),
+                    numCacheNodes = get(cluster, "numCacheNodes", len(_azs)),
 
                 if get(cluster, "engine", get(_oxr, "spec.engine", False)):
                     engine = get(cluster, "engine", get(_oxr, "spec.engine", "redis")),
@@ -93,9 +94,6 @@ _clusters = [
 
                 if get(cluster, "notificationTopicArn", get(_oxr, "spec.notificationTopicArn", False)):
                     notificationTopicArn = get(cluster, "notificationTopicArn", get(_oxr, "spec.notificationTopicArn", "")),
-
-                if get(cluster, "numCacheNodes", get(_oxr, "spec.numCacheNodes", False)):
-                    numCacheNodes = get(cluster, "numCacheNodes", get(_oxr, "spec.numCacheNodes", 1)),
 
                 if all_true([
                     get(cluster, "outpostMode", get(_oxr, "spec.outpostMode", False)),
@@ -157,7 +155,6 @@ _clusters = [
     if all_true([
         get(_oxr, "status.subnetGroupName", False)
         get(_oxr, "status.securityGroupId", False)
-        get(_oxr, "status.kmsKeyId", False)
     ])
 ]
 
