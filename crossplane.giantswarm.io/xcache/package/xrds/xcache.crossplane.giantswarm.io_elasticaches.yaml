@@ -11,9 +11,9 @@ spec:
     kind: ElasticacheClaim
     plural: elasticacheclaims
   defaultCompositionRef:
-    name: elasticache-base
+    name: cache-base
   enforcedCompositionRef:
-    name: elasticache-base
+    name: cache-base
   group: xcache.crossplane.giantswarm.io
   names:
     kind: Elasticache
@@ -384,11 +384,6 @@ spec:
                 items:
                   type: string
                 type: array
-              clusterId:
-                description: |-
-                  ClusterId is the group Identifier for the cluster. Elasticache converts
-                  this name to lowercase.
-                type: string
               clusterModeEnabled:
                 description: |-
                   ClusterModeEnabled specifies whether cluster mode is enabled for the
@@ -912,7 +907,6 @@ spec:
                 - namespace
                 type: object
             required:
-            - clusterId
             - region
             - vpcId
             type: object
@@ -968,6 +962,11 @@ spec:
                   GlobalEndpoint is the DNS name of the endpoint for the cluster at global
                   scope
                 type: string
+              globalReaderEndpoint:
+                description: |-
+                  GlobalReaderEndpoint is the DNS name of the reader endpoint for the
+                  cluster at global scope
+                type: string
               globalReplicationGroupId:
                 description: GlobalReplicationGroupId is the ID of the global replication
                   group.
@@ -983,6 +982,10 @@ spec:
                   connections.
                 format: int64
                 type: integer
+              readerEndpoint:
+                description: ReaderEndpoint is the DNS name of the reader endpoint
+                  for the cluster.
+                type: string
               replicationGroupId:
                 description: ReplicationGroupId is the ID of the replication group.
                 type: string

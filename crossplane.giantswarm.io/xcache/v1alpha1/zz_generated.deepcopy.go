@@ -269,11 +269,6 @@ func (in *ElasticacheSpec) DeepCopyInto(out *ElasticacheSpec) {
 			}
 		}
 	}
-	if in.ClusterId != nil {
-		in, out := &in.ClusterId, &out.ClusterId
-		*out = new(string)
-		**out = **in
-	}
 	in.ReplicationGroup.DeepCopyInto(&out.ReplicationGroup)
 	if in.Region != nil {
 		in, out := &in.Region, &out.Region
@@ -327,6 +322,11 @@ func (in *ElasticacheStatus) DeepCopyInto(out *ElasticacheStatus) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.GlobalReaderEndpoint != nil {
+		in, out := &in.GlobalReaderEndpoint, &out.GlobalReaderEndpoint
+		*out = new(string)
+		**out = **in
+	}
 	if in.GlobalReplicationGroupId != nil {
 		in, out := &in.GlobalReplicationGroupId, &out.GlobalReplicationGroupId
 		*out = new(string)
@@ -340,6 +340,11 @@ func (in *ElasticacheStatus) DeepCopyInto(out *ElasticacheStatus) {
 	if in.Port != nil {
 		in, out := &in.Port, &out.Port
 		*out = new(int64)
+		**out = **in
+	}
+	if in.ReaderEndpoint != nil {
+		in, out := &in.ReaderEndpoint, &out.ReaderEndpoint
+		*out = new(string)
 		**out = **in
 	}
 	if in.ReplicationGroupId != nil {

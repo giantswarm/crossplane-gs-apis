@@ -26,6 +26,8 @@ _requiredClusters = get(_oxr, "spec.cacheClusters", []) if get(_oxr, "spec.cache
 ]
 
 _region = get(_oxr, "spec.region", "eu-central-1")
+_appName = get(_oxr, "spec.claimRef.name", "")
+_azs = get(_oxr, "spec.availabilityZones", False)
 
 _clusters = [
     {
@@ -37,6 +39,7 @@ _clusters = [
             }
         }
         "spec": {
+            deletionPolicy: _oxr.spec.deletionPolicy
             forProvider: {
                 if get(cluster, "applyImmediately", get(_oxr, "spec.applyImmediately", False)):
                     applyImmediately: get(cluster, "applyImmediately", get(_oxr, "spec.applyImmediately", True))
@@ -44,17 +47,14 @@ _clusters = [
                     autoMinorVersionUpgrade: get(cluster, "autoMinorVersionUpgrade", get(_oxr, "spec.autoMinorVersionUpgrade", True)),
 
                 _az = get(cluster, "availabilityZone", _azs[i % len(_azs)])
-                _clusterName = get(cluster, "clusterName", "${_appName}-${_region}")
                 if get(cluster, "availabilityZone", False):
                     availabilityZone: _az,
-                    _clusterName = "${_appName}-${_region}-${_az}"
 
                 if all_true([
                     get(cluster, "azMode", get(_oxr, "spec.azMode", False)),
                     get(cluster, "engine", get(_oxr, "spec.engine", False)) == "memcached",
                 ]):
                     azMode: get(cluster, "azMode", get(_oxr, "spec.azMode", "single-az")),
-                clusterId = "${_clusterName}",
 
                 if get(cluster, "engine", get(_oxr, "spec.engine", False)):
                     engine = get(cluster, "engine", get(_oxr, "spec.engine", "redis")),
@@ -84,6 +84,7 @@ _clusters = [
 
                 if get(cluster, "maintenanceWindow", get(_oxr, "spec.maintenanceWindow", False)):
                     maintenanceWindow = get(cluster, "maintenanceWindow", get(_oxr, "spec.maintenanceWindow", "Sun:05:00-Mon:09:00")),
+
                 if get(cluster, "networkType", get(_oxr, "spec.networkType", False)):
                     networkType = get(cluster, "networkType", get(_oxr, "spec.networkType", "ipv4")),
 
@@ -106,7 +107,7 @@ _clusters = [
                 if get(cluster, "parameterGroupName", get(_oxr, "spec.parameterGroupName", False)):
                     parameterGroupName = get(cluster, "parameterGroupName", get(_oxr, "spec.parameterGroupName", "")),
 
-                if get(cluster, "port", get(_oxr, "spec.port", 6379)):
+                if get(cluster, "port", get(_oxr, "spec.port", False)):
                     port = get(cluster, "port", get(_oxr, "spec.port", 6379))
 
                 if not get(cluster, "availabilityZone", False):
@@ -140,18 +141,54 @@ _clusters = [
                     get(_oxr, "status.subnetGroupName", False),
                     not get(cluster, "createReplicationGroup", get(_oxr, "spec.createReplicationGroup", False)),
                 ]):
-                    subnetGroupName = get(cluster, "subnetGroupName", get(_oxr, "spec.subnetGroupName", "")),
+                    subnetGroupName = get(cluster, "subnetGroupName", get(_oxr, "status.subnetGroupName", "")),
 
                 tags = get(cluster, "tags", get(_oxr, "spec.tags", {})) | {
                     "Name": "${_appName}-${_region}-${_az}"
                 },
+
                 if get(cluster, "transitEncryptionEnabled", get(_oxr, "spec.transitEncryptionEnabled", False)):
                     transitEncryptionEnabled = get(cluster, "transitEncryptionEnabled", get(_oxr, "spec.transitEncryptionEnabled", False)),
             }
+            providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
         }
     }
     for i, cluster in _requiredClusters
     if all_true([
-        get(_oxr, "spec.subnetGroupName", False),
+        get(_oxr, "status.subnetGroupName", False)
+        get(_oxr, "status.securityGroupId", False)
+        get(_oxr, "status.kmsKeyId", False)
+
     ])
 ]
+
+_port = get(_oxr, "status.port", False)
+_securityGroupRules = [
+    {
+        apiVersion: "ec2.aws.upbound.io/v1beta1"
+        kind: "SecurityGroupRule"
+        "metadata": {
+            annotations: {
+                "krm.kcl.dev/composition-resource-name": "elasticache-security-group-rule-inbound"
+            }
+        }
+        "spec": {
+            deletionPolicy: _oxr.spec.deletionPolicy
+            forProvider: {
+                region: _region,
+                fromPort: _port,
+                toPort: _port,
+                protocol: "tcp",
+                securityGroupId: get(_oxr, "status.securityGroupId", ""),
+                type: "ingress",
+            }
+            providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
+        }
+    } if all_true([
+        get(_oxr, "status.securityGroupId", False),
+        _port
+    ]) else {}
+]
+
+_items = [_clusters, _securityGroupRules]
+items = [i for r in _items for i in r if i]

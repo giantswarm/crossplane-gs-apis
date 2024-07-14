@@ -1,0 +1,41 @@
+---
+apiVersion: xcache.crossplane.giantswarm.io/v1alpha1
+kind: ElasticacheClaim
+metadata:
+  name: xcache-memcache-cluster
+  namespace: default
+  labels:
+    owner: honeybadger
+    provider: aws
+    app.kubernetes.io/name: myapp
+    app.kubernetes.io/instance: myapp-elasticache-memcache-cluster
+    app.kubernetes.io/part-of: myapp
+    app.kubernetes.io/managed-by: crossplane
+spec:
+  compositionSelector:
+    matchLabels:
+      provider: aws
+      component: elasticache
+      type: base
+
+  providerConfigRef:
+    name: aws-golem
+
+  availabilityZones: ["a", "b", "c"]
+  region: eu-central-1
+
+  createReplicationGroup: false
+  engine: memcached
+  engineVersion: "1.6.22"
+  nodeType: cache.t3.micro
+  numCacheClusters: 3
+  tags:
+    giantswarm.io/owner: honeybadger
+    giantswarm.io/managed-by: crossplane
+    giantswarm.io/part-of: myapp
+
+  vpcId: vpc-d2772f2e
+  subnetIds:
+  - subnet-9802d9cb
+  - subnet-7c973270
+  - subnet-5d88435d

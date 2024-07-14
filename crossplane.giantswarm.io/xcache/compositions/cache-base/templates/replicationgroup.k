@@ -82,7 +82,7 @@ _globalReplicationGroup = [{
         }
         providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
     }
-}]_replicationGroups = []
+}] if _globalEnabled else []
 
 _enabledReplicationGroups = [
     "global" if _globalEnabled else "",
@@ -174,21 +174,32 @@ _replicationGroups = [
                 if any_true([
                     get(_oxr, "spec.globalReplicationGroupId", False),
                     i == "global"
+                    all_true([
+                        not get(_oxr, "spec.globalReplicationGroup.enabled", False),
+                        not get(_oxr, "spec.globalReplicationGroupId", False),
+                        i == "local"
+                    ])
                 ]):
                     if get(_oxr, "spec.nodeType", False):
                         nodeType: _oxr.spec.nodeType
-                    if all_true([_clusterModeEnabled, get(_oxr, "spec.numNodeGroups", False)]):
-                            numNodeGroups: _oxr.spec.numNodeGroups
+                    if all_true([
+                        _clusterModeEnabled,
+                        get(_oxr, "spec.numNodeGroups", False)
+                    ]):
+                        numNodeGroups: _oxr.spec.numNodeGroups
                 if _ipgn:
                     parameterGroupName: _ipgn
+
                 if get(_oxr, "spec.port", False):
                     port: _oxr.spec.port
 
                 if _azs:
-                    preferredCacheClusterAZs: _azs
+                    preferredCacheClusterAzs: _azs
 
                 if get(_oxr, "spec.replicasPerNodeGroup", None) != None:
                     replicasPerNodeGroup: get(_oxr, "spec.replicasPerNodeGroup", 0)
+
+                region: _region
 
                 if _securityGroupIds:
                     securityGroupIds: [i for i in _securityGroupIds if i]
@@ -230,5 +241,11 @@ _replicationGroups = [
             all_true([i == "local", not _globalEnabled]),
             all_true([i == "local", _globalEnabled, _replicationGlobalRID]),
         ]),
+        get(_oxr, "status.subnetGroupName", False)
+        get(_oxr, "status.securityGroupId", False)
+        get(_oxr, "status.kmsKeyId", False)
     ])
 ]
+
+_items = [_replicationGroups, _globalReplicationGroup]
+items = [i for r in _items for i in r if i]

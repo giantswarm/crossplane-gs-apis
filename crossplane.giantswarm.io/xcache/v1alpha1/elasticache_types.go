@@ -15,8 +15,8 @@ import (
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=ec
 // +crossbuilder:generate:xrd:claimNames:kind=ElasticacheClaim,plural=elasticacheclaims
-// +crossbuilder:generate:xrd:defaultCompositionRef:name=elasticache-base
-// +crossbuilder:generate:xrd:enforcedCompositionRef:name=elasticache-base
+// +crossbuilder:generate:xrd:defaultCompositionRef:name=cache-base
+// +crossbuilder:generate:xrd:enforcedCompositionRef:name=cache-base
 type Elasticache struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -46,12 +46,6 @@ type ElasticacheSpec struct {
 	//
 	// +optional
 	CidrBlocks []*string `json:"cidrBlocks,omitempty"`
-
-	// ClusterId is the group Identifier for the cluster. Elasticache converts
-	// this name to lowercase.
-	//
-	// +required
-	ClusterId *string `json:"clusterId"`
 
 	// ClusterParameters is the set of parameters that are used to create the
 	// cluster.
@@ -93,6 +87,12 @@ type ElasticacheStatus struct {
 	// +optional
 	GlobalEndpoint *string `json:"globalEndpoint,omitempty"`
 
+	// GlobalReaderEndpoint is the DNS name of the reader endpoint for the
+	// cluster at global scope
+	//
+	// +optional
+	GlobalReaderEndpoint *string `json:"globalReaderEndpoint,omitempty"`
+
 	// GlobalReplicationGroupId is the ID of the global replication group.
 	//
 	// +optional
@@ -109,6 +109,11 @@ type ElasticacheStatus struct {
 	//
 	// +optional
 	Port *int64 `json:"port,omitempty"`
+
+	// ReaderEndpoint is the DNS name of the reader endpoint for the cluster.
+	//
+	// +optional
+	ReaderEndpoint *string `json:"readerEndpoint,omitempty"`
 
 	// ReplicationGroupId is the ID of the replication group.
 	//
@@ -780,7 +785,7 @@ type GlobalReplicationGroup struct {
 
 // Repository type metadata.
 var (
-	ElasticacheClusterKind      = "ElasticacheCluster"
+	ElasticacheClusterKind      = "Elasticache"
 	ElasticacheClusterGroupKind = schema.GroupKind{
 		Group: XRDGroup,
 		Kind:  ElasticacheClusterKind,
