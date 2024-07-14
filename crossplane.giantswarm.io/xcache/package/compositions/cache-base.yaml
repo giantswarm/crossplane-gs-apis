@@ -202,7 +202,7 @@ spec:
 
           _subnetGroup = get(_oxr, "status.subnetGroupName", False)
           _keyId = get(_oxr, "status.kmsKeyId", False)
-          _ipgn = get(_oxr, "spec.parameterGroupName", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else ""
+          _ipgn = get(_oxr, "status.parameterGroupName", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else ""
           _labels = get(_oxr, "metadata.labels", {}) | {
               "region": get(_oxr, "spec.region", "eu-central-1"),
           }
@@ -231,6 +231,40 @@ spec:
 
           _primaryGlobalRID = get(_oxr, "spec.globalReplicationGroupId", "") if _globalEnabled else ""
           _replicationGlobalRID = get(_oxr, "status.globalReplicationGroupId", "") if _globalEnabled else get(_oxr, "spec.globalReplicationGroupId", "")
+
+          _parameterGroup = [
+              {
+                  apiVersion: "elasticache.aws.upbound.io/v1beta1"
+                  kind: "ParameterGroup"
+                  "metadata": {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name": "elasticache-parameter-group"
+                      }
+                      labels: _labels
+                  }
+                  spec: {
+                      deletionPolicy: _oxr.spec.deletionPolicy
+                      forProvider: {
+                          description: _appName + " Parameter Group"
+                          family: get(_oxr, "spec.parameterGroupFamily", "redis6.x")
+                          name: _appName + "-parameter-group"
+                          if get(_oxr, "spec.parameters", False):
+                              parameter = [
+                                  {
+                                      name: k,
+                                      value: v,
+                                  }
+                                  for k, v in get(_oxr, "spec.parameterGroupConfiguration.parameters", {})
+                              ]
+                          region = _region
+                          tags = _labels | {
+                              "Name": _appName
+                          } | get(_oxr, "spec.tags", {}) | get(_oxr, "spec.parameterGroupConfiguration.tags", {})
+                      }
+                      providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
+                  }
+              }
+          ] if get(_oxr, "spec.parameterGroupConfiguration", False) else []
 
           _globalReplicationGroup = [{
               apiVersion: "elasticache.aws.upbound.io/v1beta1"
@@ -544,8 +578,8 @@ spec:
                               outpostMode = get(cluster, "outpostMode", get(_oxr, "spec.outpostMode", "none")),
                               preferredOutpostArn = get(cluster, "preferredOutpostArn", get(_oxr, "spec.preferredOutpostArn", "")),
 
-                          if get(cluster, "parameterGroupName", get(_oxr, "spec.parameterGroupName", False)):
-                              parameterGroupName = get(cluster, "parameterGroupName", get(_oxr, "spec.parameterGroupName", "")),
+                          if get(_oxr, "status.parameterGroupName", False):
+                              parameterGroupName = get(_oxr, "status.parameterGroupName", ""),
 
                           if get(cluster, "port", get(_oxr, "spec.port", False)):
                               port = get(cluster, "port", get(_oxr, "spec.port", 6379))
@@ -598,7 +632,6 @@ spec:
                   get(_oxr, "status.subnetGroupName", False)
                   get(_oxr, "status.securityGroupId", False)
                   get(_oxr, "status.kmsKeyId", False)
-
               ])
           ]
 
@@ -615,19 +648,21 @@ spec:
                   "spec": {
                       deletionPolicy: _oxr.spec.deletionPolicy
                       forProvider: {
-                          region: _region,
+                          cidrBlocks: [cidr],
                           fromPort: _port,
-                          toPort: _port,
                           protocol: "tcp",
+                          region: _region,
                           securityGroupId: get(_oxr, "status.securityGroupId", ""),
                           type: "ingress",
                       }
                       providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
                   }
-              } if all_true([
+              }
+              for _, cidr in get(_oxr, "spec.cidrBlocks", [])
+              if all_true([
                   get(_oxr, "status.securityGroupId", False),
                   _port
-              ]) else {}
+              ])
           ]
 
           _items = [_clusters, _securityGroupRules]
@@ -687,6 +722,10 @@ spec:
           _globalReplicationId = get(_ocds, "elasticache-replication-group-global.Resource.status.atProvider.id", "")
           _localReplicationId = get(_ocds, "elasticache-replication-group-local.Resource.status.atProvider.id", "")
 
+          _ipgn = get(_oxr, "spec.parameterGroupName", "")
+          if get(_oxr, "spec.parameterGroupConfiguration", False):
+              _ipgn = get(_oxr, "spec.parameterGroupConfiguration.name", "")
+
           _newdxr = {
               **_oxr,
               **{
@@ -701,6 +740,8 @@ spec:
                       if _localReplicationId:
                           replicationGroupId: _localReplicationId,
 
+                      if _ipgn:
+                          parameterGroupName: _ipgn,
                       if _port:
                           port: _port,
                       if _endpoint:

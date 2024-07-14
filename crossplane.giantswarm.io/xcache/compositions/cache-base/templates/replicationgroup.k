@@ -28,7 +28,7 @@ _region = get(_oxr, "spec.region", "eu-central-1")
 
 _subnetGroup = get(_oxr, "status.subnetGroupName", False)
 _keyId = get(_oxr, "status.kmsKeyId", False)
-_ipgn = get(_oxr, "spec.parameterGroupName", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else ""
+_ipgn = get(_oxr, "status.parameterGroupName", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else ""
 _labels = get(_oxr, "metadata.labels", {}) | {
     "region": get(_oxr, "spec.region", "eu-central-1"),
 }
@@ -57,6 +57,40 @@ _globalEnabled = all_true([
 
 _primaryGlobalRID = get(_oxr, "spec.globalReplicationGroupId", "") if _globalEnabled else ""
 _replicationGlobalRID = get(_oxr, "status.globalReplicationGroupId", "") if _globalEnabled else get(_oxr, "spec.globalReplicationGroupId", "")
+
+_parameterGroup = [
+    {
+        apiVersion: "elasticache.aws.upbound.io/v1beta1"
+        kind: "ParameterGroup"
+        "metadata": {
+            annotations: {
+                "krm.kcl.dev/composition-resource-name": "elasticache-parameter-group"
+            }
+            labels: _labels
+        }
+        spec: {
+            deletionPolicy: _oxr.spec.deletionPolicy
+            forProvider: {
+                description: _appName + " Parameter Group"
+                family: get(_oxr, "spec.parameterGroupFamily", "redis6.x")
+                name: _appName + "-parameter-group"
+                if get(_oxr, "spec.parameters", False):
+                    parameter = [
+                        {
+                            name: k,
+                            value: v,
+                        }
+                        for k, v in get(_oxr, "spec.parameterGroupConfiguration.parameters", {})
+                    ]
+                region = _region
+                tags = _labels | {
+                    "Name": _appName
+                } | get(_oxr, "spec.tags", {}) | get(_oxr, "spec.parameterGroupConfiguration.tags", {})
+            }
+            providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
+        }
+    }
+] if get(_oxr, "spec.parameterGroupConfiguration", False) else []
 
 _globalReplicationGroup = [{
     apiVersion: "elasticache.aws.upbound.io/v1beta1"

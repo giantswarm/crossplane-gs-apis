@@ -6,6 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	xcache "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xcache/v1alpha1"
 	xnet "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 )
 
@@ -44,6 +45,11 @@ type SubnetGroupIndexes struct {
 // infrastructure for an RDS + Elasticache Cluster.
 type RdsCacheClusterSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
+
+	// Cache defines the cache settings
+	//
+	// +required
+	Cache xcache.ReplicationGroup `json:"cache"`
 
 	// Database defines the database settings
 	//

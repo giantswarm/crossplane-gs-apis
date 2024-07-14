@@ -1206,6 +1206,7 @@ func (in *RdsCacheCluster) DeepCopyObject() runtime.Object {
 func (in *RdsCacheClusterSpec) DeepCopyInto(out *RdsCacheClusterSpec) {
 	*out = *in
 	in.ResourceSpec.DeepCopyInto(&out.ResourceSpec)
+	in.Cache.DeepCopyInto(&out.Cache)
 	in.Database.DeepCopyInto(&out.Database)
 	out.SubnetGroupIndexes = in.SubnetGroupIndexes
 	if in.AvailabilityZones != nil {

@@ -337,6 +337,11 @@ func (in *ElasticacheStatus) DeepCopyInto(out *ElasticacheStatus) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.ParameterGroupName != nil {
+		in, out := &in.ParameterGroupName, &out.ParameterGroupName
+		*out = new(string)
+		**out = **in
+	}
 	if in.Port != nil {
 		in, out := &in.Port, &out.Port
 		*out = new(int64)
@@ -669,6 +674,7 @@ func (in *ReplicationGroup) DeepCopyInto(out *ReplicationGroup) {
 		*out = new(string)
 		**out = **in
 	}
+	in.ParameterGroupConfiguration.DeepCopyInto(&out.ParameterGroupConfiguration)
 	if in.Port != nil {
 		in, out := &in.Port, &out.Port
 		*out = new(int64)

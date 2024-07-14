@@ -102,6 +102,41 @@ spec:
           metadata:
             creationTimestamp: null
           spec:
+            engine: null
+            region: null
+            vpcId: null
+          status: {}
+        name: cache-base
+        patches:
+        - fromFieldPath: spec.cache
+          toFieldPath: spec
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.availabilityZones
+          toFieldPath: spec.availabilityZones
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.claimRef
+          toFieldPath: spec.claimRef
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.deletionPolicy
+          toFieldPath: spec.deletionPolicy
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.providerConfigRef
+          toFieldPath: spec.providerConfigRef
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.region
+          toFieldPath: spec.region
+          type: FromCompositeFieldPath
+        - fromFieldPath: status.vpc.id
+          policy:
+            fromFieldPath: Required
+          toFieldPath: spec.vpcId
+          type: FromCompositeFieldPath
+      - base:
+          apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
+          kind: RdsBaseDbCluster
+          metadata:
+            creationTimestamp: null
+          spec:
             cidrBlocks: null
             dbClusterParameterGroup: null
             region: null

@@ -8,6 +8,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	xapiextv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
+	xcache "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xcache/v1alpha1"
 	xnet "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 	"github.com/mproffitt/crossbuilder/pkg/generate/composition/build"
 	cb "github.com/mproffitt/crossbuilder/pkg/generate/utils"
@@ -107,6 +108,35 @@ func createResources() []xpt.ComposedTemplate {
 				cb.FromPatch("spec.region", "spec.region"),
 				cb.FromPatch(("spec.providerConfigRef"), "spec.providerConfigRef"),
 				cb.ToPatch("status.vpc", "status.vpcs.self"),
+			},
+		},
+		{
+			Name: "cache-base",
+			Base: &runtime.RawExtension{
+				Object: &xcache.Elasticache{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "xdatabase.crossplane.giantswarm.io/v1alpha1",
+						Kind:       "RdsBaseDbCluster",
+					},
+				},
+			},
+			Patches: []xpt.ComposedPatch{
+				cb.FromPatch("spec.cache", "spec"),
+				cb.FromPatch("spec.availabilityZones", "spec.availabilityZones"),
+				cb.FromPatch("spec.claimRef", "spec.claimRef"),
+				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
+				cb.FromPatch(("spec.providerConfigRef"), "spec.providerConfigRef"),
+				cb.FromPatch("spec.region", "spec.region"),
+				{
+					Type: xpt.PatchTypeFromCompositeFieldPath,
+					Patch: xpt.Patch{
+						FromFieldPath: cb.StrPtr("status.vpc.id"),
+						ToFieldPath:   cb.StrPtr("spec.vpcId"),
+						Policy: &xpt.PatchPolicy{
+							FromFieldPath: &required,
+						},
+					},
+				},
 			},
 		},
 		{

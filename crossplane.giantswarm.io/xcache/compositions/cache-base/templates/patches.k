@@ -38,6 +38,10 @@ else:
 _globalReplicationId = get(_ocds, "elasticache-replication-group-global.Resource.status.atProvider.id", "")
 _localReplicationId = get(_ocds, "elasticache-replication-group-local.Resource.status.atProvider.id", "")
 
+_ipgn = get(_oxr, "spec.parameterGroupName", "")
+if get(_oxr, "spec.parameterGroupConfiguration", False):
+    _ipgn = get(_oxr, "spec.parameterGroupConfiguration.name", "")
+
 _newdxr = {
     **_oxr,
     **{
@@ -52,6 +56,8 @@ _newdxr = {
             if _localReplicationId:
                 replicationGroupId: _localReplicationId,
 
+            if _ipgn:
+                parameterGroupName: _ipgn,
             if _port:
                 port: _port,
             if _endpoint:

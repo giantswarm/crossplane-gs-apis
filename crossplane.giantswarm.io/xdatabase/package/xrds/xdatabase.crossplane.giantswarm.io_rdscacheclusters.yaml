@@ -41,6 +41,680 @@ spec:
                 maxItems: 3
                 minItems: 3
                 type: array
+              cache:
+                description: Cache defines the cache settings
+                properties:
+                  applyImmediately:
+                    description: |-
+                      ApplyImmediately specifies whether the changes should be applied
+                      immediately or during the next maintenance window.
+                    type: boolean
+                  atRestEncryptionEnabled:
+                    description: |-
+                      AtRestEncryptionEnabled specifies whether data stored in the cluster is
+                      encrypted at rest.
+                    type: boolean
+                  authToken:
+                    description: AuthToken is the password used to access a password
+                      protected server.
+                    type: string
+                  authTokenUpdateStrategy:
+                    description: |-
+                      AuthTokenUpdateStrategy specifies how the auth token should be updated.
+
+
+                      Valid values are:
+                      - ROTATE
+                      - SET
+                      - DELETE
+                    enum:
+                    - rotate
+                    - set
+                    type: string
+                  autoMinorVersionUpgrade:
+                    description: |-
+                      AutoMinorVersionUpgrade specifies whether minor engine upgrades will be
+                      applied automatically to the cluster during the maintenance window.
+                    type: boolean
+                  automaticFailoverEnabled:
+                    description: |-
+                      AutomaticFailoverEnabled specifies whether a read replica will be
+                      automatically promoted to the primary cluster if the existing primary
+                      cluster fails.
+
+
+                      If enabled, NumCacheNodes must be greater than 1. Must be enabled for
+                      Redis (cluster mode enabled) replication groups.
+                    type: boolean
+                  cacheClusters:
+                    description: |-
+                      CacheClusters is a list of cache clusters in the replication group.
+
+
+                      This value is overridden by NumCacheClusters.
+
+
+                      May be used to specify cluster specific configuration.
+                    items:
+                      properties:
+                        applyImmediately:
+                          description: |-
+                            ApplyImmediately specifies whether the changes should be applied
+                            immediately or during the next maintenance window.
+                          type: boolean
+                        autoMinorVersionUpgrade:
+                          description: |-
+                            AutoMinorVersionUpgrade specifies whether minor engine upgrades will be
+                            applied automatically to the cluster during the maintenance window.
+                          type: boolean
+                        availabilityZone:
+                          description: |-
+                            AvailabilityZone is the name of the Availability Zone in which the
+                            cluster will be created.
+
+
+                            If you want to create cache nodes in multi-az, use
+                            preferred_availability_zones instead.
+                            Default: System chosen Availability Zone.
+                          type: string
+                        azMode:
+                          description: |-
+                            AzMode specifies the Availability Zone mode of the cluster.
+
+
+                            This parameter is only valid when the Engine parameter is memcached.
+                            For resiliance, we recommend setting the AzMode parameter to cross-az and
+                            this is the default value. In this mode, the number of nodes must be > 1
+                            If memcached is selected, the number of nodes will default to 3, one per
+                            availability zone.
+
+
+                            Valid values are:
+                            - single-az: The cluster is created in a single Availability Zone.
+                            - cross-az: The cluster is created across multiple Availability Zones.
+                          enum:
+                          - single-az
+                          - cross-az
+                          type: string
+                        engine:
+                          description: |-
+                            Engine is the name of the cache engine to be used for the clusters in
+                            this group.
+
+
+                            Valid values are:
+                            - memcached
+                            - redis
+                          enum:
+                          - memcached
+                          - redis
+                          type: string
+                        engineVersion:
+                          description: |-
+                            EngineVersion is the version number of the cache engine to be used for
+                            the cluster. If not set this will default to the latest version.
+
+
+                            This value will be ignored once the cluster is created.
+                          type: string
+                        finalSnapshotIdentifier:
+                          description: |-
+                            FinalSnapshotIdentifier is the user-supplied name for the final snapshot
+                            that is created immediately before the cluster is deleted.
+                          type: string
+                        ipDiscovery:
+                          description: |-
+                            IpDiscovery is the method used to discover cluster nodes.
+
+
+                            Valid values are:
+                            - ipv4 (default)
+                            - ipv6
+                          enum:
+                          - ipv4
+                          - ipv6
+                          type: string
+                        logDeliveryConfigurations:
+                          description: |-
+                            LogDeliveryConfiguration is a list of log delivery configurations for
+                            the cluster.
+
+
+                            This is only applicable when the Engine parameter is redis.
+                          items:
+                            properties:
+                              destination:
+                                description: Destination Name of the cloudwatch log
+                                  group or for kinesis firehose resource.
+                                type: string
+                              destinationType:
+                                description: |-
+                                  DestinationType The destination type for the logs.
+
+
+                                  Valid values are:
+                                  - cloudwatch-logs
+                                  - kinesis-firehose
+                                enum:
+                                - cloudwatch-logs
+                                - kinesis-firehose
+                                type: string
+                              logFormat:
+                                description: |-
+                                  LogFormat The log format to use.
+
+
+                                  Valid values are:
+                                  - text
+                                  - json
+                                enum:
+                                - text
+                                - json
+                                type: string
+                              logType:
+                                description: |-
+                                  LogType The type of log to deliver.
+
+
+                                  Valid values are:
+                                  - slow-log
+                                  - engine-log
+                                enum:
+                                - slow-log
+                                - engine-log
+                                type: string
+                            required:
+                            - destination
+                            - destinationType
+                            - logType
+                            type: object
+                          type: array
+                        maintenanceWindow:
+                          description: |-
+                            MaintenanceWindow specifies the weekly time range during which system
+                            maintenance can occur.
+                          type: string
+                        networkType:
+                          description: |-
+                            NetworkType specifies the network configuration for the cluster.
+
+
+                            Valid values are:
+                            - ipv4
+                            - ipv6
+                            - dual_stack
+                          enum:
+                          - ipv4
+                          - ipv6
+                          - dual_stack
+                          type: string
+                        nodeType:
+                          description: |-
+                            NodeType is the instance class to use for the cache nodes.
+
+
+                            Requried unless replication group is specified.
+                          type: string
+                        notificationTopicArn:
+                          description: |-
+                            NotificationTopicArn is the Amazon Resource Name (ARN) of the Amazon SNS
+                            topic to which notifications will be sent.
+                          type: string
+                        numCacheNodes:
+                          description: |-
+                            NumCacheNodes is the number of cache nodes in the cluster.
+
+
+                            Required unless replication group is specified.
+                          format: int64
+                          type: integer
+                        outpostMode:
+                          description: |-
+                            OutpostMode specifies the outpost mode that will apply to the cache
+                            cluster creation.
+
+
+                            Valid values are:
+                            - single-outpost
+                            - cross-outpost
+
+
+                            Currently only single-outpost is supported.
+                          enum:
+                          - single-outpost
+                          - cross-outpost
+                          type: string
+                        parameterGroupName:
+                          description: |-
+                            ParameterGroupName is the name of the parameter group to associate with
+                            this cluster.
+
+
+                            Required unless replication group is specified.
+                          type: string
+                        port:
+                          description: |-
+                            Port is the port number on which each of the cache nodes will accept
+                            connections.
+                          format: int64
+                          type: integer
+                        preferredAvailabilityZones:
+                          description: |-
+                            PreferredAvailabilityZones is a list of Availability Zones in which the
+                            cluster's nodes will be created.
+
+
+                            Memcached only. The number of availability zones must equal the number of
+                            nodes specified in the NumCacheNodes parameter.
+                          items:
+                            type: string
+                          type: array
+                        preferredOutpostArn:
+                          description: |-
+                            PreferredOutpostArn is the Amazon Resource Name (ARN) of the outpost in
+                            which the cache cluster will be created.
+                          type: string
+                        securityGroupIds:
+                          description: |-
+                            SecurityGroupIds is a list of security group IDs to associate with the
+                            cluster.
+                          items:
+                            type: string
+                          type: array
+                        snapshotArns:
+                          description: |-
+                            SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
+                            from which to restore data into the cluster.
+
+
+                            Optional, Redis only
+                          items:
+                            type: string
+                          type: array
+                        snapshotName:
+                          description: |-
+                            SnapshotName is the name of the snapshot from which to restore data into
+                            the cluster.
+
+
+                            Optional, Redis only
+                          type: string
+                        snapshotRetentionLimit:
+                          description: |-
+                            SnapshotRetentionLimit is the number of days for which ElastiCache will
+                            retain automatic cache cluster snapshots before deleting them.
+
+
+                            Optional, Redis only
+                          format: int64
+                          type: integer
+                        snapshotWindow:
+                          description: |-
+                            SnapshotWindow is the daily time range (in UTC) during which ElastiCache
+                            will begin taking a daily snapshot of the cache cluster.
+
+
+                            Optional, Redis only
+                          type: string
+                        subnetGroupName:
+                          description: |-
+                            SubnetGroupName is the name of the subnet group to associate with this
+                            cluster.
+
+
+                            Required unless replication group is specified in which case it will be
+                            ignored.
+                          type: string
+                        tags:
+                          additionalProperties:
+                            type: string
+                          description: Tags is a list of key-value pairs to associate
+                            with the cluster.
+                          maxProperties: 50
+                          type: object
+                        transitEncryptionEnabled:
+                          description: |-
+                            TransitEncryptionEnabled specifies whether data in the cluster is
+                            encrypted in transit.
+
+
+                            Optional, Memcached only
+                          type: boolean
+                      required:
+                      - engine
+                      type: object
+                    type: array
+                  clusterModeEnabled:
+                    description: |-
+                      ClusterModeEnabled specifies whether cluster mode is enabled for the
+                      replication group.
+                    type: boolean
+                  createReplicationGroup:
+                    description: |-
+                      CreateReplicationGroup specifies whether a replication group should be
+                      created.
+
+
+                      If set false, the replication group configuration will be used for
+                      creating a single cluster
+                    type: boolean
+                  dataTieringEnabled:
+                    description: |-
+                      DataTieringEnabled specifies whether data tiering is enabled for the
+                      replication group.
+
+
+                      Must be true if the replcation group is using r6gd nodes
+                    type: boolean
+                  engine:
+                    description: |-
+                      Engine is the name of the cache engine to be used for the clusters in
+                      this group.
+
+
+                      Valid values are:
+                      - memcached
+                      - redis
+                    enum:
+                    - memcached
+                    - redis
+                    type: string
+                  engineVersion:
+                    description: |-
+                      EngineVersion is the version number of the cache engine to be used for
+                      the cluster. If not set this will default to the latest version.
+
+
+                      This value will be ignored once the cluster is created.
+                    type: string
+                  finalSnapshotIdentifier:
+                    description: |-
+                      FinalSnapshotIdentifier is the user-supplied name for the final snapshot
+                      that is created immediately before the cluster is deleted.
+                    type: string
+                  globalReplicationGroup:
+                    description: GlobalReplicationGroup is the global replication
+                      group configuration.
+                    properties:
+                      automaticFailoverEnabled:
+                        description: |-
+                          AutomaticFailoverEnabled specifies whether a read replica will be
+                          automatically promoted to the primary cluster if the existing primary
+                          cluster fails.
+                        type: boolean
+                      cacheNodeType:
+                        description: CacheNodeType is the instance class to use for
+                          the cache nodes.
+                        type: string
+                      enabled:
+                        description: Enabled is a flag that enables the global replication
+                          group.
+                        type: boolean
+                      engineVersion:
+                        description: |-
+                          EngineVersion is the version number of the cache engine to be used for
+                          the cluster. If not set this will default to the latest version.
+                        type: string
+                      numNodeGroups:
+                        description: NumNodeGroups is the number of node groups in
+                          the replication group.
+                        format: int64
+                        type: integer
+                      parameterGroupName:
+                        description: |-
+                          ParameterGroupName is the name of the parameter group to associate with
+                          the global replication group.
+
+
+                          Required when upgrading to a new major engine version but subsequently
+                          ignored.
+
+
+                          Specifying this parameter will result in an error if a major engine version
+                          is not specified.
+                        type: string
+                      suffix:
+                        description: |-
+                          GlobalReplicationGroupIdSuffix is the suffix to append to the global
+                          replication group id.
+                        type: string
+                    type: object
+                  globalReplicationGroupId:
+                    description: |-
+                      GlobalReplicationGroupId is the id of the global replication group to
+                      which this replication group should belong.
+
+
+                      If this value is specified, the number of node groups parameter must not
+                      be specified.
+                    type: string
+                  ipDiscovery:
+                    description: |-
+                      IpDiscovery is the method used to discover cluster nodes.
+
+
+                      Valid values are:
+                      - ipv4 (default)
+                      - ipv6
+                    enum:
+                    - ipv4
+                    - ipv6
+                    type: string
+                  kmsKeyId:
+                    description: |-
+                      KmsKeyId is the ID of the AWS Key Management Service (KMS) key used to
+                      encrypt the data in the cluster.
+
+
+                      Ignored unless AtRestEncryptionEnabled is set to true.
+                    type: string
+                  logDeliveryConfigurations:
+                    description: |-
+                      LogDeliveryConfiguration is a list of log delivery configurations for
+                      the cluster.
+
+
+                      This is only applicable when the Engine parameter is redis.
+                    items:
+                      properties:
+                        destination:
+                          description: Destination Name of the cloudwatch log group
+                            or for kinesis firehose resource.
+                          type: string
+                        destinationType:
+                          description: |-
+                            DestinationType The destination type for the logs.
+
+
+                            Valid values are:
+                            - cloudwatch-logs
+                            - kinesis-firehose
+                          enum:
+                          - cloudwatch-logs
+                          - kinesis-firehose
+                          type: string
+                        logFormat:
+                          description: |-
+                            LogFormat The log format to use.
+
+
+                            Valid values are:
+                            - text
+                            - json
+                          enum:
+                          - text
+                          - json
+                          type: string
+                        logType:
+                          description: |-
+                            LogType The type of log to deliver.
+
+
+                            Valid values are:
+                            - slow-log
+                            - engine-log
+                          enum:
+                          - slow-log
+                          - engine-log
+                          type: string
+                      required:
+                      - destination
+                      - destinationType
+                      - logType
+                      type: object
+                    type: array
+                  maintenanceWindow:
+                    description: |-
+                      MaintenanceWindow specifies the weekly time range during which system
+                      maintenance can occur.
+                    type: string
+                  multiAzEnabled:
+                    description: |-
+                      MultiAzEnabled specifies whether the cluster should be created in
+                      multiple Availability Zones.
+
+
+                      If true, AutomaticFailoverEnabled must also be true.
+                    type: boolean
+                  networkType:
+                    description: |-
+                      NetworkType specifies the network configuration for the cluster.
+
+
+                      Valid values are:
+                      - ipv4
+                      - ipv6
+                      - dual_stack
+                    enum:
+                    - ipv4
+                    - ipv6
+                    - dual_stack
+                    type: string
+                  nodeType:
+                    description: |-
+                      NodeType is the instance class to use for the cache nodes.
+
+
+                      Requried unless global replication group is specified.
+                    type: string
+                  notificationTopicArn:
+                    description: |-
+                      NotificationTopicArn is the Amazon Resource Name (ARN) of the Amazon SNS
+                      topic to which notifications will be sent.
+                    type: string
+                  numCacheClusters:
+                    description: |-
+                      NumCacheClusters is the number of cache clusters in the replication group.
+
+
+                      If MultiAzEnabled is true, this value must be at least 2 but generally
+                      should be equal to the number of Availability Zones.
+
+
+                      Conflicts with NumNodeGroups.
+                    format: int64
+                    type: integer
+                  numNodeGroups:
+                    description: |-
+                      NumNodeGroups is the number of node groups in the replication group.
+
+
+                      If GlobalReplicationGroupId is specified or GlobalReplicationGroup.Enabled
+                      is true, this value must not be specified.
+
+
+                      Conflicts with NumCacheClusters.
+                    format: int64
+                    type: integer
+                  parameterGroupName:
+                    description: |-
+                      ParameterGroupName is the name of the parameter group to associate with
+                      this cluster.
+                    type: string
+                  port:
+                    description: |-
+                      Port is the port number on which each of the cache nodes will accept
+                      connections.
+                    format: int64
+                    type: integer
+                  preferredCacheClusterAzs:
+                    description: |-
+                      PreferredCacheClusterAzs is a list ec2 availability zones in which the
+                      cache clusters will be created.
+                    items:
+                      type: string
+                    type: array
+                  replicasPerNodeGroup:
+                    description: ReplicasPerNodeGroup is the number of read replicas
+                      per node group.
+                    format: int64
+                    maximum: 5
+                    minimum: 0
+                    type: integer
+                  securityGroupIds:
+                    description: |-
+                      SecurityGroupIds is a list of security group IDs to associate with the
+                      cluster.
+                    items:
+                      type: string
+                    type: array
+                  snapshotArns:
+                    description: |-
+                      SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
+                      from which to restore data into the cluster.
+
+
+                      Optional, Redis only
+                    items:
+                      type: string
+                    type: array
+                  snapshotName:
+                    description: |-
+                      SnapshotName is the name of the snapshot from which to restore data into
+                      the cluster.
+
+
+                      Optional, Redis only
+                    type: string
+                  snapshotRetentionLimit:
+                    description: |-
+                      SnapshotRetentionLimit is the number of days for which ElastiCache will
+                      retain automatic cache cluster snapshots before deleting them.
+
+
+                      Optional, Redis only
+                    format: int64
+                    type: integer
+                  snapshotWindow:
+                    description: |-
+                      SnapshotWindow is the daily time range (in UTC) during which ElastiCache
+                      will begin taking a daily snapshot of the cache cluster.
+
+
+                      Optional, Redis only
+                    type: string
+                  tags:
+                    additionalProperties:
+                      type: string
+                    description: Tags is a list of key-value pairs to associate with
+                      the cluster.
+                    maxProperties: 50
+                    type: object
+                  transitEncryptionEnabled:
+                    description: |-
+                      TransitEncryptionEnabled specifies whether data in the cluster is
+                      encrypted in transit.
+
+
+                      Optional, Memcached only
+                    type: boolean
+                  userGroupIds:
+                    description: UserGroupIds is a list of user group IDs to associate
+                      with the cluster.
+                    items:
+                      type: string
+                    type: array
+                type: object
               database:
                 description: Database defines the database settings
                 properties:
@@ -1072,6 +1746,24 @@ spec:
                                 Disabled specifies if the peering connection should be disabled.
                                 Defaults to true
                               type: boolean
+                            excludeFromPeering:
+                              description: |-
+                                MyExcludedSubnetsets specifies the indexes of subnetsets for this VPC to
+                                exclude from routing to the peering connection
+                              properties:
+                                private:
+                                  description: private subnets to exclude from peering
+                                  items:
+                                    type: integer
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                                public:
+                                  description: public subnets to exclude from peering
+                                  items:
+                                    type: integer
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                              type: object
                             name:
                               description: Name specifies the name of the VPC to peer
                                 with.
@@ -1089,6 +1781,27 @@ spec:
                                 If not defined, the region of the VPC will be assumed to be the same as
                                 the region of the peered VPC.
                               type: string
+                            theirExcludeFromPeering:
+                              description: |-
+                                TheirExcludedSubnetsets specifies the indexes of subnetsets for the remote
+                                VPC to exclude from routing to the peering connection. If emmpty, all
+                                subnetsets will be included by default
+                              items:
+                                properties:
+                                  private:
+                                    description: private subnets to exclude from peering
+                                    items:
+                                      type: integer
+                                    type: array
+                                    x-kubernetes-list-type: atomic
+                                  public:
+                                    description: public subnets to exclude from peering
+                                    items:
+                                      type: integer
+                                    type: array
+                                    x-kubernetes-list-type: atomic
+                                type: object
+                              type: array
                           required:
                           - name
                           type: object
@@ -1241,6 +1954,7 @@ spec:
                 type: object
             required:
             - availabilityZones
+            - cache
             - database
             - region
             - vpc

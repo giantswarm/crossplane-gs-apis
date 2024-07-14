@@ -104,8 +104,8 @@ _clusters = [
                     outpostMode = get(cluster, "outpostMode", get(_oxr, "spec.outpostMode", "none")),
                     preferredOutpostArn = get(cluster, "preferredOutpostArn", get(_oxr, "spec.preferredOutpostArn", "")),
 
-                if get(cluster, "parameterGroupName", get(_oxr, "spec.parameterGroupName", False)):
-                    parameterGroupName = get(cluster, "parameterGroupName", get(_oxr, "spec.parameterGroupName", "")),
+                if get(_oxr, "status.parameterGroupName", False):
+                    parameterGroupName = get(_oxr, "status.parameterGroupName", ""),
 
                 if get(cluster, "port", get(_oxr, "spec.port", False)):
                     port = get(cluster, "port", get(_oxr, "spec.port", 6379))
@@ -158,7 +158,6 @@ _clusters = [
         get(_oxr, "status.subnetGroupName", False)
         get(_oxr, "status.securityGroupId", False)
         get(_oxr, "status.kmsKeyId", False)
-
     ])
 ]
 
@@ -175,19 +174,21 @@ _securityGroupRules = [
         "spec": {
             deletionPolicy: _oxr.spec.deletionPolicy
             forProvider: {
-                region: _region,
+                cidrBlocks: [cidr],
                 fromPort: _port,
-                toPort: _port,
                 protocol: "tcp",
+                region: _region,
                 securityGroupId: get(_oxr, "status.securityGroupId", ""),
                 type: "ingress",
             }
             providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
         }
-    } if all_true([
+    }
+    for _, cidr in get(_oxr, "spec.cidrBlocks", [])
+    if all_true([
         get(_oxr, "status.securityGroupId", False),
         _port
-    ]) else {}
+    ])
 ]
 
 _items = [_clusters, _securityGroupRules]

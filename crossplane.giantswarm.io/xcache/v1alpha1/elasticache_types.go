@@ -104,6 +104,12 @@ type ElasticacheStatus struct {
 	// +optional
 	KmsKeyId *string `json:"kmsKeyId,omitempty"`
 
+	// ParameterGroupName is the name of the parameter group associated with the
+	// cluster.
+	//
+	// +optional
+	ParameterGroupName *string `json:"parameterGroupName,omitempty"`
+
 	// Port is the port number on which each of the cache nodes will accept
 	// connections.
 	//
@@ -648,10 +654,17 @@ type ReplicationGroup struct {
 	NumNodeGroups *int64 `json:"numNodeGroups,omitempty"`
 
 	// ParameterGroupName is the name of the parameter group to associate with
-	// this cluster.
+	// this cluster. To create a new parameter group, use the
+	// `ParameterGroupConfiguration` option instead.
 	//
 	// +optional
 	ParameterGroupName *string `json:"parameterGroupName,omitempty"`
+
+	// ParameterGroupConfiguration defines the configuration for the parameter
+	// group.
+	//
+	// +optional
+	ParameterGroupConfiguration ParameterGroup `json:"parameterGroupConfiguration,omitempty"`
 
 	// Port is the port number on which each of the cache nodes will accept
 	// connections.
