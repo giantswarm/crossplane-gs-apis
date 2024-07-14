@@ -19,12 +19,15 @@ get = lambda x: any, y: str, d: any -> any {
 if get(_oxr, "spec.createReplicationGroup", False):
     assert get(_oxr, "spec.engine", "redis") == "redis", "engine must be redis when createReplicationGroup is true"
 
-_azs = get(_oxr, "spec.availabilityZones", False)
 _appName = get(_oxr, "spec.claimRef.name", "")
 _created = get(_ocds, "elasticache-replication-group.Resource", {})
 _createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
 _clusterModeEnabled = get(_oxr, "spec.clusterMode.enabled", False)
 _region = get(_oxr, "spec.region", "eu-central-1")
+_azs = [
+    "${_region}${az}"
+    for az in get(_oxr, "spec.availabilityZones", [])
+]
 
 _subnetGroup = get(_oxr, "status.subnetGroupName", False)
 _keyId = get(_oxr, "status.kmsKeyId", False)
@@ -84,7 +87,7 @@ _parameterGroup = [
                     ]
                 region = _region
                 tags = _labels | {
-                    "Name": _appName
+                    "Name": "${_appName}-${_region}"
                 } | get(_oxr, "spec.tags", {}) | get(_oxr, "spec.parameterGroupConfiguration.tags", {})
             }
             providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
@@ -185,8 +188,9 @@ _replicationGroups = [
 
                 if get(_oxr, "spec.ipDiscovery", False):
                     ipDiscovery: _oxr.spec.ipDiscovery
-                if _keyId:
-                    kmsKeyId: _keyId
+
+                kmsKeyId: _keyId
+
                 if get(_oxr, "spec.maintenanceWindow", False):
                     maintenanceWindow: _oxr.spec.maintenanceWindow
                 if get(_oxr, "spec.multiAzEnabled", None) != None:
@@ -261,7 +265,7 @@ _replicationGroups = [
                     userGroupIds: _oxr.spec.userGroupIds
 
                 tags: _labels | {
-                    "Name": "${_appName}-global"
+                    "Name": "${_appName}-${_region}-${i}"
                 } | get(_oxr, "spec.tags", {})
             }
             providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
@@ -277,7 +281,7 @@ _replicationGroups = [
         ]),
         get(_oxr, "status.subnetGroupName", False)
         get(_oxr, "status.securityGroupId", False)
-        get(_oxr, "status.kmsKeyId", False)
+        _keyId
     ])
 ]
 

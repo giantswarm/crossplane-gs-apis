@@ -470,7 +470,7 @@ _pubRtblFilter = [
 _peeringFilteredPubRtbls = [
     x
     for i, x in get(_self, "publicRouteTables", [])
-    if _self and get(_self, "publicRouteTables", False) and _peeringEnabled and _pubRtblFilter[i]
+    if _self and get(_self, "publicRouteTables", False) and _peeringEnabled # and _pubRtblFilter[i]
 ]
 
 _priRtblFilter = [
@@ -481,7 +481,7 @@ _priRtblFilter = [
 _peeringFilteredPriRtbls = [
     x
     for i, x in get(_self, "privateRouteTables", [])
-    if _self and get(_self, "privateRouteTables", False) and _peeringEnabled and _priRtblFilter[i]
+    if _self and get(_self, "privateRouteTables", False) and _peeringEnabled # and _priRtblFilter[i]
 ]
 
 # This is the most complicated part of the setup, adding the peering connections

@@ -55,7 +55,7 @@ items = [{
     **{
         "status": {
             if _eps:
-                clusterEndpoints: _eps,
+                clusterEndpoints = _eps,
 
             if _endpoint:
                 endpoint: _endpoint,

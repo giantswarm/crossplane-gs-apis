@@ -27,7 +27,11 @@ _requiredClusters = get(_oxr, "spec.cacheClusters", []) if get(_oxr, "spec.cache
 
 _region = get(_oxr, "spec.region", "eu-central-1")
 _appName = get(_oxr, "spec.claimRef.name", "")
-_azs = get(_oxr, "spec.availabilityZones", False)
+
+_azs = [
+    "${_region}${az}"
+    for az in get(_oxr, "spec.availabilityZones", [])
+]
 
 _clusters = [
     {
@@ -40,6 +44,12 @@ _clusters = [
         }
         "spec": {
             deletionPolicy: _oxr.spec.deletionPolicy
+            initProvider: {
+                if get(_oxr, "spec.autoMinorVersionUpgrade", False):
+                    if get(_oxr, "spec.engineVersion", False):
+                        engineVersion: _oxr.spec.engineVersion
+            }
+
             forProvider: {
                 if get(cluster, "applyImmediately", get(_oxr, "spec.applyImmediately", False)):
                     applyImmediately: get(cluster, "applyImmediately", get(_oxr, "spec.applyImmediately", True))
@@ -59,8 +69,10 @@ _clusters = [
 
                 if get(cluster, "engine", get(_oxr, "spec.engine", False)):
                     engine = get(cluster, "engine", get(_oxr, "spec.engine", "redis")),
-                if get(cluster, "engineVersion", get(_oxr, "spec.engineVersion", False)):
-                    engineVersion = get(cluster, "engineVersion", get(_oxr, "spec.engineVersion", "6.x")),
+
+                if not get(_oxr, "spec.autoMinorVersionUpgrade", False):
+                    if get(cluster, "engineVersion", get(_oxr, "spec.engineVersion", False)):
+                        engineVersion = get(cluster, "engineVersion", get(_oxr, "spec.engineVersion", "6.x")),
                 if get(cluster, "finalSnapshotIdentifier", get(_oxr, "spec.finalSnapshotIdentifier", False)):
                     finalSnapshotIdentifier = get(cluster, "finalSnapshotIdentifier", get(_oxr, "spec.finalSnapshotIdentifier", "")),
 

@@ -97,8 +97,8 @@ spec:
           toFieldPath: status.vpc
           type: ToCompositeFieldPath
       - base:
-          apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
-          kind: RdsBaseDbCluster
+          apiVersion: xcache.crossplane.giantswarm.io/v1alpha1
+          kind: Elasticache
           metadata:
             creationTimestamp: null
           spec:
@@ -198,10 +198,6 @@ spec:
       metadata:
         creationTimestamp: null
       spec:
-        config: {}
-        credentials:
-          password: ""
-          username: ""
         source: |-
           import regex
 
@@ -224,10 +220,10 @@ spec:
           _subnets = get(_oxr, "status.vpc.privateSubnets", [])
 
           _dbsnindex = get(_oxr, "spec.subnetGroupIndexes.database", False)
-          _dbSnIds = [k for _, k in _subnets[_dbsnindex]] if _dbsnindex and _subnets else []
+          _dbSnIds = [k for _, k in _subnets[_dbsnindex]] if _dbsnindex != False and _subnets else []
 
           _cachesnindex = get(_oxr, "spec.subnetGroupIndexes.cache", False)
-          _cacheSnIds = [k for _, k in _subnets[_cachesnindex]] if _cachesnindex and _subnets else []
+          _cacheSnIds = [k for _, k in _subnets[_cachesnindex]] if _cachesnindex != False and _subnets else []
 
           _dbPatch = {
               **get(_dcds, "rds-base.Resource", {}),

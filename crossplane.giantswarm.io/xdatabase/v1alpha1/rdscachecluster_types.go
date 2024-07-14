@@ -140,7 +140,7 @@ type RdsClusterStatus struct {
 	// Vpc is a VPC configuration to bind the cluster to
 	//
 	// +optional
-	Vpc nd.Vpc `json:"vpc,omitempty"`
+	Vpc nd.AwsVpc `json:"vpc,omitempty"`
 }
 
 // Repository type metadata.

@@ -167,10 +167,6 @@ spec:
       metadata:
         creationTimestamp: null
       spec:
-        config: {}
-        credentials:
-          password: ""
-          username: ""
         source: |-
           import regex
 
@@ -193,12 +189,15 @@ spec:
           if get(_oxr, "spec.createReplicationGroup", False):
               assert get(_oxr, "spec.engine", "redis") == "redis", "engine must be redis when createReplicationGroup is true"
 
-          _azs = get(_oxr, "spec.availabilityZones", False)
           _appName = get(_oxr, "spec.claimRef.name", "")
           _created = get(_ocds, "elasticache-replication-group.Resource", {})
           _createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
           _clusterModeEnabled = get(_oxr, "spec.clusterMode.enabled", False)
           _region = get(_oxr, "spec.region", "eu-central-1")
+          _azs = [
+              "${_region}${az}"
+              for az in get(_oxr, "spec.availabilityZones", [])
+          ]
 
           _subnetGroup = get(_oxr, "status.subnetGroupName", False)
           _keyId = get(_oxr, "status.kmsKeyId", False)
@@ -258,7 +257,7 @@ spec:
                               ]
                           region = _region
                           tags = _labels | {
-                              "Name": _appName
+                              "Name": "${_appName}-${_region}"
                           } | get(_oxr, "spec.tags", {}) | get(_oxr, "spec.parameterGroupConfiguration.tags", {})
                       }
                       providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
@@ -359,8 +358,9 @@ spec:
 
                           if get(_oxr, "spec.ipDiscovery", False):
                               ipDiscovery: _oxr.spec.ipDiscovery
-                          if _keyId:
-                              kmsKeyId: _keyId
+
+                          kmsKeyId: _keyId
+
                           if get(_oxr, "spec.maintenanceWindow", False):
                               maintenanceWindow: _oxr.spec.maintenanceWindow
                           if get(_oxr, "spec.multiAzEnabled", None) != None:
@@ -435,7 +435,7 @@ spec:
                               userGroupIds: _oxr.spec.userGroupIds
 
                           tags: _labels | {
-                              "Name": "${_appName}-global"
+                              "Name": "${_appName}-${_region}-${i}"
                           } | get(_oxr, "spec.tags", {})
                       }
                       providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
@@ -451,7 +451,7 @@ spec:
                   ]),
                   get(_oxr, "status.subnetGroupName", False)
                   get(_oxr, "status.securityGroupId", False)
-                  get(_oxr, "status.kmsKeyId", False)
+                  _keyId
               ])
           ]
 
@@ -467,10 +467,6 @@ spec:
       metadata:
         creationTimestamp: null
       spec:
-        config: {}
-        credentials:
-          password: ""
-          username: ""
         source: |-
           import regex
 
@@ -501,7 +497,11 @@ spec:
 
           _region = get(_oxr, "spec.region", "eu-central-1")
           _appName = get(_oxr, "spec.claimRef.name", "")
-          _azs = get(_oxr, "spec.availabilityZones", False)
+
+          _azs = [
+              "${_region}${az}"
+              for az in get(_oxr, "spec.availabilityZones", [])
+          ]
 
           _clusters = [
               {
@@ -514,6 +514,12 @@ spec:
                   }
                   "spec": {
                       deletionPolicy: _oxr.spec.deletionPolicy
+                      initProvider: {
+                          if get(_oxr, "spec.autoMinorVersionUpgrade", False):
+                              if get(_oxr, "spec.engineVersion", False):
+                                  engineVersion: _oxr.spec.engineVersion
+                      }
+
                       forProvider: {
                           if get(cluster, "applyImmediately", get(_oxr, "spec.applyImmediately", False)):
                               applyImmediately: get(cluster, "applyImmediately", get(_oxr, "spec.applyImmediately", True))
@@ -533,8 +539,10 @@ spec:
 
                           if get(cluster, "engine", get(_oxr, "spec.engine", False)):
                               engine = get(cluster, "engine", get(_oxr, "spec.engine", "redis")),
-                          if get(cluster, "engineVersion", get(_oxr, "spec.engineVersion", False)):
-                              engineVersion = get(cluster, "engineVersion", get(_oxr, "spec.engineVersion", "6.x")),
+
+                          if not get(_oxr, "spec.autoMinorVersionUpgrade", False):
+                              if get(cluster, "engineVersion", get(_oxr, "spec.engineVersion", False)):
+                                  engineVersion = get(cluster, "engineVersion", get(_oxr, "spec.engineVersion", "6.x")),
                           if get(cluster, "finalSnapshotIdentifier", get(_oxr, "spec.finalSnapshotIdentifier", False)):
                               finalSnapshotIdentifier = get(cluster, "finalSnapshotIdentifier", get(_oxr, "spec.finalSnapshotIdentifier", "")),
 
@@ -674,10 +682,6 @@ spec:
       metadata:
         creationTimestamp: null
       spec:
-        config: {}
-        credentials:
-          password: ""
-          username: ""
         source: |-
           import regex
 
@@ -736,7 +740,7 @@ spec:
               **{
                   "status": {
                       if _eps:
-                          clusterEndpoints: _eps,
+                          clusterEndpoints = _eps,
 
                       if _endpoint:
                           endpoint: _endpoint,

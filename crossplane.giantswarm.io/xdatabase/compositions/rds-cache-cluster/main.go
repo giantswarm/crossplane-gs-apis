@@ -115,8 +115,8 @@ func createResources() []xpt.ComposedTemplate {
 			Base: &runtime.RawExtension{
 				Object: &xcache.Elasticache{
 					TypeMeta: metav1.TypeMeta{
-						APIVersion: "xdatabase.crossplane.giantswarm.io/v1alpha1",
-						Kind:       "RdsBaseDbCluster",
+						APIVersion: "xcache.crossplane.giantswarm.io/v1alpha1",
+						Kind:       "Elasticache",
 					},
 				},
 			},

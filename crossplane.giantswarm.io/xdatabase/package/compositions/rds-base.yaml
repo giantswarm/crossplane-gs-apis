@@ -167,10 +167,6 @@ spec:
       metadata:
         creationTimestamp: null
       spec:
-        config: {}
-        credentials:
-          password: ""
-          username: ""
         source: |-
           import regex
 
@@ -361,10 +357,6 @@ spec:
       metadata:
         creationTimestamp: null
       spec:
-        config: {}
-        credentials:
-          password: ""
-          username: ""
         source: |-
           import regex
           import json

@@ -564,14 +564,14 @@ spec:
           # These are used to filter out subnets that should not be peered with
           # the remote VPCs
           _pubRtblFilter = [
-              c not in get(_oxr, "spec.subnetsets.${k}.public.excludeFromPeering", [])
+              True if c not in get(_oxr, "spec.subnetsets.${k}.public.excludeFromPeering", []) else False
               for i, k in [k for k in get(_oxr, "spec.subnetsets", {})]
               for c in range(get(_oxr, "spec.subnetsets.${k}.public.count", 0))
           ]
           _peeringFilteredPubRtbls = [
               x
               for i, x in get(_self, "publicRouteTables", [])
-              if _self and get(_self, "publicRouteTables", False) and _peeringEnabled and _pubRtblFilter[i]
+              if _self and get(_self, "publicRouteTables", False) and _peeringEnabled
           ]
 
           _priRtblFilter = [
@@ -579,10 +579,14 @@ spec:
               for i, k in [k for k in get(_oxr, "spec.subnetsets", {})]
               for c in range(get(_oxr, "spec.subnetsets.${k}.private.count", 0))
           ]
+          print("=============================================================")
+          print(_pubRtblFilter)
+          print(_priRtblFilter)
+          print("=============================================================")
           _peeringFilteredPriRtbls = [
               x
               for i, x in get(_self, "privateRouteTables", [])
-              if _self and get(_self, "privateRouteTables", False) and _peeringEnabled and _priRtblFilter[i]
+              if _self and get(_self, "privateRouteTables", False) and _peeringEnabled
           ]
 
           # This is the most complicated part of the setup, adding the peering connections
