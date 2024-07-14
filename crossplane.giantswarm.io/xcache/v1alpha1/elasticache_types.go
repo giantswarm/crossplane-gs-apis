@@ -76,6 +76,11 @@ type ElasticacheStatus struct {
 	// +optional
 	ClusterName *string `json:"clusterName,omitempty"`
 
+	// ClusterEndpoints is a list of endpoints for the clusters.
+	//
+	// +optional
+	ClusterEndpoints []*string `json:"clusterEndpoints,omitempty"`
+
 	// Endpoint is the DNS name of the endpoint for the cluster.
 	//
 	// +optional
@@ -435,7 +440,7 @@ type ParameterGroup struct {
 	// Tags is a list of key-value pairs to associate with the parameter group.
 	//
 	// +optional
-	// +kubebuilder:validation:MaxItems=50
+	// +kubebuilder:validation:MaxProperties=50
 	Tags map[string]string `json:"tags,omitempty"`
 }
 

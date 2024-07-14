@@ -312,6 +312,17 @@ func (in *ElasticacheStatus) DeepCopyInto(out *ElasticacheStatus) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.ClusterEndpoints != nil {
+		in, out := &in.ClusterEndpoints, &out.ClusterEndpoints
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	if in.Endpoint != nil {
 		in, out := &in.Endpoint, &out.Endpoint
 		*out = new(string)

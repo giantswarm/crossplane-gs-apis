@@ -1231,6 +1231,11 @@ func (in *RdsCacheClusterSpec) DeepCopy() *RdsCacheClusterSpec {
 func (in *RdsClusterStatus) DeepCopyInto(out *RdsClusterStatus) {
 	*out = *in
 	in.ConditionedStatus.DeepCopyInto(&out.ConditionedStatus)
+	if in.CacheClusterEndpoints != nil {
+		in, out := &in.CacheClusterEndpoints, &out.CacheClusterEndpoints
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.CacheSubnets != nil {
 		in, out := &in.CacheSubnets, &out.CacheSubnets
 		*out = make([]string, len(*in))

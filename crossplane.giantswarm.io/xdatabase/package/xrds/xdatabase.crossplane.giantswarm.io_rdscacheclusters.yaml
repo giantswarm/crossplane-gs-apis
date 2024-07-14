@@ -626,10 +626,44 @@ spec:
                       Conflicts with NumCacheClusters.
                     format: int64
                     type: integer
+                  parameterGroupConfiguration:
+                    description: |-
+                      ParameterGroupConfiguration defines the configuration for the parameter
+                      group.
+                    properties:
+                      description:
+                        description: Description is a description of the parameter
+                          group.
+                        type: string
+                      family:
+                        description: |-
+                          Family is the name of the parameter group family that this parameter
+                          group is compatible with.
+                        type: string
+                      name:
+                        description: Name is the name of the parameter group.
+                        type: string
+                      parameters:
+                        additionalProperties:
+                          type: string
+                        description: Parameters is a list of parameters in the parameter
+                          group.
+                        type: object
+                      tags:
+                        additionalProperties:
+                          type: string
+                        description: Tags is a list of key-value pairs to associate
+                          with the parameter group.
+                        type: object
+                    required:
+                    - family
+                    - name
+                    type: object
                   parameterGroupName:
                     description: |-
                       ParameterGroupName is the name of the parameter group to associate with
-                      this cluster.
+                      this cluster. To create a new parameter group, use the
+                      `ParameterGroupConfiguration` option instead.
                     type: string
                   port:
                     description: |-
@@ -1962,12 +1996,35 @@ spec:
           status:
             description: RdsClusterStatus defines the observed state of RdsCluster
             properties:
+              cacheClusterEndpoints:
+                description: |-
+                  CacheClusterEndpoints is a list of endpoints of the Elasticache clusters
+                  when the cache is configured in cluster mode
+                items:
+                  type: string
+                type: array
               cacheEndpoint:
-                description: CacheEndpoint is the endpoint of the Elasticache
+                description: CacheEndpoint is the endpoint of the Elasticache replication
+                  group
+                type: string
+              cacheGlobalEndpoint:
+                description: |-
+                  CacheGlobalEndpoint is the global (RW) endpoint of the Elasticache
+                  global replication group
+                type: string
+              cacheGlobalReaderEndpoint:
+                description: |-
+                  CacheGlobalReaderEndpoint is the global (RO) endpoint of the Elasticache
+                  global replication group
                 type: string
               cachePort:
                 description: CachePort is the port of the Elasticache
                 type: integer
+              cacheReaderEndpoint:
+                description: |-
+                  CacheReaderEndpoint is the reader endpoint of the Elasticache replication
+                  group
+                type: string
               cacheSubnets:
                 description: CacheSubnets is the list of subnets to be used by ElasticSearch
                 items:

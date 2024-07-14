@@ -694,6 +694,7 @@ spec:
                       type: string
                     description: Tags is a list of key-value pairs to associate with
                       the parameter group.
+                    maxProperties: 50
                     type: object
                 required:
                 - family
@@ -945,6 +946,11 @@ spec:
             type: object
           status:
             properties:
+              clusterEndpoints:
+                description: ClusterEndpoints is a list of endpoints for the clusters.
+                items:
+                  type: string
+                type: array
               clusterName:
                 description: ClusterName is the name of the cluster.
                 type: string

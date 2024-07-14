@@ -103,6 +103,9 @@ spec:
             creationTimestamp: null
           spec:
             engine: null
+            parameterGroupConfiguration:
+              family: null
+              name: null
             region: null
             vpcId: null
           status: {}
@@ -131,6 +134,24 @@ spec:
             fromFieldPath: Required
           toFieldPath: spec.vpcId
           type: FromCompositeFieldPath
+        - fromFieldPath: status.clusterEndpoints
+          toFieldPath: status.cacheClusterEndpoints
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.endpoint
+          toFieldPath: status.cacheEndpoint
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.readerEndpoint
+          toFieldPath: status.cacheReaderEndpoint
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.globalEndpoint
+          toFieldPath: status.cacheGlobalEndpoint
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.globalReaderEndpoint
+          toFieldPath: status.cacheGlobalReaderEndpoint
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.port
+          toFieldPath: status.cachePort
+          type: ToCompositeFieldPath
       - base:
           apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
           kind: RdsBaseDbCluster

@@ -717,7 +717,14 @@ spec:
               _port = get(_ocds, "elasticache-replication-group-local.Resource.status.atProvider.port", "")
           else:
               _port = get(_ocds, "elasticache-cluster-0.Resource.status.atProvider.port", "")
-              _endpoint = get(_ocds, "elasticache-cluster-0.Resource.status.atProvider.clusterAddress", "")
+
+
+          _requiredClusters = len(get(_oxr, "spec.cacheClusters", [])) if get(_oxr, "spec.cacheClusters", False) else get(_oxr, "spec.numCacheClusters", 1)
+
+          _clusterEndpoints = [
+              get(_ocds, "elasticache-cluster-${i}.Resource.status.atProvider.clusterAddress", "")
+              for i in range(_requiredClusters)
+          ]
 
           _globalReplicationId = get(_ocds, "elasticache-replication-group-global.Resource.status.atProvider.id", "")
           _localReplicationId = get(_ocds, "elasticache-replication-group-local.Resource.status.atProvider.id", "")
@@ -730,22 +737,29 @@ spec:
               **_oxr,
               **{
                   "status": {
+                      if _clusterEndpoints:
+                          clusterEndpoints: _clusterEndpoints,
+
+                      if _endpoint:
+                          endpoint: _endpoint,
+
                       if _globalEndpoint:
                           globalEndpoint: _globalEndpoint,
+
                       if _globalROEndpoint:
                           globalReaderEndpoint: _globalROEndpoint,
 
                       if _globalReplicationId:
                           globalReplicationGroupId: _globalReplicationId,
+
                       if _localReplicationId:
                           replicationGroupId: _localReplicationId,
 
                       if _ipgn:
                           parameterGroupName: _ipgn,
+
                       if _port:
                           port: _port,
-                      if _endpoint:
-                          endpoint: _endpoint,
                       if _readerep:
                           readerEndpoint: _readerep,
                   },

@@ -137,6 +137,13 @@ func createResources() []xpt.ComposedTemplate {
 						},
 					},
 				},
+				cb.ToPatch("status.cacheClusterEndpoints", "status.clusterEndpoints"),
+				cb.ToPatch("status.cacheEndpoint", "status.endpoint"),
+				cb.ToPatch("status.cacheReaderEndpoint", "status.readerEndpoint"),
+
+				cb.ToPatch("status.cacheGlobalEndpoint", "status.globalEndpoint"),
+				cb.ToPatch("status.cacheGlobalReaderEndpoint", "status.globalReaderEndpoint"),
+				cb.ToPatch("status.cachePort", "status.port"),
 			},
 		},
 		{

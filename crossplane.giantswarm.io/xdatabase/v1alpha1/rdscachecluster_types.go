@@ -83,10 +83,34 @@ type RdsCacheClusterSpec struct {
 type RdsClusterStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
 
-	// CacheEndpoint is the endpoint of the Elasticache
+	// CacheGlobalEndpoint is the global (RW) endpoint of the Elasticache
+	// global replication group
+	//
+	// +optional
+	CacheGlobalEndpoint string `json:"cacheGlobalEndpoint,omitempty"`
+
+	// CacheGlobalReaderEndpoint is the global (RO) endpoint of the Elasticache
+	// global replication group
+	//
+	// +optional
+	CacheGlobalReaderEndpoint string `json:"cacheGlobalReaderEndpoint,omitempty"`
+
+	// CacheEndpoint is the endpoint of the Elasticache replication group
 	//
 	// +optional
 	CacheEndpoint string `json:"cacheEndpoint,omitempty"`
+
+	// CacheReaderEndpoint is the reader endpoint of the Elasticache replication
+	// group
+	//
+	// +optional
+	CacheReaderEndpoint string `json:"cacheReaderEndpoint,omitempty"`
+
+	// CacheClusterEndpoints is a list of endpoints of the Elasticache clusters
+	// when the cache is configured in cluster mode
+	//
+	// +optional
+	CacheClusterEndpoints []string `json:"cacheClusterEndpoints,omitempty"`
 
 	// CachePort is the port of the Elasticache
 	//
