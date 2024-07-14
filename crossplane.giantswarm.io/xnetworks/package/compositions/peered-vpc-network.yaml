@@ -25,6 +25,7 @@ spec:
         groupByRef: spec.peering.groupBy
         patchTo: status.vpcs
         providerConfigRef: spec.providerConfigRef.name
+        providerType: aws
         regionRef: spec.region
         vpcRef: spec.peering.remoteVpcs
     step: network-discovery
@@ -36,10 +37,6 @@ spec:
       metadata:
         creationTimestamp: null
       spec:
-        config: {}
-        credentials:
-          password: ""
-          username: ""
         source: |-
           _oxr = option("params").oxr
           _dxr = option("params").dxr
@@ -101,10 +98,6 @@ spec:
       metadata:
         creationTimestamp: null
       spec:
-        config: {}
-        credentials:
-          password: ""
-          username: ""
         source: |-
           import regex
           _oxr = option("params").oxr
@@ -722,10 +715,6 @@ spec:
       metadata:
         creationTimestamp: null
       spec:
-        config: {}
-        credentials:
-          password: ""
-          username: ""
         source: |-
           import regex
           _oxr = option("params").oxr
