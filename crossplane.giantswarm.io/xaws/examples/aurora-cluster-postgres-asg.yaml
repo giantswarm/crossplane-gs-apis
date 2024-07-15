@@ -1,0 +1,98 @@
+---
+apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
+kind: RCCWithRegionLookupClaim
+metadata:
+  name: ${PROJECT_NAME}
+  namespace: ${PROJECT_NAMESPACE}
+  labels:
+    owner: honeybadger
+    provider: aws
+    app.kubernetes.io/name: ${PROJECT_NAME}
+    app.kubernetes.io/instance: ${PROJECT_NAME}-elasticache-aurora-cluster
+    app.kubernetes.io/part-of: ${PROJECT_NAME}
+    app.kubernetes.io/managed-by: crossplane
+spec:
+  clusterDiscovery:
+    clusterName: ${CLUSTER_NAME}
+    clusterNamespace: ${PROJECT_NAMESPACE}
+    providerConfigRef:
+      name: kubernetes-read-only-eso-write # This is going to have to be static
+                                           # for now, otherwise the user has to
+                                           # select multiple provider configs
+  rdsCacheClusterSpec:
+    availabilityZones: ["a", "b", "c"] # Will be auto-discovered based on cluster settings
+
+    subnetGroupIndexes:
+      cache: 0
+      database: 1
+
+    cache:
+      # Cannot be true if CACHE_ENGINE is `memcached`
+      createReplicationGroup: ${CACHE_REPLICATION_ENABLED}
+      engine: redis
+      engineVersion: ${CACHE_VERSION}
+      nodeType: ${CACHE_NODE_TYPE}
+      numCacheClusters: ${CACHE_CLUSTER_COUNT}
+      # Only used if createReplicationGroup is false
+      numNodes: ${CACHE_NODE_COUNT}
+
+    database:
+      autoscaling:
+        enabled: true
+        minCapacity: ${DB_MIN_CAPACITY}
+        maxCapacity: ${DB_MAX_CAPACITY}
+      createCluster: true
+      enabledCloudwatchLogsExports:
+        - postgresql
+      cloudwatchLogGroupParameters:
+        retentionInDays: 7
+        class: standard
+        create: false
+      engine: aurora
+      engineVersion: ${DB_VERSION}
+      instanceCount: ${DB_INSTANCE_COUNT}
+      masterUsername: ${DB_MASTER_USERNAME}
+      secretRotation:
+        enabled: false
+      storageType: aurora
+
+    deletionPolicy: Delete
+    providerConfigRef:
+      name: ${PROVIDER_CONFIG_NAME}
+
+    # Region will be auto-discovered
+    region: eu-west-2
+
+    vpc:
+      peering:
+        remoteVpcs:
+        - name: ${CLUSTER_NAME}-vpc
+          region: eu-west-2 # Cluster region will be auto-discovered
+          allowPublic: true
+        enabled: true
+      subnetsets:
+        cidrs:
+        - prefix: ${VPC_CIDR}
+          public:
+            mask: ""
+            count: 0
+            lbSetIndex: -1
+          private:
+            mask: ${VPC_PRIVATE_SUBNET_MASK}
+            count: 2
+            lbSetIndex: -1
+      tags:
+        common:
+          giantswarm.io/owner: ${TEAM_NAME}
+          giantswarm.io/managed-by: crossplane
+          giantswarm.io/part-of: ${PROJECT_NAME}
+
+# The following additional information will be written back to the status of the
+# claim.
+#
+# I will ammend the composition to perform readiness checks and only write this
+# information back to the status if the real resources are ready.
+
+# status:
+#   elasticacheConnectionSecret: <secret-name>
+#   rdsConnectionSecret: <secret-name>
