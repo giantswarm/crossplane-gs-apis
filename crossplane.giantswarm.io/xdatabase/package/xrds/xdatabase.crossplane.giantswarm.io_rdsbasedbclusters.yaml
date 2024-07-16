@@ -1097,6 +1097,10 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              connectionSecretName:
+                description: ConnectionSecretName is the name of the connection secret
+                  used for the DB.
+                type: string
               dbParameterGroupName:
                 description: |-
                   DbParameterGroupName is the name of the DB parameter group to associate

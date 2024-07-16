@@ -154,10 +154,18 @@ _replicationGroups = [
             forProvider: {
                 if get(_oxr, "spec.applyImmediately", None) != None:
                     applyImmediately: _oxr.spec.applyImmediately
-                if get(_oxr, "spec.atRestEncryptionEnabled", None) != None:
-                    atRestEncryptionEnabled: _oxr.spec.atRestEncryptionEnabled
-                if get(_oxr, "spec.authToken", False):
-                    authToken: _oxr.spec.authToken
+
+                atRestEncryptionEnabled = get(_oxr, "spec.atRestEncryptionEnabled", True)
+
+                if get(_oxr, "spec.transitEncryptionEnabled", False):
+                    autoGenerateAuthToken: True
+                    authTokenSecretRef: {
+                        key: "token"
+                        name: "${_appName}-elasticache-auth-token"
+                        namespace: get(_oxr, "spec.claimRef.namespace", "default")
+                    }
+                    transitEncryptionEnabled: _oxr.spec.transitEncryptionEnabled
+
                 if get(_oxr, "spec.authTokenUpdateStrategy", False):
                     authTokenUpdateStrategy: _oxr.spec.authTokenUpdateStrategy
                 if get(_oxr, "spec.autoMinorVersionUpgrade", None) != None:
@@ -259,16 +267,20 @@ _replicationGroups = [
                     snapshotRetentionLimit: _oxr.spec.snapshotRetentionLimit
                 if get(_oxr, "spec.snapshotWindow", False):
                     snapshotWindow: _oxr.spec.snapshotWindow
-                if get(_oxr, "spec.transitEncryptionEnabled", None) != None:
-                    transitEncryptionEnabled: _oxr.spec.transitEncryptionEnabled
                 if get(_oxr, "spec.userGroupIds", False):
-                    userGroupIds: _oxr.spec.userGroupIds
+                    userGroupIds: [
+                        get(_oxr, "status.userGroupId", "")
+                    ]
 
                 tags: _labels | {
                     "Name": "${_appName}-${_region}-${i}"
                 } | get(_oxr, "spec.tags", {})
             }
             providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
+            writeConnectionSecretToRef: {
+                name: "${_appName}-elasticache-${i}"
+                namespace: get(_oxr, "spec.claimRef.namespace", "default")
+            }
         }
     } for _, i in _enabledReplicationGroups if all_true([
         _createReplicationGroup,
@@ -285,5 +297,82 @@ _replicationGroups = [
     ])
 ]
 
-_items = [_replicationGroups, _globalReplicationGroup]
+_userNames = get(_oxr, "spec.userNames", []) + [_appName]
+_users = [
+    {
+        apiVersion: "elasticache.aws.upbound.io/v1beta1"
+        kind: "User"
+        "metadata": {
+            annotations: {
+                "krm.kcl.dev/composition-resource-name": "elasticache-user-${name}"
+            }
+            labels: _labels
+        }
+        spec: {
+            deletionPolicy: _oxr.spec.deletionPolicy
+            forProvider: {
+                accessString: "on ~* +@all"
+                authenticationMode: [
+                    {
+                        passwordsSecretRef: [
+                            {
+                                "key": "password"
+                                "name": "${_appName}-elasticache-user-${name}"
+                                "namespace": get(_oxr, "spec.claimRef.namespace", "default")
+                            }
+                        ]
+                        "type": "password"
+                    }
+                ]
+                engine: get(_oxr, "spec.engine", "redis")
+                region: _region
+                tags = _labels | {
+                    "Name": "${_appName}-${_region}-${name}"
+                } | get(_oxr, "spec.tags", {})
+                userName: name
+            }
+            providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
+        }
+    }
+    for name in _userNames
+] if all_true([
+    get(_oxr, "spec.engine", "redis") == "redis",
+    get(_oxr, "spec.createReplicationGroup", True),
+]) else []
+
+_userIds = [
+    get(item, "Resource.status.atProvider.id", "")
+    for item in _ocds
+    if all_true([
+        get(item, "Resource.kind", "") == "User",
+        get(item, "Resource.apiVersion", "") == "elasticache.aws.upbound.io/v1beta1",
+    ])
+]
+
+_userGroup = [{
+    apiVersion: "elasticache.aws.upbound.io/v1beta1"
+    kind: "UserGroup"
+    "metadata": {
+        annotations: {
+            "krm.kcl.dev/composition-resource-name": "elasticache-user-group"
+        }
+        labels: _labels
+    }
+    spec: {
+        deletionPolicy: _oxr.spec.deletionPolicy
+        forProvider: {
+            engine: get(_oxr, "spec.engine", "redis")
+            region: _region
+            tags: _labels | {
+                "Name": "${_appName}-${_region}"
+            } | get(_oxr, "spec.tags", {})
+        }
+        providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
+    }
+}] if all_true([
+    get(_oxr, "spec.engine", "redis") == "redis",
+    get(_oxr, "spec.createReplicationGroup", True),
+]) else []
+
+_items = [_replicationGroups, _globalReplicationGroup, _parameterGroup, _users, _userGroup]
 items = [i for r in _items for i in r if i]

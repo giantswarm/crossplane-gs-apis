@@ -323,6 +323,16 @@ func (in *ElasticacheStatus) DeepCopyInto(out *ElasticacheStatus) {
 			}
 		}
 	}
+	if in.ConnectionSecretName != nil {
+		in, out := &in.ConnectionSecretName, &out.ConnectionSecretName
+		*out = new(string)
+		**out = **in
+	}
+	if in.GlobalConnectionSecretName != nil {
+		in, out := &in.GlobalConnectionSecretName, &out.GlobalConnectionSecretName
+		*out = new(string)
+		**out = **in
+	}
 	if in.Endpoint != nil {
 		in, out := &in.Endpoint, &out.Endpoint
 		*out = new(string)
@@ -375,6 +385,11 @@ func (in *ElasticacheStatus) DeepCopyInto(out *ElasticacheStatus) {
 	}
 	if in.SubnetGroupName != nil {
 		in, out := &in.SubnetGroupName, &out.SubnetGroupName
+		*out = new(string)
+		**out = **in
+	}
+	if in.UserGroupId != nil {
+		in, out := &in.UserGroupId, &out.UserGroupId
 		*out = new(string)
 		**out = **in
 	}
@@ -553,11 +568,6 @@ func (in *ReplicationGroup) DeepCopyInto(out *ReplicationGroup) {
 		*out = new(bool)
 		**out = **in
 	}
-	if in.AuthToken != nil {
-		in, out := &in.AuthToken, &out.AuthToken
-		*out = new(string)
-		**out = **in
-	}
 	if in.AuthTokenUpdateStrategy != nil {
 		in, out := &in.AuthTokenUpdateStrategy, &out.AuthTokenUpdateStrategy
 		*out = new(string)
@@ -680,6 +690,11 @@ func (in *ReplicationGroup) DeepCopyInto(out *ReplicationGroup) {
 		*out = new(int64)
 		**out = **in
 	}
+	if in.NumCacheNodes != nil {
+		in, out := &in.NumCacheNodes, &out.NumCacheNodes
+		*out = new(int64)
+		**out = **in
+	}
 	if in.ParameterGroupName != nil {
 		in, out := &in.ParameterGroupName, &out.ParameterGroupName
 		*out = new(string)
@@ -756,8 +771,8 @@ func (in *ReplicationGroup) DeepCopyInto(out *ReplicationGroup) {
 		*out = new(bool)
 		**out = **in
 	}
-	if in.UserGroupIds != nil {
-		in, out := &in.UserGroupIds, &out.UserGroupIds
+	if in.Usernames != nil {
+		in, out := &in.Usernames, &out.Usernames
 		*out = make([]*string, len(*in))
 		for i := range *in {
 			if (*in)[i] != nil {

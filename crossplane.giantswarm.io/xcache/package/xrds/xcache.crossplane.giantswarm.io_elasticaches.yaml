@@ -40,10 +40,6 @@ spec:
                   AtRestEncryptionEnabled specifies whether data stored in the cluster is
                   encrypted at rest.
                 type: boolean
-              authToken:
-                description: AuthToken is the password used to access a password protected
-                  server.
-                type: string
               authTokenUpdateStrategy:
                 description: |-
                   AuthTokenUpdateStrategy specifies how the auth token should be updated.
@@ -655,6 +651,15 @@ spec:
                   Conflicts with NumNodeGroups.
                 format: int64
                 type: integer
+              numCacheNodes:
+                description: |-
+                  NumCacheNodes is the number of cache nodes in the cluster.
+
+
+                  Ignored if replication group is specified or being created
+                  This is a convenience parameter when building a single cluster.
+                format: int64
+                type: integer
               numNodeGroups:
                 description: |-
                   NumNodeGroups is the number of node groups in the replication group.
@@ -909,9 +914,8 @@ spec:
 
                   Optional, Memcached only
                 type: boolean
-              userGroupIds:
-                description: UserGroupIds is a list of user group IDs to associate
-                  with the cluster.
+              usernames:
+                description: Usernames is a list of users to associate with the cluster.
                 items:
                   type: string
                 type: array
@@ -993,8 +997,15 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              connectionSecretName:
+                description: ConnectionSecretName is the name of the connection secret.
+                type: string
               endpoint:
                 description: Endpoint is the DNS name of the endpoint for the cluster.
+                type: string
+              globalConnectionSecretName:
+                description: GlobalConnectionSecretName is the name of the global
+                  connection secret.
                 type: string
               globalEndpoint:
                 description: |-
@@ -1040,6 +1051,9 @@ spec:
               subnetGroupName:
                 description: SubnetGroupName is the name of the subnet group for the
                   cluster.
+                type: string
+              userGroupId:
+                description: UserGroupId is the ID of the user group for the cluster.
                 type: string
             type: object
         required:

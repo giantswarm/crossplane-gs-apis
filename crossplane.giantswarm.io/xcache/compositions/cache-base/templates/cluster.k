@@ -65,7 +65,7 @@ _clusters = [
                     get(cluster, "engine", get(_oxr, "spec.engine", False)) == "memcached",
                 ]):
                     azMode: get(cluster, "azMode", get(_oxr, "spec.azMode", "cross-az")),
-                    numCacheNodes = get(cluster, "numCacheNodes", len(_azs)),
+                    numCacheNodes = get(cluster, "numCacheNodes", get(_oxr, "spec.numCacheNodes", len(_azs))),
 
                 if get(cluster, "engine", get(_oxr, "spec.engine", False)):
                     engine = get(cluster, "engine", get(_oxr, "spec.engine", "redis")),
@@ -177,7 +177,7 @@ _securityGroupRules = [
         kind: "SecurityGroupRule"
         "metadata": {
             annotations: {
-                "krm.kcl.dev/composition-resource-name": "elasticache-security-group-rule-inbound"
+                "krm.kcl.dev/composition-resource-name": "elasticache-security-group-rule-inbound-${i}"
             }
         }
         "spec": {
@@ -188,12 +188,13 @@ _securityGroupRules = [
                 protocol: "tcp",
                 region: _region,
                 securityGroupId: get(_oxr, "status.securityGroupId", ""),
+                toPort: _port,
                 type: "ingress",
             }
             providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
         }
     }
-    for _, cidr in get(_oxr, "spec.cidrBlocks", [])
+    for i, cidr in get(_oxr, "spec.cidrBlocks", [])
     if all_true([
         get(_oxr, "status.securityGroupId", False),
         _port

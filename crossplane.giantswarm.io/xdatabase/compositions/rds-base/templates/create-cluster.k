@@ -163,6 +163,13 @@ _cluster = {
     }
 } if _keyId and _subnetGroup else False
 
+_secretRef = False
+if _createCluster:
+    if get(_ocds, "rds-cluster.Resource", False) and all_true([
+        c.status == "True" for c in get(_ocds, "rds-cluster.Resource.status.conditions", [])
+    ]):
+        _secretRef = get(_ocds, "rds-cluster.Resource.spec.writeConnectionSecretToRef.name", "")
+
 _newdxr = {
     **_dxr,
     **{
@@ -172,6 +179,8 @@ _newdxr = {
             clusterArn: _clusterArn,
             endpoint: _endpoint,
             port: _port,
+            if _secretRef:
+                connectionSecretName: _secretRef,
         }
     }
 } if _cluster and _created else False

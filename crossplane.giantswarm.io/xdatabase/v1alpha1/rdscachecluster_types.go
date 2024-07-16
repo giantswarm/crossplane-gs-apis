@@ -83,6 +83,29 @@ type RdsCacheClusterSpec struct {
 type RdsClusterStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
 
+	// CacheClusterEndpoints is a list of endpoints of the Elasticache clusters
+	// when the cache is configured in cluster mode
+	//
+	// +optional
+	CacheClusterEndpoints []string `json:"cacheClusterEndpoints,omitempty"`
+
+	// CacheConnectionSecret is the secret containing the connection details for
+	// the Elasticache replication group
+	//
+	// +optional
+	CacheConnectionSecret string `json:"cacheConnectionSecret,omitempty"`
+
+	// CacheEndpoint is the endpoint of the Elasticache replication group
+	//
+	// +optional
+	CacheEndpoint string `json:"cacheEndpoint,omitempty"`
+
+	// CacheGlobalConnectionSecret is the secret containing the connection
+	// details for the global Elasticache replication group
+	//
+	// +optional
+	CacheGlobalConnectionSecret string `json:"cacheGlobalConnectionSecret,omitempty"`
+
 	// CacheGlobalEndpoint is the global (RW) endpoint of the Elasticache
 	// global replication group
 	//
@@ -95,10 +118,10 @@ type RdsClusterStatus struct {
 	// +optional
 	CacheGlobalReaderEndpoint string `json:"cacheGlobalReaderEndpoint,omitempty"`
 
-	// CacheEndpoint is the endpoint of the Elasticache replication group
+	// CachePort is the port of the Elasticache
 	//
 	// +optional
-	CacheEndpoint string `json:"cacheEndpoint,omitempty"`
+	CachePort int `json:"cachePort,omitempty"`
 
 	// CacheReaderEndpoint is the reader endpoint of the Elasticache replication
 	// group
@@ -106,36 +129,31 @@ type RdsClusterStatus struct {
 	// +optional
 	CacheReaderEndpoint string `json:"cacheReaderEndpoint,omitempty"`
 
-	// CacheClusterEndpoints is a list of endpoints of the Elasticache clusters
-	// when the cache is configured in cluster mode
-	//
-	// +optional
-	CacheClusterEndpoints []string `json:"cacheClusterEndpoints,omitempty"`
-
-	// CachePort is the port of the Elasticache
-	//
-	// +optional
-	CachePort int `json:"cachePort,omitempty"`
-
 	// CacheSubnets is the list of subnets to be used by ElasticSearch
 	//
 	// +optional
 	CacheSubnets []string `json:"cacheSubnets,omitempty"`
 
-	// DatabaseEndpoint is the endpoint of the database
+	// RdsConnectionSecret is the secret containing the connection details
+	// for the database
 	//
 	// +optional
-	DatabaseEndpoint string `json:"databaseEndpoint,omitempty"`
+	RdsConnectionSecret string `json:"rdsConnectionSecret,omitempty"`
 
-	// DatabasePort is the port of the database
+	// RdsEndpoint is the endpoint of the database
 	//
 	// +optional
-	DatabasePort int `json:"databasePort,omitempty"`
+	RdsEndpoint string `json:"rdsEndpoint,omitempty"`
 
-	// DatabaseSubnets is the list of subnets to be used by the database
+	// RdsPort is the port of the database
 	//
 	// +optional
-	DatabaseSubnets []string `json:"databaseSubnets,omitempty"`
+	RdsPort int `json:"rdsPort,omitempty"`
+
+	// RdsSubnets is the list of subnets to be used by the database
+	//
+	// +optional
+	RdsSubnets []string `json:"rdsSubnets,omitempty"`
 
 	// Vpc is a VPC configuration to bind the cluster to
 	//

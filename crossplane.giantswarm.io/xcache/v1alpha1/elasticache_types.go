@@ -81,6 +81,16 @@ type ElasticacheStatus struct {
 	// +optional
 	ClusterEndpoints []*string `json:"clusterEndpoints,omitempty"`
 
+	// ConnectionSecretName is the name of the connection secret.
+	//
+	// +optional
+	ConnectionSecretName *string `json:"connectionSecretName,omitempty"`
+
+	// GlobalConnectionSecretName is the name of the global connection secret.
+	//
+	// +optional
+	GlobalConnectionSecretName *string `json:"globalConnectionSecretName,omitempty"`
+
 	// Endpoint is the DNS name of the endpoint for the cluster.
 	//
 	// +optional
@@ -140,6 +150,11 @@ type ElasticacheStatus struct {
 	//
 	// +optional
 	SubnetGroupName *string `json:"subnetGroupName,omitempty"`
+
+	// UserGroupId is the ID of the user group for the cluster.
+	//
+	// +optional
+	UserGroupId *string `json:"userGroupId,omitempty"`
 }
 
 type Cluster struct {
@@ -457,12 +472,8 @@ type ReplicationGroup struct {
 	// encrypted at rest.
 	//
 	// +optional
+	// +default=true
 	AtRestEncryptionEnabled *bool `json:"atRestEncryptionEnabled,omitempty"`
-
-	// AuthToken is the password used to access a password protected server.
-	//
-	// +optional
-	AuthToken *string `json:"authToken,omitempty"`
 
 	// AuthTokenUpdateStrategy specifies how the auth token should be updated.
 	//
@@ -658,6 +669,15 @@ type ReplicationGroup struct {
 	// +optional
 	NumNodeGroups *int64 `json:"numNodeGroups,omitempty"`
 
+	// NumCacheNodes is the number of cache nodes in the cluster.
+	//
+	// Ignored if replication group is specified or being created
+	// This is a convenience parameter when building a single cluster.
+	//
+	// +optional
+	// +default=3
+	NumCacheNodes *int64 `json:"numCacheNodes,omitempty"`
+
 	// ParameterGroupName is the name of the parameter group to associate with
 	// this cluster. To create a new parameter group, use the
 	// `ParameterGroupConfiguration` option instead.
@@ -744,10 +764,10 @@ type ReplicationGroup struct {
 	// +optional
 	TransitEncryptionEnabled *bool `json:"transitEncryptionEnabled,omitempty"`
 
-	// UserGroupIds is a list of user group IDs to associate with the cluster.
+	// Usernames is a list of users to associate with the cluster.
 	//
 	// +optional
-	UserGroupIds []*string `json:"userGroupIds,omitempty"`
+	Usernames []*string `json:"usernames,omitempty"`
 }
 
 // GlobalReplicationGroup

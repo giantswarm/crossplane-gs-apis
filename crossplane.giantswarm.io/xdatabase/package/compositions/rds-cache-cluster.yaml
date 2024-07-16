@@ -134,6 +134,9 @@ spec:
             fromFieldPath: Required
           toFieldPath: spec.vpcId
           type: FromCompositeFieldPath
+        - fromFieldPath: status.connectionSecret
+          toFieldPath: status.cacheConnectionSecret
+          type: ToCompositeFieldPath
         - fromFieldPath: status.clusterEndpoints
           toFieldPath: status.cacheClusterEndpoints
           type: ToCompositeFieldPath
@@ -142,6 +145,9 @@ spec:
           type: ToCompositeFieldPath
         - fromFieldPath: status.readerEndpoint
           toFieldPath: status.cacheReaderEndpoint
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.globalConnectionSecret
+          toFieldPath: status.cacheGlobalConnectionSecret
           type: ToCompositeFieldPath
         - fromFieldPath: status.globalEndpoint
           toFieldPath: status.cacheGlobalEndpoint
@@ -189,6 +195,15 @@ spec:
             fromFieldPath: Required
           toFieldPath: spec.vpcId
           type: FromCompositeFieldPath
+        - fromFieldPath: status.connectionSecret
+          toFieldPath: status.databaseConnectionSecret
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.endpoint
+          toFieldPath: status.databaseEndpoint
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.port
+          toFieldPath: status.databasePort
+          type: ToCompositeFieldPath
     step: patch-and-transform
   - functionRef:
       name: function-kcl

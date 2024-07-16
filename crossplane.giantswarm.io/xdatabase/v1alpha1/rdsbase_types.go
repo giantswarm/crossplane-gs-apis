@@ -74,6 +74,11 @@ type RdsBaseDbStatus struct {
 	// +optional
 	AccountId *string `json:"accountId,omitempty"`
 
+	// ConnectionSecretName is the name of the connection secret used for the DB.
+	//
+	// +optional
+	ConnectionSecretName *string `json:"connectionSecretName,omitempty"`
+
 	// ClusterIdentifier is the identifier of the DB cluster.
 	//
 	// +optional

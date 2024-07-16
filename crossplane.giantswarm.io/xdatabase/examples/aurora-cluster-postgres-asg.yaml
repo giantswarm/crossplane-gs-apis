@@ -30,6 +30,7 @@ spec:
     engineVersion: "7.1"
     nodeType: cache.t3.micro
     numCacheClusters: 3
+    transitEncryptionEnabled: true
 
   database:
     autoscaling:

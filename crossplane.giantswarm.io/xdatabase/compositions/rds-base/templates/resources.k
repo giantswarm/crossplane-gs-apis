@@ -221,12 +221,23 @@ _instances = [
     }
     for i, item in _buildInstances if all_true([
         any_true([
-            (_createCluster and _clusterIdentifier != None), not _createCluster
+            (_createCluster and _clusterIdentifier != None),
+            not _createCluster,
         ]),
         _keyId,
         _dbSubnetGroupName
     ])
 ]
+
+_secretRef = False
+if all_true([
+    not _createCluster,
+    get(_ocds, "instance-0.Resource", False),
+    all_true([
+        c.status == "True" for c in get(_ocds, "instance-0.Resource.status", False)
+    ])
+]):
+    _secretRef = get(_ocds, "instance-0.Resource.spec.writeConnectionSecretToRef", False)
 
 ##
 # OptionGroups may be specified for non-cluster, non-postgresql instances.
@@ -718,6 +729,8 @@ _newdxr = {
         "status": {
             endpoint: get(_masterInstance, "address", ""),
             port: get(_masterInstance, "port", 0),
+            if _secretRef:
+                connectionSecretName: _secretRef
         }
     }
 } if not _createCluster and _masterInstance else {}

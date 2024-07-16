@@ -1113,6 +1113,11 @@ func (in *RdsBaseDbStatus) DeepCopyInto(out *RdsBaseDbStatus) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.ConnectionSecretName != nil {
+		in, out := &in.ConnectionSecretName, &out.ConnectionSecretName
+		*out = new(string)
+		**out = **in
+	}
 	if in.ClusterIdentifier != nil {
 		in, out := &in.ClusterIdentifier, &out.ClusterIdentifier
 		*out = new(string)
@@ -1241,8 +1246,8 @@ func (in *RdsClusterStatus) DeepCopyInto(out *RdsClusterStatus) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
-	if in.DatabaseSubnets != nil {
-		in, out := &in.DatabaseSubnets, &out.DatabaseSubnets
+	if in.RdsSubnets != nil {
+		in, out := &in.RdsSubnets, &out.RdsSubnets
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}

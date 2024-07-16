@@ -2004,9 +2004,19 @@ spec:
                 items:
                   type: string
                 type: array
+              cacheConnectionSecret:
+                description: |-
+                  CacheConnectionSecret is the secret containing the connection details for
+                  the Elasticache replication group
+                type: string
               cacheEndpoint:
                 description: CacheEndpoint is the endpoint of the Elasticache replication
                   group
+                type: string
+              cacheGlobalConnectionSecret:
+                description: |-
+                  CacheGlobalConnectionSecret is the secret containing the connection
+                  details for the global Elasticache replication group
                 type: string
               cacheGlobalEndpoint:
                 description: |-
@@ -2070,15 +2080,19 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
-              databaseEndpoint:
-                description: DatabaseEndpoint is the endpoint of the database
+              rdsConnectionSecret:
+                description: |-
+                  RdsConnectionSecret is the secret containing the connection details
+                  for the database
                 type: string
-              databasePort:
-                description: DatabasePort is the port of the database
+              rdsEndpoint:
+                description: RdsEndpoint is the endpoint of the database
+                type: string
+              rdsPort:
+                description: RdsPort is the port of the database
                 type: integer
-              databaseSubnets:
-                description: DatabaseSubnets is the list of subnets to be used by
-                  the database
+              rdsSubnets:
+                description: RdsSubnets is the list of subnets to be used by the database
                 items:
                   type: string
                 type: array

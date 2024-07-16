@@ -137,10 +137,12 @@ func createResources() []xpt.ComposedTemplate {
 						},
 					},
 				},
+				cb.ToPatch("status.cacheConnectionSecret", "status.connectionSecret"),
 				cb.ToPatch("status.cacheClusterEndpoints", "status.clusterEndpoints"),
 				cb.ToPatch("status.cacheEndpoint", "status.endpoint"),
 				cb.ToPatch("status.cacheReaderEndpoint", "status.readerEndpoint"),
 
+				cb.ToPatch("status.cacheGlobalConnectionSecret", "status.globalConnectionSecret"),
 				cb.ToPatch("status.cacheGlobalEndpoint", "status.globalEndpoint"),
 				cb.ToPatch("status.cacheGlobalReaderEndpoint", "status.globalReaderEndpoint"),
 				cb.ToPatch("status.cachePort", "status.port"),
@@ -161,7 +163,7 @@ func createResources() []xpt.ComposedTemplate {
 				cb.FromPatch("spec.availabilityZones", "spec.availabilityZones"),
 				cb.FromPatch("spec.claimRef", "spec.claimRef"),
 				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
-				cb.FromPatch(("spec.providerConfigRef"), "spec.providerConfigRef"),
+				cb.FromPatch("spec.providerConfigRef", "spec.providerConfigRef"),
 				cb.FromPatch("spec.region", "spec.region"),
 				{
 					Type: xpt.PatchTypeFromCompositeFieldPath,
@@ -173,6 +175,9 @@ func createResources() []xpt.ComposedTemplate {
 						},
 					},
 				},
+				cb.ToPatch("status.databaseConnectionSecret", "status.connectionSecret"),
+				cb.ToPatch("status.databaseEndpoint", "status.endpoint"),
+				cb.ToPatch("status.databasePort", "status.port"),
 			},
 		},
 	}
