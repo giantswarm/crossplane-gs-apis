@@ -1,0 +1,248 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  creationTimestamp: null
+  labels:
+    component: aws
+    provider: aws
+    type: regionlookup
+  name: rcc-with-region-lookup
+spec:
+  compositeTypeRef:
+    apiVersion: xaws.crossplane.giantswarm.io/v1alpha1
+    kind: RdsCacheClusterWithRegionLookup
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-patch-and-transform
+    input:
+      apiVersion: pt.crossplane.io/v1beta1
+      kind: Resources
+      metadata:
+        creationTimestamp: null
+      resources:
+      - base:
+          apiVersion: kubernetes.crossplane.io/v1alpha2
+          kind: Object
+          metadata:
+            creationTimestamp: null
+          spec:
+            deletionPolicy: Delete
+            forProvider:
+              manifest:
+                apiVersion: cluster.x-k8s.io/v1beta1
+                kind: Cluster
+                metadata:
+                  creationTimestamp: null
+                  name: test-cluster
+                  namespace: test-namespace
+                spec:
+                  controlPlaneEndpoint:
+                    host: ""
+                    port: 0
+                status:
+                  controlPlaneReady: false
+                  infrastructureReady: false
+            managementPolicies:
+            - Observe
+            providerConfigRef:
+              name: test-provider
+            readiness: {}
+          status:
+            atProvider:
+              manifest: null
+        name: cluster-lookup
+        patches:
+        - fromFieldPath: spec.clusterDiscovery.name
+          toFieldPath: spec.forProvider.manifest.metadata.name
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.clusterDiscovery.namespace
+          toFieldPath: spec.forProvider.manifest.metadata.namespace
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.clusterDiscovery.deletionPolicy
+          toFieldPath: spec.deletionPolicy
+          type: FromCompositeFieldPath
+      - base:
+          apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
+          kind: RdsCacheCluster
+          metadata:
+            creationTimestamp: null
+          spec:
+            availabilityZones: null
+            cache:
+              engine: null
+              parameterGroupConfiguration:
+                family: null
+                name: null
+            database:
+              dbClusterParameterGroup: null
+            region: ""
+            subnetGroupIndexes:
+              cache: 0
+              database: 0
+            vpc:
+              peering:
+                allowPublic: false
+                enabled: false
+                groupBy: ""
+                remoteVpcs: null
+              subnetsets:
+                cidrs: null
+                function: ""
+              tags: {}
+          status:
+            vpc:
+              additionalCidrBlocks: null
+              cidrBlock: ""
+              id: ""
+              internetGateway: ""
+              natGateways: null
+              privateRouteTables: null
+              privateSubnets: null
+              providerConfig: ""
+              publicRouteTables: null
+              publicSubnets: null
+              region: ""
+              securityGroups: null
+              transitGateways: null
+              vpcPeeringConnections: null
+        name: rds-cache-cluster
+        patches:
+        - fromFieldPath: spec.rdsCacheClusterSpec
+          toFieldPath: spec
+          type: FromCompositeFieldPath
+        - fromFieldPath: status.region
+          policy:
+            fromFieldPath: Required
+          toFieldPath: spec.region
+          type: FromCompositeFieldPath
+        - fromFieldPath: status.availabilityZones
+          policy:
+            fromFieldPath: Required
+          toFieldPath: spec.availabilityZones
+          type: FromCompositeFieldPath
+        - fromFieldPath: status.cacheClusterEndpoints
+          toFieldPath: status.cacheClusterEndpoints
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.cacheConnectionSecret
+          toFieldPath: status.cacheConnectionSecret
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.cacheEndpoint
+          toFieldPath: status.cacheEndpoint
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.cacheGlobalConnectionSecret
+          toFieldPath: status.cacheGlobalConnectionSecret
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.cacheGlobalEndpoint
+          toFieldPath: status.cacheGlobalEndpoint
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.cacheGlobalReaderEndpoint
+          toFieldPath: status.cacheGlobalReaderEndpoint
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.cachePort
+          toFieldPath: status.cachePort
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.cacheReaderEndpoint
+          toFieldPath: status.cacheReaderEndpoint
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.cacheSubnets
+          toFieldPath: status.cacheSubnets
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.rdsConnectionSecret
+          toFieldPath: status.rdsConnectionSecret
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.rdsEndpoint
+          toFieldPath: status.rdsEndpoint
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.rdsPort
+          toFieldPath: status.rdsPort
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.rdsSubnets
+          toFieldPath: status.rdsSubnets
+          type: ToCompositeFieldPath
+        - fromFieldPath: status.vpc
+          toFieldPath: status.vpc
+          type: ToCompositeFieldPath
+    step: patch-and-transform
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+
+          _oxr = option("params").oxr
+          _dxr = option("params").dxr
+          _ocds = option("params").ocds
+          _dcds = option("params").dcds
+
+          get = lambda x: any, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          _clusterLookup = get(_ocds, "cluster-lookup.Resource", False)
+
+          _kind = get(_clusterLookup, "spec.infrastructureRef.kind", "")
+          assert _kind in ["AWSCluster", "AWSManagedCluster"], "Unsupported kind: ${_kind}"
+
+          _awsClusterObject = {} if not _clusterLookup else {
+              apiVersion: get(_clusterLookup, "spec.infrastructureRef.apiVersion", ""),
+              kind: _kind,
+              metadata: {
+                  name: get(_clusterLookup, "spec.infrastructureRef.name", "")
+                  namespace: get(_clusterLookup, "spec.infrastructureRef.namespace", "")
+              }
+          }
+
+          _kubernetesObject = {
+              apiVersion: "kubernetes.crossplane.io/v1alpha2",
+              kind: "Object"
+              metadata: {
+                  annotations: {
+                      "krm.kcl.dev/composition-resource-name" = "aws-cluster"
+                  }
+              }
+              spec: {
+                  managementPolicies: ["Observe"],
+                  deletionPolicy: get(_oxr, "spec.clusterDiscovery.deletionPolicy", "Delete"),
+                  providerConfigRef: {
+                      name: get(_oxr, "spec.clusterDiscovery.providerConfigRef.name", "")
+                  }
+                  forProvider: {
+                      manifest: _awsClusterObject,
+                  }
+              }
+          } if _awsClusterObject else {}
+
+          _region = get(_ocds, "aws-cluster.Resource.spec.region", False)
+          _availabilityZones = {} if not _region else {
+              regex.replace(k.availabilityZone, _region, "") = False for k in get(_ocds, "aws-cluster.Resource.spec.network.subnets", [])
+          }
+
+          _dxr = {
+              **_oxr,
+              **{
+                  "status": {
+                          region = _region
+                          availabilityZones = sorted([k for k, _ in _availabilityZones])
+                  }
+              },
+          } if _region and _availabilityZones else {}
+
+          items = [i for i in [_kubernetesObject, _dxr] if i]
+        target: ""
+    step: function-kcl-resources
+  - functionRef:
+      name: function-auto-ready
+    step: function-auto-ready
