@@ -234,7 +234,7 @@ if all_true([
     not _createCluster,
     get(_ocds, "instance-0.Resource", False),
     all_true([
-        c.status == "True" for c in get(_ocds, "instance-0.Resource.status", False)
+        c.status == "True" for c in get(_ocds, "instance-0.Resource.status.conditions", False)
     ])
 ]):
     _secretRef = get(_ocds, "instance-0.Resource.spec.writeConnectionSecretToRef", False)
@@ -730,7 +730,7 @@ _newdxr = {
             endpoint: get(_masterInstance, "address", ""),
             port: get(_masterInstance, "port", 0),
             if _secretRef:
-                connectionSecretName: _secretRef
+                connectionSecret: _secretRef
         }
     }
 } if not _createCluster and _masterInstance else {}

@@ -136,7 +136,7 @@ _enabledReplicationGroups = [
 
 _replicationGroups = [
     {
-        apiVersion: "elasticache.aws.upbound.io/v1beta1"
+        apiVersion: "elasticache.aws.upbound.io/v1beta2"
         kind: "ReplicationGroup"
         "metadata": {
             annotations: {
@@ -297,7 +297,7 @@ _replicationGroups = [
     ])
 ]
 
-_userNames = get(_oxr, "spec.userNames", []) + [_appName]
+_userNames = get(_oxr, "spec.userNames", []) + [_appName, "default"]
 _users = [
     {
         apiVersion: "elasticache.aws.upbound.io/v1beta1"
@@ -311,19 +311,30 @@ _users = [
         spec: {
             deletionPolicy: _oxr.spec.deletionPolicy
             forProvider: {
-                accessString: "on ~* +@all"
-                authenticationMode: [
-                    {
-                        passwordsSecretRef: [
-                            {
-                                "key": "password"
-                                "name": "${_appName}-elasticache-user-${name}"
-                                "namespace": get(_oxr, "spec.claimRef.namespace", "default")
-                            }
-                        ]
-                        "type": "password"
-                    }
-                ]
+                if name == "default":
+                    accessString: "off ~* +@all"
+                    authenticationMode: [
+                        {
+                            type: "no-password-required"
+                        }
+                    ]
+                else:
+                    accessString: "on ~* +@all"
+                    authenticationMode: [
+                        {
+                            passwordsSecretRef: [
+                                {
+                                    "key": "password"
+                                    if name == _appName:
+                                        "name": "elasticache-user-${name}"
+                                    else:
+                                        "name": "${_appName}-elasticache-user-${name}"
+                                    "namespace": get(_oxr, "spec.claimRef.namespace", "default")
+                                }
+                            ]
+                            "type": "password"
+                        }
+                    ]
                 engine: get(_oxr, "spec.engine", "redis")
                 region: _region
                 tags = _labels | {
@@ -342,7 +353,7 @@ _users = [
 
 _userIds = [
     get(item, "Resource.status.atProvider.id", "")
-    for item in _ocds
+    for _, item in _ocds
     if all_true([
         get(item, "Resource.kind", "") == "User",
         get(item, "Resource.apiVersion", "") == "elasticache.aws.upbound.io/v1beta1",
@@ -366,6 +377,7 @@ _userGroup = [{
             tags: _labels | {
                 "Name": "${_appName}-${_region}"
             } | get(_oxr, "spec.tags", {})
+            userIds: _userIds
         }
         providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
     }

@@ -29,6 +29,13 @@ type RdsCacheCluster struct {
 	Status RdsClusterStatus    `json:"status,omitempty"`
 }
 
+// +kubebuilder:object:root=true
+type RdsCacheClusterList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []RdsCacheCluster `json:"items"`
+}
+
 type SubnetGroupIndexes struct {
 	// Database is the subnet group index to use for the database
 	//

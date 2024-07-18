@@ -196,13 +196,13 @@ spec:
           toFieldPath: spec.vpcId
           type: FromCompositeFieldPath
         - fromFieldPath: status.connectionSecret
-          toFieldPath: status.databaseConnectionSecret
+          toFieldPath: status.rdsConnectionSecret
           type: ToCompositeFieldPath
         - fromFieldPath: status.endpoint
-          toFieldPath: status.databaseEndpoint
+          toFieldPath: status.rdsEndpoint
           type: ToCompositeFieldPath
         - fromFieldPath: status.port
-          toFieldPath: status.databasePort
+          toFieldPath: status.rdsPort
           type: ToCompositeFieldPath
     step: patch-and-transform
   - functionRef:

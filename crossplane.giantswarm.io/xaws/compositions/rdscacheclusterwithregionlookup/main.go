@@ -9,13 +9,14 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	xapiextv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
-	xcache "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xcache/v1alpha1"
 	"github.com/mproffitt/crossbuilder/pkg/generate/composition/build"
 	cb "github.com/mproffitt/crossbuilder/pkg/generate/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	ccKubernetes "github.com/crossplane-contrib/provider-kubernetes/apis/object/v1alpha2"
 	capi "sigs.k8s.io/cluster-api/api/v1beta1"
+
+	xdatabase "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xdatabase/v1alpha1"
 )
 
 type builder struct{}
@@ -132,10 +133,10 @@ func createResources() []xpt.ComposedTemplate {
 		{
 			Name: "rds-cache-cluster",
 			Base: &runtime.RawExtension{
-				Object: &xcache.Elasticache{
+				Object: &xdatabase.RdsCacheCluster{
 					TypeMeta: metav1.TypeMeta{
-						APIVersion: "xcache.crossplane.giantswarm.io/v1alpha1",
-						Kind:       "Elasticache",
+						APIVersion: "xdatabase.crossplane.giantswarm.io/v1alpha1",
+						Kind:       "RdsCacheCluster",
 					},
 				},
 			},
@@ -169,9 +170,12 @@ func createResources() []xpt.ComposedTemplate {
 				cb.ToPatch("status.cacheGlobalReaderEndpoint", "status.cacheGlobalReaderEndpoint"),
 				cb.ToPatch("status.cachePort", "status.cachePort"),
 				cb.ToPatch("status.cacheReaderEndpoint", "status.cacheReaderEndpoint"),
+				cb.ToPatch("status.cacheSubnets", "status.cacheSubnets"),
 				cb.ToPatch("status.rdsConnectionSecret", "status.rdsConnectionSecret"),
 				cb.ToPatch("status.rdsEndpoint", "status.rdsEndpoint"),
 				cb.ToPatch("status.rdsPort", "status.rdsPort"),
+				cb.ToPatch("status.rdsSubnets", "status.rdsSubnets"),
+				cb.ToPatch("status.vpc", "status.vpc"),
 			},
 		},
 	}

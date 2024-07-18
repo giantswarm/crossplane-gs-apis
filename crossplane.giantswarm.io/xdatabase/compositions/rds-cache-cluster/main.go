@@ -175,9 +175,9 @@ func createResources() []xpt.ComposedTemplate {
 						},
 					},
 				},
-				cb.ToPatch("status.databaseConnectionSecret", "status.connectionSecret"),
-				cb.ToPatch("status.databaseEndpoint", "status.endpoint"),
-				cb.ToPatch("status.databasePort", "status.port"),
+				cb.ToPatch("status.rdsConnectionSecret", "status.connectionSecret"),
+				cb.ToPatch("status.rdsEndpoint", "status.endpoint"),
+				cb.ToPatch("status.rdsPort", "status.port"),
 			},
 		},
 	}

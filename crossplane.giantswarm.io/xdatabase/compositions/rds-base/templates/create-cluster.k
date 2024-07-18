@@ -180,7 +180,7 @@ _newdxr = {
             endpoint: _endpoint,
             port: _port,
             if _secretRef:
-                connectionSecretName: _secretRef,
+                connectionSecret: _secretRef,
         }
     }
 } if _cluster and _created else False
