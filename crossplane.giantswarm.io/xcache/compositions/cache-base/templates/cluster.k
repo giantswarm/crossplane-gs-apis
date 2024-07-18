@@ -197,7 +197,8 @@ _securityGroupRules = [
     for i, cidr in get(_oxr, "spec.cidrBlocks", [])
     if all_true([
         get(_oxr, "status.securityGroupId", False),
-        _port
+        _port,
+        cidr,
     ])
 ]
 

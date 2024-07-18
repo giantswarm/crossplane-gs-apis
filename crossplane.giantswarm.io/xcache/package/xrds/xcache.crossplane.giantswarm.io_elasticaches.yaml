@@ -997,15 +997,15 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
-              connectionSecretName:
-                description: ConnectionSecretName is the name of the connection secret.
+              connectionSecret:
+                description: ConnectionSecret is the name of the connection secret.
                 type: string
               endpoint:
                 description: Endpoint is the DNS name of the endpoint for the cluster.
                 type: string
-              globalConnectionSecretName:
-                description: GlobalConnectionSecretName is the name of the global
-                  connection secret.
+              globalConnectionSecret:
+                description: GlobalConnectionSecret is the name of the global connection
+                  secret.
                 type: string
               globalEndpoint:
                 description: |-

@@ -38,6 +38,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		resources                []xpt.ComposedTemplate = createResources()
 		kclCreateClusterTemplate string
 		kclResourcesTemplate     string
+		kclSqlTemplate           string
 		err                      error
 	)
 
@@ -47,6 +48,11 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 	}
 
 	kclCreateClusterTemplate, err = build.LoadTemplate("compositions/rds-base/templates/create-cluster.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclSqlTemplate, err = build.LoadTemplate("compositions/rds-base/templates/provision-sql.k")
 	if err != nil {
 		panic(err)
 	}
@@ -97,6 +103,22 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 				Spec: xkcl.RunSpec{
 					Source: kclResourcesTemplate,
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-provision-sql").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: kclSqlTemplate,
 				},
 			},
 		})

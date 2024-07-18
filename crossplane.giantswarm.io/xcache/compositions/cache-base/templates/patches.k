@@ -68,7 +68,7 @@ items = [{
     **{
         "status": {
             if _connectionSecretName:
-                connectionSecretName: _connectionSecretName,
+                connectionSecret: _connectionSecretName,
 
             if _eps:
                 clusterEndpoints = _eps,
@@ -77,7 +77,7 @@ items = [{
                 endpoint: _endpoint,
 
             if _globalConnectionSecretName:
-                globalConnectionSecretName: _globalConnectionSecretName,
+                globalConnectionSecret: _globalConnectionSecretName,
 
             if _globalEndpoint:
                 globalEndpoint: _globalEndpoint,

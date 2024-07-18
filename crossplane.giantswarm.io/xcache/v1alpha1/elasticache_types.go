@@ -81,15 +81,15 @@ type ElasticacheStatus struct {
 	// +optional
 	ClusterEndpoints []*string `json:"clusterEndpoints,omitempty"`
 
-	// ConnectionSecretName is the name of the connection secret.
+	// ConnectionSecret is the name of the connection secret.
 	//
 	// +optional
-	ConnectionSecretName *string `json:"connectionSecretName,omitempty"`
+	ConnectionSecret *string `json:"connectionSecret,omitempty"`
 
-	// GlobalConnectionSecretName is the name of the global connection secret.
+	// GlobalConnectionSecret is the name of the global connection secret.
 	//
 	// +optional
-	GlobalConnectionSecretName *string `json:"globalConnectionSecretName,omitempty"`
+	GlobalConnectionSecret *string `json:"globalConnectionSecret,omitempty"`
 
 	// Endpoint is the DNS name of the endpoint for the cluster.
 	//

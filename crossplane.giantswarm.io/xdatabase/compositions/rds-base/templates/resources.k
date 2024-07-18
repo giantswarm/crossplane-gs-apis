@@ -234,10 +234,10 @@ if all_true([
     not _createCluster,
     get(_ocds, "instance-0.Resource", False),
     all_true([
-        c.status == "True" for c in get(_ocds, "instance-0.Resource.status.conditions", False)
+        c.status == "True" for c in get(_ocds, "instance-0.Resource.status.conditions", [])
     ])
 ]):
-    _secretRef = get(_ocds, "instance-0.Resource.spec.writeConnectionSecretToRef", False)
+    _secretRef = get(_ocds, "instance-0.Resource.spec.writeConnectionSecretToRef", "")
 
 ##
 # OptionGroups may be specified for non-cluster, non-postgresql instances.
@@ -541,7 +541,11 @@ _securityGroupRules = [
             providerConfigRef: _oxr.spec.providerConfigRef
         }
     }
-    for i, cidr in get(_oxr, "spec.cidrBlocks", []) if _port
+    for i, cidr in get(_oxr, "spec.cidrBlocks", []) if all_true([
+        _port,
+        get(_oxr, "status.securityGroupId", False),
+        cidr
+    ])
 ] + [
     {
         apiVersion: "ec2.aws.upbound.io/v1beta1"
@@ -568,8 +572,10 @@ _securityGroupRules = [
     }
     for i, cidr in get(_oxr, "spec.cidrBlocks", []) if all_true([
         get(_oxr, "spec.optionGroup.enabled", False),
+        get(_oxr, "status.securityGroupId", False),
         _optionGroupPort,
-        _optionGroupPort != _port
+        _optionGroupPort != _port,
+        cidr
     ])
 ]
 

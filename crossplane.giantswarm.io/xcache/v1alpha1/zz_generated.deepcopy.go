@@ -323,13 +323,13 @@ func (in *ElasticacheStatus) DeepCopyInto(out *ElasticacheStatus) {
 			}
 		}
 	}
-	if in.ConnectionSecretName != nil {
-		in, out := &in.ConnectionSecretName, &out.ConnectionSecretName
+	if in.ConnectionSecret != nil {
+		in, out := &in.ConnectionSecret, &out.ConnectionSecret
 		*out = new(string)
 		**out = **in
 	}
-	if in.GlobalConnectionSecretName != nil {
-		in, out := &in.GlobalConnectionSecretName, &out.GlobalConnectionSecretName
+	if in.GlobalConnectionSecret != nil {
+		in, out := &in.GlobalConnectionSecret, &out.GlobalConnectionSecret
 		*out = new(string)
 		**out = **in
 	}
