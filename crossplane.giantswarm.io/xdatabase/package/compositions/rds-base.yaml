@@ -240,9 +240,20 @@ spec:
                       if get(_oxr, "spec.replicationSourceIdentifier", False):
                           replicationSourceIdentifier: _oxr.spec.replicationSourceIdentifier
                   }
+
                   forProvider: {
+                      _managedMasterUserPassword = False
+                      _autoGeneratePassword = get(_oxr, "spec.autoGeneratePassword", True),
+                      if _autoGeneratePassword and not _managedMasterUserPassword:
+                          autoGeneratePassword: _autoGeneratePassword,
+                          masterPasswordSecretRef: {
+                              key: "password",
+                              namespace: get(_oxr, "spec.claimRef.namespace", "default"),
+                              name: "${_appName}-${_region}-rds-autogen-pass",
+                          }
+
+
                       copyTagsToSnapshot: True
-                      manageMasterUserPassword: True
                       networkType: "IPV4"
                       skipFinalSnapshot: True
                       storageEncrypted: True
@@ -327,7 +338,7 @@ spec:
                   }
                   providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
                   writeConnectionSecretToRef: {
-                      name: "${_oxr.spec.claimRef.name}-${_region}-cluster"
+                      name: "${_appName}-${_region}-rds"
                       namespace: _oxr.spec.claimRef.namespace
                   }
               }
@@ -355,7 +366,9 @@ spec:
               }
           } if _cluster and _created else False
 
-          items = [x for x in [_cluster, _newdxr] if x and _createCluster]
+          _items = [x for x in [_cluster, _newdxr] if x and _createCluster]
+
+          items = _items
         target: ""
     step: function-kcl-create-cluster
   - functionRef:
@@ -368,7 +381,6 @@ spec:
       spec:
         source: |-
           import regex
-          import json
 
           _oxr = option("params").oxr
           _dxr = option("params").dxr
@@ -385,6 +397,8 @@ spec:
               y = ".".join(p[1:])
               x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
           }
+
+          import json
 
           _createCluster = get(_oxr, "spec.createCluster", True)
           _appName = get(_oxr, "spec.claimRef.name", "")
@@ -508,19 +522,23 @@ spec:
                               storageType: get(item, "spec.storageType", get(_oxr, "spec.storageType", "gp2")),
                               vpcSecurityGroupIds: [get(_oxr, "status.securityGroupId", "")],
 
-                              _managedMasterUserPassword: get(item, "spec.manageMasterUserPassword", get(_oxr, "spec.manageMasterUserPassword", False)),
-                              _autogeneratePassword: get(item, "spec.autoGeneratePassword", get(_oxr, "spec.autoGeneratePassword", True)),
+                              # You cannot have read replicas with manage master user password
+                              #
+                              # This means that in the longer term, this will be removed as an option
+                              # and instead, the password will be pushed to secretsmanager via ESO
+                              _managedMasterUserPassword = False # get(item, "spec.manageMasterUserPassword", get(_oxr, "spec.manageMasterUserPassword", True)),
+                              _autoGeneratePassword = get(item, "spec.autoGeneratePassword", get(_oxr, "spec.autoGeneratePassword", True)),
 
                               # If this is the primary (non-cluster) instance, set
                               # the database name and master user password. Additionally,
                               # if s3Import has been defined, this is configured here.
                               if _isPrimaryInstance:
-                                  if _autogeneratePassword and not _managedMasterUserPassword:
-                                      autoGeneratePassword: get(item, "spec.autoGeneratePassword", get(_oxr, "spec.autoGeneratePassword", True)),
+                                  if _autoGeneratePassword and not _managedMasterUserPassword:
+                                      autoGeneratePassword: _autoGeneratePassword,
                                       passwordSecretRef: {
                                           key: "password",
                                           namespace: get(_oxr, "spec.claimRef.namespace", "default"),
-                                          name: "${_appName}-pass",
+                                          name: "${_appName}-${_region}-rds-autogen-pass",
                                       }
 
                                   allocatedStorage: get(item, "spec.allocatedStorage", get(_oxr, "spec.allocatedStorage", 20)),
@@ -529,7 +547,7 @@ spec:
                                       dbName: _dbName,
                                   if _managedMasterUserPassword:
                                       manageMasterUserPassword: _managedMasterUserPassword,
-                                      masterUserSecretKmsKeyId: _keyId,
+                                      # masterUserSecretKmsKeyId: _keyId,
                                   username: get(item, "spec.username", get(_oxr, "spec.masterUsername", None)),
                                   if _s3import:
                                       s3import: _s3import,
@@ -584,7 +602,7 @@ spec:
                       if not _createCluster and _isPrimaryInstance:
                           writeConnectionSecretToRef: {
                               namespace: get(_oxr, "spec.claimRef.namespace", "default")
-                              name: _appName,
+                              name: "${_appName}-${_region}-rds",
                           }
                   }
               }
@@ -1110,18 +1128,473 @@ spec:
               }
           } if not _createCluster and _masterInstance else {}
 
-          # Bring all items together in a list of lists
+          # Merge all resources into a single flat list
           _items = [
-              _instances, _endpoints, _iam_roles, _monitoringRole,
-              _autoscaling, _securityGroupRules, _clusterParameterGroup,
-              _dbParameterGroup, _cloudwatchLogGroups, _clusterActivityStream,
-              _secretRotation, [_newdxr]
+              i for r in [
+                  _instances, _endpoints, _iam_roles, _monitoringRole,
+                  _autoscaling, _securityGroupRules, _clusterParameterGroup,
+                  _dbParameterGroup, _cloudwatchLogGroups, _clusterActivityStream,
+                  _secretRotation, [_newdxr]
+              ]
+              for i in r if i
           ]
 
-          # Flatten items to a single list for processing
-          items = [i for x in _items for i in x if i]
+          items = _items
         target: ""
     step: function-kcl-create-resources
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+
+          _oxr = option("params").oxr
+          _dxr = option("params").dxr
+          _ocds = option("params").ocds
+          _dcds = option("params").dcds
+
+          get = lambda x: any, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          _appName = get(_oxr, "spec.claimRef.name", "")
+          _createCluster = get(_oxr, "spec.createCluster", True)
+          _connectionSecret = get(_oxr, "status.connectionSecret", "")
+          _engine = get(_oxr, "spec.engine", "")
+
+          _externalSecretStores = [
+              {
+                  "name": get(_oxr, "spec.eso.kubernetesSecretStore", "default"),
+                  "clusterScoped": False,
+              }
+          ]
+
+          _pushSecretStores = [
+              {
+                  "name": store.secretStore,
+                  "clusterScoped": True,
+              }
+              for _, store in get(_oxr, "spec.eso.stores", [])
+              if get(_oxr, "spec.eso.enabled", True) and store.enabled
+          ]
+          _usernameField = "username" if not _createCluster else "master_username"
+          _passwordField = "password" if not _createCluster else "attribute.master_password"
+
+          _pushSecretData = [
+              {
+                  conversionStrategy: "None"
+                  match: {
+                      secretKey: k,
+                      remoteRef: {
+                          remoteKey: k
+                      }
+
+                  }
+              }
+              for _, k in [
+                  "endpoint", "port",
+                  "password", "username",
+              ]
+          ]
+
+          _deletionPolicy = "Delete" if get(_oxr, "spec.deletionPolicy", "Delete") == "Delete" else "Retain"
+          _esoSqlSecret = [
+              {
+                  "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+                  "kind": "Object"
+                  "metadata": {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name" = "${_appName}-externalsecret"
+                      }
+                  }
+                  "spec": {
+                      deletionPolicy: get(_oxr, "spec.deletionPolicy", "Delete"),
+                      providerConfigRef: {
+                          name: get(_oxr, "spec.kubernetesProviderConfig.name", "")
+                      }
+                      forProvider: {
+                          manifest: {
+                              apiVersion: "external-secrets.io/v1alpha1"
+                              kind: "ExternalSecret"
+                              metadata: {
+                                  namespace: get(_oxr, "spec.claimRef.namespace", "default")
+                              }
+                              spec: {
+                                  refreshInterval: "1h"
+                                  secretStoreRef: {
+                                      name: value.name
+                                      kind: "ClusterSecretStore" if value.clusterScoped else "SecretStore"
+                                  }
+                                  data: [
+                                      {
+                                          secretKey: k.r,
+                                          remoteRef: {
+                                              key: _connectionSecret,
+                                              property: k.p
+                                          }
+                                      }
+                                      for _, k in [
+                                          {r: "endpoint", p:"endpoint"},
+                                          {r: "port", p: "port"},
+                                          {r: "password", p: _passwordField},
+                                          {r: "username", p: _usernameField},
+                                      ]
+                                  ]
+                                  target: {
+                                      name: "${_appName}-rds-master"
+                                      deletionPolicy: _deletionPolicy
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+              for _, value in _externalSecretStores
+              if _connectionSecret and get(_oxr, "spec.eso.enabled", True)
+          ]
+
+          _pushSecret = [
+              {
+                  "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+                  "kind": "Object"
+                  "metadata": {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name" = "${_appName}-pushsecret"
+                      }
+                  }
+                  "spec": {
+                      deletionPolicy: get(_oxr, "spec.deletionPolicy", "Delete"),
+                      providerConfigRef: {
+                          name: get(_oxr, "spec.kubernetesProviderConfig.name", "")
+                      }
+                      forProvider: {
+                          manifest: {
+                              apiVersion: "external-secrets.io/v1alpha1"
+                              kind: "PushSecret"
+                              metadata: {
+                                  namespace: get(_oxr, "spec.claimRef.namespace", "default")
+                              }
+                              spec: {
+                                  refreshInterval: "10s"
+                                  secretStoreRefs: [
+                                      {
+                                          name: value.name
+                                          kind: "ClusterSecretStore" if value.clusterScoped else "SecretStore"
+                                      }
+                                      for _, value in _pushSecretStores
+                                  ]
+                                  data: _pushSecretData
+                                  deletionPolicy: _deletionPolicy
+                                  selector: {
+                                      secret: {
+                                          name: "${_appName}-rds-master"
+                                      }
+                                  }
+                                  updatePolicy: "Replace"
+                              }
+                          }
+                      }
+                  }
+              } for _ in [True] if _pushSecretStores and get(_oxr, "spec.eso.enabled", True)
+          ]
+
+          _newdxr = {
+              **_oxr,
+              **{
+                  "status": {
+                      "esoConnectionSecret": "${_appName}-rds-master"
+                  }
+              }
+          } if get(_oxr, "spec.eso.enabled", True) and _connectionSecret else {}
+
+          _items = [
+              i for r in [_esoSqlSecret, _pushSecret, [_newdxr]]
+              for i in r if i
+          ]
+
+          items = _items
+        target: ""
+    step: function-provision-eso
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+
+          _oxr = option("params").oxr
+          _dxr = option("params").dxr
+          _ocds = option("params").ocds
+          _dcds = option("params").dcds
+
+          get = lambda x: any, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          _e = get(_oxr, "spec.engine", False)
+          _engine = ""
+
+          if _e and _e in ["mysql", "aurora-mysql"]:
+              _engine = "mysql"
+          elif _e and _e in ["postgres", "aurora-postgresql"]:
+              _engine = "postgresql"
+          else:
+              assert False, "Unsupported engine: ${_e}"
+
+          _appName = get(_oxr, "spec.claimRef.name", "")
+          _connectionSecret = get(_oxr, "status.esoConnectionSecret", "")
+          _requiredDatabases = {}
+
+          if _engine == "mysql":
+              _requiredDatabases = get(_oxr, "spec.databases", {}) | {
+                  "${_appName}": {
+                      name: _appName,
+                      users: [
+                          {
+                              name: _appName,
+                              maxQueriesPerHour: 1000,
+                              maxUpdatesPerHour: 1000,
+                              maxConnectionsPerHour: 100,
+                              maxUserConnections: 10,
+                              privileges = [
+                                  "ALL PRIVILEGES",
+                              ],
+                          }
+                      ]
+                  }
+              }
+
+          if _engine == "postgresql":
+              _requiredDatabases = get(_oxr, "spec.databases", {}) | {
+                  "${_appName}": {
+                      name: _appName,
+                      users: [
+                          {
+                              name: _appName,
+                              connectionLimit: 10,
+                              privileges = [
+                                  "ALL PRIVILEGES",
+                              ],
+                              bypassRls: False,
+                              createDb: False,
+                              createRole: False,
+                              inherit: True,
+                              login: True,
+                              replication: False,
+                              superuser: False,
+                          }
+                      ]
+                  }
+              }
+
+          # Create provider connection secret for the database
+
+          _providerConnectionSecret = [
+              {
+                  "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+                  "kind": "Object"
+                  "metadata": {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name" = "${_engine}-connection-secret"
+                      }
+                  }
+                  "spec": {
+                      deletionPolicy: get(_oxr, "spec.clusterDiscovery.deletionPolicy", "Delete"),
+                      providerConfigRef: {
+                          name: get(_oxr, "spec.kubernetesProviderConfig.name", "")
+                      }
+                      forProvider: {
+                          manifest: {
+                              apiVersion: "${_engine}.sql.crossplane.io/v1alpha1"
+                              kind: "ProviderConfig"
+                              metadata: {
+                                  name: "${_appName}-${_engine}-provider-config"
+                              }
+                              spec: {
+                                  credentials: {
+                                      connectionSecretRef: {
+                                          name: _connectionSecret
+                                          namespace: get(_oxr, "spec.claimRef.namespace", "")
+                                      }
+                                      source: "MySQLConnectionSecret" if _engine == "mysql" else "PostgreSQLConnectionSecret"
+                                  }
+                                  if _engine == "mysql":
+                                      tls = "preferred"
+                                  if _engine == "postgresql":
+                                      defaultDatabase = "postgres"
+                              }
+                          }
+                      }
+                  }
+              }
+          ] if all_true([
+              _connectionSecret,
+              _requiredDatabases,
+          ]) else []
+
+          # Create each required database
+          _databases = [
+              {
+                  apiVersion: "${_engine}.sql.crossplane.io/v1alpha1"
+                  kind: "Database"
+                  metadata: {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name": "database-${database}"
+                      }
+                      name: database
+                  }
+                  spec: {
+                      deletionPolicy: get(_oxr, "spec.deletionPolicy", "Delete"),
+                      providerConfigRef: {
+                          name: "${_appName}-${_engine}-provider-config"
+                      }
+                      forProvider: {}
+                  }
+              }
+
+              for database, _ in _requiredDatabases
+              if all_true([
+                  get(_ocds, "${_engine}-connection-secret", False),
+                  _connectionSecret,
+                  _requiredDatabases,
+              ])
+          ]
+
+          # Create each required user
+          _users = [
+              {
+                  apiVersion: "${_engine}.sql.crossplane.io/v1alpha1"
+                  kind: "User" if _engine == "mysql" else "Role"
+                  metadata: {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name": "${database}-user-${user.name}"
+                      }
+                      labels: {
+                          "engine": _engine
+                          "database": database
+                          "username": user.name
+                      }
+                      name: user.name
+                  }
+                  spec: {
+                      deletionPolicy: get(_oxr, "spec.deletionPolicy", "Delete"),
+                      providerConfigRef: {
+                          name: "${_appName}-${_engine}-provider-config"
+                      }
+                      forProvider: {
+                          if _engine == "mysql":
+                              maxQueriesPerHour: get(user, "maxQueriesPerHour", 1000)
+                              maxUpdatesPerHour: get(user, "maxUpdatesPerHour", 1000)
+                              maxConnectionsPerHour: get(user, "maxConnectionsPerHour", 100)
+                              maxUserConnections: get(user, "maxUserConnections", 10)
+                          if _engine == "postgresql":
+                              if get(user, "configurationParameters", False):
+                                  configurationParameters: [
+                                      {
+                                          name: k
+                                          value: v
+                                      }
+                                      for k, v in get(user, "configurationParameters", {})
+                                  ]
+                              connectionLimit: get(user, "connectionLimit", 10)
+                              privileges: {
+                                  bypassRls: get(user, "bypassRls", False)
+                                  createDb: get(user, "createDb", False)
+                                  createRole: get(user, "createRole", False)
+                                  inherit: get(user, "inherit", True)
+                                  login: get(user, "login", True)
+                                  replication: get(user, "replication", False)
+                                  superUser: get(user, "superuser", False)
+                              }
+                      }
+                  }
+              }
+
+              for database, user in _requiredDatabases
+              if all_true([
+                  get(_ocds, "${_engine}-connection-secret", False),
+                  _connectionSecret,
+                  _requiredDatabases,
+                  _databases,
+              ])
+          ]
+
+          _grants = [
+              {
+                  apiVersion: "${_engine}.sql.crossplane.io/v1alpha1"
+                  kind: "Grant"
+                  metadata: {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name": "${database}-grant-${user.name}"
+                      }
+                      labels: {
+                          "engine": _engine
+                          "database": database
+                          "username": user.name
+                      }
+                      name: user.name
+                  }
+                  spec: {
+                      deletionPolicy: get(_oxr, "spec.deletionPolicy", "Delete"),
+                      providerConfigRef: {
+                          name: "${_appName}-${_engine}-provider-config"
+                      }
+                      forProvider: {
+                          "database": database
+                          if _engine == "mysql":
+                              user: user.name
+                          if _engine == "postgresql":
+                              role: user.name
+
+                          privileges: get(user, "privileges", [])
+                      }
+                  }
+              }
+              for database, user in _requiredDatabases
+              if all_true([
+                  get(_ocds, "${_engine}-connection-secret", False),
+                  _connectionSecret,
+                  _requiredDatabases,
+                  _databases,
+                  _users,
+              ])
+          ]
+
+          _provisionSql = get(_oxr, "spec.provisionSql", True)
+          _items = [
+              i for r in [
+                  _providerConnectionSecret, _databases,
+                  _users, _grants
+              ]
+              for i in r if i and _provisionSql
+          ]
+
+          items = _items
+        target: ""
+    step: function-provision-sql
   - functionRef:
       name: function-auto-ready
     step: function-auto-ready

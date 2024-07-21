@@ -11,6 +11,10 @@ metadata:
   name: complex-peered-network
   namespace: default
 spec:
+  availabilityZones:
+  - a
+  - b
+  - c
   compositionSelector:
     matchLabels:
       provider: aws
@@ -75,10 +79,6 @@ spec:
         mask: /24
         count: 3
         lbSetIndex: 2
-    availabilityZones:
-    - a
-    - b
-    - c
   tags:
     common:
       giantswarm.io/owner: honeybadger

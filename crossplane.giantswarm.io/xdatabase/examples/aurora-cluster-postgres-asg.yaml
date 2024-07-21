@@ -14,16 +14,6 @@ metadata:
 spec:
   availabilityZones: ["a", "b", "c"]
 
-  compositionSelector:
-    matchLabels:
-      provider: aws
-      component: database
-      type: rds-cluster
-
-  subnetGroupIndexes:
-    cache: 0
-    database: 1
-
   cache:
     createReplicationGroup: true
     engine: redis
@@ -53,9 +43,18 @@ spec:
     storageType: aurora
 
   deletionPolicy: Delete
+
+  kubernetesProviderConfig:
+    name: default
+
   providerConfigRef:
     name: aws-golem
+
   region: eu-west-2
+
+  subnetGroupIndexes:
+    cache: 0
+    database: 1
 
   vpc:
     peering:

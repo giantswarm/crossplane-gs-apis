@@ -85,7 +85,7 @@ type SubnetSetParameters struct {
 
 	// Subnets is a map of availability zones and subnet cidr blocks.
 	// +required
-	Subnets SubnetSetSubnets `json:"subnets"`
+	Subnets map[string]*string `json:"subnets"`
 
 	// VpcId is the unique identifier for the VPC.
 	// +immutable
@@ -159,12 +159,12 @@ type SubnetSetStatus struct {
 	// Subnets is a map of subnets discovered by the composite.
 	// +optional
 	// +structType=atomic
-	Subnets SubnetSetStatusSubnet `json:"subnets,omitempty"`
+	Subnets map[string]*string `json:"subnets,omitempty"`
 
 	// RouteTables is a map of route tables discovered by the composite.
 	// +optional
 	// +structType=atomic
-	RouteTables SubnetSetStatusRouteTable `json:"routeTables,omitempty"`
+	RouteTables map[string]*string `json:"routeTables,omitempty"`
 }
 
 type SubnetSetSpec struct {

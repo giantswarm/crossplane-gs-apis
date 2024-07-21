@@ -172,6 +172,29 @@ spec:
               databaseName:
                 description: DatabaseName is the name of the database to create.
                 type: string
+              databases:
+                additionalProperties:
+                  items:
+                    properties:
+                      configurationParameters:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          ConfigurationParameters is the configuration parameters for the user.
+
+
+                          Only applicable for postgresql databases
+                        type: object
+                      name:
+                        description: Name is the name of the user.
+                        type: string
+                    required:
+                    - name
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                  type: array
+                description: Databases is a map of databases to create.
+                type: object
               dbClusterInstanceClass:
                 description: DbClusterInstanceClass is the instance class to use.
                 type: string
@@ -388,6 +411,43 @@ spec:
                     description: PermissionsBoundary is the ARN of the policy that
                       is used to set the permissions boundary for the monitoring role.
                     type: string
+                type: object
+              eso:
+                description: |-
+                  Eso is the ESO configuration.
+
+
+                  This field is used to sync secrets using `external-secrets-operator`.
+                  External Secrets Operator must be installed if this value is set to true
+                properties:
+                  enabled:
+                    description: Enabled is whether ESO is enabled.
+                    type: boolean
+                  kubernetesSecretStore:
+                    description: KubernetesSecretStore is the Kubernetes secret store
+                      to use.
+                    type: string
+                  stores:
+                    description: Stores is a list of secret stores to use.
+                    items:
+                      description: |-
+                        SecretsStore is a reference to a secrets store to be passed to External
+                        Secrets Operator for creating PushSecrets
+                      properties:
+                        enabled:
+                          description: Enabled is whether the secrets store is enabled.
+                          type: boolean
+                        isClusterSecretStore:
+                          description: IsClusterSecretStore is whether the secret
+                            store is a cluster secret store.
+                          type: boolean
+                        secretStore:
+                          description: SecretStoreName is the name of the secret store.
+                          type: string
+                      required:
+                      - secretStore
+                      type: object
+                    type: array
                 type: object
               globalClusterIdentifier:
                 description: GlobalClusterIdentifier is the global cluster identifier
@@ -685,6 +745,15 @@ spec:
                 description: Iops is the amount of provisioned IOPS.
                 format: int64
                 type: integer
+              kubernetesProviderConfig:
+                description: KubernetesProviderConfig is the provider config for the
+                  Kubernetes provider.
+                properties:
+                  name:
+                    type: string
+                required:
+                - name
+                type: object
               managementPolicies:
                 default:
                 - '*'
@@ -784,6 +853,11 @@ spec:
                 required:
                 - name
                 type: object
+              provisionSql:
+                description: |-
+                  ProvisionSql determines whether or not to provision databases inside the
+                  RDS cluster.
+                type: boolean
               publiclyAccessible:
                 description: PubliclyAccessible is whether the DB instance is publicly
                   accessible.
@@ -1113,6 +1187,11 @@ spec:
                 type: string
               endpoint:
                 description: Endpoint is the endpoint of the DB cluster.
+                type: string
+              esoConnectionSecret:
+                description: |-
+                  EsoConnectionSecret is the name of the connection secret created by ESO
+                  for use with provider-sql.
                 type: string
               kmsKeyId:
                 description: KmsKeyId is the ID of the KMS key.

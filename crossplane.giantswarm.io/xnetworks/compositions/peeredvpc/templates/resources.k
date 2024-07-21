@@ -1,19 +1,3 @@
-import regex
-_oxr = option("params").oxr
-_dxr = option("params").dxr
-_ocs = option("params").ocds
-
-get = lambda x: any, y: str, d: any -> any {
-    """
-    Get an item from a dictionary using a dot separated path.
-    If the item is not found, return a default value.
-    """
-    p = regex.split(y, "\.")
-    c = p[0]
-    y = ".".join(p[1:])
-    x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
-}
-
 chunksplit = lambda size: int subnets: [] -> [] {
     # split the subnets array into chunks of size `size`
     [] if not subnets or subnets == Undefined else [
@@ -39,7 +23,7 @@ _requestedSets = [
     for c in get(_oxr, "spec.subnetsets.cidrs", [])
 ]
 
-_zones = get(_oxr, "spec.availabilityZones", [ "a", "b", "c" ])
+_zones = sorted(get(_oxr, "spec.availabilityZones", [ "a", "b", "c" ]))
 
 assert sum(_requestedSets)*len(_zones) < 200, """
     The number of subnet sets you are requesting will exceed the maximum number
@@ -66,9 +50,8 @@ _clusterTags = get(_oxr, "spec.tags.cluster", {})
 _dp = get(_oxr, "spec.deletionPolicy", "Delete")
 _labels = get(_oxr, "metadata.labels", {})
 _pcr = get(_oxr, "spec.providerConfigRef", {})
-_region = get(_oxr, "spec.region", "eu-central-1")
-
 _peeringEnabled = get(_oxr, "spec.peering.enabled", False)
+_region = get(_oxr, "spec.region", "eu-central-1")
 _tags = _labels | get(_oxr, "spec.tags.common", {}) | {
     region: _region,
 }
@@ -145,18 +128,8 @@ _subnetsets = [
             region: _region
             providerConfigRef: _pcr
             subnets: {
-                "a": {
-                    cidrBlock: _subnets[i][0]
-                    zone: _zones[0]
-                }
-                "b": {
-                    cidrBlock: _subnets[i][1]
-                    zone: _zones[1]
-                }
-                "c": {
-                    cidrBlock: _subnets[i][2]
-                    zone: _zones[2]
-                }
+                _zones[j]: _subnets[i][j]
+                for j in range(len(_zones))
             }
             type: _visibility
             tags: {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"crossbuilder/v1alpha1"
 
@@ -36,11 +37,18 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 
 	var (
 		resources                []xpt.ComposedTemplate = createResources()
+		kclCommon                string
+		kclFooter                string = "items = _items"
 		replicationGroupTemplate string
 		clusterTemplate          string
 		patchTemplate            string
 		err                      error
 	)
+
+	kclCommon, err = build.LoadTemplate("compositions/cache-base/templates/common.k")
+	if err != nil {
+		panic(err)
+	}
 
 	clusterTemplate, err = build.LoadTemplate("compositions/cache-base/templates/cluster.k")
 	if err != nil {
@@ -86,7 +94,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: replicationGroupTemplate,
+					Source: strings.Join([]string{kclCommon, replicationGroupTemplate, kclFooter}, "\n\n"),
 				},
 			},
 		})
@@ -102,7 +110,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: clusterTemplate,
+					Source: strings.Join([]string{kclCommon, clusterTemplate, kclFooter}, "\n\n"),
 				},
 			},
 		})
@@ -118,7 +126,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: patchTemplate,
+					Source: strings.Join([]string{kclCommon, patchTemplate, kclFooter}, "\n\n"),
 				},
 			},
 		})

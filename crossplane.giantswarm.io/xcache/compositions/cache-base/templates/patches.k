@@ -1,19 +1,3 @@
-import regex
-
-_oxr = option("params").oxr
-_ocds = option("params").ocds
-
-get = lambda x: any, y: str, d: any -> any {
-    """
-    Get an item from a dictionary using a dot separated path.
-    If the item is not found, return a default value.
-    """
-    p = regex.split(y, "\.")
-    c = p[0]
-    y = ".".join(p[1:])
-    x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
-}
-
 _createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
 _globalEnabled = all_true([
     False,
@@ -63,7 +47,7 @@ if get(_oxr, "spec.parameterGroupConfiguration", False):
 
 _ugId = get(_ocds, "elasticache-user-group.Resource.status.atProvider.id", "")
 
-items = [{
+_items = [{
     **_oxr,
     **{
         "status": {

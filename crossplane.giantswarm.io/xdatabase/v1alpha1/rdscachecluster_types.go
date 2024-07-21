@@ -63,6 +63,11 @@ type RdsCacheClusterSpec struct {
 	// +required
 	Database ClusterParameters `json:"database"`
 
+	// KubernetesProviderConfig
+	//
+	// +required
+	KubernetesProviderConfig *ProviderConfig `json:"kubernetesProviderConfig"`
+
 	// SubnetGroupIndexes is a map of service name to subnet set indexes
 	//
 	// +required

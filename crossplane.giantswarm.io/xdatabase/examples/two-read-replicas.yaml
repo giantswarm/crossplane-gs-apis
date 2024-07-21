@@ -13,15 +13,14 @@ metadata:
     app.kubernetes.io/managed-by: crossplane
 spec:
   availabilityZones: ["a", "b", "c"]
-  compositionSelector:
-    matchLabels:
-      provider: aws
-      component: database
-      type: rds-cluster
 
-  subnetGroupIndexes:
-    cache: 0
-    database: 1
+  cache:
+    createReplicationGroup: true
+    engine: redis
+    engineVersion: "7.1"
+    nodeType: cache.t3.micro
+    numCacheClusters: 3
+    transitEncryptionEnabled: true
 
   database:
     allocatedStorage: 100
@@ -43,9 +42,18 @@ spec:
     storageType: io1
 
   deletionPolicy: Delete
+
+  kubernetesProviderConfig:
+    name: default
+
   providerConfigRef:
     name: aws-golem
+
   region: eu-central-1
+
+  subnetGroupIndexes:
+    cache: 0
+    database: 1
 
   vpc:
     peering:

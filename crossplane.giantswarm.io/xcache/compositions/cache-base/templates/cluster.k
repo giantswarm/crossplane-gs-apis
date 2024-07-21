@@ -1,21 +1,3 @@
-import regex
-
-_oxr = option("params").oxr
-_dxr = option("params").dxr
-_ocds = option("params").ocds
-_dcds = option("params").dcds
-
-get = lambda x: any, y: str, d: any -> any {
-    """
-    Get an item from a dictionary using a dot separated path.
-    If the item is not found, return a default value.
-    """
-    p = regex.split(y, "\.")
-    c = p[0]
-    y = ".".join(p[1:])
-    x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
-}
-
 # If we are not creating a replication group, check how many cache clusters have
 # been requested and default a list of empty dictionaries as being the cache
 # cluster template.
@@ -202,5 +184,7 @@ _securityGroupRules = [
     ])
 ]
 
-_items = [_clusters, _securityGroupRules]
-items = [i for r in _items for i in r if i]
+_items = [
+    i for r in [_clusters, _securityGroupRules]
+    for i in r if i
+]

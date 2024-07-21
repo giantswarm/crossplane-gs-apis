@@ -1,37 +1,20 @@
-import regex
+_e = get(_oxr, "spec.engine", False)
+_engine = ""
 
-_oxr = option("params").oxr
-_dxr = option("params").dxr
-_ocds = option("params").ocds
-_dcds = option("params").dcds
-
-get = lambda x: any, y: str, d: any -> any {
-    """
-    Get an item from a dictionary using a dot separated path.
-    If the item is not found, return a default value.
-    """
-    p = regex.split(y, "\.")
-    c = p[0]
-    y = ".".join(p[1:])
-    x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
-}
-
-_engine = get(_oxr, "spec.engine", False)
-
-if _engine and _engine in ["mysql", "aurora-mysql"]:
+if _e and _e in ["mysql", "aurora-mysql"]:
     _engine = "mysql"
-elif _engine and _engine in ["postgres", "aurora-postgresql"]:
+elif _e and _e in ["postgres", "aurora-postgresql"]:
     _engine = "postgresql"
 else:
-    assert False, "Unsupported engine: ${_engine}"
+    assert False, "Unsupported engine: ${_e}"
 
 _appName = get(_oxr, "spec.claimRef.name", "")
-_connectionSecret = get(_oxr, "status.connectionSecret", "")
-_requiredDatabases = get(_oxr, "spec.databases", {})
+_connectionSecret = get(_oxr, "status.esoConnectionSecret", "")
+_requiredDatabases = {}
 
 if _engine == "mysql":
-    _requiredDatabases = _requiredDatabases | {
-        _appName: {
+    _requiredDatabases = get(_oxr, "spec.databases", {}) | {
+        "${_appName}": {
             name: _appName,
             users: [
                 {
@@ -49,8 +32,8 @@ if _engine == "mysql":
     }
 
 if _engine == "postgresql":
-    _requiredDatabases = _requiredDatabases | {
-        _appName: {
+    _requiredDatabases = get(_oxr, "spec.databases", {}) | {
+        "${_appName}": {
             name: _appName,
             users: [
                 {
@@ -73,43 +56,45 @@ if _engine == "postgresql":
 
 # Create provider connection secret for the database
 
-_providerConnectionSecret = [{
-    apiVersion: "kubernetes.crossplane.io/v1alpha2",
-    kind: "Object"
-    metadata: {
-        annotations: {
-            "krm.kcl.dev/composition-resource-name" = "${_engine}-connection-secret"
+_providerConnectionSecret = [
+    {
+        "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+        "kind": "Object"
+        "metadata": {
+            annotations: {
+                "krm.kcl.dev/composition-resource-name" = "${_engine}-connection-secret"
+            }
         }
-    }
-    spec: {
-        deletionPolicy: get(_oxr, "spec.clusterDiscovery.deletionPolicy", "Delete"),
-        providerConfigRef: {
-            name: get(_oxr, "spec.kubernetesProviderConfigRef.name", "")
-        }
-        forProvider: {
-            manifest: {
-                apiVersion: "${_engine}.sql.crossplane.io/v1alpha1"
-                kind: "ProviderConfig"
-                metadata: {
-                    name: "${_appName}-${_engine}-provider-config"
-                }
-                spec: {
-                    credentials: {
-                        connectionSecretRef: {
-                            name: _connectionSecret
-                            namespace: get(_oxr, "spec.claimRef.namespace", "")
+        "spec": {
+            deletionPolicy: get(_oxr, "spec.clusterDiscovery.deletionPolicy", "Delete"),
+            providerConfigRef: {
+                name: get(_oxr, "spec.kubernetesProviderConfig.name", "")
+            }
+            forProvider: {
+                manifest: {
+                    apiVersion: "${_engine}.sql.crossplane.io/v1alpha1"
+                    kind: "ProviderConfig"
+                    metadata: {
+                        name: "${_appName}-${_engine}-provider-config"
+                    }
+                    spec: {
+                        credentials: {
+                            connectionSecretRef: {
+                                name: _connectionSecret
+                                namespace: get(_oxr, "spec.claimRef.namespace", "")
+                            }
+                            source: "MySQLConnectionSecret" if _engine == "mysql" else "PostgreSQLConnectionSecret"
                         }
-                        source: "MySQLConnectionSecret" if _engine == "mysql" else "PostgreSQLConnectionSecret"
-                    },
-                    if _engine == "mysql":
-                        tls = "preferred"
-                    if _engine == "postgresql":
-                        defaultDatabase = "postgres"
-                },
-            },
+                        if _engine == "mysql":
+                            tls = "preferred"
+                        if _engine == "postgresql":
+                            defaultDatabase = "postgres"
+                    }
+                }
+            }
         }
     }
-}] if all_true([
+] if all_true([
     _connectionSecret,
     _requiredDatabases,
 ]) else []
@@ -186,7 +171,7 @@ _users = [
                         inherit: get(user, "inherit", True)
                         login: get(user, "login", True)
                         replication: get(user, "replication", False)
-                        superuser: get(user, "superuser", False)
+                        superUser: get(user, "superuser", False)
                     }
             }
         }
@@ -204,7 +189,7 @@ _users = [
 _grants = [
     {
         apiVersion: "${_engine}.sql.crossplane.io/v1alpha1"
-        kind: "Grant" if _engine == "mysql" else "RoleBinding"
+        kind: "Grant"
         metadata: {
             annotations: {
                 "krm.kcl.dev/composition-resource-name": "${database}-grant-${user.name}"
@@ -222,7 +207,7 @@ _grants = [
                 name: "${_appName}-${_engine}-provider-config"
             }
             forProvider: {
-                database: database
+                "database": database
                 if _engine == "mysql":
                     user: user.name
                 if _engine == "postgresql":
@@ -242,4 +227,11 @@ _grants = [
     ])
 ]
 
-items = [i for i in [_providerConnectionSecret, _databases, _users, _grants] if i]
+_provisionSql = get(_oxr, "spec.provisionSql", True)
+_items = [
+    i for r in [
+        _providerConnectionSecret, _databases,
+        _users, _grants
+    ]
+    for i in r if i and _provisionSql
+]

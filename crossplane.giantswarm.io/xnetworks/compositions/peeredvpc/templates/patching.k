@@ -1,26 +1,10 @@
-import regex
-_oxr = option("params").oxr
-_dxr = option("params").dxr
-_ocs = option("params").ocds
-
-get = lambda x: any, y: str, d: any -> any {
-    """
-    Get an item from a dictionary using a dot separated path.
-    If the item is not found, return a default value.
-    """
-    p = regex.split(y, "\.")
-    c = p[0]
-    y = ".".join(p[1:])
-    x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
-}
-
-kf = lambda w: any -> any {
-    keys = [k for k in w]
-    [
-        [w[keys[k]], w[keys[k+1]]]
-        for k in range(0, len(keys), 2)
-    ]
-}
+# kf = lambda w: any -> any {
+#     keys = [k for k in w]
+#     [
+#         [w[keys[k]], w[keys[k+1]]]
+#         for k in range(0, len(keys), 2)
+#     ]
+# }
 
 _privateSubnetsetKeys = sorted([
       k for k in _ocs
@@ -42,29 +26,29 @@ _publicSubnetsetKeys = sorted([
 
 _privateRouteTables = [
       {
-          i[1]: i[0]
-          for i in kf(get(_ocs, "${k}.Resource.status.routeTables", {}))
+          key = value
+          for key, value in get(_ocs, "${k}.Resource.status.routeTables", {})
       }
       for _, k in _privateSubnetsetKeys
 ]
 _privateSubnets = [
       {
-          i[1]: i[0]
-          for i in kf(get(_ocs, "${k}.Resource.status.subnets", {}))
+          key = value
+          for key, value in get(_ocs, "${k}.Resource.status.subnets", {})
       }
       for _, k in _privateSubnetsetKeys
 ]
 _publicRouteTables = [
       {
-          i[1]: i[0]
-          for i in kf(get(_ocs, "${k}.Resource.status.routeTables", {}))
+          key = value
+          for key, value in get(_ocs, "${k}.Resource.status.routeTables", {})
       }
       for _, k in _publicSubnetsetKeys
 ]
 _publicSubnets = [
       {
-          i[1]: i[0]
-          for i in kf(get(_ocs, "${k}.Resource.status.subnets", {}))
+          key = value
+          for key, value in get(_ocs, "${k}.Resource.status.subnets", {})
       }
       for _, k in _publicSubnetsetKeys
 ]

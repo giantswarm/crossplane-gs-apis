@@ -201,61 +201,10 @@ spec:
                 pattern: ^[a-z]{2}-[a-z]+-[0-9]$
                 type: string
               subnets:
+                additionalProperties:
+                  type: string
                 description: Subnets is a map of availability zones and subnet cidr
                   blocks.
-                properties:
-                  a:
-                    description: SubnetA is the subnet in availability zone A.
-                    properties:
-                      cidrBlock:
-                        description: CidrBlock is a the CIDR block to use for this
-                          subnets.
-                        pattern: ^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$
-                        type: string
-                      zone:
-                        description: Zone is the availability zone to create the subnet
-                          in.
-                        type: string
-                    required:
-                    - cidrBlock
-                    - zone
-                    type: object
-                  b:
-                    description: SubnetB is the subnet in availability zone B.
-                    properties:
-                      cidrBlock:
-                        description: CidrBlock is a the CIDR block to use for this
-                          subnets.
-                        pattern: ^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$
-                        type: string
-                      zone:
-                        description: Zone is the availability zone to create the subnet
-                          in.
-                        type: string
-                    required:
-                    - cidrBlock
-                    - zone
-                    type: object
-                  c:
-                    description: SubnetC is the subnet in availability zone C.
-                    properties:
-                      cidrBlock:
-                        description: CidrBlock is a the CIDR block to use for this
-                          subnets.
-                        pattern: ^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$
-                        type: string
-                      zone:
-                        description: Zone is the availability zone to create the subnet
-                          in.
-                        type: string
-                    required:
-                    - cidrBlock
-                    - zone
-                    type: object
-                required:
-                - a
-                - b
-                - c
                 type: object
               tags:
                 description: Tags is a set of tags to apply to resources in the subnetset
@@ -356,59 +305,16 @@ spec:
                 - type
                 x-kubernetes-list-type: map
               routeTables:
+                additionalProperties:
+                  type: string
                 description: RouteTables is a map of route tables discovered by the
                   composite.
-                properties:
-                  a:
-                    description: RouteTableA is the route table ID for availability
-                      zone A.
-                    type: string
-                  aName:
-                    description: RouteTableAName is the name of the route table in
-                      availability zone A.
-                    type: string
-                  b:
-                    description: RouteTableB is the route table ID for availability
-                      zone B.
-                    type: string
-                  bName:
-                    description: RouteTableBName is the name of the route table in
-                      availability zone B.
-                    type: string
-                  c:
-                    description: RouteTableC is the route table ID for availability
-                      zone C.
-                    type: string
-                  cName:
-                    description: RouteTableCName is the name of the route table in
-                      availability zone C.
-                    type: string
                 type: object
                 x-kubernetes-map-type: atomic
               subnets:
+                additionalProperties:
+                  type: string
                 description: Subnets is a map of subnets discovered by the composite.
-                properties:
-                  a:
-                    description: SubnetA is the subnet ID in availability zone A.
-                    type: string
-                  aName:
-                    description: SubnetAName is the name of the subnet in availability
-                      zone A.
-                    type: string
-                  b:
-                    description: SubnetB is subnet ID in availability zone B.
-                    type: string
-                  bName:
-                    description: SubnetBName is the name of the subnet in availability
-                      zone B.
-                    type: string
-                  c:
-                    description: SubnetC is the subnet ID in availability zone C.
-                    type: string
-                  cName:
-                    description: SubnetCName is the name of the subnet in availability
-                      zone C.
-                    type: string
                 type: object
                 x-kubernetes-map-type: atomic
               vpcId:

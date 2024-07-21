@@ -184,6 +184,9 @@ spec:
         - fromFieldPath: spec.deletionPolicy
           toFieldPath: spec.deletionPolicy
           type: FromCompositeFieldPath
+        - fromFieldPath: spec.kubernetesProviderConfig
+          toFieldPath: spec.kubernetesProviderConfig
+          type: FromCompositeFieldPath
         - fromFieldPath: spec.providerConfigRef
           toFieldPath: spec.providerConfigRef
           type: FromCompositeFieldPath

@@ -1,21 +1,3 @@
-import regex
-
-_oxr = option("params").oxr
-_dxr = option("params").dxr
-_ocds = option("params").ocds
-_dcds = option("params").dcds
-
-get = lambda x: any, y: str, d: any -> any {
-    """
-    Get an item from a dictionary using a dot separated path.
-    If the item is not found, return a default value.
-    """
-    p = regex.split(y, "\.")
-    c = p[0]
-    y = ".".join(p[1:])
-    x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
-}
-
 _appName = get(_oxr, "spec.claimRef.name", "")
 _createCluster = get(_oxr, "spec.createCluster", True)
 
@@ -70,9 +52,20 @@ _cluster = {
             if get(_oxr, "spec.replicationSourceIdentifier", False):
                 replicationSourceIdentifier: _oxr.spec.replicationSourceIdentifier
         }
+
         forProvider: {
+            _managedMasterUserPassword = False
+            _autoGeneratePassword = get(_oxr, "spec.autoGeneratePassword", True),
+            if _autoGeneratePassword and not _managedMasterUserPassword:
+                autoGeneratePassword: _autoGeneratePassword,
+                masterPasswordSecretRef: {
+                    key: "password",
+                    namespace: get(_oxr, "spec.claimRef.namespace", "default"),
+                    name: "${_appName}-${_region}-rds-autogen-pass",
+                }
+
+
             copyTagsToSnapshot: True
-            manageMasterUserPassword: True
             networkType: "IPV4"
             skipFinalSnapshot: True
             storageEncrypted: True
@@ -157,7 +150,7 @@ _cluster = {
         }
         providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
         writeConnectionSecretToRef: {
-            name: "${_oxr.spec.claimRef.name}-${_region}-cluster"
+            name: "${_appName}-${_region}-rds"
             namespace: _oxr.spec.claimRef.namespace
         }
     }
@@ -185,4 +178,4 @@ _newdxr = {
     }
 } if _cluster and _created else False
 
-items = [x for x in [_cluster, _newdxr] if x and _createCluster]
+_items = [x for x in [_cluster, _newdxr] if x and _createCluster]

@@ -1,21 +1,4 @@
-import regex
 import json
-
-_oxr = option("params").oxr
-_dxr = option("params").dxr
-_ocds = option("params").ocds
-_dcds = option("params").dcds
-
-get = lambda x: any, y: str, d: any -> any {
-    """
-    Get an item from a dictionary using a dot separated path.
-    If the item is not found, return a default value.
-    """
-    p = regex.split(y, "\.")
-    c = p[0]
-    y = ".".join(p[1:])
-    x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
-}
 
 _createCluster = get(_oxr, "spec.createCluster", True)
 _appName = get(_oxr, "spec.claimRef.name", "")
@@ -139,19 +122,23 @@ _instances = [
                     storageType: get(item, "spec.storageType", get(_oxr, "spec.storageType", "gp2")),
                     vpcSecurityGroupIds: [get(_oxr, "status.securityGroupId", "")],
 
-                    _managedMasterUserPassword: get(item, "spec.manageMasterUserPassword", get(_oxr, "spec.manageMasterUserPassword", False)),
-                    _autogeneratePassword: get(item, "spec.autoGeneratePassword", get(_oxr, "spec.autoGeneratePassword", True)),
+                    # You cannot have read replicas with manage master user password
+                    #
+                    # This means that in the longer term, this will be removed as an option
+                    # and instead, the password will be pushed to secretsmanager via ESO
+                    _managedMasterUserPassword = False # get(item, "spec.manageMasterUserPassword", get(_oxr, "spec.manageMasterUserPassword", True)),
+                    _autoGeneratePassword = get(item, "spec.autoGeneratePassword", get(_oxr, "spec.autoGeneratePassword", True)),
 
                     # If this is the primary (non-cluster) instance, set
                     # the database name and master user password. Additionally,
                     # if s3Import has been defined, this is configured here.
                     if _isPrimaryInstance:
-                        if _autogeneratePassword and not _managedMasterUserPassword:
-                            autoGeneratePassword: get(item, "spec.autoGeneratePassword", get(_oxr, "spec.autoGeneratePassword", True)),
+                        if _autoGeneratePassword and not _managedMasterUserPassword:
+                            autoGeneratePassword: _autoGeneratePassword,
                             passwordSecretRef: {
                                 key: "password",
                                 namespace: get(_oxr, "spec.claimRef.namespace", "default"),
-                                name: "${_appName}-pass",
+                                name: "${_appName}-${_region}-rds-autogen-pass",
                             }
 
                         allocatedStorage: get(item, "spec.allocatedStorage", get(_oxr, "spec.allocatedStorage", 20)),
@@ -160,7 +147,7 @@ _instances = [
                             dbName: _dbName,
                         if _managedMasterUserPassword:
                             manageMasterUserPassword: _managedMasterUserPassword,
-                            masterUserSecretKmsKeyId: _keyId,
+                            # masterUserSecretKmsKeyId: _keyId,
                         username: get(item, "spec.username", get(_oxr, "spec.masterUsername", None)),
                         if _s3import:
                             s3import: _s3import,
@@ -215,7 +202,7 @@ _instances = [
             if not _createCluster and _isPrimaryInstance:
                 writeConnectionSecretToRef: {
                     namespace: get(_oxr, "spec.claimRef.namespace", "default")
-                    name: _appName,
+                    name: "${_appName}-${_region}-rds",
                 }
         }
     }
@@ -741,13 +728,13 @@ _newdxr = {
     }
 } if not _createCluster and _masterInstance else {}
 
-# Bring all items together in a list of lists
+# Merge all resources into a single flat list
 _items = [
-    _instances, _endpoints, _iam_roles, _monitoringRole,
-    _autoscaling, _securityGroupRules, _clusterParameterGroup,
-    _dbParameterGroup, _cloudwatchLogGroups, _clusterActivityStream,
-    _secretRotation, [_newdxr]
+    i for r in [
+        _instances, _endpoints, _iam_roles, _monitoringRole,
+        _autoscaling, _securityGroupRules, _clusterParameterGroup,
+        _dbParameterGroup, _cloudwatchLogGroups, _clusterActivityStream,
+        _secretRotation, [_newdxr]
+    ]
+    for i in r if i
 ]
-
-# Flatten items to a single list for processing
-items = [i for x in _items for i in x if i]

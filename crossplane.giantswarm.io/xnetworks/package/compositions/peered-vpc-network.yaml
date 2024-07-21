@@ -38,9 +38,23 @@ spec:
         creationTimestamp: null
       spec:
         source: |-
+          import regex
           _oxr = option("params").oxr
           _dxr = option("params").dxr
-          _azl = len(_oxr.spec.availabilityZones)
+          _ocs = option("params").ocds
+
+          get = lambda x: any, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          _azl = len(get(_oxr, "spec.availabilityZones", []))
 
           m = lambda x: str -> int {
               """
@@ -74,7 +88,7 @@ spec:
                       offset = m(s.offset) - _x if s.offset else 0
                       newBits = cb(s.public.mask, _x, s.public.count) + cb(s.private.mask, _x, s.private.count)
                   }
-                  for s in _oxr.spec.subnetsets.cidrs
+                  for s in get(_oxr, "spec.subnetsets.cidrs", {}) if s
               ]
           }
         target: ""
@@ -140,7 +154,7 @@ spec:
               for c in get(_oxr, "spec.subnetsets.cidrs", [])
           ]
 
-          _zones = get(_oxr, "spec.availabilityZones", [ "a", "b", "c" ])
+          _zones = sorted(get(_oxr, "spec.availabilityZones", [ "a", "b", "c" ]))
 
           assert sum(_requestedSets)*len(_zones) < 200, """
               The number of subnet sets you are requesting will exceed the maximum number
@@ -167,9 +181,8 @@ spec:
           _dp = get(_oxr, "spec.deletionPolicy", "Delete")
           _labels = get(_oxr, "metadata.labels", {})
           _pcr = get(_oxr, "spec.providerConfigRef", {})
-          _region = get(_oxr, "spec.region", "eu-central-1")
-
           _peeringEnabled = get(_oxr, "spec.peering.enabled", False)
+          _region = get(_oxr, "spec.region", "eu-central-1")
           _tags = _labels | get(_oxr, "spec.tags.common", {}) | {
               region: _region,
           }
@@ -246,18 +259,8 @@ spec:
                       region: _region
                       providerConfigRef: _pcr
                       subnets: {
-                          "a": {
-                              cidrBlock: _subnets[i][0]
-                              zone: _zones[0]
-                          }
-                          "b": {
-                              cidrBlock: _subnets[i][1]
-                              zone: _zones[1]
-                          }
-                          "c": {
-                              cidrBlock: _subnets[i][2]
-                              zone: _zones[2]
-                          }
+                          _zones[j]: _subnets[i][j]
+                          for j in range(len(_zones))
                       }
                       type: _visibility
                       tags: {
@@ -732,13 +735,13 @@ spec:
               x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
           }
 
-          kf = lambda w: any -> any {
-              keys = [k for k in w]
-              [
-                  [w[keys[k]], w[keys[k+1]]]
-                  for k in range(0, len(keys), 2)
-              ]
-          }
+          # kf = lambda w: any -> any {
+          #     keys = [k for k in w]
+          #     [
+          #         [w[keys[k]], w[keys[k+1]]]
+          #         for k in range(0, len(keys), 2)
+          #     ]
+          # }
 
           _privateSubnetsetKeys = sorted([
                 k for k in _ocs
@@ -760,29 +763,29 @@ spec:
 
           _privateRouteTables = [
                 {
-                    i[1]: i[0]
-                    for i in kf(get(_ocs, "${k}.Resource.status.routeTables", {}))
+                    key = value
+                    for key, value in get(_ocs, "${k}.Resource.status.routeTables", {})
                 }
                 for _, k in _privateSubnetsetKeys
           ]
           _privateSubnets = [
                 {
-                    i[1]: i[0]
-                    for i in kf(get(_ocs, "${k}.Resource.status.subnets", {}))
+                    key = value
+                    for key, value in get(_ocs, "${k}.Resource.status.subnets", {})
                 }
                 for _, k in _privateSubnetsetKeys
           ]
           _publicRouteTables = [
                 {
-                    i[1]: i[0]
-                    for i in kf(get(_ocs, "${k}.Resource.status.routeTables", {}))
+                    key = value
+                    for key, value in get(_ocs, "${k}.Resource.status.routeTables", {})
                 }
                 for _, k in _publicSubnetsetKeys
           ]
           _publicSubnets = [
                 {
-                    i[1]: i[0]
-                    for i in kf(get(_ocs, "${k}.Resource.status.subnets", {}))
+                    key = value
+                    for key, value in get(_ocs, "${k}.Resource.status.subnets", {})
                 }
                 for _, k in _publicSubnetsetKeys
           ]

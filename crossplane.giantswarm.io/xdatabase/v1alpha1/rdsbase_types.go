@@ -44,15 +44,20 @@ type RdsBaseDbSpec struct {
 	// ClusterParameters is the parameters for the RDS cluster.
 	ClusterParameters `json:",inline"`
 
-	// Region is the region to use.
-	//
-	// +required
-	Region *string `json:"region"`
-
 	// CidrBlocks is a list of CIDRs that are allowed to connect to the DB.
 	//
 	// +optional
 	CidrBlocks []*string `json:"cidrBlocks"`
+
+	// KubernetesProviderConfig is the provider config for the Kubernetes provider.
+	//
+	// +required
+	KubernetesProviderConfig *ProviderConfig `json:"kubernetesProviderConfig,omitempty"`
+
+	// Region is the region to use.
+	//
+	// +required
+	Region *string `json:"region"`
 
 	// SubnetIds is a list of subnet IDs to use for the subnet group.
 	//
@@ -110,6 +115,12 @@ type RdsBaseDbStatus struct {
 	//
 	// +optional
 	Endpoint *string `json:"endpoint,omitempty"`
+
+	// EsoConnectionSecret is the name of the connection secret created by ESO
+	// for use with provider-sql.
+	//
+	// +optional
+	EsoConnectionSecret *string `json:"esoConnectionSecret,omitempty"`
 
 	// KmsKeyId is the ID of the KMS key.
 	//
@@ -627,6 +638,11 @@ type ClusterParameters struct {
 	// +optional
 	DatabaseName *string `json:"databaseName,omitempty"`
 
+	// Databases is a map of databases to create.
+	//
+	// +optional
+	Databases map[string]SqlUsers `json:"databases,omitempty"`
+
 	// DbClusterInstanceClass is the instance class to use.
 	//
 	// +optional
@@ -715,6 +731,14 @@ type ClusterParameters struct {
 	// +required
 	EngineVersion *string `json:"engineVersion,omitempty"`
 
+	// Eso is the ESO configuration.
+	//
+	// This field is used to sync secrets using `external-secrets-operator`.
+	// External Secrets Operator must be installed if this value is set to true
+	//
+	// +optional
+	Eso *Eso `json:"eso,omitempty"`
+
 	// GlobalClusterIdentifier is the global cluster identifier for an Aurora global database.
 	//
 	// +optional
@@ -798,6 +822,13 @@ type ClusterParameters struct {
 	//
 	// +optional
 	PreferredMaintenanceWindow *string `json:"preferredMaintenanceWindow,omitempty"`
+
+	// ProvisionSql determines whether or not to provision databases inside the
+	// RDS cluster.
+	//
+	// +optional
+	// +default=true
+	ProvisionSql *bool `json:"provisionSql,omitempty"`
 
 	// PubliclyAccessible is whether the DB instance is publicly accessible.
 	//
@@ -920,6 +951,34 @@ type EnhancedMonitoring struct {
 	Path *string `json:"path,omitempty"`
 }
 
+// ExternalSecretsOperator (ESO) is the configuration for the external secrets
+// operator.
+//
+// If enabled will duplicate the RDS connection secret to a secret managed by
+// external secrets operator which standardises the fields for use with
+// provider-sql.
+//
+// Additionally, PushSecrets can be automatically created to push the secret to
+// external secrets stores.
+type Eso struct {
+	// Enabled is whether ESO is enabled.
+	//
+	// +optional
+	// +default=true
+	Enabled *bool `json:"enabled,omitempty"`
+
+	// KubernetesSecretStore is the Kubernetes secret store to use.
+	//
+	// +optional
+	// +default="default"
+	KubernetesSecretStore *string `json:"kubernetesSecretStore,omitempty"`
+
+	// Stores is a list of secret stores to use.
+	//
+	// +optional
+	Stores []*SecretsStore `json:"stores,omitempty"`
+}
+
 type DbParameterGroup struct {
 	// Description is the description of the parameter group.
 	//
@@ -1009,6 +1068,13 @@ type OptionGroup struct {
 //
 // +kubebuilder:validation:Pattern=^[a-zA-Z0-9_]*$
 type Parameter string
+
+// ProviderConfig is a simplified version of the provider configuration.
+// used mainly to provide additional providerconfigs to the composition
+type ProviderConfig struct {
+	// +required
+	Name string `json:"name"`
+}
 
 // RestoreToPointInTime is the point in time to restore to.
 type RestoreToPointInTime struct {
@@ -1155,6 +1221,44 @@ type ServerlessV2ScalingConfiguration struct {
 	// +optional
 	MinCapacity *int64 `json:"minCapacity,omitempty"`
 }
+
+// SecretsStore is a reference to a secrets store to be passed to External
+// Secrets Operator for creating PushSecrets
+type SecretsStore struct {
+	// Enabled is whether the secrets store is enabled.
+	//
+	// +optional
+	// +default=true
+	Enabled *bool `json:"enabled,omitempty"`
+
+	// SecretStoreName is the name of the secret store.
+	//
+	// +required
+	SecretStoreName *string `json:"secretStore"`
+
+	// IsClusterSecretStore is whether the secret store is a cluster secret store.
+	//
+	// +optional
+	// +default=false
+	IsClusterSecretStore *bool `json:"isClusterSecretStore,omitempty"`
+}
+
+// +kubebuilder:pruning:PreserveUnknownFields
+type SqlUser struct {
+	// Name is the name of the user.
+	//
+	// +required
+	Name *string `json:"name"`
+
+	// ConfigurationParameters is the configuration parameters for the user.
+	//
+	// Only applicable for postgresql databases
+	//
+	// +optional
+	ConfigurationParameters map[string]*string `json:"configurationParameters,omitempty"`
+}
+
+type SqlUsers []*SqlUser
 
 // Repository type metadata.
 var (

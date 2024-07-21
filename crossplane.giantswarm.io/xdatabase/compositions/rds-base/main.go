@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"crossbuilder/v1alpha1"
 
@@ -36,11 +37,18 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 
 	var (
 		resources                []xpt.ComposedTemplate = createResources()
+		kclCommon                string
 		kclCreateClusterTemplate string
 		kclResourcesTemplate     string
 		kclSqlTemplate           string
+		kclEsoTemplate           string
 		err                      error
 	)
+
+	kclCommon, err = build.LoadTemplate("compositions/rds-base/templates/common.k")
+	if err != nil {
+		panic(err)
+	}
 
 	kclResourcesTemplate, err = build.LoadTemplate("compositions/rds-base/templates/resources.k")
 	if err != nil {
@@ -56,6 +64,13 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 	if err != nil {
 		panic(err)
 	}
+
+	kclEsoTemplate, err = build.LoadTemplate("compositions/rds-base/templates/provision-eso.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclFooter := "items = _items"
 
 	c.NewPipelineStep("patch-and-transform").
 		WithFunctionRef(xapiextv1.FunctionReference{
@@ -86,7 +101,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: kclCreateClusterTemplate,
+					Source: strings.Join([]string{kclCommon, kclCreateClusterTemplate, kclFooter}, "\n\n"),
 				},
 			},
 		})
@@ -102,7 +117,23 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: kclResourcesTemplate,
+					Source: strings.Join([]string{kclCommon, kclResourcesTemplate, kclFooter}, "\n\n"),
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-provision-eso").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclCommon, kclEsoTemplate, kclFooter}, "\n\n"),
 				},
 			},
 		})
@@ -118,7 +149,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: kclSqlTemplate,
+					Source: strings.Join([]string{kclCommon, kclSqlTemplate, kclFooter}, "\n\n"),
 				},
 			},
 		})

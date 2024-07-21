@@ -163,6 +163,7 @@ func createResources() []xpt.ComposedTemplate {
 				cb.FromPatch("spec.availabilityZones", "spec.availabilityZones"),
 				cb.FromPatch("spec.claimRef", "spec.claimRef"),
 				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
+				cb.FromPatch("spec.kubernetesProviderConfig", "spec.kubernetesProviderConfig"),
 				cb.FromPatch("spec.providerConfigRef", "spec.providerConfigRef"),
 				cb.FromPatch("spec.region", "spec.region"),
 				{

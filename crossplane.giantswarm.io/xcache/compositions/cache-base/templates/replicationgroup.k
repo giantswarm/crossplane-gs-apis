@@ -1,21 +1,3 @@
-import regex
-
-_oxr = option("params").oxr
-_dxr = option("params").dxr
-_ocds = option("params").ocds
-_dcds = option("params").dcds
-
-get = lambda x: any, y: str, d: any -> any {
-    """
-    Get an item from a dictionary using a dot separated path.
-    If the item is not found, return a default value.
-    """
-    p = regex.split(y, "\.")
-    c = p[0]
-    y = ".".join(p[1:])
-    x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
-}
-
 if get(_oxr, "spec.createReplicationGroup", False):
     assert get(_oxr, "spec.engine", "redis") == "redis", "engine must be redis when createReplicationGroup is true"
 
@@ -352,12 +334,14 @@ _users = [
 ]) else []
 
 _userIds = [
-    get(item, "Resource.status.atProvider.id", "")
-    for _, item in _ocds
-    if all_true([
-        get(item, "Resource.kind", "") == "User",
-        get(item, "Resource.apiVersion", "") == "elasticache.aws.upbound.io/v1beta1",
-    ])
+    i for i in [
+        get(item, "Resource.status.atProvider.id", "")
+        for _, item in _ocds
+        if all_true([
+            get(item, "Resource.kind", "") == "User",
+            get(item, "Resource.apiVersion", "") == "elasticache.aws.upbound.io/v1beta1",
+        ])
+    ] if i
 ]
 
 _userGroup = [{
@@ -382,9 +366,14 @@ _userGroup = [{
         providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
     }
 }] if all_true([
+    _userIds,
     get(_oxr, "spec.engine", "redis") == "redis",
     get(_oxr, "spec.createReplicationGroup", True),
 ]) else []
 
-_items = [_replicationGroups, _globalReplicationGroup, _parameterGroup, _users, _userGroup]
-items = [i for r in _items for i in r if i]
+_items = [
+    i for r in [
+        _replicationGroups, _globalReplicationGroup,
+        _parameterGroup, _users, _userGroup
+    ] for i in r if i
+]

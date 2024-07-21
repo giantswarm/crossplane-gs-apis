@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 
@@ -39,11 +40,17 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 	// Load the template
 	var (
 		err                  error
+		kclCommon            string
 		kclSubnetsTemplate   string
 		kclResourcesTemplate string
 		kclPatchTemplate     string
 		resources            []xpt.ComposedTemplate = createResources()
 	)
+
+	kclCommon, err = build.LoadTemplate("compositions/peeredvpc/templates/common.k")
+	if err != nil {
+		panic(err)
+	}
 
 	kclSubnetsTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/subnets.k")
 	if err != nil {
@@ -93,7 +100,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: kclSubnetsTemplate,
+					Source: strings.Join([]string{kclCommon, kclSubnetsTemplate}, "\n\n"),
 				},
 			},
 		})
@@ -125,7 +132,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: kclResourcesTemplate,
+					Source: strings.Join([]string{kclCommon, kclResourcesTemplate}, "\n\n"),
 				},
 			},
 		})
@@ -141,7 +148,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: kclPatchTemplate,
+					Source: strings.Join([]string{kclCommon, kclPatchTemplate}, "\n\n"),
 				},
 			},
 		})
