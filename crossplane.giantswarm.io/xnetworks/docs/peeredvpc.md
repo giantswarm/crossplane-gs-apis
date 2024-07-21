@@ -47,6 +47,9 @@ This composition relies on the following providers and functions:
 
 ## Configuration parameters
 
+> For a full set of configuration options, see the api documentation at
+> [apidocs/peeredvpcnetworks.xnetworks.crossplane.giantswarm.io](../../../apidocs/peeredvpcnetworks.xnetworks.crossplane.giantswarm.io.md)
+
 The following parameters are defined specifically for creating a Peered VPC
 
 - `availabilityZones` A list of single character availability zone identifiers,

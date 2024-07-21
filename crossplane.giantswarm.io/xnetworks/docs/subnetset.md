@@ -29,6 +29,9 @@ This composition relies on the following providers and functions:
 
 ## Configuration parameters
 
+> For a full set of configuration options, see the api documentation at
+> [apidocs/subnetsets.xnetworks.crossplane.giantswarm.io](../../../apidocs/subnetsets.xnetworks.crossplane.giantswarm.io.md)
+
 The following parameters are defined specifically for controlling the subnet set
 
 - `appIndex` \[*optional*\] A unique index for the subnetset. When used from the
