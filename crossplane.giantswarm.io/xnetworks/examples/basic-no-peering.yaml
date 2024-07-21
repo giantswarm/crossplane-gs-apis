@@ -31,7 +31,7 @@ spec:
       private:
         mask: /28
         count: 2
-        lbSetIndex: 2
+        lbSetIndex: 1
   availabilityZones:
   - a
   - b

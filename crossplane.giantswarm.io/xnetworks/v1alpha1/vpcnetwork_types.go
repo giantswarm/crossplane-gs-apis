@@ -8,11 +8,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// Cidr is a string type that represents a CIDR block.
-// +kubebuilder:validation:Pattern="^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$"
-// +kubebuilder:validation:Type=string
-type Cidr string
-
 type Subnets struct {
 	// CidrBlocks is a list of CIDR blocks for the subnets.
 	// The number of blocks defined should be twice the length of the

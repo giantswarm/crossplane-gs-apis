@@ -65,6 +65,10 @@ spec:
                   of subnetsets (public + private). The VPC Cidr must be big enough to
                   encompass all the subnet CIDR blocks.
                 items:
+                  description: |-
+                    ShortAs is a string type that represents the short name of an availability
+                    zone.
+                  pattern: ^[a-z]$
                   type: string
                 maxItems: 3
                 minItems: 3
@@ -140,9 +144,9 @@ spec:
                             Disabled specifies if the peering connection should be disabled.
                             Defaults to true
                           type: boolean
-                        excludeFromPeering:
+                        excludeFromLocalPeering:
                           description: |-
-                            MyExcludedSubnetsets specifies the indexes of subnetsets for this VPC to
+                            ExcludeFromLocalPeering specifies the indexes of subnetsets for this VPC to
                             exclude from routing to the peering connection
                           properties:
                             private:
@@ -158,26 +162,9 @@ spec:
                               type: array
                               x-kubernetes-list-type: atomic
                           type: object
-                        name:
-                          description: Name specifies the name of the VPC to peer
-                            with.
-                          type: string
-                        providerConfigRef:
+                        excludeFromRemotePeering:
                           description: |-
-                            ProviderConfigRef specifies the provider config to use for the peering
-                            connection.
-                          type: string
-                        region:
-                          description: |-
-                            Region specifies the region the VPC is found in.
-
-
-                            If not defined, the region of the VPC will be assumed to be the same as
-                            the region of the peered VPC.
-                          type: string
-                        theirExcludeFromPeering:
-                          description: |-
-                            TheirExcludedSubnetsets specifies the indexes of subnetsets for the remote
+                            ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
                             VPC to exclude from routing to the peering connection. If emmpty, all
                             subnetsets will be included by default
                           items:
@@ -196,6 +183,23 @@ spec:
                                 x-kubernetes-list-type: atomic
                             type: object
                           type: array
+                        name:
+                          description: Name specifies the name of the VPC to peer
+                            with.
+                          type: string
+                        providerConfigRef:
+                          description: |-
+                            ProviderConfigRef specifies the provider config to use for the peering
+                            connection.
+                          type: string
+                        region:
+                          description: |-
+                            Region specifies the region the VPC is found in.
+
+
+                            If not defined, the region of the VPC will be assumed to be the same as
+                            the region of the peered VPC.
+                          type: string
                       required:
                       - name
                       type: object
@@ -327,11 +331,8 @@ spec:
                   sets to create.
                 properties:
                   cidrs:
-                    description: |-
-                      Cidrs is a list of PeeredSubnetSets to create in the VPC
-
-
-                      Each PeeredSubnetSet will create 1 subnet
+                    description: Cidrs is a list of PeeredSubnetSets to create in
+                      the VPC
                     items:
                       description: |-
                         PeeredSubnetSet defines the parameters for creating a set of subnets with the
@@ -346,6 +347,13 @@ spec:
                           description: Private is the number of private subnets to
                             create in this set
                           properties:
+                            clusterNames:
+                              description: ClusterNames is a list of EKS cluster names
+                                to add shared LB tags for
+                              items:
+                                type: string
+                              type: array
+                              x-kubernetes-list-type: atomic
                             count:
                               description: Count is the number of subnet sets to create
                                 with this mask
@@ -364,12 +372,20 @@ spec:
                                 the subnet mask by
                               type: integer
                           required:
+                          - count
                           - mask
                           type: object
                         public:
                           description: Public is the number of public subnets to create
                             in this set
                           properties:
+                            clusterNames:
+                              description: ClusterNames is a list of EKS cluster names
+                                to add shared LB tags for
+                              items:
+                                type: string
+                              type: array
+                              x-kubernetes-list-type: atomic
                             count:
                               description: Count is the number of subnet sets to create
                                 with this mask
@@ -388,6 +404,7 @@ spec:
                                 the subnet mask by
                               type: integer
                           required:
+                          - count
                           - mask
                           type: object
                       required:

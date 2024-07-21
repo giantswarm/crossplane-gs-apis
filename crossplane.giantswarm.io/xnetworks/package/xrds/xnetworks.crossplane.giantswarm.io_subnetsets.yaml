@@ -35,7 +35,7 @@ spec:
                   AppIndex is the index of the application that the subnet is being created for.
 
 
-                  This is used for complex applications that require multiple subnet groupsr
+                  This is used for complex applications that require multiple subnet groups
                   Normally leave this on the default.
                 type: string
               deletionPolicy:
@@ -202,6 +202,8 @@ spec:
                 type: string
               subnets:
                 additionalProperties:
+                  description: Cidr is a string type that represents a CIDR block.
+                  pattern: ^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$
                   type: string
                 description: Subnets is a map of availability zones and subnet cidr
                   blocks.
@@ -236,6 +238,7 @@ spec:
                 type: string
               vpcId:
                 description: VpcId is the unique identifier for the VPC.
+                pattern: ^vpc-[a-z0-9]{8,17}$
                 type: string
               writeConnectionSecretToRef:
                 description: |-
@@ -306,6 +309,10 @@ spec:
                 x-kubernetes-list-type: map
               routeTables:
                 additionalProperties:
+                  description: |-
+                    RouteTableId is a string type that represents the unique identifier for a
+                    route table.
+                  pattern: ^rtb-[a-z0-9]{8,17}$
                   type: string
                 description: RouteTables is a map of route tables discovered by the
                   composite.
@@ -313,12 +320,16 @@ spec:
                 x-kubernetes-map-type: atomic
               subnets:
                 additionalProperties:
+                  description: SubnetId is a string type that represents the unique
+                    identifier for a subnet.
+                  pattern: ^subnet-[a-z0-9]{8,17}$
                   type: string
                 description: Subnets is a map of subnets discovered by the composite.
                 type: object
                 x-kubernetes-map-type: atomic
               vpcId:
                 description: VpcID is the unique identifier for the VPC.
+                pattern: ^vpc-[a-z0-9]{8,17}$
                 type: string
             type: object
         required:

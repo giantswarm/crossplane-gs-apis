@@ -58,7 +58,7 @@ type PeeredVpcNetworkSpec struct {
 	// +required
 	// +kubebuilder:validation:MinItems=3
 	// +kubebuilder:validation:MaxItems=3
-	AvailabilityZones []string `json:"availabilityZones"`
+	AvailabilityZones []ShortAz `json:"availabilityZones"`
 
 	// PeeredVpcNetworkParameters defines the parameters for creating a VPC with
 	// the option of peered subnets.
@@ -169,11 +169,11 @@ type VpcPeer struct {
 	// +default=true
 	AllowPublic bool `json:"allowPublic"`
 
-	// MyExcludedSubnetsets specifies the indexes of subnetsets for this VPC to
+	// ExcludeFromLocalPeering specifies the indexes of subnetsets for this VPC to
 	// exclude from routing to the peering connection
 	//
 	// +optional
-	MyExcludedSubnetSets SetExclusion `json:"excludeFromPeering,omitempty"`
+	ExcludeFromLocalPeering SetExclusion `json:"excludeFromLocalPeering,omitempty"`
 
 	// Name specifies the name of the VPC to peer with.
 	//
@@ -194,12 +194,12 @@ type VpcPeer struct {
 	// +optional
 	Region string `json:"region"`
 
-	// TheirExcludedSubnetsets specifies the indexes of subnetsets for the remote
+	// ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
 	// VPC to exclude from routing to the peering connection. If emmpty, all
 	// subnetsets will be included by default
 	//
 	// +optional
-	TheirExcludedSubnetSets []SetExclusion `json:"theirExcludeFromPeering,omitempty"`
+	ExcludeFromRemotePeering []SetExclusion `json:"excludeFromRemotePeering,omitempty"`
 }
 
 // PeeredSubnetSet defines the parameters for creating a set of subnets with the
@@ -236,10 +236,15 @@ type PeeredSubnetSet struct {
 // If no offset is specified, the subnets will be created from the start of the
 // cidr range
 type PeeredSubnetBuilder struct {
-	// Count is the number of subnet sets to create with this mask
+	// ClusterNames is a list of EKS cluster names to add shared LB tags for
 	//
 	// +optional
-	// +default=0
+	// +listType=atomic
+	ClusterNames []string `json:"clusterNames"`
+
+	// Count is the number of subnet sets to create with this mask
+	//
+	// +required
 	Count int `json:"count"`
 
 	// Determines which subnet set in this range to use for kubernetes load
@@ -266,8 +271,6 @@ type PeeredSubnetBuilder struct {
 // same mask.
 type PeeredSubnets struct {
 	// Cidrs is a list of PeeredSubnetSets to create in the VPC
-	//
-	// Each PeeredSubnetSet will create 1 subnet
 	//
 	// +required
 	// +kubebuilder:validation:MinItems=1

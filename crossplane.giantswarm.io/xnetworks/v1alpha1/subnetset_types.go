@@ -7,37 +7,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type SubnetSetSubnet struct {
-
-	// CidrBlock is a the CIDR block to use for this subnets.
-	// +required
-	// +kubebuilder:validation:Required
-	CidrBlock Cidr `json:"cidrBlock"`
-
-	// Zone is the availability zone to create the subnet in.
-	// +required
-	// +kubebuilder:validation:Required
-	Zone string `json:"zone"`
-}
-
-type SubnetSetSubnets struct {
-
-	// SubnetA is the subnet in availability zone A.
-	// +required
-	// +kubebuilder:validation:Required
-	SubnetA SubnetSetSubnet `json:"a"`
-
-	// SubnetB is the subnet in availability zone B.
-	// +required
-	// +kubebuilder:validation:Required
-	SubnetB SubnetSetSubnet `json:"b"`
-
-	// SubnetC is the subnet in availability zone C.
-	// +required
-	// +kubebuilder:validation:Required
-	SubnetC SubnetSetSubnet `json:"c"`
-}
-
+// TagSet is a set of tags to apply to resources in the subnetset.
 type TagSet struct {
 
 	// All is a map of tags to apply to all resources in the subnetset.
@@ -53,118 +23,69 @@ type TagSet struct {
 	Subnet map[string]string `json:"subnet,omitempty"`
 }
 
-type VpcId string
-
 type SubnetSetParameters struct {
 	// AppIndex is the index of the application that the subnet is being created for.
 	//
-	// This is used for complex applications that require multiple subnet groupsr
+	// This is used for complex applications that require multiple subnet groups
 	// Normally leave this on the default.
+	//
 	// +optional
 	// +default=""
 	AppIndex string `json:"appIndex,omitempty"`
 
 	// Region is the region you'd like the VPC to be created in.
+	//
 	// +immutable
 	// +required
 	// +kubebuilder:validation:Pattern="^[a-z]{2}-[a-z]+-[0-9]$"
 	// +kubebuilder:validation:Required
 	Region string `json:"region"`
 
+	// Subnets is a map of availability zones and subnet cidr blocks.
+	//
+	// +required
+	Subnets map[ShortAz]*Cidr `json:"subnets"`
+
 	// Tags is a set of tags to apply to resources in the subnetset
+	//
 	// +optional
 	// +structType=atomic
 	Tags TagSet `json:"tags,omitempty"`
 
 	// Type is the type of VPC Subnet to create.
+	//
 	// +optional
 	// +kubebuilder:validation:Enum=public;private
 	// +kubebuilder:default=public
 	// +kubebuilder:validation:Required
 	Type string `json:"type,omitempty"`
 
-	// Subnets is a map of availability zones and subnet cidr blocks.
-	// +required
-	Subnets map[string]*string `json:"subnets"`
-
 	// VpcId is the unique identifier for the VPC.
+	//
 	// +immutable
 	// +required
 	VpcId VpcId `json:"vpcId"`
-}
-
-type SubnetStatusId string
-
-type SubnetSetStatusSubnet struct {
-
-	// SubnetA is the subnet ID in availability zone A.
-	// +optional
-	SubnetA SubnetStatusId `json:"a,omitempty"`
-
-	// SubnetAName is the name of the subnet in availability zone A.
-	// +optional
-	SubnetAName string `json:"aName,omitempty"`
-
-	// SubnetB is subnet ID in availability zone B.
-	// +optional
-	SubnetB SubnetStatusId `json:"b,omitempty"`
-
-	// SubnetBName is the name of the subnet in availability zone B.
-	// +optional
-	SubnetBName string `json:"bName,omitempty"`
-
-	// SubnetC is the subnet ID in availability zone C.
-	// +optional
-	SubnetC SubnetStatusId `json:"c,omitempty"`
-
-	// SubnetCName is the name of the subnet in availability zone C.
-	// +optional
-	SubnetCName string `json:"cName,omitempty"`
-}
-
-type SubnetSetStatusRouteTable struct {
-
-	// RouteTableA is the route table ID for availability zone A.
-	// +optional
-	RouteTableA string `json:"a,omitempty"`
-
-	// RouteTableAName is the name of the route table in availability zone A.
-	// +optional
-	RouteTableAName string `json:"aName,omitempty"`
-
-	// RouteTableB is the route table ID for availability zone B.
-	// +optional
-	RouteTableB string `json:"b,omitempty"`
-
-	// RouteTableBName is the name of the route table in availability zone B.
-	// +optional
-	RouteTableBName string `json:"bName,omitempty"`
-
-	// RouteTableC is the route table ID for availability zone C.
-	// +optional
-	RouteTableC string `json:"c,omitempty"`
-
-	// RouteTableCName is the name of the route table in availability zone C.
-	// +optional
-	RouteTableCName string `json:"cName,omitempty"`
 }
 
 type SubnetSetStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
 
 	// VpcID is the unique identifier for the VPC.
+	//
 	// +required
-	VpcID string `json:"vpcId,omitempty"`
+	VpcID VpcId `json:"vpcId,omitempty"`
 
 	// Subnets is a map of subnets discovered by the composite.
+	//
 	// +optional
 	// +structType=atomic
-	Subnets map[string]*string `json:"subnets,omitempty"`
+	Subnets map[AvailabilityZone]*SubnetId `json:"subnets,omitempty"`
 
 	// RouteTables is a map of route tables discovered by the composite.
+	//
 	// +optional
 	// +structType=atomic
-	RouteTables map[string]*string `json:"routeTables,omitempty"`
+	RouteTables map[AvailabilityZone]*RouteTableId `json:"routeTables,omitempty"`
 }
 
 type SubnetSetSpec struct {
