@@ -156,7 +156,7 @@ encompass all the subnet CIDR blocks.</p>
 </div>
 
 <div class="property-description">
-<p>ShortAs is a string type that represents the short name of an availability
+<p>ShortAz is a string type that represents the short name of an availability
 zone.</p>
 
 </div>
