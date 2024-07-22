@@ -5,7 +5,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: (devel)
   creationTimestamp: null
-  name: rdsbasedbclusters.xdatabase.crossplane.giantswarm.io
+  name: rdsbases.xdatabase.crossplane.giantswarm.io
 spec:
   claimNames:
     kind: RdsBaseClaim
@@ -16,12 +16,12 @@ spec:
     name: rds-base
   group: xdatabase.crossplane.giantswarm.io
   names:
-    kind: RdsBaseDbCluster
-    listKind: RdsBaseDbClusterList
-    plural: rdsbasedbclusters
+    kind: RdsBase
+    listKind: RdsBaseList
+    plural: rdsbases
     shortNames:
     - rdb
-    singular: rdsbasedbcluster
+    singular: rdsbase
   versions:
   - name: v1alpha1
     referenceable: true
@@ -421,14 +421,21 @@ spec:
                   External Secrets Operator must be installed if this value is set to true
                 properties:
                   enabled:
-                    description: Enabled is whether ESO is enabled.
+                    description: |-
+                      Enabled Whether or not to enable `external-secrets-operator` object
+                      deployments using `provider-kubernetes.
                     type: boolean
                   kubernetesSecretStore:
-                    description: KubernetesSecretStore is the Kubernetes secret store
-                      to use.
+                    description: |-
+                      KubernetesSecretStore is the Kubernetes secret store to use.
+
+
+                      The kubernetes secret store is expected to be namespace scoped to prevent
+                      secrets leaking across namespaces.
                     type: string
                   stores:
-                    description: Stores is a list of secret stores to use.
+                    description: Stores is a list of secret stores to use for push
+                      secrets.
                     items:
                       description: |-
                         SecretsStore is a reference to a secrets store to be passed to External

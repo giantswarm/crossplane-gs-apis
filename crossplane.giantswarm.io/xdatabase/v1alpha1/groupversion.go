@@ -23,5 +23,5 @@ var (
 )
 
 func init() {
-	SchemeBuilder.Register(&RdsBaseDbCluster{}, &RdsBaseDbList{})
+	SchemeBuilder.Register(&RdsBase{}, &RdsBaseList{})
 }

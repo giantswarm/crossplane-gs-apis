@@ -14,25 +14,25 @@ import (
 // +kubebuilder:resource:scope=Cluster,categories=crossplane
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=ec
-// +crossbuilder:generate:xrd:claimNames:kind=ElasticacheClaim,plural=elasticacheclaims
+// +crossbuilder:generate:xrd:claimNames:kind=CacheBaseClaim,plural=cachebaseclaims
 // +crossbuilder:generate:xrd:defaultCompositionRef:name=cache-base
 // +crossbuilder:generate:xrd:enforcedCompositionRef:name=cache-base
-type Elasticache struct {
+type CacheBase struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ElasticacheSpec   `json:"spec"`
-	Status ElasticacheStatus `json:"status,omitempty"`
+	Spec   CacheBaseSpec   `json:"spec"`
+	Status CacheBaseStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
-type ElasticacheList struct {
+type CacheBaseList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Elasticache `json:"items"`
+	Items           []CacheBase `json:"items"`
 }
 
-type ElasticacheSpec struct {
+type CacheBaseSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
 
 	// AvailabilityZones is a list of Availability Zones in which the
@@ -68,7 +68,7 @@ type ElasticacheSpec struct {
 	VpcId *string `json:"vpcId"`
 }
 
-type ElasticacheStatus struct {
+type CacheBaseStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
 
 	// ClusterName is the name of the cluster.
@@ -823,11 +823,11 @@ type GlobalReplicationGroup struct {
 
 // Repository type metadata.
 var (
-	ElasticacheClusterKind      = "Elasticache"
-	ElasticacheClusterGroupKind = schema.GroupKind{
+	CacheBaseKind      = "CacheBase"
+	CacheBaseGroupKind = schema.GroupKind{
 		Group: XRDGroup,
-		Kind:  ElasticacheClusterKind,
+		Kind:  CacheBaseKind,
 	}.String()
-	ElasticacheClusterKindAPIVersion   = ElasticacheClusterKind + "." + GroupVersion.String()
-	ElasticacheClusterGroupVersionKind = GroupVersion.WithKind(ElasticacheClusterKind)
+	CacheBaseKindAPIVersion   = CacheBaseKind + "." + GroupVersion.String()
+	CacheBaseGroupVersionKind = GroupVersion.WithKind(CacheBaseKind)
 )

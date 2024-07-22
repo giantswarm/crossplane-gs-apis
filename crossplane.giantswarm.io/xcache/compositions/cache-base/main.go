@@ -21,8 +21,8 @@ var Builder = builder{}
 
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
-		GroupVersionKind: v1alpha1.ElasticacheClusterGroupVersionKind,
-		Object:           &v1alpha1.Elasticache{},
+		GroupVersionKind: v1alpha1.CacheBaseGroupVersionKind,
+		Object:           &v1alpha1.CacheBase{},
 	}
 }
 

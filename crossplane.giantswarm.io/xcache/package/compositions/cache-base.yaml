@@ -10,7 +10,7 @@ metadata:
 spec:
   compositeTypeRef:
     apiVersion: xcache.crossplane.giantswarm.io/v1alpha1
-    kind: Elasticache
+    kind: CacheBase
   mode: Pipeline
   pipeline:
   - functionRef:

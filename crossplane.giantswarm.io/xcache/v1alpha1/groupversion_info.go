@@ -23,5 +23,5 @@ var (
 )
 
 func init() {
-	SchemeBuilder.Register(&Elasticache{}, &ElasticacheList{})
+	SchemeBuilder.Register(&CacheBase{}, &CacheBaseList{})
 }

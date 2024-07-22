@@ -5,23 +5,23 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: (devel)
   creationTimestamp: null
-  name: elasticaches.xcache.crossplane.giantswarm.io
+  name: cachebases.xcache.crossplane.giantswarm.io
 spec:
   claimNames:
-    kind: ElasticacheClaim
-    plural: elasticacheclaims
+    kind: CacheBaseClaim
+    plural: cachebaseclaims
   defaultCompositionRef:
     name: cache-base
   enforcedCompositionRef:
     name: cache-base
   group: xcache.crossplane.giantswarm.io
   names:
-    kind: Elasticache
-    listKind: ElasticacheList
-    plural: elasticaches
+    kind: CacheBase
+    listKind: CacheBaseList
+    plural: cachebases
     shortNames:
     - ec
-    singular: elasticache
+    singular: cachebase
   versions:
   - name: v1alpha1
     referenceable: true

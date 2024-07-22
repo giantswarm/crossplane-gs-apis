@@ -5,7 +5,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: (devel)
   creationTimestamp: null
-  name: rdscacheclusterwithregionlookups.xaws.crossplane.giantswarm.io
+  name: rccwithregionlookups.xaws.crossplane.giantswarm.io
 spec:
   claimNames:
     kind: RCCWithRegionLookupClaim
@@ -16,12 +16,12 @@ spec:
     name: rcc-with-region-lookup
   group: xaws.crossplane.giantswarm.io
   names:
-    kind: RdsCacheClusterWithRegionLookup
-    listKind: RdsCacheClusterWithRegionLookupList
-    plural: rdscacheclusterwithregionlookups
+    kind: RCCWithRegionLookup
+    listKind: RCCWithRegionLookupList
+    plural: rccwithregionlookups
     shortNames:
     - rccwrl
-    singular: rdscacheclusterwithregionlookup
+    singular: rccwithregionlookup
   versions:
   - name: v1alpha1
     referenceable: true
@@ -30,7 +30,7 @@ spec:
         properties:
           spec:
             description: |-
-              RdsCacheClusterWithRegionLookupSpec contains the structure required for building the
+              RCCWithRegionLookupSpec contains the structure required for building the
               infrastructure for an RDS + Elasticache Cluster.
             properties:
               clusterDiscovery:
@@ -1086,6 +1086,29 @@ spec:
                       databaseName:
                         description: DatabaseName is the name of the database to create.
                         type: string
+                      databases:
+                        additionalProperties:
+                          items:
+                            properties:
+                              configurationParameters:
+                                additionalProperties:
+                                  type: string
+                                description: |-
+                                  ConfigurationParameters is the configuration parameters for the user.
+
+
+                                  Only applicable for postgresql databases
+                                type: object
+                              name:
+                                description: Name is the name of the user.
+                                type: string
+                            required:
+                            - name
+                            type: object
+                            x-kubernetes-preserve-unknown-fields: true
+                          type: array
+                        description: Databases is a map of databases to create.
+                        type: object
                       dbClusterInstanceClass:
                         description: DbClusterInstanceClass is the instance class
                           to use.
@@ -1302,6 +1325,52 @@ spec:
                               that is used to set the permissions boundary for the
                               monitoring role.
                             type: string
+                        type: object
+                      eso:
+                        description: |-
+                          Eso is the ESO configuration.
+
+
+                          This field is used to sync secrets using `external-secrets-operator`.
+                          External Secrets Operator must be installed if this value is set to true
+                        properties:
+                          enabled:
+                            description: |-
+                              Enabled Whether or not to enable `external-secrets-operator` object
+                              deployments using `provider-kubernetes.
+                            type: boolean
+                          kubernetesSecretStore:
+                            description: |-
+                              KubernetesSecretStore is the Kubernetes secret store to use.
+
+
+                              The kubernetes secret store is expected to be namespace scoped to prevent
+                              secrets leaking across namespaces.
+                            type: string
+                          stores:
+                            description: Stores is a list of secret stores to use
+                              for push secrets.
+                            items:
+                              description: |-
+                                SecretsStore is a reference to a secrets store to be passed to External
+                                Secrets Operator for creating PushSecrets
+                              properties:
+                                enabled:
+                                  description: Enabled is whether the secrets store
+                                    is enabled.
+                                  type: boolean
+                                isClusterSecretStore:
+                                  description: IsClusterSecretStore is whether the
+                                    secret store is a cluster secret store.
+                                  type: boolean
+                                secretStore:
+                                  description: SecretStoreName is the name of the
+                                    secret store.
+                                  type: string
+                              required:
+                              - secretStore
+                              type: object
+                            type: array
                         type: object
                       globalClusterIdentifier:
                         description: GlobalClusterIdentifier is the global cluster
@@ -1636,6 +1705,11 @@ spec:
                         description: PreferredMaintenanceWindow is the preferred maintenance
                           window.
                         type: string
+                      provisionSql:
+                        description: |-
+                          ProvisionSql determines whether or not to provision databases inside the
+                          RDS cluster.
+                        type: boolean
                       publiclyAccessible:
                         description: PubliclyAccessible is whether the DB instance
                           is publicly accessible.
@@ -1801,6 +1875,14 @@ spec:
                     - Orphan
                     - Delete
                     type: string
+                  kubernetesProviderConfig:
+                    description: KubernetesProviderConfig
+                    properties:
+                      name:
+                        type: string
+                    required:
+                    - name
+                    type: object
                   managementPolicies:
                     default:
                     - '*'
@@ -1997,9 +2079,9 @@ spec:
                                     Disabled specifies if the peering connection should be disabled.
                                     Defaults to true
                                   type: boolean
-                                excludeFromPeering:
+                                excludeFromLocalPeering:
                                   description: |-
-                                    MyExcludedSubnetsets specifies the indexes of subnetsets for this VPC to
+                                    ExcludeFromLocalPeering specifies the indexes of subnetsets for this VPC to
                                     exclude from routing to the peering connection
                                   properties:
                                     private:
@@ -2017,26 +2099,9 @@ spec:
                                       type: array
                                       x-kubernetes-list-type: atomic
                                   type: object
-                                name:
-                                  description: Name specifies the name of the VPC
-                                    to peer with.
-                                  type: string
-                                providerConfigRef:
+                                excludeFromRemotePeering:
                                   description: |-
-                                    ProviderConfigRef specifies the provider config to use for the peering
-                                    connection.
-                                  type: string
-                                region:
-                                  description: |-
-                                    Region specifies the region the VPC is found in.
-
-
-                                    If not defined, the region of the VPC will be assumed to be the same as
-                                    the region of the peered VPC.
-                                  type: string
-                                theirExcludeFromPeering:
-                                  description: |-
-                                    TheirExcludedSubnetsets specifies the indexes of subnetsets for the remote
+                                    ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
                                     VPC to exclude from routing to the peering connection. If emmpty, all
                                     subnetsets will be included by default
                                   items:
@@ -2057,6 +2122,23 @@ spec:
                                         x-kubernetes-list-type: atomic
                                     type: object
                                   type: array
+                                name:
+                                  description: Name specifies the name of the VPC
+                                    to peer with.
+                                  type: string
+                                providerConfigRef:
+                                  description: |-
+                                    ProviderConfigRef specifies the provider config to use for the peering
+                                    connection.
+                                  type: string
+                                region:
+                                  description: |-
+                                    Region specifies the region the VPC is found in.
+
+
+                                    If not defined, the region of the VPC will be assumed to be the same as
+                                    the region of the peered VPC.
+                                  type: string
                               required:
                               - name
                               type: object
@@ -2069,11 +2151,8 @@ spec:
                           subnet sets to create.
                         properties:
                           cidrs:
-                            description: |-
-                              Cidrs is a list of PeeredSubnetSets to create in the VPC
-
-
-                              Each PeeredSubnetSet will create 1 subnet
+                            description: Cidrs is a list of PeeredSubnetSets to create
+                              in the VPC
                             items:
                               description: |-
                                 PeeredSubnetSet defines the parameters for creating a set of subnets with the
@@ -2088,6 +2167,13 @@ spec:
                                   description: Private is the number of private subnets
                                     to create in this set
                                   properties:
+                                    clusterNames:
+                                      description: ClusterNames is a list of EKS cluster
+                                        names to add shared LB tags for
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
                                     count:
                                       description: Count is the number of subnet sets
                                         to create with this mask
@@ -2106,12 +2192,20 @@ spec:
                                         offset the subnet mask by
                                       type: integer
                                   required:
+                                  - count
                                   - mask
                                   type: object
                                 public:
                                   description: Public is the number of public subnets
                                     to create in this set
                                   properties:
+                                    clusterNames:
+                                      description: ClusterNames is a list of EKS cluster
+                                        names to add shared LB tags for
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
                                     count:
                                       description: Count is the number of subnet sets
                                         to create with this mask
@@ -2130,6 +2224,7 @@ spec:
                                         offset the subnet mask by
                                       type: integer
                                   required:
+                                  - count
                                   - mask
                                   type: object
                               required:
@@ -2211,6 +2306,7 @@ spec:
                 - availabilityZones
                 - cache
                 - database
+                - kubernetesProviderConfig
                 - region
                 - vpc
                 type: object

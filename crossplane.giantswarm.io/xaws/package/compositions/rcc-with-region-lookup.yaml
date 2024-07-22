@@ -10,7 +10,7 @@ metadata:
 spec:
   compositeTypeRef:
     apiVersion: xaws.crossplane.giantswarm.io/v1alpha1
-    kind: RdsCacheClusterWithRegionLookup
+    kind: RCCWithRegionLookup
   mode: Pipeline
   pipeline:
   - functionRef:
@@ -76,6 +76,7 @@ spec:
                 name: null
             database:
               dbClusterParameterGroup: null
+            kubernetesProviderConfig: null
             region: ""
             subnetGroupIndexes:
               cache: 0

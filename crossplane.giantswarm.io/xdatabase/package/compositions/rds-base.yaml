@@ -10,7 +10,7 @@ metadata:
 spec:
   compositeTypeRef:
     apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
-    kind: RdsBaseDbCluster
+    kind: RdsBase
   mode: Pipeline
   pipeline:
   - functionRef:

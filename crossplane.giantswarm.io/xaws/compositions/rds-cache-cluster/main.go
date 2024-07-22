@@ -9,6 +9,7 @@ import (
 
 	xapiextv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	xcache "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xcache/v1alpha1"
+	xdb "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xdatabase/v1alpha1"
 	xnet "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 	"github.com/mproffitt/crossbuilder/pkg/generate/composition/build"
 	cb "github.com/mproffitt/crossbuilder/pkg/generate/utils"
@@ -113,7 +114,7 @@ func createResources() []xpt.ComposedTemplate {
 		{
 			Name: "cache-base",
 			Base: &runtime.RawExtension{
-				Object: &xcache.Elasticache{
+				Object: &xcache.CacheBase{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: "xcache.crossplane.giantswarm.io/v1alpha1",
 						Kind:       "Elasticache",
@@ -151,7 +152,7 @@ func createResources() []xpt.ComposedTemplate {
 		{
 			Name: "rds-base",
 			Base: &runtime.RawExtension{
-				Object: &v1alpha1.RdsBaseDbCluster{
+				Object: &xdb.RdsBase{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: "xdatabase.crossplane.giantswarm.io/v1alpha1",
 						Kind:       "RdsBaseDbCluster",

@@ -6,7 +6,6 @@ import (
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	nd "github.com/giantswarm/crossplane-fn-network-discovery/pkg/composite/v1beta1"
-	xrds "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xdatabase/v1alpha1"
 )
 
 // +kubebuilder:object:root=true
@@ -20,19 +19,19 @@ import (
 // +crossbuilder:generate:xrd:claimNames:kind=RCCWithRegionLookupClaim,plural=rccwithregionlookupclaims
 // +crossbuilder:generate:xrd:defaultCompositionRef:name=rcc-with-region-lookup
 // +crossbuilder:generate:xrd:enforcedCompositionRef:name=rcc-with-region-lookup
-type RdsCacheClusterWithRegionLookup struct {
+type RCCWithRegionLookup struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   RdsCacheClusterWithRegionLookupSpec   `json:"spec"`
-	Status RdsCacheClusterWithRegionLookupStatus `json:"status,omitempty"`
+	Spec   RCCWithRegionLookupSpec   `json:"spec"`
+	Status RCCWithRegionLookupStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
-type RdsCacheClusterWithRegionLookupList struct {
+type RCCWithRegionLookupList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []RdsCacheClusterWithRegionLookup `json:"items"`
+	Items           []RCCWithRegionLookup `json:"items"`
 }
 
 type ClusterDiscovery struct {
@@ -48,9 +47,9 @@ type ClusterDiscovery struct {
 	Namespace string `json:"namespace"`
 }
 
-// RdsCacheClusterWithRegionLookupSpec contains the structure required for building the
+// RCCWithRegionLookupSpec contains the structure required for building the
 // infrastructure for an RDS + Elasticache Cluster.
-type RdsCacheClusterWithRegionLookupSpec struct {
+type RCCWithRegionLookupSpec struct {
 	// ClusterDiscovery is the reference to the cluster to discover
 	//
 	// +required
@@ -59,10 +58,10 @@ type RdsCacheClusterWithRegionLookupSpec struct {
 	// RdsCacheClusterSpec is the spec for the RDS Cache Cluster
 	//
 	// +required
-	RdsCacheClusterSpec xrds.RdsCacheClusterSpec `json:"rdsCacheClusterSpec"`
+	RdsCacheClusterSpec RdsCacheClusterSpec `json:"rdsCacheClusterSpec"`
 }
 
-type RdsCacheClusterWithRegionLookupStatus struct {
+type RCCWithRegionLookupStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
 
 	// CacheClusterEndpoints is a list of endpoints of the Elasticache clusters
@@ -145,11 +144,11 @@ type RdsCacheClusterWithRegionLookupStatus struct {
 
 // Repository type metadata.
 var (
-	RdsCacheClusterWithRegionLookupKind      = "RdsCacheClusterWithRegionLookup"
-	RdsCacheClusterWithRegionLookupGroupKind = schema.GroupKind{
+	RCCWithRegionLookupKind      = "RCCWithRegionLookup"
+	RCCWithRegionLookupGroupKind = schema.GroupKind{
 		Group: XRDGroup,
-		Kind:  RdsCacheClusterWithRegionLookupKind,
+		Kind:  RCCWithRegionLookupKind,
 	}.String()
-	RdsCacheClusterWithRegionLookupKindAPIVersion   = RdsCacheClusterWithRegionLookupKind + "." + GroupVersion.String()
-	RdsCacheClusterWithRegionLookupGroupVersionKind = GroupVersion.WithKind(RdsCacheClusterWithRegionLookupKind)
+	RCCWithRegionLookupKindAPIVersion   = RCCWithRegionLookupKind + "." + GroupVersion.String()
+	RCCWithRegionLookupGroupVersionKind = GroupVersion.WithKind(RCCWithRegionLookupKind)
 )

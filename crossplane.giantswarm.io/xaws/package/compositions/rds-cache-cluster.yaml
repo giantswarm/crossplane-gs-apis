@@ -9,7 +9,7 @@ metadata:
   name: rds-cache-cluster
 spec:
   compositeTypeRef:
-    apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
+    apiVersion: xaws.crossplane.giantswarm.io/v1alpha1
     kind: RdsCacheCluster
   mode: Pipeline
   pipeline:

@@ -15,8 +15,6 @@ import (
 
 	ccKubernetes "github.com/crossplane-contrib/provider-kubernetes/apis/object/v1alpha2"
 	capi "sigs.k8s.io/cluster-api/api/v1beta1"
-
-	xdatabase "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xdatabase/v1alpha1"
 )
 
 type builder struct{}
@@ -25,8 +23,8 @@ var Builder = builder{}
 
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
-		GroupVersionKind: v1alpha1.RdsCacheClusterWithRegionLookupGroupVersionKind,
-		Object:           &v1alpha1.RdsCacheClusterWithRegionLookup{},
+		GroupVersionKind: v1alpha1.RCCWithRegionLookupGroupVersionKind,
+		Object:           &v1alpha1.RCCWithRegionLookup{},
 	}
 }
 
@@ -45,7 +43,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		err                 error
 	)
 
-	kclResourceTemplate, err = build.LoadTemplate("compositions/rdscacheclusterwithregionlookup/templates/resources.k")
+	kclResourceTemplate, err = build.LoadTemplate("compositions/rccwithregionlookup/templates/resources.k")
 	if err != nil {
 		panic(err)
 	}
@@ -133,7 +131,7 @@ func createResources() []xpt.ComposedTemplate {
 		{
 			Name: "rds-cache-cluster",
 			Base: &runtime.RawExtension{
-				Object: &xdatabase.RdsCacheCluster{
+				Object: &v1alpha1.RdsCacheCluster{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: "xdatabase.crossplane.giantswarm.io/v1alpha1",
 						Kind:       "RdsCacheCluster",

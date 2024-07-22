@@ -5,7 +5,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: (devel)
   creationTimestamp: null
-  name: rdscacheclusters.xdatabase.crossplane.giantswarm.io
+  name: rdscacheclusters.xaws.crossplane.giantswarm.io
 spec:
   claimNames:
     kind: RdsCacheClusterClaim
@@ -14,7 +14,7 @@ spec:
     name: rds-cache-cluster
   enforcedCompositionRef:
     name: rds-cache-cluster
-  group: xdatabase.crossplane.giantswarm.io
+  group: xaws.crossplane.giantswarm.io
   names:
     kind: RdsCacheCluster
     listKind: RdsCacheClusterList
@@ -1132,14 +1132,21 @@ spec:
                       External Secrets Operator must be installed if this value is set to true
                     properties:
                       enabled:
-                        description: Enabled is whether ESO is enabled.
+                        description: |-
+                          Enabled Whether or not to enable `external-secrets-operator` object
+                          deployments using `provider-kubernetes.
                         type: boolean
                       kubernetesSecretStore:
-                        description: KubernetesSecretStore is the Kubernetes secret
-                          store to use.
+                        description: |-
+                          KubernetesSecretStore is the Kubernetes secret store to use.
+
+
+                          The kubernetes secret store is expected to be namespace scoped to prevent
+                          secrets leaking across namespaces.
                         type: string
                       stores:
-                        description: Stores is a list of secret stores to use.
+                        description: Stores is a list of secret stores to use for
+                          push secrets.
                         items:
                           description: |-
                             SecretsStore is a reference to a secrets store to be passed to External
@@ -1861,9 +1868,9 @@ spec:
                                 Disabled specifies if the peering connection should be disabled.
                                 Defaults to true
                               type: boolean
-                            excludeFromPeering:
+                            excludeFromLocalPeering:
                               description: |-
-                                MyExcludedSubnetsets specifies the indexes of subnetsets for this VPC to
+                                ExcludeFromLocalPeering specifies the indexes of subnetsets for this VPC to
                                 exclude from routing to the peering connection
                               properties:
                                 private:
@@ -1879,26 +1886,9 @@ spec:
                                   type: array
                                   x-kubernetes-list-type: atomic
                               type: object
-                            name:
-                              description: Name specifies the name of the VPC to peer
-                                with.
-                              type: string
-                            providerConfigRef:
+                            excludeFromRemotePeering:
                               description: |-
-                                ProviderConfigRef specifies the provider config to use for the peering
-                                connection.
-                              type: string
-                            region:
-                              description: |-
-                                Region specifies the region the VPC is found in.
-
-
-                                If not defined, the region of the VPC will be assumed to be the same as
-                                the region of the peered VPC.
-                              type: string
-                            theirExcludeFromPeering:
-                              description: |-
-                                TheirExcludedSubnetsets specifies the indexes of subnetsets for the remote
+                                ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
                                 VPC to exclude from routing to the peering connection. If emmpty, all
                                 subnetsets will be included by default
                               items:
@@ -1917,6 +1907,23 @@ spec:
                                     x-kubernetes-list-type: atomic
                                 type: object
                               type: array
+                            name:
+                              description: Name specifies the name of the VPC to peer
+                                with.
+                              type: string
+                            providerConfigRef:
+                              description: |-
+                                ProviderConfigRef specifies the provider config to use for the peering
+                                connection.
+                              type: string
+                            region:
+                              description: |-
+                                Region specifies the region the VPC is found in.
+
+
+                                If not defined, the region of the VPC will be assumed to be the same as
+                                the region of the peered VPC.
+                              type: string
                           required:
                           - name
                           type: object
@@ -1929,11 +1936,8 @@ spec:
                       subnet sets to create.
                     properties:
                       cidrs:
-                        description: |-
-                          Cidrs is a list of PeeredSubnetSets to create in the VPC
-
-
-                          Each PeeredSubnetSet will create 1 subnet
+                        description: Cidrs is a list of PeeredSubnetSets to create
+                          in the VPC
                         items:
                           description: |-
                             PeeredSubnetSet defines the parameters for creating a set of subnets with the
@@ -1948,6 +1952,13 @@ spec:
                               description: Private is the number of private subnets
                                 to create in this set
                               properties:
+                                clusterNames:
+                                  description: ClusterNames is a list of EKS cluster
+                                    names to add shared LB tags for
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
                                 count:
                                   description: Count is the number of subnet sets
                                     to create with this mask
@@ -1966,12 +1977,20 @@ spec:
                                     the subnet mask by
                                   type: integer
                               required:
+                              - count
                               - mask
                               type: object
                             public:
                               description: Public is the number of public subnets
                                 to create in this set
                               properties:
+                                clusterNames:
+                                  description: ClusterNames is a list of EKS cluster
+                                    names to add shared LB tags for
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
                                 count:
                                   description: Count is the number of subnet sets
                                     to create with this mask
@@ -1990,6 +2009,7 @@ spec:
                                     the subnet mask by
                                   type: integer
                               required:
+                              - count
                               - mask
                               type: object
                           required:

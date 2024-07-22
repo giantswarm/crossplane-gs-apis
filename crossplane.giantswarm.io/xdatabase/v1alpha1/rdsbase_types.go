@@ -18,23 +18,23 @@ import (
 // +crossbuilder:generate:xrd:claimNames:kind=RdsBaseClaim,plural=rdsbaseclaims
 // +crossbuilder:generate:xrd:defaultCompositionRef:name=rds-base
 // +crossbuilder:generate:xrd:enforcedCompositionRef:name=rds-base
-type RdsBaseDbCluster struct {
+type RdsBase struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   RdsBaseDbSpec   `json:"spec"`
-	Status RdsBaseDbStatus `json:"status,omitempty"`
+	Spec   RdsBaseSpec   `json:"spec"`
+	Status RdsBaseStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
-type RdsBaseDbList struct {
+type RdsBaseList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []RdsBaseDbCluster `json:"items"`
+	Items           []RdsBase `json:"items"`
 }
 
 // Defines the spec of a RDS cluster
-type RdsBaseDbSpec struct {
+type RdsBaseSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
 	// AvailabilityZones is a list of availability zone to use.
 	//
@@ -71,7 +71,7 @@ type RdsBaseDbSpec struct {
 }
 
 // Defines the status of a RDS cluster
-type RdsBaseDbStatus struct {
+type RdsBaseStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
 
 	// AccountId is the account ID of the DB cluster.
@@ -143,7 +143,7 @@ type RdsBaseDbStatus struct {
 	SecurityGroupId *string `json:"securityGroupId,omitempty"`
 }
 
-type RdsBaseDbRole struct {
+type RdsBaseRole struct {
 	// FeatureName is the name of the feature.
 	//
 	// +optional
@@ -753,7 +753,7 @@ type ClusterParameters struct {
 	// IamRoles is a list of IAM roles to associate with the DB cluster.
 	//
 	// +optional
-	IamRoles []*RdsBaseDbRole `json:"iamRoles,omitempty"`
+	IamRoles []*RdsBaseRole `json:"iamRoles,omitempty"`
 
 	// Iops is the amount of provisioned IOPS.
 	//
@@ -961,7 +961,8 @@ type EnhancedMonitoring struct {
 // Additionally, PushSecrets can be automatically created to push the secret to
 // external secrets stores.
 type Eso struct {
-	// Enabled is whether ESO is enabled.
+	// Enabled Whether or not to enable `external-secrets-operator` object
+	// deployments using `provider-kubernetes.
 	//
 	// +optional
 	// +default=true
@@ -969,11 +970,14 @@ type Eso struct {
 
 	// KubernetesSecretStore is the Kubernetes secret store to use.
 	//
+	// The kubernetes secret store is expected to be namespace scoped to prevent
+	// secrets leaking across namespaces.
+	//
 	// +optional
 	// +default="default"
 	KubernetesSecretStore *string `json:"kubernetesSecretStore,omitempty"`
 
-	// Stores is a list of secret stores to use.
+	// Stores is a list of secret stores to use for push secrets.
 	//
 	// +optional
 	Stores []*SecretsStore `json:"stores,omitempty"`
@@ -1076,7 +1080,7 @@ type ProviderConfig struct {
 	Name string `json:"name"`
 }
 
-// RestoreToPointInTime is the point in time to restore to.
+// RestoreToPointInTime contains details of a point in time restoration
 type RestoreToPointInTime struct {
 	// Identifier is the identifier of the source DB cluster snapshot or DB
 	// instance snapshot to restore from. Only valid if not running in cluster
@@ -1262,11 +1266,11 @@ type SqlUsers []*SqlUser
 
 // Repository type metadata.
 var (
-	RdsBaseDbClusterKind      = "RdsBaseDbCluster"
-	RdsBaseDbClusterGroupKind = schema.GroupKind{
+	RdsBaseKind      = "RdsBase"
+	RdsBaseGroupKind = schema.GroupKind{
 		Group: XRDGroup,
-		Kind:  RdsBaseDbClusterKind,
+		Kind:  RdsBaseKind,
 	}.String()
-	RdsBaseDbClusterKindAPIVersion   = RdsBaseDbClusterKind + "." + GroupVersion.String()
-	RdsBaseDbClusterGroupVersionKind = GroupVersion.WithKind(RdsBaseDbClusterKind)
+	RdsBaseKindAPIVersion   = RdsBaseKind + "." + GroupVersion.String()
+	RdsBaseGroupVersionKind = GroupVersion.WithKind(RdsBaseKind)
 )

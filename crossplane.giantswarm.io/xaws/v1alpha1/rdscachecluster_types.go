@@ -7,6 +7,7 @@ import (
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	xcache "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xcache/v1alpha1"
+	xdb "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xdatabase/v1alpha1"
 	xnet "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 )
 
@@ -61,12 +62,12 @@ type RdsCacheClusterSpec struct {
 	// Database defines the database settings
 	//
 	// +required
-	Database ClusterParameters `json:"database"`
+	Database xdb.ClusterParameters `json:"database"`
 
 	// KubernetesProviderConfig
 	//
 	// +required
-	KubernetesProviderConfig *ProviderConfig `json:"kubernetesProviderConfig"`
+	KubernetesProviderConfig *xdb.ProviderConfig `json:"kubernetesProviderConfig"`
 
 	// SubnetGroupIndexes is a map of service name to subnet set indexes
 	//
@@ -178,7 +179,7 @@ var (
 	RdsCacheClusterKind      = "RdsCacheCluster"
 	RdsCacheClusterGroupKind = schema.GroupKind{
 		Group: XRDGroup,
-		Kind:  RdsBaseDbClusterKind,
+		Kind:  RdsCacheClusterKind,
 	}.String()
 	RdsCacheClusterKindAPIVersion   = RdsCacheClusterKind + "." + GroupVersion.String()
 	RdsCacheClusterGroupVersionKind = GroupVersion.WithKind(RdsCacheClusterKind)
