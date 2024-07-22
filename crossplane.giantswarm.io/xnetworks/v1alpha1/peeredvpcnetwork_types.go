@@ -9,14 +9,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// PeerVpcNetworkSpec defines the desired state of PeerVpcNetwork
+// PeeredVpcNetwork defines the desired state of a VPC.
 //
-// This is a more advanced composition that uses KCL language to calculate the
-// overall structure of the VPC and subnets, utilising dynamic calculation for
-// the components of the VPC.
+// This composition can be used to create an *n-dimensional* VPC with optional
+// peering to other VPCs.
 //
 // A claim made against this composition will result in the creation of a VPC
-// with a number of subnets grouped into sets of 3 availability zones.
+// with a number of subnets grouped into sets across *n* availability zones.
 //
 // If VPC Peering is enabled, the VPC will be peered with the VPCs specified in
 // the claim under the `spec.peering.remoteVpcs` field.

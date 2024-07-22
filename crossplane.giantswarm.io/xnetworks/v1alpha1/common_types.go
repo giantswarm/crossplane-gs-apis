@@ -13,8 +13,8 @@ type AvailabilityZone string
 // +kubebuilder:validation:Type=string
 type Cidr string
 
-// ShortAz is a string type that represents the short name of an availability
-// zone.
+// A single character representation of the short name of an availability zone.
+// For example, "a" for "eu-west-1a".
 //
 // +kubebuilder:validation:Type=string
 // +kubebuilder:validation:Pattern="^[a-z]$"
