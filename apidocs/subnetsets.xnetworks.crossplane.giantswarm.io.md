@@ -74,7 +74,8 @@ source_repository_ref: main
 
 
 ### Spec Properties
-<h4>`.spec.appIndex`</h4>
+
+#### `.spec.appIndex`
 
 |Property |Value    |
 |:--------|:--------|
@@ -87,7 +88,8 @@ AppIndex is the index of the application that the subnet is being created for.
   
   This is used for complex applications that require multiple subnet groups
   Normally leave this on the default.
-<h4>`.spec.deletionPolicy`</h4>
+
+#### `.spec.deletionPolicy`
 
 |Property |Value    |
 |:--------|:--------|
@@ -107,7 +109,8 @@ DeletionPolicy specifies what will happen to the underlying external
   field in a future release. Currently, both could be set independently and
   non-default values would be honored if the feature flag is enabled.
   See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
-<h4>`.spec.managementPolicies`</h4>
+
+#### `.spec.managementPolicies`
 
 |Property |Value    |
 |:--------|:--------|
@@ -128,7 +131,8 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
   custom, the DeletionPolicy field will be ignored.
   See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
   and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
-<h4>`.spec.managementPolicies[*]`</h4>
+
+#### `.spec.managementPolicies[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -138,7 +142,8 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
 
 A ManagementAction represents an action that the Crossplane controllers
   can take on an external resource.
-<h4>`.spec.providerConfigRef`</h4>
+
+#### `.spec.providerConfigRef`
 
 |Property |Value    |
 |:--------|:--------|
@@ -150,7 +155,8 @@ A ManagementAction represents an action that the Crossplane controllers
 ProviderConfigReference specifies how the provider that will be used to
   create, observe, update, and delete this managed resource should be
   configured.
-<h4>`.spec.providerConfigRef.name`</h4>
+
+#### `.spec.providerConfigRef.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -159,7 +165,8 @@ ProviderConfigReference specifies how the provider that will be used to
 
 
 Name of the referenced object.
-<h4>`.spec.providerConfigRef.policy`</h4>
+
+#### `.spec.providerConfigRef.policy`
 
 |Property |Value    |
 |:--------|:--------|
@@ -168,7 +175,8 @@ Name of the referenced object.
 
 
 Policies for referencing.
-<h4>`.spec.providerConfigRef.policy.resolution`</h4>
+
+#### `.spec.providerConfigRef.policy.resolution`
 
 |Property |Value    |
 |:--------|:--------|
@@ -185,7 +193,8 @@ Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
   reference cannot be resolved. 'Optional' means this reference will be
   a no-op if it cannot be resolved.
-<h4>`.spec.providerConfigRef.policy.resolve`</h4>
+
+#### `.spec.providerConfigRef.policy.resolve`
 
 |Property |Value    |
 |:--------|:--------|
@@ -201,7 +210,8 @@ Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
   the corresponding field is not present. Use 'Always' to resolve the
   reference on every reconcile.
-<h4>`.spec.publishConnectionDetailsTo`</h4>
+
+#### `.spec.publishConnectionDetailsTo`
 
 |Property |Value    |
 |:--------|:--------|
@@ -214,7 +224,8 @@ PublishConnectionDetailsTo specifies the connection secret config which
   which any connection details for this managed resource should be written.
   Connection details frequently include the endpoint, username,
   and password required to connect to the managed resource.
-<h4>`.spec.publishConnectionDetailsTo.configRef`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef`
 
 |Property |Value    |
 |:--------|:--------|
@@ -225,7 +236,8 @@ PublishConnectionDetailsTo specifies the connection secret config which
 
 SecretStoreConfigRef specifies which secret store config should be used
   for this ConnectionSecret.
-<h4>`.spec.publishConnectionDetailsTo.configRef.name`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -234,7 +246,8 @@ SecretStoreConfigRef specifies which secret store config should be used
 
 
 Name of the referenced object.
-<h4>`.spec.publishConnectionDetailsTo.configRef.policy`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef.policy`
 
 |Property |Value    |
 |:--------|:--------|
@@ -243,7 +256,8 @@ Name of the referenced object.
 
 
 Policies for referencing.
-<h4>`.spec.publishConnectionDetailsTo.configRef.policy.resolution`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef.policy.resolution`
 
 |Property |Value    |
 |:--------|:--------|
@@ -260,7 +274,8 @@ Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
   reference cannot be resolved. 'Optional' means this reference will be
   a no-op if it cannot be resolved.
-<h4>`.spec.publishConnectionDetailsTo.configRef.policy.resolve`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef.policy.resolve`
 
 |Property |Value    |
 |:--------|:--------|
@@ -276,7 +291,8 @@ Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
   the corresponding field is not present. Use 'Always' to resolve the
   reference on every reconcile.
-<h4>`.spec.publishConnectionDetailsTo.metadata`</h4>
+
+#### `.spec.publishConnectionDetailsTo.metadata`
 
 |Property |Value    |
 |:--------|:--------|
@@ -285,7 +301,8 @@ Resolve specifies when this reference should be resolved. The default
 
 
 Metadata is the metadata for connection secret.
-<h4>`.spec.publishConnectionDetailsTo.metadata.annotations`</h4>
+
+#### `.spec.publishConnectionDetailsTo.metadata.annotations`
 
 |Property |Value    |
 |:--------|:--------|
@@ -296,7 +313,8 @@ Metadata is the metadata for connection secret.
 Annotations are the annotations to be added to connection secret.
   - For Kubernetes secrets, this will be used as "metadata.annotations".
   - It is up to Secret Store implementation for others store types.
-<h4>`.spec.publishConnectionDetailsTo.metadata.labels`</h4>
+
+#### `.spec.publishConnectionDetailsTo.metadata.labels`
 
 |Property |Value    |
 |:--------|:--------|
@@ -307,7 +325,8 @@ Annotations are the annotations to be added to connection secret.
 Labels are the labels/tags to be added to connection secret.
   - For Kubernetes secrets, this will be used as "metadata.labels".
   - It is up to Secret Store implementation for others store types.
-<h4>`.spec.publishConnectionDetailsTo.metadata.type`</h4>
+
+#### `.spec.publishConnectionDetailsTo.metadata.type`
 
 |Property |Value    |
 |:--------|:--------|
@@ -317,7 +336,8 @@ Labels are the labels/tags to be added to connection secret.
 
 Type is the SecretType for the connection secret.
   - Only valid for Kubernetes Secret Stores.
-<h4>`.spec.publishConnectionDetailsTo.name`</h4>
+
+#### `.spec.publishConnectionDetailsTo.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -326,7 +346,8 @@ Type is the SecretType for the connection secret.
 
 
 Name is the name of the connection secret.
-<h4>`.spec.region`</h4>
+
+#### `.spec.region`
 
 |Property |Value    |
 |:--------|:--------|
@@ -336,7 +357,8 @@ Name is the name of the connection secret.
 
 
 Region is the region you'd like the VPC to be created in.
-<h4>`.spec.subnets`</h4>
+
+#### `.spec.subnets`
 
 |Property |Value    |
 |:--------|:--------|
@@ -345,7 +367,8 @@ Region is the region you'd like the VPC to be created in.
 
 
 Subnets is a map of availability zones and subnet cidr blocks.
-<h4>`.spec.tags`</h4>
+
+#### `.spec.tags`
 
 |Property |Value    |
 |:--------|:--------|
@@ -354,7 +377,8 @@ Subnets is a map of availability zones and subnet cidr blocks.
 
 
 Tags is a set of tags to apply to resources in the subnetset
-<h4>`.spec.tags.all`</h4>
+
+#### `.spec.tags.all`
 
 |Property |Value    |
 |:--------|:--------|
@@ -363,7 +387,8 @@ Tags is a set of tags to apply to resources in the subnetset
 
 
 All is a map of tags to apply to all resources in the subnetset.
-<h4>`.spec.tags.subnet`</h4>
+
+#### `.spec.tags.subnet`
 
 |Property |Value    |
 |:--------|:--------|
@@ -372,7 +397,8 @@ All is a map of tags to apply to all resources in the subnetset.
 
 
 Subnet is a map of tags to apply only to the subnet resources
-<h4>`.spec.type`</h4>
+
+#### `.spec.type`
 
 |Property |Value    |
 |:--------|:--------|
@@ -386,7 +412,8 @@ Allowed Values:
 - private
 
 Type is the type of VPC Subnet to create.
-<h4>`.spec.vpcId`</h4>
+
+#### `.spec.vpcId`
 
 |Property |Value    |
 |:--------|:--------|
@@ -396,7 +423,8 @@ Type is the type of VPC Subnet to create.
 
 
 VpcId is the unique identifier for the VPC.
-<h4>`.spec.writeConnectionSecretToRef`</h4>
+
+#### `.spec.writeConnectionSecretToRef`
 
 |Property |Value    |
 |:--------|:--------|
@@ -412,7 +440,8 @@ WriteConnectionSecretToReference specifies the namespace and name of a
   PublishConnectionDetailsTo. Currently, both could be set independently
   and connection details would be published to both without affecting
   each other.
-<h4>`.spec.writeConnectionSecretToRef.name`</h4>
+
+#### `.spec.writeConnectionSecretToRef.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -421,7 +450,8 @@ WriteConnectionSecretToReference specifies the namespace and name of a
 
 
 Name of the secret.
-<h4>`.spec.writeConnectionSecretToRef.namespace`</h4>
+
+#### `.spec.writeConnectionSecretToRef.namespace`
 
 |Property |Value    |
 |:--------|:--------|
@@ -432,7 +462,8 @@ Name of the secret.
 Namespace of the secret.
 
 ### Status Properties
-<h4>`.status.conditions`</h4>
+
+#### `.status.conditions`
 
 |Property |Value    |
 |:--------|:--------|
@@ -443,7 +474,8 @@ Namespace of the secret.
 
 
 Conditions of the resource.
-<h4>`.status.conditions[*]`</h4>
+
+#### `.status.conditions[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -452,7 +484,8 @@ Conditions of the resource.
 
 
 A Condition that may apply to a resource.
-<h4>`.status.conditions[*].lastTransitionTime`</h4>
+
+#### `.status.conditions[*].lastTransitionTime`
 
 |Property |Value    |
 |:--------|:--------|
@@ -462,7 +495,8 @@ A Condition that may apply to a resource.
 
 LastTransitionTime is the last time this condition transitioned from one
   status to another.
-<h4>`.status.conditions[*].message`</h4>
+
+#### `.status.conditions[*].message`
 
 |Property |Value    |
 |:--------|:--------|
@@ -472,7 +506,8 @@ LastTransitionTime is the last time this condition transitioned from one
 
 A Message containing details about this condition's last transition from
   one status to another, if any.
-<h4>`.status.conditions[*].reason`</h4>
+
+#### `.status.conditions[*].reason`
 
 |Property |Value    |
 |:--------|:--------|
@@ -481,7 +516,8 @@ A Message containing details about this condition's last transition from
 
 
 A Reason for this condition's last transition from one status to another.
-<h4>`.status.conditions[*].status`</h4>
+
+#### `.status.conditions[*].status`
 
 |Property |Value    |
 |:--------|:--------|
@@ -490,7 +526,8 @@ A Reason for this condition's last transition from one status to another.
 
 
 Status of this condition; is it currently True, False, or Unknown?
-<h4>`.status.conditions[*].type`</h4>
+
+#### `.status.conditions[*].type`
 
 |Property |Value    |
 |:--------|:--------|
@@ -500,7 +537,8 @@ Status of this condition; is it currently True, False, or Unknown?
 
 Type of this condition. At most one of each condition type may apply to
   a resource at any point in time.
-<h4>`.status.routeTables`</h4>
+
+#### `.status.routeTables`
 
 |Property |Value    |
 |:--------|:--------|
@@ -509,7 +547,8 @@ Type of this condition. At most one of each condition type may apply to
 
 
 RouteTables is a map of route tables discovered by the composite.
-<h4>`.status.subnets`</h4>
+
+#### `.status.subnets`
 
 |Property |Value    |
 |:--------|:--------|
@@ -518,7 +557,8 @@ RouteTables is a map of route tables discovered by the composite.
 
 
 Subnets is a map of subnets discovered by the composite.
-<h4>`.status.vpcId`</h4>
+
+#### `.status.vpcId`
 
 |Property |Value    |
 |:--------|:--------|

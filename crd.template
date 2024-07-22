@@ -136,7 +136,8 @@ This CRD is being replaced by <a href="../{{ .FullName }}/">{{ .ShortName }}</a>
 
 ### Status Properties
 {{- else }}
-<h4>`{{.Path}}`</h4>
+
+#### `{{.Path}}`
 
 |Property |Value    |
 |:--------|:--------|

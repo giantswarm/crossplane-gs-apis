@@ -113,7 +113,8 @@ VPC CIDRs.
 
 
 ### Spec Properties
-<h4>`.spec.availabilityZones`</h4>
+
+#### `.spec.availabilityZones`
 
 |Property |Value    |
 |:--------|:--------|
@@ -125,7 +126,8 @@ VPC CIDRs.
 
 AvailabilityZones is a list of availability zones in the region to be
   used for this VPC. This should be a list of single character strings
-<h4>`.spec.availabilityZones[*]`</h4>
+
+#### `.spec.availabilityZones[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -136,7 +138,8 @@ AvailabilityZones is a list of availability zones in the region to be
 
 A single character representation of the short name of an availability zone.
   For example, "a" for "eu-west-1a".
-<h4>`.spec.deletionPolicy`</h4>
+
+#### `.spec.deletionPolicy`
 
 |Property |Value    |
 |:--------|:--------|
@@ -156,7 +159,8 @@ DeletionPolicy specifies what will happen to the underlying external
   field in a future release. Currently, both could be set independently and
   non-default values would be honored if the feature flag is enabled.
   See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
-<h4>`.spec.managementPolicies`</h4>
+
+#### `.spec.managementPolicies`
 
 |Property |Value    |
 |:--------|:--------|
@@ -177,7 +181,8 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
   custom, the DeletionPolicy field will be ignored.
   See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
   and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
-<h4>`.spec.managementPolicies[*]`</h4>
+
+#### `.spec.managementPolicies[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -187,7 +192,8 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
 
 A ManagementAction represents an action that the Crossplane controllers
   can take on an external resource.
-<h4>`.spec.peering`</h4>
+
+#### `.spec.peering`
 
 |Property |Value    |
 |:--------|:--------|
@@ -196,7 +202,8 @@ A ManagementAction represents an action that the Crossplane controllers
 
 
 Peering is the VPC to peer with.
-<h4>`.spec.peering.allowPublic`</h4>
+
+#### `.spec.peering.allowPublic`
 
 |Property |Value    |
 |:--------|:--------|
@@ -207,7 +214,8 @@ Peering is the VPC to peer with.
 AllowPublic specifies if the VPC peering connections should be allowed to
   be linked to the public subnets
   Defaults to false
-<h4>`.spec.peering.enabled`</h4>
+
+#### `.spec.peering.enabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -218,7 +226,8 @@ AllowPublic specifies if the VPC peering connections should be allowed to
 Enabled specifies if the VPC peering connections should be enabled for
   this VPC.
   Defaults to false
-<h4>`.spec.peering.groupBy`</h4>
+
+#### `.spec.peering.groupBy`
 
 |Property |Value    |
 |:--------|:--------|
@@ -227,7 +236,8 @@ Enabled specifies if the VPC peering connections should be enabled for
 
 
 GroupBy specifies the key to group the remote subnets by
-<h4>`.spec.peering.remoteVpcs`</h4>
+
+#### `.spec.peering.remoteVpcs`
 
 |Property |Value    |
 |:--------|:--------|
@@ -238,7 +248,8 @@ GroupBy specifies the key to group the remote subnets by
 
 
 RemoteVpcs is a list of VPCs to peer with.
-<h4>`.spec.peering.remoteVpcs[*]`</h4>
+
+#### `.spec.peering.remoteVpcs[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -247,7 +258,8 @@ RemoteVpcs is a list of VPCs to peer with.
 
 
 VpcPeer defines the parameters for peering with a VPC.
-<h4>`.spec.peering.remoteVpcs[*].allowPublic`</h4>
+
+#### `.spec.peering.remoteVpcs[*].allowPublic`
 
 |Property |Value    |
 |:--------|:--------|
@@ -257,7 +269,8 @@ VpcPeer defines the parameters for peering with a VPC.
 
 Disabled specifies if the peering connection should be disabled.
   Defaults to true
-<h4>`.spec.peering.remoteVpcs[*].excludeFromLocalPeering`</h4>
+
+#### `.spec.peering.remoteVpcs[*].excludeFromLocalPeering`
 
 |Property |Value    |
 |:--------|:--------|
@@ -267,7 +280,8 @@ Disabled specifies if the peering connection should be disabled.
 
 ExcludeFromLocalPeering specifies the indexes of subnetsets for this VPC to
   exclude from routing to the peering connection
-<h4>`.spec.peering.remoteVpcs[*].excludeFromLocalPeering.private`</h4>
+
+#### `.spec.peering.remoteVpcs[*].excludeFromLocalPeering.private`
 
 |Property |Value    |
 |:--------|:--------|
@@ -278,7 +292,8 @@ ExcludeFromLocalPeering specifies the indexes of subnetsets for this VPC to
 
 
 private subnets to exclude from peering
-<h4>`.spec.peering.remoteVpcs[*].excludeFromLocalPeering.private[*]`</h4>
+
+#### `.spec.peering.remoteVpcs[*].excludeFromLocalPeering.private[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -286,7 +301,8 @@ private subnets to exclude from peering
 |Required |No|
 
 
-<h4>`.spec.peering.remoteVpcs[*].excludeFromLocalPeering.public`</h4>
+
+#### `.spec.peering.remoteVpcs[*].excludeFromLocalPeering.public`
 
 |Property |Value    |
 |:--------|:--------|
@@ -297,7 +313,8 @@ private subnets to exclude from peering
 
 
 public subnets to exclude from peering
-<h4>`.spec.peering.remoteVpcs[*].excludeFromLocalPeering.public[*]`</h4>
+
+#### `.spec.peering.remoteVpcs[*].excludeFromLocalPeering.public[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -305,7 +322,8 @@ public subnets to exclude from peering
 |Required |No|
 
 
-<h4>`.spec.peering.remoteVpcs[*].excludeFromRemotePeering`</h4>
+
+#### `.spec.peering.remoteVpcs[*].excludeFromRemotePeering`
 
 |Property |Value    |
 |:--------|:--------|
@@ -318,7 +336,8 @@ public subnets to exclude from peering
 ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
   VPC to exclude from routing to the peering connection. If emmpty, all
   subnetsets will be included by default
-<h4>`.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*]`</h4>
+
+#### `.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -326,7 +345,8 @@ ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
 |Required |No|
 
 
-<h4>`.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*].private`</h4>
+
+#### `.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*].private`
 
 |Property |Value    |
 |:--------|:--------|
@@ -337,7 +357,8 @@ ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
 
 
 private subnets to exclude from peering
-<h4>`.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*].private[*]`</h4>
+
+#### `.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*].private[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -345,7 +366,8 @@ private subnets to exclude from peering
 |Required |No|
 
 
-<h4>`.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*].public`</h4>
+
+#### `.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*].public`
 
 |Property |Value    |
 |:--------|:--------|
@@ -356,7 +378,8 @@ private subnets to exclude from peering
 
 
 public subnets to exclude from peering
-<h4>`.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*].public[*]`</h4>
+
+#### `.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*].public[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -364,7 +387,8 @@ public subnets to exclude from peering
 |Required |No|
 
 
-<h4>`.spec.peering.remoteVpcs[*].name`</h4>
+
+#### `.spec.peering.remoteVpcs[*].name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -373,7 +397,8 @@ public subnets to exclude from peering
 
 
 Name specifies the name of the VPC to peer with.
-<h4>`.spec.peering.remoteVpcs[*].providerConfigRef`</h4>
+
+#### `.spec.peering.remoteVpcs[*].providerConfigRef`
 
 |Property |Value    |
 |:--------|:--------|
@@ -383,7 +408,8 @@ Name specifies the name of the VPC to peer with.
 
 ProviderConfigRef specifies the provider config to use for the peering
   connection.
-<h4>`.spec.peering.remoteVpcs[*].region`</h4>
+
+#### `.spec.peering.remoteVpcs[*].region`
 
 |Property |Value    |
 |:--------|:--------|
@@ -396,7 +422,8 @@ Region specifies the region the VPC is found in.
   
   If not defined, the region of the VPC will be assumed to be the same as
   the region of the peered VPC.
-<h4>`.spec.providerConfigRef`</h4>
+
+#### `.spec.providerConfigRef`
 
 |Property |Value    |
 |:--------|:--------|
@@ -408,7 +435,8 @@ Region specifies the region the VPC is found in.
 ProviderConfigReference specifies how the provider that will be used to
   create, observe, update, and delete this managed resource should be
   configured.
-<h4>`.spec.providerConfigRef.name`</h4>
+
+#### `.spec.providerConfigRef.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -417,7 +445,8 @@ ProviderConfigReference specifies how the provider that will be used to
 
 
 Name of the referenced object.
-<h4>`.spec.providerConfigRef.policy`</h4>
+
+#### `.spec.providerConfigRef.policy`
 
 |Property |Value    |
 |:--------|:--------|
@@ -426,7 +455,8 @@ Name of the referenced object.
 
 
 Policies for referencing.
-<h4>`.spec.providerConfigRef.policy.resolution`</h4>
+
+#### `.spec.providerConfigRef.policy.resolution`
 
 |Property |Value    |
 |:--------|:--------|
@@ -443,7 +473,8 @@ Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
   reference cannot be resolved. 'Optional' means this reference will be
   a no-op if it cannot be resolved.
-<h4>`.spec.providerConfigRef.policy.resolve`</h4>
+
+#### `.spec.providerConfigRef.policy.resolve`
 
 |Property |Value    |
 |:--------|:--------|
@@ -459,7 +490,8 @@ Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
   the corresponding field is not present. Use 'Always' to resolve the
   reference on every reconcile.
-<h4>`.spec.publishConnectionDetailsTo`</h4>
+
+#### `.spec.publishConnectionDetailsTo`
 
 |Property |Value    |
 |:--------|:--------|
@@ -472,7 +504,8 @@ PublishConnectionDetailsTo specifies the connection secret config which
   which any connection details for this managed resource should be written.
   Connection details frequently include the endpoint, username,
   and password required to connect to the managed resource.
-<h4>`.spec.publishConnectionDetailsTo.configRef`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef`
 
 |Property |Value    |
 |:--------|:--------|
@@ -483,7 +516,8 @@ PublishConnectionDetailsTo specifies the connection secret config which
 
 SecretStoreConfigRef specifies which secret store config should be used
   for this ConnectionSecret.
-<h4>`.spec.publishConnectionDetailsTo.configRef.name`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -492,7 +526,8 @@ SecretStoreConfigRef specifies which secret store config should be used
 
 
 Name of the referenced object.
-<h4>`.spec.publishConnectionDetailsTo.configRef.policy`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef.policy`
 
 |Property |Value    |
 |:--------|:--------|
@@ -501,7 +536,8 @@ Name of the referenced object.
 
 
 Policies for referencing.
-<h4>`.spec.publishConnectionDetailsTo.configRef.policy.resolution`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef.policy.resolution`
 
 |Property |Value    |
 |:--------|:--------|
@@ -518,7 +554,8 @@ Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
   reference cannot be resolved. 'Optional' means this reference will be
   a no-op if it cannot be resolved.
-<h4>`.spec.publishConnectionDetailsTo.configRef.policy.resolve`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef.policy.resolve`
 
 |Property |Value    |
 |:--------|:--------|
@@ -534,7 +571,8 @@ Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
   the corresponding field is not present. Use 'Always' to resolve the
   reference on every reconcile.
-<h4>`.spec.publishConnectionDetailsTo.metadata`</h4>
+
+#### `.spec.publishConnectionDetailsTo.metadata`
 
 |Property |Value    |
 |:--------|:--------|
@@ -543,7 +581,8 @@ Resolve specifies when this reference should be resolved. The default
 
 
 Metadata is the metadata for connection secret.
-<h4>`.spec.publishConnectionDetailsTo.metadata.annotations`</h4>
+
+#### `.spec.publishConnectionDetailsTo.metadata.annotations`
 
 |Property |Value    |
 |:--------|:--------|
@@ -554,7 +593,8 @@ Metadata is the metadata for connection secret.
 Annotations are the annotations to be added to connection secret.
   - For Kubernetes secrets, this will be used as "metadata.annotations".
   - It is up to Secret Store implementation for others store types.
-<h4>`.spec.publishConnectionDetailsTo.metadata.labels`</h4>
+
+#### `.spec.publishConnectionDetailsTo.metadata.labels`
 
 |Property |Value    |
 |:--------|:--------|
@@ -565,7 +605,8 @@ Annotations are the annotations to be added to connection secret.
 Labels are the labels/tags to be added to connection secret.
   - For Kubernetes secrets, this will be used as "metadata.labels".
   - It is up to Secret Store implementation for others store types.
-<h4>`.spec.publishConnectionDetailsTo.metadata.type`</h4>
+
+#### `.spec.publishConnectionDetailsTo.metadata.type`
 
 |Property |Value    |
 |:--------|:--------|
@@ -575,7 +616,8 @@ Labels are the labels/tags to be added to connection secret.
 
 Type is the SecretType for the connection secret.
   - Only valid for Kubernetes Secret Stores.
-<h4>`.spec.publishConnectionDetailsTo.name`</h4>
+
+#### `.spec.publishConnectionDetailsTo.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -584,7 +626,8 @@ Type is the SecretType for the connection secret.
 
 
 Name is the name of the connection secret.
-<h4>`.spec.region`</h4>
+
+#### `.spec.region`
 
 |Property |Value    |
 |:--------|:--------|
@@ -593,7 +636,8 @@ Name is the name of the connection secret.
 
 
 Region is the region in which the VPC will be created.
-<h4>`.spec.subnetsets`</h4>
+
+#### `.spec.subnetsets`
 
 |Property |Value    |
 |:--------|:--------|
@@ -602,7 +646,8 @@ Region is the region in which the VPC will be created.
 
 
 PeeredSubnets defines how many public and private subnet sets to create.
-<h4>`.spec.subnetsets.cidrs`</h4>
+
+#### `.spec.subnetsets.cidrs`
 
 |Property |Value    |
 |:--------|:--------|
@@ -624,7 +669,8 @@ A list of PeeredSubnetSets to create in the VPC
   > [!IMPORTANT]
   > There must be at least 1 entry in this set which will be used as the VPC
   > default CIDR range, and you may define a maximum of 4 additional entries.
-<h4>`.spec.subnetsets.cidrs[*]`</h4>
+
+#### `.spec.subnetsets.cidrs[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -634,7 +680,8 @@ A list of PeeredSubnetSets to create in the VPC
 
 PeeredSubnetSet defines the parameters for creating a set of subnets with the
   same mask.
-<h4>`.spec.subnetsets.cidrs[*].prefix`</h4>
+
+#### `.spec.subnetsets.cidrs[*].prefix`
 
 |Property |Value    |
 |:--------|:--------|
@@ -646,7 +693,8 @@ PeeredSubnetSet defines the parameters for creating a set of subnets with the
 A VPC CIDR or Additional CIDR to use for the VPC. If this is the first
   entry in the list, it will be used as the default VPC CIDR, otherwise it
   will be assigned as an additional CIDR to the VPC.
-<h4>`.spec.subnetsets.cidrs[*].private`</h4>
+
+#### `.spec.subnetsets.cidrs[*].private`
 
 |Property |Value    |
 |:--------|:--------|
@@ -655,7 +703,8 @@ A VPC CIDR or Additional CIDR to use for the VPC. If this is the first
 
 
 Private is the number of private subnets to create in this set
-<h4>`.spec.subnetsets.cidrs[*].private.clusterNames`</h4>
+
+#### `.spec.subnetsets.cidrs[*].private.clusterNames`
 
 |Property |Value    |
 |:--------|:--------|
@@ -672,7 +721,8 @@ A list of cluster names that may add load balancers in the tagged subnet
   
   
   See #lbSetIndex for deciding which subnetset gets these tags.
-<h4>`.spec.subnetsets.cidrs[*].private.clusterNames[*]`</h4>
+
+#### `.spec.subnetsets.cidrs[*].private.clusterNames[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -680,7 +730,8 @@ A list of cluster names that may add load balancers in the tagged subnet
 |Required |No|
 
 
-<h4>`.spec.subnetsets.cidrs[*].private.count`</h4>
+
+#### `.spec.subnetsets.cidrs[*].private.count`
 
 |Property |Value    |
 |:--------|:--------|
@@ -695,7 +746,8 @@ Count is the number of subnet sets to create with this mask.
   > Whilst this field is not `immutable`, care should be taken to never
   > decrease its value once set as this will result in the destruction of
   > subnet sets which may fail if there are attached resources.
-<h4>`.spec.subnetsets.cidrs[*].private.lbSetIndex`</h4>
+
+#### `.spec.subnetsets.cidrs[*].private.lbSetIndex`
 
 |Property |Value    |
 |:--------|:--------|
@@ -705,7 +757,8 @@ Count is the number of subnet sets to create with this mask.
 
 Identifies which subnet set to use for public EKS load balancers. Subnets
   in this set will recieve the `kubernetes.io/role/elb: 1` tag
-<h4>`.spec.subnetsets.cidrs[*].private.mask`</h4>
+
+#### `.spec.subnetsets.cidrs[*].private.mask`
 
 |Property |Value    |
 |:--------|:--------|
@@ -718,7 +771,8 @@ This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
   
   
   To prevent subnets being destroyed and recreated *This field is immutable*
-<h4>`.spec.subnetsets.cidrs[*].private.offset`</h4>
+
+#### `.spec.subnetsets.cidrs[*].private.offset`
 
 |Property |Value    |
 |:--------|:--------|
@@ -727,7 +781,8 @@ This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
 
 
 Offset is the number of bits to offset the subnet mask by
-<h4>`.spec.subnetsets.cidrs[*].public`</h4>
+
+#### `.spec.subnetsets.cidrs[*].public`
 
 |Property |Value    |
 |:--------|:--------|
@@ -746,7 +801,8 @@ Details on how to build the public subnets.
   > public subnets will be used for the NAT gateways. Setting this value to
   > 0 on the default VPC CIDR may result in the creation of fully private
   > networks with no route to the outside world.
-<h4>`.spec.subnetsets.cidrs[*].public.clusterNames`</h4>
+
+#### `.spec.subnetsets.cidrs[*].public.clusterNames`
 
 |Property |Value    |
 |:--------|:--------|
@@ -763,7 +819,8 @@ A list of cluster names that may add load balancers in the tagged subnet
   
   
   See #lbSetIndex for deciding which subnetset gets these tags.
-<h4>`.spec.subnetsets.cidrs[*].public.clusterNames[*]`</h4>
+
+#### `.spec.subnetsets.cidrs[*].public.clusterNames[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -771,7 +828,8 @@ A list of cluster names that may add load balancers in the tagged subnet
 |Required |No|
 
 
-<h4>`.spec.subnetsets.cidrs[*].public.count`</h4>
+
+#### `.spec.subnetsets.cidrs[*].public.count`
 
 |Property |Value    |
 |:--------|:--------|
@@ -786,7 +844,8 @@ Count is the number of subnet sets to create with this mask.
   > Whilst this field is not `immutable`, care should be taken to never
   > decrease its value once set as this will result in the destruction of
   > subnet sets which may fail if there are attached resources.
-<h4>`.spec.subnetsets.cidrs[*].public.lbSetIndex`</h4>
+
+#### `.spec.subnetsets.cidrs[*].public.lbSetIndex`
 
 |Property |Value    |
 |:--------|:--------|
@@ -796,7 +855,8 @@ Count is the number of subnet sets to create with this mask.
 
 Identifies which subnet set to use for public EKS load balancers. Subnets
   in this set will recieve the `kubernetes.io/role/elb: 1` tag
-<h4>`.spec.subnetsets.cidrs[*].public.mask`</h4>
+
+#### `.spec.subnetsets.cidrs[*].public.mask`
 
 |Property |Value    |
 |:--------|:--------|
@@ -809,7 +869,8 @@ This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
   
   
   To prevent subnets being destroyed and recreated *This field is immutable*
-<h4>`.spec.subnetsets.cidrs[*].public.offset`</h4>
+
+#### `.spec.subnetsets.cidrs[*].public.offset`
 
 |Property |Value    |
 |:--------|:--------|
@@ -818,7 +879,8 @@ This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
 
 
 Offset is the number of bits to offset the subnet mask by
-<h4>`.spec.subnetsets.function`</h4>
+
+#### `.spec.subnetsets.function`
 
 |Property |Value    |
 |:--------|:--------|
@@ -837,7 +899,8 @@ Function defines the function to use to calculate the CIDR blocks for the
   this XRD and as it's defaulted it can be hidden from the user. The
   function input expects a path though so this has to exist but isn't
   expected to be defined on the claim.
-<h4>`.spec.tags`</h4>
+
+#### `.spec.tags`
 
 |Property |Value    |
 |:--------|:--------|
@@ -846,7 +909,8 @@ Function defines the function to use to calculate the CIDR blocks for the
 
 
 Tags is a map of additional tags to assign to the VPC.
-<h4>`.spec.tags.cluster`</h4>
+
+#### `.spec.tags.cluster`
 
 |Property |Value    |
 |:--------|:--------|
@@ -855,7 +919,8 @@ Tags is a map of additional tags to assign to the VPC.
 
 
 Cluster tags to apply subnets for autodiscovery of load balancers
-<h4>`.spec.tags.common`</h4>
+
+#### `.spec.tags.common`
 
 |Property |Value    |
 |:--------|:--------|
@@ -864,7 +929,8 @@ Cluster tags to apply subnets for autodiscovery of load balancers
 
 
 common tags apoplied to all resources
-<h4>`.spec.tags.subnet`</h4>
+
+#### `.spec.tags.subnet`
 
 |Property |Value    |
 |:--------|:--------|
@@ -873,7 +939,8 @@ common tags apoplied to all resources
 
 
 Subnet tags to apply to all subnetsets
-<h4>`.spec.writeConnectionSecretToRef`</h4>
+
+#### `.spec.writeConnectionSecretToRef`
 
 |Property |Value    |
 |:--------|:--------|
@@ -889,7 +956,8 @@ WriteConnectionSecretToReference specifies the namespace and name of a
   PublishConnectionDetailsTo. Currently, both could be set independently
   and connection details would be published to both without affecting
   each other.
-<h4>`.spec.writeConnectionSecretToRef.name`</h4>
+
+#### `.spec.writeConnectionSecretToRef.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -898,7 +966,8 @@ WriteConnectionSecretToReference specifies the namespace and name of a
 
 
 Name of the secret.
-<h4>`.spec.writeConnectionSecretToRef.namespace`</h4>
+
+#### `.spec.writeConnectionSecretToRef.namespace`
 
 |Property |Value    |
 |:--------|:--------|
@@ -909,7 +978,8 @@ Name of the secret.
 Namespace of the secret.
 
 ### Status Properties
-<h4>`.status.calculatedCidrs`</h4>
+
+#### `.status.calculatedCidrs`
 
 |Property |Value    |
 |:--------|:--------|
@@ -918,7 +988,8 @@ Namespace of the secret.
 
 
 Contains the CIDR blocks output by function-cidr
-<h4>`.status.conditions`</h4>
+
+#### `.status.conditions`
 
 |Property |Value    |
 |:--------|:--------|
@@ -929,7 +1000,8 @@ Contains the CIDR blocks output by function-cidr
 
 
 Conditions of the resource.
-<h4>`.status.conditions[*]`</h4>
+
+#### `.status.conditions[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -938,7 +1010,8 @@ Conditions of the resource.
 
 
 A Condition that may apply to a resource.
-<h4>`.status.conditions[*].lastTransitionTime`</h4>
+
+#### `.status.conditions[*].lastTransitionTime`
 
 |Property |Value    |
 |:--------|:--------|
@@ -948,7 +1021,8 @@ A Condition that may apply to a resource.
 
 LastTransitionTime is the last time this condition transitioned from one
   status to another.
-<h4>`.status.conditions[*].message`</h4>
+
+#### `.status.conditions[*].message`
 
 |Property |Value    |
 |:--------|:--------|
@@ -958,7 +1032,8 @@ LastTransitionTime is the last time this condition transitioned from one
 
 A Message containing details about this condition's last transition from
   one status to another, if any.
-<h4>`.status.conditions[*].reason`</h4>
+
+#### `.status.conditions[*].reason`
 
 |Property |Value    |
 |:--------|:--------|
@@ -967,7 +1042,8 @@ A Message containing details about this condition's last transition from
 
 
 A Reason for this condition's last transition from one status to another.
-<h4>`.status.conditions[*].status`</h4>
+
+#### `.status.conditions[*].status`
 
 |Property |Value    |
 |:--------|:--------|
@@ -976,7 +1052,8 @@ A Reason for this condition's last transition from one status to another.
 
 
 Status of this condition; is it currently True, False, or Unknown?
-<h4>`.status.conditions[*].type`</h4>
+
+#### `.status.conditions[*].type`
 
 |Property |Value    |
 |:--------|:--------|
@@ -986,7 +1063,8 @@ Status of this condition; is it currently True, False, or Unknown?
 
 Type of this condition. At most one of each condition type may apply to
   a resource at any point in time.
-<h4>`.status.subnetBits`</h4>
+
+#### `.status.subnetBits`
 
 |Property |Value    |
 |:--------|:--------|
@@ -997,7 +1075,8 @@ Type of this condition. At most one of each condition type may apply to
 
 
 Contains the subnet bits output by function-kcl-subnet-bits
-<h4>`.status.subnetBits[*]`</h4>
+
+#### `.status.subnetBits[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1006,7 +1085,8 @@ Contains the subnet bits output by function-kcl-subnet-bits
 
 
 MultiPrefix defines an item in a list of CIDR blocks to NewBits mappings
-<h4>`.status.subnetBits[*].newBits`</h4>
+
+#### `.status.subnetBits[*].newBits`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1017,7 +1097,8 @@ MultiPrefix defines an item in a list of CIDR blocks to NewBits mappings
 
 
 NewBits is a list of bits to allocate to the subnet
-<h4>`.status.subnetBits[*].newBits[*]`</h4>
+
+#### `.status.subnetBits[*].newBits[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1025,7 +1106,8 @@ NewBits is a list of bits to allocate to the subnet
 |Required |No|
 
 
-<h4>`.status.subnetBits[*].offset`</h4>
+
+#### `.status.subnetBits[*].offset`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1036,7 +1118,8 @@ NewBits is a list of bits to allocate to the subnet
 
 Offset is the number of bits to offset the subnet mask by when generating
   subnets.
-<h4>`.status.subnetBits[*].prefix`</h4>
+
+#### `.status.subnetBits[*].prefix`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1046,7 +1129,8 @@ Offset is the number of bits to offset the subnet mask by when generating
 
 
 Prefix is a CIDR block that is used as input for CIDR calculations
-<h4>`.status.vpcs`</h4>
+
+#### `.status.vpcs`
 
 |Property |Value    |
 |:--------|:--------|

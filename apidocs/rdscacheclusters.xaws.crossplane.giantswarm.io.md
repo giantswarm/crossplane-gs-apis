@@ -77,7 +77,8 @@ source_repository_ref: main
 
 
 ### Spec Properties
-<h4>`.spec.availabilityZones`</h4>
+
+#### `.spec.availabilityZones`
 
 |Property |Value    |
 |:--------|:--------|
@@ -88,7 +89,8 @@ source_repository_ref: main
 
 
 AvailabilityZones is the list of availability zones to be used by the cluster
-<h4>`.spec.availabilityZones[*]`</h4>
+
+#### `.spec.availabilityZones[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -96,7 +98,8 @@ AvailabilityZones is the list of availability zones to be used by the cluster
 |Required |No|
 
 
-<h4>`.spec.cache`</h4>
+
+#### `.spec.cache`
 
 |Property |Value    |
 |:--------|:--------|
@@ -105,7 +108,8 @@ AvailabilityZones is the list of availability zones to be used by the cluster
 
 
 Cache defines the cache settings
-<h4>`.spec.cache.applyImmediately`</h4>
+
+#### `.spec.cache.applyImmediately`
 
 |Property |Value    |
 |:--------|:--------|
@@ -115,7 +119,8 @@ Cache defines the cache settings
 
 ApplyImmediately specifies whether the changes should be applied
   immediately or during the next maintenance window.
-<h4>`.spec.cache.atRestEncryptionEnabled`</h4>
+
+#### `.spec.cache.atRestEncryptionEnabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -125,7 +130,8 @@ ApplyImmediately specifies whether the changes should be applied
 
 AtRestEncryptionEnabled specifies whether data stored in the cluster is
   encrypted at rest.
-<h4>`.spec.cache.authTokenUpdateStrategy`</h4>
+
+#### `.spec.cache.authTokenUpdateStrategy`
 
 |Property |Value    |
 |:--------|:--------|
@@ -144,7 +150,8 @@ AuthTokenUpdateStrategy specifies how the auth token should be updated.
   - ROTATE
   - SET
   - DELETE
-<h4>`.spec.cache.autoMinorVersionUpgrade`</h4>
+
+#### `.spec.cache.autoMinorVersionUpgrade`
 
 |Property |Value    |
 |:--------|:--------|
@@ -154,7 +161,8 @@ AuthTokenUpdateStrategy specifies how the auth token should be updated.
 
 AutoMinorVersionUpgrade specifies whether minor engine upgrades will be
   applied automatically to the cluster during the maintenance window.
-<h4>`.spec.cache.automaticFailoverEnabled`</h4>
+
+#### `.spec.cache.automaticFailoverEnabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -169,7 +177,8 @@ AutomaticFailoverEnabled specifies whether a read replica will be
   
   If enabled, NumCacheNodes must be greater than 1. Must be enabled for
   Redis (cluster mode enabled) replication groups.
-<h4>`.spec.cache.cacheClusters`</h4>
+
+#### `.spec.cache.cacheClusters`
 
 |Property |Value    |
 |:--------|:--------|
@@ -186,7 +195,8 @@ CacheClusters is a list of cache clusters in the replication group.
   
   
   May be used to specify cluster specific configuration.
-<h4>`.spec.cache.cacheClusters[*]`</h4>
+
+#### `.spec.cache.cacheClusters[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -194,7 +204,8 @@ CacheClusters is a list of cache clusters in the replication group.
 |Required |No|
 
 
-<h4>`.spec.cache.cacheClusters[*].applyImmediately`</h4>
+
+#### `.spec.cache.cacheClusters[*].applyImmediately`
 
 |Property |Value    |
 |:--------|:--------|
@@ -204,7 +215,8 @@ CacheClusters is a list of cache clusters in the replication group.
 
 ApplyImmediately specifies whether the changes should be applied
   immediately or during the next maintenance window.
-<h4>`.spec.cache.cacheClusters[*].autoMinorVersionUpgrade`</h4>
+
+#### `.spec.cache.cacheClusters[*].autoMinorVersionUpgrade`
 
 |Property |Value    |
 |:--------|:--------|
@@ -214,7 +226,8 @@ ApplyImmediately specifies whether the changes should be applied
 
 AutoMinorVersionUpgrade specifies whether minor engine upgrades will be
   applied automatically to the cluster during the maintenance window.
-<h4>`.spec.cache.cacheClusters[*].availabilityZone`</h4>
+
+#### `.spec.cache.cacheClusters[*].availabilityZone`
 
 |Property |Value    |
 |:--------|:--------|
@@ -229,7 +242,8 @@ AvailabilityZone is the name of the Availability Zone in which the
   If you want to create cache nodes in multi-az, use
   preferred_availability_zones instead.
   Default: System chosen Availability Zone.
-<h4>`.spec.cache.cacheClusters[*].azMode`</h4>
+
+#### `.spec.cache.cacheClusters[*].azMode`
 
 |Property |Value    |
 |:--------|:--------|
@@ -254,7 +268,8 @@ AzMode specifies the Availability Zone mode of the cluster.
   Valid values are:
   - single-az: The cluster is created in a single Availability Zone.
   - cross-az: The cluster is created across multiple Availability Zones.
-<h4>`.spec.cache.cacheClusters[*].engine`</h4>
+
+#### `.spec.cache.cacheClusters[*].engine`
 
 |Property |Value    |
 |:--------|:--------|
@@ -273,7 +288,8 @@ Engine is the name of the cache engine to be used for the clusters in
   Valid values are:
   - memcached
   - redis
-<h4>`.spec.cache.cacheClusters[*].engineVersion`</h4>
+
+#### `.spec.cache.cacheClusters[*].engineVersion`
 
 |Property |Value    |
 |:--------|:--------|
@@ -286,7 +302,8 @@ EngineVersion is the version number of the cache engine to be used for
   
   
   This value will be ignored once the cluster is created.
-<h4>`.spec.cache.cacheClusters[*].finalSnapshotIdentifier`</h4>
+
+#### `.spec.cache.cacheClusters[*].finalSnapshotIdentifier`
 
 |Property |Value    |
 |:--------|:--------|
@@ -296,7 +313,8 @@ EngineVersion is the version number of the cache engine to be used for
 
 FinalSnapshotIdentifier is the user-supplied name for the final snapshot
   that is created immediately before the cluster is deleted.
-<h4>`.spec.cache.cacheClusters[*].ipDiscovery`</h4>
+
+#### `.spec.cache.cacheClusters[*].ipDiscovery`
 
 |Property |Value    |
 |:--------|:--------|
@@ -314,7 +332,8 @@ IpDiscovery is the method used to discover cluster nodes.
   Valid values are:
   - ipv4 (default)
   - ipv6
-<h4>`.spec.cache.cacheClusters[*].logDeliveryConfigurations`</h4>
+
+#### `.spec.cache.cacheClusters[*].logDeliveryConfigurations`
 
 |Property |Value    |
 |:--------|:--------|
@@ -329,7 +348,8 @@ LogDeliveryConfiguration is a list of log delivery configurations for
   
   
   This is only applicable when the Engine parameter is redis.
-<h4>`.spec.cache.cacheClusters[*].logDeliveryConfigurations[*]`</h4>
+
+#### `.spec.cache.cacheClusters[*].logDeliveryConfigurations[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -337,7 +357,8 @@ LogDeliveryConfiguration is a list of log delivery configurations for
 |Required |No|
 
 
-<h4>`.spec.cache.cacheClusters[*].logDeliveryConfigurations[*].destination`</h4>
+
+#### `.spec.cache.cacheClusters[*].logDeliveryConfigurations[*].destination`
 
 |Property |Value    |
 |:--------|:--------|
@@ -346,7 +367,8 @@ LogDeliveryConfiguration is a list of log delivery configurations for
 
 
 Destination Name of the cloudwatch log group or for kinesis firehose resource.
-<h4>`.spec.cache.cacheClusters[*].logDeliveryConfigurations[*].destinationType`</h4>
+
+#### `.spec.cache.cacheClusters[*].logDeliveryConfigurations[*].destinationType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -364,7 +386,8 @@ DestinationType The destination type for the logs.
   Valid values are:
   - cloudwatch-logs
   - kinesis-firehose
-<h4>`.spec.cache.cacheClusters[*].logDeliveryConfigurations[*].logFormat`</h4>
+
+#### `.spec.cache.cacheClusters[*].logDeliveryConfigurations[*].logFormat`
 
 |Property |Value    |
 |:--------|:--------|
@@ -382,7 +405,8 @@ LogFormat The log format to use.
   Valid values are:
   - text
   - json
-<h4>`.spec.cache.cacheClusters[*].logDeliveryConfigurations[*].logType`</h4>
+
+#### `.spec.cache.cacheClusters[*].logDeliveryConfigurations[*].logType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -400,7 +424,8 @@ LogType The type of log to deliver.
   Valid values are:
   - slow-log
   - engine-log
-<h4>`.spec.cache.cacheClusters[*].maintenanceWindow`</h4>
+
+#### `.spec.cache.cacheClusters[*].maintenanceWindow`
 
 |Property |Value    |
 |:--------|:--------|
@@ -410,7 +435,8 @@ LogType The type of log to deliver.
 
 MaintenanceWindow specifies the weekly time range during which system
   maintenance can occur.
-<h4>`.spec.cache.cacheClusters[*].networkType`</h4>
+
+#### `.spec.cache.cacheClusters[*].networkType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -430,7 +456,8 @@ NetworkType specifies the network configuration for the cluster.
   - ipv4
   - ipv6
   - dual_stack
-<h4>`.spec.cache.cacheClusters[*].nodeType`</h4>
+
+#### `.spec.cache.cacheClusters[*].nodeType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -442,7 +469,8 @@ NodeType is the instance class to use for the cache nodes.
   
   
   Requried unless replication group is specified.
-<h4>`.spec.cache.cacheClusters[*].notificationTopicArn`</h4>
+
+#### `.spec.cache.cacheClusters[*].notificationTopicArn`
 
 |Property |Value    |
 |:--------|:--------|
@@ -452,7 +480,8 @@ NodeType is the instance class to use for the cache nodes.
 
 NotificationTopicArn is the Amazon Resource Name (ARN) of the Amazon SNS
   topic to which notifications will be sent.
-<h4>`.spec.cache.cacheClusters[*].numCacheNodes`</h4>
+
+#### `.spec.cache.cacheClusters[*].numCacheNodes`
 
 |Property |Value    |
 |:--------|:--------|
@@ -464,7 +493,8 @@ NumCacheNodes is the number of cache nodes in the cluster.
   
   
   Required unless replication group is specified.
-<h4>`.spec.cache.cacheClusters[*].outpostMode`</h4>
+
+#### `.spec.cache.cacheClusters[*].outpostMode`
 
 |Property |Value    |
 |:--------|:--------|
@@ -486,7 +516,8 @@ OutpostMode specifies the outpost mode that will apply to the cache
   
   
   Currently only single-outpost is supported.
-<h4>`.spec.cache.cacheClusters[*].parameterGroupName`</h4>
+
+#### `.spec.cache.cacheClusters[*].parameterGroupName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -499,7 +530,8 @@ ParameterGroupName is the name of the parameter group to associate with
   
   
   Required unless replication group is specified.
-<h4>`.spec.cache.cacheClusters[*].port`</h4>
+
+#### `.spec.cache.cacheClusters[*].port`
 
 |Property |Value    |
 |:--------|:--------|
@@ -509,7 +541,8 @@ ParameterGroupName is the name of the parameter group to associate with
 
 Port is the port number on which each of the cache nodes will accept
   connections.
-<h4>`.spec.cache.cacheClusters[*].preferredAvailabilityZones`</h4>
+
+#### `.spec.cache.cacheClusters[*].preferredAvailabilityZones`
 
 |Property |Value    |
 |:--------|:--------|
@@ -525,7 +558,8 @@ PreferredAvailabilityZones is a list of Availability Zones in which the
   
   Memcached only. The number of availability zones must equal the number of
   nodes specified in the NumCacheNodes parameter.
-<h4>`.spec.cache.cacheClusters[*].preferredAvailabilityZones[*]`</h4>
+
+#### `.spec.cache.cacheClusters[*].preferredAvailabilityZones[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -533,7 +567,8 @@ PreferredAvailabilityZones is a list of Availability Zones in which the
 |Required |No|
 
 
-<h4>`.spec.cache.cacheClusters[*].preferredOutpostArn`</h4>
+
+#### `.spec.cache.cacheClusters[*].preferredOutpostArn`
 
 |Property |Value    |
 |:--------|:--------|
@@ -543,7 +578,8 @@ PreferredAvailabilityZones is a list of Availability Zones in which the
 
 PreferredOutpostArn is the Amazon Resource Name (ARN) of the outpost in
   which the cache cluster will be created.
-<h4>`.spec.cache.cacheClusters[*].securityGroupIds`</h4>
+
+#### `.spec.cache.cacheClusters[*].securityGroupIds`
 
 |Property |Value    |
 |:--------|:--------|
@@ -555,7 +591,8 @@ PreferredOutpostArn is the Amazon Resource Name (ARN) of the outpost in
 
 SecurityGroupIds is a list of security group IDs to associate with the
   cluster.
-<h4>`.spec.cache.cacheClusters[*].securityGroupIds[*]`</h4>
+
+#### `.spec.cache.cacheClusters[*].securityGroupIds[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -563,7 +600,8 @@ SecurityGroupIds is a list of security group IDs to associate with the
 |Required |No|
 
 
-<h4>`.spec.cache.cacheClusters[*].snapshotArns`</h4>
+
+#### `.spec.cache.cacheClusters[*].snapshotArns`
 
 |Property |Value    |
 |:--------|:--------|
@@ -578,7 +616,8 @@ SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
   
   
   Optional, Redis only
-<h4>`.spec.cache.cacheClusters[*].snapshotArns[*]`</h4>
+
+#### `.spec.cache.cacheClusters[*].snapshotArns[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -586,7 +625,8 @@ SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
 |Required |No|
 
 
-<h4>`.spec.cache.cacheClusters[*].snapshotName`</h4>
+
+#### `.spec.cache.cacheClusters[*].snapshotName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -599,7 +639,8 @@ SnapshotName is the name of the snapshot from which to restore data into
   
   
   Optional, Redis only
-<h4>`.spec.cache.cacheClusters[*].snapshotRetentionLimit`</h4>
+
+#### `.spec.cache.cacheClusters[*].snapshotRetentionLimit`
 
 |Property |Value    |
 |:--------|:--------|
@@ -612,7 +653,8 @@ SnapshotRetentionLimit is the number of days for which ElastiCache will
   
   
   Optional, Redis only
-<h4>`.spec.cache.cacheClusters[*].snapshotWindow`</h4>
+
+#### `.spec.cache.cacheClusters[*].snapshotWindow`
 
 |Property |Value    |
 |:--------|:--------|
@@ -625,7 +667,8 @@ SnapshotWindow is the daily time range (in UTC) during which ElastiCache
   
   
   Optional, Redis only
-<h4>`.spec.cache.cacheClusters[*].subnetGroupName`</h4>
+
+#### `.spec.cache.cacheClusters[*].subnetGroupName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -639,7 +682,8 @@ SubnetGroupName is the name of the subnet group to associate with this
   
   Required unless replication group is specified in which case it will be
   ignored.
-<h4>`.spec.cache.cacheClusters[*].tags`</h4>
+
+#### `.spec.cache.cacheClusters[*].tags`
 
 |Property |Value    |
 |:--------|:--------|
@@ -648,7 +692,8 @@ SubnetGroupName is the name of the subnet group to associate with this
 
 
 Tags is a list of key-value pairs to associate with the cluster.
-<h4>`.spec.cache.cacheClusters[*].transitEncryptionEnabled`</h4>
+
+#### `.spec.cache.cacheClusters[*].transitEncryptionEnabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -661,7 +706,8 @@ TransitEncryptionEnabled specifies whether data in the cluster is
   
   
   Optional, Memcached only
-<h4>`.spec.cache.clusterModeEnabled`</h4>
+
+#### `.spec.cache.clusterModeEnabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -671,7 +717,8 @@ TransitEncryptionEnabled specifies whether data in the cluster is
 
 ClusterModeEnabled specifies whether cluster mode is enabled for the
   replication group.
-<h4>`.spec.cache.createReplicationGroup`</h4>
+
+#### `.spec.cache.createReplicationGroup`
 
 |Property |Value    |
 |:--------|:--------|
@@ -685,7 +732,8 @@ CreateReplicationGroup specifies whether a replication group should be
   
   If set false, the replication group configuration will be used for
   creating a single cluster
-<h4>`.spec.cache.dataTieringEnabled`</h4>
+
+#### `.spec.cache.dataTieringEnabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -698,7 +746,8 @@ DataTieringEnabled specifies whether data tiering is enabled for the
   
   
   Must be true if the replcation group is using r6gd nodes
-<h4>`.spec.cache.engine`</h4>
+
+#### `.spec.cache.engine`
 
 |Property |Value    |
 |:--------|:--------|
@@ -717,7 +766,8 @@ Engine is the name of the cache engine to be used for the clusters in
   Valid values are:
   - memcached
   - redis
-<h4>`.spec.cache.engineVersion`</h4>
+
+#### `.spec.cache.engineVersion`
 
 |Property |Value    |
 |:--------|:--------|
@@ -730,7 +780,8 @@ EngineVersion is the version number of the cache engine to be used for
   
   
   This value will be ignored once the cluster is created.
-<h4>`.spec.cache.finalSnapshotIdentifier`</h4>
+
+#### `.spec.cache.finalSnapshotIdentifier`
 
 |Property |Value    |
 |:--------|:--------|
@@ -740,7 +791,8 @@ EngineVersion is the version number of the cache engine to be used for
 
 FinalSnapshotIdentifier is the user-supplied name for the final snapshot
   that is created immediately before the cluster is deleted.
-<h4>`.spec.cache.globalReplicationGroup`</h4>
+
+#### `.spec.cache.globalReplicationGroup`
 
 |Property |Value    |
 |:--------|:--------|
@@ -749,7 +801,8 @@ FinalSnapshotIdentifier is the user-supplied name for the final snapshot
 
 
 GlobalReplicationGroup is the global replication group configuration.
-<h4>`.spec.cache.globalReplicationGroup.automaticFailoverEnabled`</h4>
+
+#### `.spec.cache.globalReplicationGroup.automaticFailoverEnabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -760,7 +813,8 @@ GlobalReplicationGroup is the global replication group configuration.
 AutomaticFailoverEnabled specifies whether a read replica will be
   automatically promoted to the primary cluster if the existing primary
   cluster fails.
-<h4>`.spec.cache.globalReplicationGroup.cacheNodeType`</h4>
+
+#### `.spec.cache.globalReplicationGroup.cacheNodeType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -769,7 +823,8 @@ AutomaticFailoverEnabled specifies whether a read replica will be
 
 
 CacheNodeType is the instance class to use for the cache nodes.
-<h4>`.spec.cache.globalReplicationGroup.enabled`</h4>
+
+#### `.spec.cache.globalReplicationGroup.enabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -778,7 +833,8 @@ CacheNodeType is the instance class to use for the cache nodes.
 
 
 Enabled is a flag that enables the global replication group.
-<h4>`.spec.cache.globalReplicationGroup.engineVersion`</h4>
+
+#### `.spec.cache.globalReplicationGroup.engineVersion`
 
 |Property |Value    |
 |:--------|:--------|
@@ -788,7 +844,8 @@ Enabled is a flag that enables the global replication group.
 
 EngineVersion is the version number of the cache engine to be used for
   the cluster. If not set this will default to the latest version.
-<h4>`.spec.cache.globalReplicationGroup.numNodeGroups`</h4>
+
+#### `.spec.cache.globalReplicationGroup.numNodeGroups`
 
 |Property |Value    |
 |:--------|:--------|
@@ -797,7 +854,8 @@ EngineVersion is the version number of the cache engine to be used for
 
 
 NumNodeGroups is the number of node groups in the replication group.
-<h4>`.spec.cache.globalReplicationGroup.parameterGroupName`</h4>
+
+#### `.spec.cache.globalReplicationGroup.parameterGroupName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -815,7 +873,8 @@ ParameterGroupName is the name of the parameter group to associate with
   
   Specifying this parameter will result in an error if a major engine version
   is not specified.
-<h4>`.spec.cache.globalReplicationGroup.suffix`</h4>
+
+#### `.spec.cache.globalReplicationGroup.suffix`
 
 |Property |Value    |
 |:--------|:--------|
@@ -825,7 +884,8 @@ ParameterGroupName is the name of the parameter group to associate with
 
 GlobalReplicationGroupIdSuffix is the suffix to append to the global
   replication group id.
-<h4>`.spec.cache.globalReplicationGroupId`</h4>
+
+#### `.spec.cache.globalReplicationGroupId`
 
 |Property |Value    |
 |:--------|:--------|
@@ -839,7 +899,8 @@ GlobalReplicationGroupId is the id of the global replication group to
   
   If this value is specified, the number of node groups parameter must not
   be specified.
-<h4>`.spec.cache.ipDiscovery`</h4>
+
+#### `.spec.cache.ipDiscovery`
 
 |Property |Value    |
 |:--------|:--------|
@@ -857,7 +918,8 @@ IpDiscovery is the method used to discover cluster nodes.
   Valid values are:
   - ipv4 (default)
   - ipv6
-<h4>`.spec.cache.kmsKeyId`</h4>
+
+#### `.spec.cache.kmsKeyId`
 
 |Property |Value    |
 |:--------|:--------|
@@ -870,7 +932,8 @@ KmsKeyId is the ID of the AWS Key Management Service (KMS) key used to
   
   
   Ignored unless AtRestEncryptionEnabled is set to true.
-<h4>`.spec.cache.logDeliveryConfigurations`</h4>
+
+#### `.spec.cache.logDeliveryConfigurations`
 
 |Property |Value    |
 |:--------|:--------|
@@ -885,7 +948,8 @@ LogDeliveryConfiguration is a list of log delivery configurations for
   
   
   This is only applicable when the Engine parameter is redis.
-<h4>`.spec.cache.logDeliveryConfigurations[*]`</h4>
+
+#### `.spec.cache.logDeliveryConfigurations[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -893,7 +957,8 @@ LogDeliveryConfiguration is a list of log delivery configurations for
 |Required |No|
 
 
-<h4>`.spec.cache.logDeliveryConfigurations[*].destination`</h4>
+
+#### `.spec.cache.logDeliveryConfigurations[*].destination`
 
 |Property |Value    |
 |:--------|:--------|
@@ -902,7 +967,8 @@ LogDeliveryConfiguration is a list of log delivery configurations for
 
 
 Destination Name of the cloudwatch log group or for kinesis firehose resource.
-<h4>`.spec.cache.logDeliveryConfigurations[*].destinationType`</h4>
+
+#### `.spec.cache.logDeliveryConfigurations[*].destinationType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -920,7 +986,8 @@ DestinationType The destination type for the logs.
   Valid values are:
   - cloudwatch-logs
   - kinesis-firehose
-<h4>`.spec.cache.logDeliveryConfigurations[*].logFormat`</h4>
+
+#### `.spec.cache.logDeliveryConfigurations[*].logFormat`
 
 |Property |Value    |
 |:--------|:--------|
@@ -938,7 +1005,8 @@ LogFormat The log format to use.
   Valid values are:
   - text
   - json
-<h4>`.spec.cache.logDeliveryConfigurations[*].logType`</h4>
+
+#### `.spec.cache.logDeliveryConfigurations[*].logType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -956,7 +1024,8 @@ LogType The type of log to deliver.
   Valid values are:
   - slow-log
   - engine-log
-<h4>`.spec.cache.maintenanceWindow`</h4>
+
+#### `.spec.cache.maintenanceWindow`
 
 |Property |Value    |
 |:--------|:--------|
@@ -966,7 +1035,8 @@ LogType The type of log to deliver.
 
 MaintenanceWindow specifies the weekly time range during which system
   maintenance can occur.
-<h4>`.spec.cache.multiAzEnabled`</h4>
+
+#### `.spec.cache.multiAzEnabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -979,7 +1049,8 @@ MultiAzEnabled specifies whether the cluster should be created in
   
   
   If true, AutomaticFailoverEnabled must also be true.
-<h4>`.spec.cache.networkType`</h4>
+
+#### `.spec.cache.networkType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -999,7 +1070,8 @@ NetworkType specifies the network configuration for the cluster.
   - ipv4
   - ipv6
   - dual_stack
-<h4>`.spec.cache.nodeType`</h4>
+
+#### `.spec.cache.nodeType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1011,7 +1083,8 @@ NodeType is the instance class to use for the cache nodes.
   
   
   Requried unless global replication group is specified.
-<h4>`.spec.cache.notificationTopicArn`</h4>
+
+#### `.spec.cache.notificationTopicArn`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1021,7 +1094,8 @@ NodeType is the instance class to use for the cache nodes.
 
 NotificationTopicArn is the Amazon Resource Name (ARN) of the Amazon SNS
   topic to which notifications will be sent.
-<h4>`.spec.cache.numCacheClusters`</h4>
+
+#### `.spec.cache.numCacheClusters`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1037,7 +1111,8 @@ NumCacheClusters is the number of cache clusters in the replication group.
   
   
   Conflicts with NumNodeGroups.
-<h4>`.spec.cache.numCacheNodes`</h4>
+
+#### `.spec.cache.numCacheNodes`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1050,7 +1125,8 @@ NumCacheNodes is the number of cache nodes in the cluster.
   
   Ignored if replication group is specified or being created
   This is a convenience parameter when building a single cluster.
-<h4>`.spec.cache.numNodeGroups`</h4>
+
+#### `.spec.cache.numNodeGroups`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1066,7 +1142,8 @@ NumNodeGroups is the number of node groups in the replication group.
   
   
   Conflicts with NumCacheClusters.
-<h4>`.spec.cache.parameterGroupConfiguration`</h4>
+
+#### `.spec.cache.parameterGroupConfiguration`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1076,7 +1153,8 @@ NumNodeGroups is the number of node groups in the replication group.
 
 ParameterGroupConfiguration defines the configuration for the parameter
   group.
-<h4>`.spec.cache.parameterGroupConfiguration.description`</h4>
+
+#### `.spec.cache.parameterGroupConfiguration.description`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1085,7 +1163,8 @@ ParameterGroupConfiguration defines the configuration for the parameter
 
 
 Description is a description of the parameter group.
-<h4>`.spec.cache.parameterGroupConfiguration.family`</h4>
+
+#### `.spec.cache.parameterGroupConfiguration.family`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1095,7 +1174,8 @@ Description is a description of the parameter group.
 
 Family is the name of the parameter group family that this parameter
   group is compatible with.
-<h4>`.spec.cache.parameterGroupConfiguration.name`</h4>
+
+#### `.spec.cache.parameterGroupConfiguration.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1104,7 +1184,8 @@ Family is the name of the parameter group family that this parameter
 
 
 Name is the name of the parameter group.
-<h4>`.spec.cache.parameterGroupConfiguration.parameters`</h4>
+
+#### `.spec.cache.parameterGroupConfiguration.parameters`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1113,7 +1194,8 @@ Name is the name of the parameter group.
 
 
 Parameters is a list of parameters in the parameter group.
-<h4>`.spec.cache.parameterGroupConfiguration.tags`</h4>
+
+#### `.spec.cache.parameterGroupConfiguration.tags`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1122,7 +1204,8 @@ Parameters is a list of parameters in the parameter group.
 
 
 Tags is a list of key-value pairs to associate with the parameter group.
-<h4>`.spec.cache.parameterGroupName`</h4>
+
+#### `.spec.cache.parameterGroupName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1133,7 +1216,8 @@ Tags is a list of key-value pairs to associate with the parameter group.
 ParameterGroupName is the name of the parameter group to associate with
   this cluster. To create a new parameter group, use the
   `ParameterGroupConfiguration` option instead.
-<h4>`.spec.cache.port`</h4>
+
+#### `.spec.cache.port`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1143,7 +1227,8 @@ ParameterGroupName is the name of the parameter group to associate with
 
 Port is the port number on which each of the cache nodes will accept
   connections.
-<h4>`.spec.cache.preferredCacheClusterAzs`</h4>
+
+#### `.spec.cache.preferredCacheClusterAzs`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1155,7 +1240,8 @@ Port is the port number on which each of the cache nodes will accept
 
 PreferredCacheClusterAzs is a list ec2 availability zones in which the
   cache clusters will be created.
-<h4>`.spec.cache.preferredCacheClusterAzs[*]`</h4>
+
+#### `.spec.cache.preferredCacheClusterAzs[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1163,7 +1249,8 @@ PreferredCacheClusterAzs is a list ec2 availability zones in which the
 |Required |No|
 
 
-<h4>`.spec.cache.replicasPerNodeGroup`</h4>
+
+#### `.spec.cache.replicasPerNodeGroup`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1172,7 +1259,8 @@ PreferredCacheClusterAzs is a list ec2 availability zones in which the
 
 
 ReplicasPerNodeGroup is the number of read replicas per node group.
-<h4>`.spec.cache.securityGroupIds`</h4>
+
+#### `.spec.cache.securityGroupIds`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1184,7 +1272,8 @@ ReplicasPerNodeGroup is the number of read replicas per node group.
 
 SecurityGroupIds is a list of security group IDs to associate with the
   cluster.
-<h4>`.spec.cache.securityGroupIds[*]`</h4>
+
+#### `.spec.cache.securityGroupIds[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1192,7 +1281,8 @@ SecurityGroupIds is a list of security group IDs to associate with the
 |Required |No|
 
 
-<h4>`.spec.cache.snapshotArns`</h4>
+
+#### `.spec.cache.snapshotArns`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1207,7 +1297,8 @@ SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
   
   
   Optional, Redis only
-<h4>`.spec.cache.snapshotArns[*]`</h4>
+
+#### `.spec.cache.snapshotArns[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1215,7 +1306,8 @@ SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
 |Required |No|
 
 
-<h4>`.spec.cache.snapshotName`</h4>
+
+#### `.spec.cache.snapshotName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1228,7 +1320,8 @@ SnapshotName is the name of the snapshot from which to restore data into
   
   
   Optional, Redis only
-<h4>`.spec.cache.snapshotRetentionLimit`</h4>
+
+#### `.spec.cache.snapshotRetentionLimit`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1241,7 +1334,8 @@ SnapshotRetentionLimit is the number of days for which ElastiCache will
   
   
   Optional, Redis only
-<h4>`.spec.cache.snapshotWindow`</h4>
+
+#### `.spec.cache.snapshotWindow`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1254,7 +1348,8 @@ SnapshotWindow is the daily time range (in UTC) during which ElastiCache
   
   
   Optional, Redis only
-<h4>`.spec.cache.tags`</h4>
+
+#### `.spec.cache.tags`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1263,7 +1358,8 @@ SnapshotWindow is the daily time range (in UTC) during which ElastiCache
 
 
 Tags is a list of key-value pairs to associate with the cluster.
-<h4>`.spec.cache.transitEncryptionEnabled`</h4>
+
+#### `.spec.cache.transitEncryptionEnabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1276,7 +1372,8 @@ TransitEncryptionEnabled specifies whether data in the cluster is
   
   
   Optional, Memcached only
-<h4>`.spec.cache.usernames`</h4>
+
+#### `.spec.cache.usernames`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1287,7 +1384,8 @@ TransitEncryptionEnabled specifies whether data in the cluster is
 
 
 Usernames is a list of users to associate with the cluster.
-<h4>`.spec.cache.usernames[*]`</h4>
+
+#### `.spec.cache.usernames[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1295,7 +1393,8 @@ Usernames is a list of users to associate with the cluster.
 |Required |No|
 
 
-<h4>`.spec.database`</h4>
+
+#### `.spec.database`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1304,7 +1403,8 @@ Usernames is a list of users to associate with the cluster.
 
 
 Database defines the database settings
-<h4>`.spec.database.activityStream`</h4>
+
+#### `.spec.database.activityStream`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1313,7 +1413,8 @@ Database defines the database settings
 
 
 ActivityStream is the activity stream configuration.
-<h4>`.spec.database.activityStream.enabled`</h4>
+
+#### `.spec.database.activityStream.enabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1322,7 +1423,8 @@ ActivityStream is the activity stream configuration.
 
 
 Enabled is whether activity stream is enabled.
-<h4>`.spec.database.activityStream.engineNativeAuditFieldsIncluded`</h4>
+
+#### `.spec.database.activityStream.engineNativeAuditFieldsIncluded`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1332,7 +1434,8 @@ Enabled is whether activity stream is enabled.
 
 EngineNativeAuditFieldsIncluded is whether engine native audit fields are
   included. This option only applies to Oracle databases.
-<h4>`.spec.database.activityStream.mode`</h4>
+
+#### `.spec.database.activityStream.mode`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1345,7 +1448,8 @@ Allowed Values:
 - async
 
 Mode is the mode of the activity stream. Valid values are `sync` and `async`.
-<h4>`.spec.database.allocatedStorage`</h4>
+
+#### `.spec.database.allocatedStorage`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1354,7 +1458,8 @@ Mode is the mode of the activity stream. Valid values are `sync` and `async`.
 
 
 AllocatedStorage is the size of the database.
-<h4>`.spec.database.allowMajorVersionUpgrade`</h4>
+
+#### `.spec.database.allowMajorVersionUpgrade`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1363,7 +1468,8 @@ AllocatedStorage is the size of the database.
 
 
 AllowMajorVersionUpgrade is whether major version upgrades are allowed.
-<h4>`.spec.database.applyImmediately`</h4>
+
+#### `.spec.database.applyImmediately`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1372,7 +1478,8 @@ AllowMajorVersionUpgrade is whether major version upgrades are allowed.
 
 
 ApplyImmediately is whether changes should be applied immediately.
-<h4>`.spec.database.autoMinorVersionUpgrade`</h4>
+
+#### `.spec.database.autoMinorVersionUpgrade`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1382,7 +1489,8 @@ ApplyImmediately is whether changes should be applied immediately.
 
 AutoMinorVersionUpgrade is whether minor version upgrades are applied
   automatically. This value can be overridden on a per instance basis.
-<h4>`.spec.database.autoscaling`</h4>
+
+#### `.spec.database.autoscaling`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1391,7 +1499,8 @@ AutoMinorVersionUpgrade is whether minor version upgrades are applied
 
 
 Autoscaling is the autoscaling configuration.
-<h4>`.spec.database.autoscaling.enabled`</h4>
+
+#### `.spec.database.autoscaling.enabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1400,7 +1509,8 @@ Autoscaling is the autoscaling configuration.
 
 
 Autoscaling is whether autoscaling is enabled.
-<h4>`.spec.database.autoscaling.maxCapacity`</h4>
+
+#### `.spec.database.autoscaling.maxCapacity`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1409,7 +1519,8 @@ Autoscaling is whether autoscaling is enabled.
 
 
 MaxCapacity is the maximum capacity for autoscaling.
-<h4>`.spec.database.autoscaling.metricType`</h4>
+
+#### `.spec.database.autoscaling.metricType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1422,7 +1533,8 @@ Allowed Values:
 - RDSReaderAverageDatabaseConnections
 
 MetricType is the type of metric to use for autoscaling.
-<h4>`.spec.database.autoscaling.minCapacity`</h4>
+
+#### `.spec.database.autoscaling.minCapacity`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1431,7 +1543,8 @@ MetricType is the type of metric to use for autoscaling.
 
 
 MinCapacity is the minimum capacity for autoscaling.
-<h4>`.spec.database.autoscaling.policyName`</h4>
+
+#### `.spec.database.autoscaling.policyName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1440,7 +1553,8 @@ MinCapacity is the minimum capacity for autoscaling.
 
 
 PolicyName is the name of the autoscaling policy.
-<h4>`.spec.database.autoscaling.scaleInCooldown`</h4>
+
+#### `.spec.database.autoscaling.scaleInCooldown`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1450,7 +1564,8 @@ PolicyName is the name of the autoscaling policy.
 
 ScaleInCooldown is the amount of time, in seconds, after a scaling in
   activity completes before another scaling activity can start.
-<h4>`.spec.database.autoscaling.scaleOutCooldown`</h4>
+
+#### `.spec.database.autoscaling.scaleOutCooldown`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1460,7 +1575,8 @@ ScaleInCooldown is the amount of time, in seconds, after a scaling in
 
 ScaleOutCooldown is the amount of time, in seconds, after a scaling out
   activity completes before another scaling activity can start.
-<h4>`.spec.database.autoscaling.targetCPU`</h4>
+
+#### `.spec.database.autoscaling.targetCPU`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1469,7 +1585,8 @@ ScaleOutCooldown is the amount of time, in seconds, after a scaling out
 
 
 TargetCPU is CPU threshold which will initiate autoscaling.
-<h4>`.spec.database.autoscaling.targetConnections`</h4>
+
+#### `.spec.database.autoscaling.targetConnections`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1480,7 +1597,8 @@ TargetCPU is CPU threshold which will initiate autoscaling.
 TargetConnections is the average number of connections threshold which
   will initiate autoscaling. Default value is 70% of db.r4/r5/r6g.large's
   default max_connections
-<h4>`.spec.database.backtrackWindow`</h4>
+
+#### `.spec.database.backtrackWindow`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1490,7 +1608,8 @@ TargetConnections is the average number of connections threshold which
 
 BacktrackWindow is the target backtrack window, in seconds.
   Only available for Aurora engine. To disable backtracking, set this value to 0.
-<h4>`.spec.database.backupRetentionPeriod`</h4>
+
+#### `.spec.database.backupRetentionPeriod`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1499,7 +1618,8 @@ BacktrackWindow is the target backtrack window, in seconds.
 
 
 BackupRetentionPeriod is the number of days to retain backups for.
-<h4>`.spec.database.cloudwatchLogGroupParameters`</h4>
+
+#### `.spec.database.cloudwatchLogGroupParameters`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1508,7 +1628,8 @@ BackupRetentionPeriod is the number of days to retain backups for.
 
 
 CloudwatchLogGroup defines the parameters for the log groups
-<h4>`.spec.database.cloudwatchLogGroupParameters.class`</h4>
+
+#### `.spec.database.cloudwatchLogGroupParameters.class`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1517,7 +1638,8 @@ CloudwatchLogGroup defines the parameters for the log groups
 
 
 Class is the class of the log group.
-<h4>`.spec.database.cloudwatchLogGroupParameters.create`</h4>
+
+#### `.spec.database.cloudwatchLogGroupParameters.create`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1526,7 +1648,8 @@ Class is the class of the log group.
 
 
 Create is whether the log group is to be created.
-<h4>`.spec.database.cloudwatchLogGroupParameters.retentionInDays`</h4>
+
+#### `.spec.database.cloudwatchLogGroupParameters.retentionInDays`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1535,7 +1658,8 @@ Create is whether the log group is to be created.
 
 
 RetentionInDays is the number of days to retain logs for.
-<h4>`.spec.database.cloudwatchLogGroupParameters.skipDestroy`</h4>
+
+#### `.spec.database.cloudwatchLogGroupParameters.skipDestroy`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1544,7 +1668,8 @@ RetentionInDays is the number of days to retain logs for.
 
 
 SkipDestroy is whether the log group should be skipped during destroy.
-<h4>`.spec.database.copyTagsToSnapshot`</h4>
+
+#### `.spec.database.copyTagsToSnapshot`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1553,7 +1678,8 @@ SkipDestroy is whether the log group should be skipped during destroy.
 
 
 CopyTagsToSnapshot is whether tags should be copied to snapshots.
-<h4>`.spec.database.createCluster`</h4>
+
+#### `.spec.database.createCluster`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1565,7 +1691,8 @@ CreateCluster is whether the cluster should be created.
   By default this is true but for non-aurora clusters, the DB Cluster
   resource is optional and can be omitted. In this case, the DB instances
   will be created as `instance.rds` types.
-<h4>`.spec.database.databaseName`</h4>
+
+#### `.spec.database.databaseName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1574,7 +1701,8 @@ CreateCluster is whether the cluster should be created.
 
 
 DatabaseName is the name of the database to create.
-<h4>`.spec.database.databases`</h4>
+
+#### `.spec.database.databases`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1583,7 +1711,8 @@ DatabaseName is the name of the database to create.
 
 
 Databases is a map of databases to create.
-<h4>`.spec.database.dbClusterInstanceClass`</h4>
+
+#### `.spec.database.dbClusterInstanceClass`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1592,7 +1721,8 @@ Databases is a map of databases to create.
 
 
 DbClusterInstanceClass is the instance class to use.
-<h4>`.spec.database.dbClusterParameterGroup`</h4>
+
+#### `.spec.database.dbClusterParameterGroup`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1601,7 +1731,8 @@ DbClusterInstanceClass is the instance class to use.
 
 
 DbClusterParameterGroup defines the parameters for the DB cluster.
-<h4>`.spec.database.dbClusterParameterGroup.applyMethod`</h4>
+
+#### `.spec.database.dbClusterParameterGroup.applyMethod`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1616,7 +1747,8 @@ Allowed Values:
 ApplyMethod is the apply method for the parameter group. Some engines
   cannot apply changes immediately, and require a reboot in which case you
   must set this value to `pending-reboot`.
-<h4>`.spec.database.dbClusterParameterGroup.create`</h4>
+
+#### `.spec.database.dbClusterParameterGroup.create`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1625,7 +1757,8 @@ ApplyMethod is the apply method for the parameter group. Some engines
 
 
 Create is whether the parameter group is to be created.
-<h4>`.spec.database.dbClusterParameterGroup.description`</h4>
+
+#### `.spec.database.dbClusterParameterGroup.description`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1634,7 +1767,8 @@ Create is whether the parameter group is to be created.
 
 
 Description is the description of the parameter group.
-<h4>`.spec.database.dbClusterParameterGroup.family`</h4>
+
+#### `.spec.database.dbClusterParameterGroup.family`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1643,7 +1777,8 @@ Description is the description of the parameter group.
 
 
 Family is the family of the parameter group.
-<h4>`.spec.database.dbClusterParameterGroup.name`</h4>
+
+#### `.spec.database.dbClusterParameterGroup.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1652,7 +1787,8 @@ Family is the family of the parameter group.
 
 
 Name is the name of the parameter group.
-<h4>`.spec.database.dbClusterParameterGroup.parameters`</h4>
+
+#### `.spec.database.dbClusterParameterGroup.parameters`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1664,7 +1800,8 @@ Name is the name of the parameter group.
 
 Parameters is a list of parameters to associate with the parameter group.
   Note that parameters may differ between families
-<h4>`.spec.database.dbClusterParameterGroup.parameters[*]`</h4>
+
+#### `.spec.database.dbClusterParameterGroup.parameters[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1674,7 +1811,8 @@ Parameters is a list of parameters to associate with the parameter group.
 
 
 Parameter is a parameter to associate with a parameter group.
-<h4>`.spec.database.dbClusterParameterGroup.tags`</h4>
+
+#### `.spec.database.dbClusterParameterGroup.tags`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1683,7 +1821,8 @@ Parameter is a parameter to associate with a parameter group.
 
 
 Tags is a set of tags to associate with the parameter group.
-<h4>`.spec.database.dbParameterGroup`</h4>
+
+#### `.spec.database.dbParameterGroup`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1692,7 +1831,8 @@ Tags is a set of tags to associate with the parameter group.
 
 
 DbParameterGroup defines the parameters for the DB instance.
-<h4>`.spec.database.dbParameterGroup.create`</h4>
+
+#### `.spec.database.dbParameterGroup.create`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1701,7 +1841,8 @@ DbParameterGroup defines the parameters for the DB instance.
 
 
 Create is whether the parameter group is created.
-<h4>`.spec.database.dbParameterGroup.description`</h4>
+
+#### `.spec.database.dbParameterGroup.description`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1710,7 +1851,8 @@ Create is whether the parameter group is created.
 
 
 Description is the description of the parameter group.
-<h4>`.spec.database.dbParameterGroup.family`</h4>
+
+#### `.spec.database.dbParameterGroup.family`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1719,7 +1861,8 @@ Description is the description of the parameter group.
 
 
 Family is the family of the parameter group.
-<h4>`.spec.database.dbParameterGroup.name`</h4>
+
+#### `.spec.database.dbParameterGroup.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1728,7 +1871,8 @@ Family is the family of the parameter group.
 
 
 Name is the name of the parameter group.
-<h4>`.spec.database.dbParameterGroup.parameters`</h4>
+
+#### `.spec.database.dbParameterGroup.parameters`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1740,7 +1884,8 @@ Name is the name of the parameter group.
 
 Parameters is a list of parameters to associate with the parameter group.
   Note that parameters may differ between families
-<h4>`.spec.database.dbParameterGroup.parameters[*]`</h4>
+
+#### `.spec.database.dbParameterGroup.parameters[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1750,7 +1895,8 @@ Parameters is a list of parameters to associate with the parameter group.
 
 
 Parameter is a parameter to associate with a parameter group.
-<h4>`.spec.database.dbParameterGroup.tags`</h4>
+
+#### `.spec.database.dbParameterGroup.tags`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1759,7 +1905,8 @@ Parameter is a parameter to associate with a parameter group.
 
 
 Tags is a set of tags to associate with the parameter group.
-<h4>`.spec.database.deleteAutomatedBackups`</h4>
+
+#### `.spec.database.deleteAutomatedBackups`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1768,7 +1915,8 @@ Tags is a set of tags to associate with the parameter group.
 
 
 DeleteAutomatedBackups is whether automated backups should be deleted.
-<h4>`.spec.database.deletionProtection`</h4>
+
+#### `.spec.database.deletionProtection`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1777,7 +1925,8 @@ DeleteAutomatedBackups is whether automated backups should be deleted.
 
 
 DeletionProtection is whether deletion protection is enabled.
-<h4>`.spec.database.domain`</h4>
+
+#### `.spec.database.domain`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1786,7 +1935,8 @@ DeletionProtection is whether deletion protection is enabled.
 
 
 Domain is the domain to use.
-<h4>`.spec.database.domainIAMRoleName`</h4>
+
+#### `.spec.database.domainIAMRoleName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1795,7 +1945,8 @@ Domain is the domain to use.
 
 
 DomainIAMRoleName is the name of the IAM role to use.
-<h4>`.spec.database.enableGlobalWriteForwarding`</h4>
+
+#### `.spec.database.enableGlobalWriteForwarding`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1804,7 +1955,8 @@ DomainIAMRoleName is the name of the IAM role to use.
 
 
 EnableGlobalWriteForwarding is whether global write forwarding is enabled.
-<h4>`.spec.database.enableHttpEndpoint`</h4>
+
+#### `.spec.database.enableHttpEndpoint`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1813,7 +1965,8 @@ EnableGlobalWriteForwarding is whether global write forwarding is enabled.
 
 
 EnableHttpEndpoint is whether the HTTP endpoint is enabled.
-<h4>`.spec.database.enableLocalWriteForwarding`</h4>
+
+#### `.spec.database.enableLocalWriteForwarding`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1822,7 +1975,8 @@ EnableHttpEndpoint is whether the HTTP endpoint is enabled.
 
 
 EnableLocalWriteForwarding is whether local write forwarding is enabled.
-<h4>`.spec.database.enabledCloudwatchLogsExports`</h4>
+
+#### `.spec.database.enabledCloudwatchLogsExports`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1833,7 +1987,8 @@ EnableLocalWriteForwarding is whether local write forwarding is enabled.
 
 
 EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Logs.
-<h4>`.spec.database.enabledCloudwatchLogsExports[*]`</h4>
+
+#### `.spec.database.enabledCloudwatchLogsExports[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1842,7 +1997,8 @@ EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Lo
 
 
 LogGroup is the name of a log group.
-<h4>`.spec.database.endpoints`</h4>
+
+#### `.spec.database.endpoints`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1853,7 +2009,8 @@ LogGroup is the name of a log group.
 
 
 Endpoints is a list of custom endpoints to create.
-<h4>`.spec.database.endpoints[*]`</h4>
+
+#### `.spec.database.endpoints[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1861,7 +2018,8 @@ Endpoints is a list of custom endpoints to create.
 |Required |No|
 
 
-<h4>`.spec.database.endpoints[*].customEndpointType`</h4>
+
+#### `.spec.database.endpoints[*].customEndpointType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1874,7 +2032,8 @@ Allowed Values:
 - ANY
 
 CustomEndpointType is the type of the custom endpoint.
-<h4>`.spec.database.endpoints[*].excludedMembers`</h4>
+
+#### `.spec.database.endpoints[*].excludedMembers`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1886,7 +2045,8 @@ CustomEndpointType is the type of the custom endpoint.
 
 ExcludedMembers is a list of DB instances that aren't part of the custom
   endpoint group.
-<h4>`.spec.database.endpoints[*].excludedMembers[*]`</h4>
+
+#### `.spec.database.endpoints[*].excludedMembers[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1894,7 +2054,8 @@ ExcludedMembers is a list of DB instances that aren't part of the custom
 |Required |No|
 
 
-<h4>`.spec.database.endpoints[*].staticMembers`</h4>
+
+#### `.spec.database.endpoints[*].staticMembers`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1906,7 +2067,8 @@ ExcludedMembers is a list of DB instances that aren't part of the custom
 
 StaticMembers is a list of DB instances that are part of the custom
   endpoint group.
-<h4>`.spec.database.endpoints[*].staticMembers[*]`</h4>
+
+#### `.spec.database.endpoints[*].staticMembers[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1914,7 +2076,8 @@ StaticMembers is a list of DB instances that are part of the custom
 |Required |No|
 
 
-<h4>`.spec.database.endpoints[*].tags`</h4>
+
+#### `.spec.database.endpoints[*].tags`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1923,7 +2086,8 @@ StaticMembers is a list of DB instances that are part of the custom
 
 
 Tags is a set of tags to associate with the custom endpoint.
-<h4>`.spec.database.engine`</h4>
+
+#### `.spec.database.engine`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1932,7 +2096,8 @@ Tags is a set of tags to associate with the custom endpoint.
 
 
 Engine is the database engine to use.
-<h4>`.spec.database.engineMode`</h4>
+
+#### `.spec.database.engineMode`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1946,7 +2111,8 @@ Allowed Values:
 - serverless
 
 EngineMode is the database engine mode to use.
-<h4>`.spec.database.engineVersion`</h4>
+
+#### `.spec.database.engineVersion`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1955,7 +2121,8 @@ EngineMode is the database engine mode to use.
 
 
 EngineVersion is the version of the database engine to use.
-<h4>`.spec.database.enhancedMonitoring`</h4>
+
+#### `.spec.database.enhancedMonitoring`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1964,7 +2131,8 @@ EngineVersion is the version of the database engine to use.
 
 
 EnhancedMonitoring is the enhanced monitoring configuration.
-<h4>`.spec.database.enhancedMonitoring.description`</h4>
+
+#### `.spec.database.enhancedMonitoring.description`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1973,7 +2141,8 @@ EnhancedMonitoring is the enhanced monitoring configuration.
 
 
 Description is the description of the monitoring role.
-<h4>`.spec.database.enhancedMonitoring.enabled`</h4>
+
+#### `.spec.database.enhancedMonitoring.enabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1982,7 +2151,8 @@ Description is the description of the monitoring role.
 
 
 Enabled is whether enhanced monitoring is enabled.
-<h4>`.spec.database.enhancedMonitoring.forceDetachPolicies`</h4>
+
+#### `.spec.database.enhancedMonitoring.forceDetachPolicies`
 
 |Property |Value    |
 |:--------|:--------|
@@ -1991,7 +2161,8 @@ Enabled is whether enhanced monitoring is enabled.
 
 
 ForceDetachPolicies Whether to force detaching any policies the monitoring role has before destroying it
-<h4>`.spec.database.enhancedMonitoring.managedPolicyArns`</h4>
+
+#### `.spec.database.enhancedMonitoring.managedPolicyArns`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2002,7 +2173,8 @@ ForceDetachPolicies Whether to force detaching any policies the monitoring role 
 
 
 ManagedPolicyArns is a list of ARNs for managed policies to attach to the monitoring role.
-<h4>`.spec.database.enhancedMonitoring.managedPolicyArns[*]`</h4>
+
+#### `.spec.database.enhancedMonitoring.managedPolicyArns[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2010,7 +2182,8 @@ ManagedPolicyArns is a list of ARNs for managed policies to attach to the monito
 |Required |No|
 
 
-<h4>`.spec.database.enhancedMonitoring.maxSessionDuration`</h4>
+
+#### `.spec.database.enhancedMonitoring.maxSessionDuration`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2019,7 +2192,8 @@ ManagedPolicyArns is a list of ARNs for managed policies to attach to the monito
 
 
 MaxSessionDuration is the maximum session duration (in seconds) that you want to set for the monitoring role.
-<h4>`.spec.database.enhancedMonitoring.monitoringInterval`</h4>
+
+#### `.spec.database.enhancedMonitoring.monitoringInterval`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2028,7 +2202,8 @@ MaxSessionDuration is the maximum session duration (in seconds) that you want to
 
 
 MonitoringInterval is the interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance.
-<h4>`.spec.database.enhancedMonitoring.path`</h4>
+
+#### `.spec.database.enhancedMonitoring.path`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2037,7 +2212,8 @@ MonitoringInterval is the interval, in seconds, between points when Enhanced Mon
 
 
 Path is the path of the monitoring role.
-<h4>`.spec.database.enhancedMonitoring.permissionsBoundary`</h4>
+
+#### `.spec.database.enhancedMonitoring.permissionsBoundary`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2046,7 +2222,8 @@ Path is the path of the monitoring role.
 
 
 PermissionsBoundary is the ARN of the policy that is used to set the permissions boundary for the monitoring role.
-<h4>`.spec.database.eso`</h4>
+
+#### `.spec.database.eso`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2059,7 +2236,8 @@ Eso is the ESO configuration.
   
   This field is used to sync secrets using `external-secrets-operator`.
   External Secrets Operator must be installed if this value is set to true
-<h4>`.spec.database.eso.enabled`</h4>
+
+#### `.spec.database.eso.enabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2069,7 +2247,8 @@ Eso is the ESO configuration.
 
 Enabled Whether or not to enable `external-secrets-operator` object
   deployments using `provider-kubernetes.
-<h4>`.spec.database.eso.kubernetesSecretStore`</h4>
+
+#### `.spec.database.eso.kubernetesSecretStore`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2082,7 +2261,8 @@ KubernetesSecretStore is the Kubernetes secret store to use.
   
   The kubernetes secret store is expected to be namespace scoped to prevent
   secrets leaking across namespaces.
-<h4>`.spec.database.eso.stores`</h4>
+
+#### `.spec.database.eso.stores`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2093,7 +2273,8 @@ KubernetesSecretStore is the Kubernetes secret store to use.
 
 
 Stores is a list of secret stores to use for push secrets.
-<h4>`.spec.database.eso.stores[*]`</h4>
+
+#### `.spec.database.eso.stores[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2103,7 +2284,8 @@ Stores is a list of secret stores to use for push secrets.
 
 SecretsStore is a reference to a secrets store to be passed to External
   Secrets Operator for creating PushSecrets
-<h4>`.spec.database.eso.stores[*].enabled`</h4>
+
+#### `.spec.database.eso.stores[*].enabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2112,7 +2294,8 @@ SecretsStore is a reference to a secrets store to be passed to External
 
 
 Enabled is whether the secrets store is enabled.
-<h4>`.spec.database.eso.stores[*].isClusterSecretStore`</h4>
+
+#### `.spec.database.eso.stores[*].isClusterSecretStore`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2121,7 +2304,8 @@ Enabled is whether the secrets store is enabled.
 
 
 IsClusterSecretStore is whether the secret store is a cluster secret store.
-<h4>`.spec.database.eso.stores[*].secretStore`</h4>
+
+#### `.spec.database.eso.stores[*].secretStore`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2130,7 +2314,8 @@ IsClusterSecretStore is whether the secret store is a cluster secret store.
 
 
 SecretStoreName is the name of the secret store.
-<h4>`.spec.database.globalClusterIdentifier`</h4>
+
+#### `.spec.database.globalClusterIdentifier`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2139,7 +2324,8 @@ SecretStoreName is the name of the secret store.
 
 
 GlobalClusterIdentifier is the global cluster identifier for an Aurora global database.
-<h4>`.spec.database.iamDatabaseAuthenticationEnabled`</h4>
+
+#### `.spec.database.iamDatabaseAuthenticationEnabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2148,7 +2334,8 @@ GlobalClusterIdentifier is the global cluster identifier for an Aurora global da
 
 
 IAMDatabaseAuthenticationEnabled is whether IAM database authentication is enabled.
-<h4>`.spec.database.iamRoles`</h4>
+
+#### `.spec.database.iamRoles`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2159,7 +2346,8 @@ IAMDatabaseAuthenticationEnabled is whether IAM database authentication is enabl
 
 
 IamRoles is a list of IAM roles to associate with the DB cluster.
-<h4>`.spec.database.iamRoles[*]`</h4>
+
+#### `.spec.database.iamRoles[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2167,7 +2355,8 @@ IamRoles is a list of IAM roles to associate with the DB cluster.
 |Required |No|
 
 
-<h4>`.spec.database.iamRoles[*].featureName`</h4>
+
+#### `.spec.database.iamRoles[*].featureName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2176,7 +2365,8 @@ IamRoles is a list of IAM roles to associate with the DB cluster.
 
 
 FeatureName is the name of the feature.
-<h4>`.spec.database.iamRoles[*].roleArn`</h4>
+
+#### `.spec.database.iamRoles[*].roleArn`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2185,7 +2375,8 @@ FeatureName is the name of the feature.
 
 
 RoleArn is the ARN of the role.
-<h4>`.spec.database.instanceCount`</h4>
+
+#### `.spec.database.instanceCount`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2199,7 +2390,8 @@ InstanceCount is the number of instances to create.
   If set, this value will create the requested number of instances using
   defaults from the cluster configuration. If `instances` are specified,
   this value is ignored.
-<h4>`.spec.database.instances`</h4>
+
+#### `.spec.database.instances`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2210,7 +2402,8 @@ InstanceCount is the number of instances to create.
 
 
 Instances is a list of instances to create.
-<h4>`.spec.database.instances[*]`</h4>
+
+#### `.spec.database.instances[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2218,7 +2411,8 @@ Instances is a list of instances to create.
 |Required |No|
 
 
-<h4>`.spec.database.instances[*].allocatedStorage`</h4>
+
+#### `.spec.database.instances[*].allocatedStorage`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2234,7 +2428,8 @@ AllocatedStorage is the size of the database.
   
   
   Overrides `ClusterParameters.AllocatedStorage`
-<h4>`.spec.database.instances[*].allowMajorVersionUpgrade`</h4>
+
+#### `.spec.database.instances[*].allowMajorVersionUpgrade`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2250,7 +2445,8 @@ AllowMajorVersionUpgrade is whether major version upgrades are allowed.
   
   
   Overrides `ClusterParameters.AllowMajorVersionUpgrade`
-<h4>`.spec.database.instances[*].applyImmediately`</h4>
+
+#### `.spec.database.instances[*].applyImmediately`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2262,7 +2458,8 @@ ApplyImmediately is whether changes should be applied immediately.
   
   
   Overrides `ClusterParameters.ApplyImmediately`
-<h4>`.spec.database.instances[*].autoMinorVersionUpgrade`</h4>
+
+#### `.spec.database.instances[*].autoMinorVersionUpgrade`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2275,7 +2472,8 @@ AutoMinorVersionUpgrade is whether minor version upgrades are applied
   
   
   Overrides `ClusterParameters.AutoMinorVersionUpgrade`
-<h4>`.spec.database.instances[*].availabilityZone`</h4>
+
+#### `.spec.database.instances[*].availabilityZone`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2285,7 +2483,8 @@ AutoMinorVersionUpgrade is whether minor version upgrades are applied
 
 AvailabilityZone is the availability zone for this instance.
   Ignored if `multiAz` is true
-<h4>`.spec.database.instances[*].backupRetentionPeriod`</h4>
+
+#### `.spec.database.instances[*].backupRetentionPeriod`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2297,7 +2496,8 @@ BackupRetentionPeriod is the number of days to retain backups for.
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].copyTagsToSnapshot`</h4>
+
+#### `.spec.database.instances[*].copyTagsToSnapshot`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2306,7 +2506,8 @@ BackupRetentionPeriod is the number of days to retain backups for.
 
 
 CopyTagsToSnapshot is whether tags should be copied to snapshots.
-<h4>`.spec.database.instances[*].databaseName`</h4>
+
+#### `.spec.database.instances[*].databaseName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2315,7 +2516,8 @@ CopyTagsToSnapshot is whether tags should be copied to snapshots.
 
 
 DatabaseName is the name of the database to create.
-<h4>`.spec.database.instances[*].deleteAutomatedBackups`</h4>
+
+#### `.spec.database.instances[*].deleteAutomatedBackups`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2327,7 +2529,8 @@ DeleteAutomatedBackups is whether automated backups should be deleted.
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].deletionProtection`</h4>
+
+#### `.spec.database.instances[*].deletionProtection`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2339,7 +2542,8 @@ DeletionProtection is whether deletion protection is enabled.
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].domainIamRoleName`</h4>
+
+#### `.spec.database.instances[*].domainIamRoleName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2351,7 +2555,8 @@ DomainIamRoleName is the name of the IAM role to use.
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].enabledCloudwatchLogsExports`</h4>
+
+#### `.spec.database.instances[*].enabledCloudwatchLogsExports`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2365,7 +2570,8 @@ EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Lo
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].enabledCloudwatchLogsExports[*]`</h4>
+
+#### `.spec.database.instances[*].enabledCloudwatchLogsExports[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2374,7 +2580,8 @@ EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Lo
 
 
 LogGroup is the name of a log group.
-<h4>`.spec.database.instances[*].finalSnapshotIdentifier`</h4>
+
+#### `.spec.database.instances[*].finalSnapshotIdentifier`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2386,7 +2593,8 @@ FinalSnapshotIdentifier is the identifier of the final snapshot.
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].iamDatabaseAuthenticationEnabled`</h4>
+
+#### `.spec.database.instances[*].iamDatabaseAuthenticationEnabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2398,7 +2606,8 @@ IamDatabaseAuthenticationEnabled is whether IAM database authentication is enabl
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].instanceClass`</h4>
+
+#### `.spec.database.instances[*].instanceClass`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2407,7 +2616,8 @@ IamDatabaseAuthenticationEnabled is whether IAM database authentication is enabl
 
 
 InstanceClass is the instance class to use.
-<h4>`.spec.database.instances[*].iops`</h4>
+
+#### `.spec.database.instances[*].iops`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2419,7 +2629,8 @@ Iops is the amount of provisioned IOPS.
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].licenseModel`</h4>
+
+#### `.spec.database.instances[*].licenseModel`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2431,7 +2642,8 @@ LicenseModel is the license model to use.
   
   
   Only applicable if not running in cluster mode.
-<h4>`.spec.database.instances[*].monitoringInterval`</h4>
+
+#### `.spec.database.instances[*].monitoringInterval`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2441,7 +2653,8 @@ LicenseModel is the license model to use.
 
 MonitoringInterval is the interval, in seconds, between points when
   Enhanced Monitoring metrics are collected for the DB instance.
-<h4>`.spec.database.instances[*].multiAz`</h4>
+
+#### `.spec.database.instances[*].multiAz`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2453,7 +2666,8 @@ MultiAZ is whether the DB instance is a Multi-AZ deployment.
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].networkType`</h4>
+
+#### `.spec.database.instances[*].networkType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2465,7 +2679,8 @@ NetworkType is the network type to use.
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].optionGroupName`</h4>
+
+#### `.spec.database.instances[*].optionGroupName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2478,7 +2693,8 @@ OptionGroupName is the name of the option group to associate with this DB
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].parameterGroupName`</h4>
+
+#### `.spec.database.instances[*].parameterGroupName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2489,7 +2705,8 @@ OptionGroupName is the name of the option group to associate with this DB
 ParameterGroupName is the name of the DB parameter group to associate
   with this DB instance. Must pre-exist in the account. Mutually exclusive
   with `RdsBaseDbCluster.dbParameterGroup`
-<h4>`.spec.database.instances[*].performanceInsightsEnabled`</h4>
+
+#### `.spec.database.instances[*].performanceInsightsEnabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2498,7 +2715,8 @@ ParameterGroupName is the name of the DB parameter group to associate
 
 
 PerformanceInsightsEnabled is whether Performance Insights is enabled.
-<h4>`.spec.database.instances[*].performanceInsightsKmsKeyID`</h4>
+
+#### `.spec.database.instances[*].performanceInsightsKmsKeyID`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2508,7 +2726,8 @@ PerformanceInsightsEnabled is whether Performance Insights is enabled.
 
 PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption
   of Performance Insights data.
-<h4>`.spec.database.instances[*].performanceInsightsRetentionPeriod`</h4>
+
+#### `.spec.database.instances[*].performanceInsightsRetentionPeriod`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2518,7 +2737,8 @@ PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption
 
 PerformanceInsightsRetentionPeriod is the amount of time, in days, to
   retain Performance Insights data.
-<h4>`.spec.database.instances[*].preferredMaintenanceWindow`</h4>
+
+#### `.spec.database.instances[*].preferredMaintenanceWindow`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2527,7 +2747,8 @@ PerformanceInsightsRetentionPeriod is the amount of time, in days, to
 
 
 PreferredMaintenanceWindow is the preferred maintenance window.
-<h4>`.spec.database.instances[*].promotionTier`</h4>
+
+#### `.spec.database.instances[*].promotionTier`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2537,7 +2758,8 @@ PreferredMaintenanceWindow is the preferred maintenance window.
 
 PromotionTier is the order in which to promote an Aurora replica to the
   primary instance.
-<h4>`.spec.database.instances[*].publiclyAccessible`</h4>
+
+#### `.spec.database.instances[*].publiclyAccessible`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2546,7 +2768,8 @@ PromotionTier is the order in which to promote an Aurora replica to the
 
 
 PubliclyAccessible is whether the DB instance is publicly accessible.
-<h4>`.spec.database.instances[*].skipFinalSnapshot`</h4>
+
+#### `.spec.database.instances[*].skipFinalSnapshot`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2558,7 +2781,8 @@ SkipFinalSnapshot is whether to skip the final snapshot.
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].storageEncrypted`</h4>
+
+#### `.spec.database.instances[*].storageEncrypted`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2570,7 +2794,8 @@ StorageEncrypted is whether storage is encrypted.
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].storageThroughput`</h4>
+
+#### `.spec.database.instances[*].storageThroughput`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2583,7 +2808,8 @@ StorageThroughput is the amount of storage throughput. Only applicable if
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].storageType`</h4>
+
+#### `.spec.database.instances[*].storageType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2595,7 +2821,8 @@ StorageType is the storage type to use.
   
   
   Only applicable if not running in cluster mode
-<h4>`.spec.database.instances[*].tags`</h4>
+
+#### `.spec.database.instances[*].tags`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2604,7 +2831,8 @@ StorageType is the storage type to use.
 
 
 Tags is a set of tags to associate with the DB instance.
-<h4>`.spec.database.iops`</h4>
+
+#### `.spec.database.iops`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2613,7 +2841,8 @@ Tags is a set of tags to associate with the DB instance.
 
 
 Iops is the amount of provisioned IOPS.
-<h4>`.spec.database.masterUsername`</h4>
+
+#### `.spec.database.masterUsername`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2622,7 +2851,8 @@ Iops is the amount of provisioned IOPS.
 
 
 MasterUsername is the master username to use.
-<h4>`.spec.database.multiAz`</h4>
+
+#### `.spec.database.multiAz`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2631,7 +2861,8 @@ MasterUsername is the master username to use.
 
 
 MultiAZ is whether the DB instance is a Multi-AZ deployment.
-<h4>`.spec.database.partition`</h4>
+
+#### `.spec.database.partition`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2645,7 +2876,8 @@ Allowed Values:
 - aws-us-gov
 
 Partition is the AWS partition to use.
-<h4>`.spec.database.performanceInsightsEnabled`</h4>
+
+#### `.spec.database.performanceInsightsEnabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2654,7 +2886,8 @@ Partition is the AWS partition to use.
 
 
 PerformanceInsightsEnabled is whether Performance Insights is enabled.
-<h4>`.spec.database.performanceInsightsKmsKeyID`</h4>
+
+#### `.spec.database.performanceInsightsKmsKeyID`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2663,7 +2896,8 @@ PerformanceInsightsEnabled is whether Performance Insights is enabled.
 
 
 PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption of Performance Insights data.
-<h4>`.spec.database.performanceInsightsRetentionPeriod`</h4>
+
+#### `.spec.database.performanceInsightsRetentionPeriod`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2672,7 +2906,8 @@ PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption of Perf
 
 
 PerformanceInsightsRetentionPeriod is the amount of time, in days, to retain Performance Insights data.
-<h4>`.spec.database.preferredBackupWindow`</h4>
+
+#### `.spec.database.preferredBackupWindow`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2681,7 +2916,8 @@ PerformanceInsightsRetentionPeriod is the amount of time, in days, to retain Per
 
 
 PreferredBackupWindow is the preferred backup window.
-<h4>`.spec.database.preferredMaintenanceWindow`</h4>
+
+#### `.spec.database.preferredMaintenanceWindow`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2690,7 +2926,8 @@ PreferredBackupWindow is the preferred backup window.
 
 
 PreferredMaintenanceWindow is the preferred maintenance window.
-<h4>`.spec.database.provisionSql`</h4>
+
+#### `.spec.database.provisionSql`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2700,7 +2937,8 @@ PreferredMaintenanceWindow is the preferred maintenance window.
 
 ProvisionSql determines whether or not to provision databases inside the
   RDS cluster.
-<h4>`.spec.database.publiclyAccessible`</h4>
+
+#### `.spec.database.publiclyAccessible`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2709,7 +2947,8 @@ ProvisionSql determines whether or not to provision databases inside the
 
 
 PubliclyAccessible is whether the DB instance is publicly accessible.
-<h4>`.spec.database.replicationSourceIdentifier`</h4>
+
+#### `.spec.database.replicationSourceIdentifier`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2719,7 +2958,8 @@ PubliclyAccessible is whether the DB instance is publicly accessible.
 
 ReplicationSourceIdentifier ARN of a source DB cluster or DB instance if
   this DB cluster is to be created as a Read Replica
-<h4>`.spec.database.restoreToPointInTime`</h4>
+
+#### `.spec.database.restoreToPointInTime`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2728,7 +2968,8 @@ ReplicationSourceIdentifier ARN of a source DB cluster or DB instance if
 
 
 RestoreToPointInTime is the point in time to restore to.
-<h4>`.spec.database.restoreToPointInTime.identifier`</h4>
+
+#### `.spec.database.restoreToPointInTime.identifier`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2739,7 +2980,8 @@ RestoreToPointInTime is the point in time to restore to.
 Identifier is the identifier of the source DB cluster snapshot or DB
   instance snapshot to restore from. Only valid if not running in cluster
   mode.
-<h4>`.spec.database.restoreToPointInTime.restoreToTime`</h4>
+
+#### `.spec.database.restoreToPointInTime.restoreToTime`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2748,7 +2990,8 @@ Identifier is the identifier of the source DB cluster snapshot or DB
 
 
 RestoreToTime is the time to restore to.
-<h4>`.spec.database.restoreToPointInTime.restoreType`</h4>
+
+#### `.spec.database.restoreToPointInTime.restoreType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2762,7 +3005,8 @@ Allowed Values:
 
 RestoreType is the type of restore to perform. This option is ignored if
   not running in cluster mode.
-<h4>`.spec.database.restoreToPointInTime.sourceDbClusterIdentifier`</h4>
+
+#### `.spec.database.restoreToPointInTime.sourceDbClusterIdentifier`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2772,7 +3016,8 @@ RestoreType is the type of restore to perform. This option is ignored if
 
 SourceDbClusterIdentifier is the identifier of the source DB cluster.
   This option is ignored if not running in cluster mode.
-<h4>`.spec.database.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn`</h4>
+
+#### `.spec.database.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2782,7 +3027,8 @@ SourceDbClusterIdentifier is the identifier of the source DB cluster.
 
 sourceDbInstanceAutomatedBackupsArn is the ARN of the source DB instance
   automated backup to restore from. Only valid if not running in cluster mode.
-<h4>`.spec.database.restoreToPointInTime.sourceDbInstanceIdentifier`</h4>
+
+#### `.spec.database.restoreToPointInTime.sourceDbInstanceIdentifier`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2793,7 +3039,8 @@ sourceDbInstanceAutomatedBackupsArn is the ARN of the source DB instance
 SourceDbInstanceIdentifier is the identifier of the source DB instance.
   Only valid if not running in cluster mode. If running in cluster mode, use
   `SourceDbClusterIdentifier` instead.
-<h4>`.spec.database.restoreToPointInTime.sourceDbiResourceId`</h4>
+
+#### `.spec.database.restoreToPointInTime.sourceDbiResourceId`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2803,7 +3050,8 @@ SourceDbInstanceIdentifier is the identifier of the source DB instance.
 
 SourceDbiResourceId is the resource ID of the source DB instance. Only
   valid if not running in cluster mode.
-<h4>`.spec.database.restoreToPointInTime.useLatestRestorableTime`</h4>
+
+#### `.spec.database.restoreToPointInTime.useLatestRestorableTime`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2812,7 +3060,8 @@ SourceDbiResourceId is the resource ID of the source DB instance. Only
 
 
 UseLatestRestorableTime is whether to use the latest restorable time.
-<h4>`.spec.database.s3Import`</h4>
+
+#### `.spec.database.s3Import`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2821,7 +3070,8 @@ UseLatestRestorableTime is whether to use the latest restorable time.
 
 
 S3Import is the S3 import configuration.
-<h4>`.spec.database.s3Import.bucketName`</h4>
+
+#### `.spec.database.s3Import.bucketName`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2830,7 +3080,8 @@ S3Import is the S3 import configuration.
 
 
 BucketName is the name of the S3 bucket.
-<h4>`.spec.database.s3Import.bucketPrefix`</h4>
+
+#### `.spec.database.s3Import.bucketPrefix`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2840,7 +3091,8 @@ BucketName is the name of the S3 bucket.
 
 BucketPrefix is the prefix of the S3 bucket. Can be blank but is the path
   within the bucket where the data is located.
-<h4>`.spec.database.s3Import.ingestionRole`</h4>
+
+#### `.spec.database.s3Import.ingestionRole`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2849,7 +3101,8 @@ BucketPrefix is the prefix of the S3 bucket. Can be blank but is the path
 
 
 IngestionRole is the role to use for ingestion.
-<h4>`.spec.database.s3Import.sourceEngine`</h4>
+
+#### `.spec.database.s3Import.sourceEngine`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2858,7 +3111,8 @@ IngestionRole is the role to use for ingestion.
 
 
 SourceEngine is the source engine to use.
-<h4>`.spec.database.s3Import.sourceEngineVersion`</h4>
+
+#### `.spec.database.s3Import.sourceEngineVersion`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2867,7 +3121,8 @@ SourceEngine is the source engine to use.
 
 
 SourceEngineVersion is the source engine version to use.
-<h4>`.spec.database.scalingConfiguration`</h4>
+
+#### `.spec.database.scalingConfiguration`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2876,7 +3131,8 @@ SourceEngineVersion is the source engine version to use.
 
 
 ScalingConfiguration is the scaling configuration.
-<h4>`.spec.database.scalingConfiguration.autoPause`</h4>
+
+#### `.spec.database.scalingConfiguration.autoPause`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2885,7 +3141,8 @@ ScalingConfiguration is the scaling configuration.
 
 
 AutoPause is whether the database should automatically pause.
-<h4>`.spec.database.scalingConfiguration.maxCapacity`</h4>
+
+#### `.spec.database.scalingConfiguration.maxCapacity`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2894,7 +3151,8 @@ AutoPause is whether the database should automatically pause.
 
 
 MaxCapacity is the maximum capacity for the database.
-<h4>`.spec.database.scalingConfiguration.minCapacity`</h4>
+
+#### `.spec.database.scalingConfiguration.minCapacity`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2903,7 +3161,8 @@ MaxCapacity is the maximum capacity for the database.
 
 
 MinCapacity is the minimum capacity for the database.
-<h4>`.spec.database.scalingConfiguration.secondsUntilAutoPause`</h4>
+
+#### `.spec.database.scalingConfiguration.secondsUntilAutoPause`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2913,7 +3172,8 @@ MinCapacity is the minimum capacity for the database.
 
 SecondsUntilAutoPause is the number of seconds until the database
   automatically pauses.
-<h4>`.spec.database.secretRotation`</h4>
+
+#### `.spec.database.secretRotation`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2922,7 +3182,8 @@ SecondsUntilAutoPause is the number of seconds until the database
 
 
 SecretRotation is the secret rotation configuration.
-<h4>`.spec.database.secretRotation.automaticallyAfterDays`</h4>
+
+#### `.spec.database.secretRotation.automaticallyAfterDays`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2932,7 +3193,8 @@ SecretRotation is the secret rotation configuration.
 
 AutomaticallyAfterDays is the number of days after which the secret is
   rotated automatically.
-<h4>`.spec.database.secretRotation.enabled`</h4>
+
+#### `.spec.database.secretRotation.enabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2941,7 +3203,8 @@ AutomaticallyAfterDays is the number of days after which the secret is
 
 
 Enabled is whether secret rotation is enabled.
-<h4>`.spec.database.secretRotation.rotateImmediately`</h4>
+
+#### `.spec.database.secretRotation.rotateImmediately`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2950,7 +3213,8 @@ Enabled is whether secret rotation is enabled.
 
 
 RotateImmediately is whether the secret should be rotated immediately.
-<h4>`.spec.database.secretRotation.scheduleExpression`</h4>
+
+#### `.spec.database.secretRotation.scheduleExpression`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2959,7 +3223,8 @@ RotateImmediately is whether the secret should be rotated immediately.
 
 
 ScheduleExpression is the schedule expression for secret rotation.
-<h4>`.spec.database.serverlessV2ScalingConfiguration`</h4>
+
+#### `.spec.database.serverlessV2ScalingConfiguration`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2968,7 +3233,8 @@ ScheduleExpression is the schedule expression for secret rotation.
 
 
 ServerlessV2ScalingConfiguration is the serverless v2 scaling configuration.
-<h4>`.spec.database.serverlessV2ScalingConfiguration.maxCapacity`</h4>
+
+#### `.spec.database.serverlessV2ScalingConfiguration.maxCapacity`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2977,7 +3243,8 @@ ServerlessV2ScalingConfiguration is the serverless v2 scaling configuration.
 
 
 MaxCapacity is the maximum capacity for the database.
-<h4>`.spec.database.serverlessV2ScalingConfiguration.minCapacity`</h4>
+
+#### `.spec.database.serverlessV2ScalingConfiguration.minCapacity`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2986,7 +3253,8 @@ MaxCapacity is the maximum capacity for the database.
 
 
 MinCapacity is the minimum capacity for the database.
-<h4>`.spec.database.storageType`</h4>
+
+#### `.spec.database.storageType`
 
 |Property |Value    |
 |:--------|:--------|
@@ -2995,7 +3263,8 @@ MinCapacity is the minimum capacity for the database.
 
 
 StorageType specifies the storage type to be associated with the cluster
-<h4>`.spec.database.tags`</h4>
+
+#### `.spec.database.tags`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3004,7 +3273,8 @@ StorageType specifies the storage type to be associated with the cluster
 
 
 Tags is a set of tags to associate with the DB cluster.
-<h4>`.spec.deletionPolicy`</h4>
+
+#### `.spec.deletionPolicy`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3024,7 +3294,8 @@ DeletionPolicy specifies what will happen to the underlying external
   field in a future release. Currently, both could be set independently and
   non-default values would be honored if the feature flag is enabled.
   See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
-<h4>`.spec.kubernetesProviderConfig`</h4>
+
+#### `.spec.kubernetesProviderConfig`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3033,7 +3304,8 @@ DeletionPolicy specifies what will happen to the underlying external
 
 
 KubernetesProviderConfig
-<h4>`.spec.kubernetesProviderConfig.name`</h4>
+
+#### `.spec.kubernetesProviderConfig.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3041,7 +3313,8 @@ KubernetesProviderConfig
 |Required |**Yes**|
 
 
-<h4>`.spec.managementPolicies`</h4>
+
+#### `.spec.managementPolicies`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3062,7 +3335,8 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
   custom, the DeletionPolicy field will be ignored.
   See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
   and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
-<h4>`.spec.managementPolicies[*]`</h4>
+
+#### `.spec.managementPolicies[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3072,7 +3346,8 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
 
 A ManagementAction represents an action that the Crossplane controllers
   can take on an external resource.
-<h4>`.spec.providerConfigRef`</h4>
+
+#### `.spec.providerConfigRef`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3084,7 +3359,8 @@ A ManagementAction represents an action that the Crossplane controllers
 ProviderConfigReference specifies how the provider that will be used to
   create, observe, update, and delete this managed resource should be
   configured.
-<h4>`.spec.providerConfigRef.name`</h4>
+
+#### `.spec.providerConfigRef.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3093,7 +3369,8 @@ ProviderConfigReference specifies how the provider that will be used to
 
 
 Name of the referenced object.
-<h4>`.spec.providerConfigRef.policy`</h4>
+
+#### `.spec.providerConfigRef.policy`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3102,7 +3379,8 @@ Name of the referenced object.
 
 
 Policies for referencing.
-<h4>`.spec.providerConfigRef.policy.resolution`</h4>
+
+#### `.spec.providerConfigRef.policy.resolution`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3119,7 +3397,8 @@ Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
   reference cannot be resolved. 'Optional' means this reference will be
   a no-op if it cannot be resolved.
-<h4>`.spec.providerConfigRef.policy.resolve`</h4>
+
+#### `.spec.providerConfigRef.policy.resolve`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3135,7 +3414,8 @@ Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
   the corresponding field is not present. Use 'Always' to resolve the
   reference on every reconcile.
-<h4>`.spec.publishConnectionDetailsTo`</h4>
+
+#### `.spec.publishConnectionDetailsTo`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3148,7 +3428,8 @@ PublishConnectionDetailsTo specifies the connection secret config which
   which any connection details for this managed resource should be written.
   Connection details frequently include the endpoint, username,
   and password required to connect to the managed resource.
-<h4>`.spec.publishConnectionDetailsTo.configRef`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3159,7 +3440,8 @@ PublishConnectionDetailsTo specifies the connection secret config which
 
 SecretStoreConfigRef specifies which secret store config should be used
   for this ConnectionSecret.
-<h4>`.spec.publishConnectionDetailsTo.configRef.name`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3168,7 +3450,8 @@ SecretStoreConfigRef specifies which secret store config should be used
 
 
 Name of the referenced object.
-<h4>`.spec.publishConnectionDetailsTo.configRef.policy`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef.policy`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3177,7 +3460,8 @@ Name of the referenced object.
 
 
 Policies for referencing.
-<h4>`.spec.publishConnectionDetailsTo.configRef.policy.resolution`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef.policy.resolution`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3194,7 +3478,8 @@ Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
   reference cannot be resolved. 'Optional' means this reference will be
   a no-op if it cannot be resolved.
-<h4>`.spec.publishConnectionDetailsTo.configRef.policy.resolve`</h4>
+
+#### `.spec.publishConnectionDetailsTo.configRef.policy.resolve`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3210,7 +3495,8 @@ Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
   the corresponding field is not present. Use 'Always' to resolve the
   reference on every reconcile.
-<h4>`.spec.publishConnectionDetailsTo.metadata`</h4>
+
+#### `.spec.publishConnectionDetailsTo.metadata`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3219,7 +3505,8 @@ Resolve specifies when this reference should be resolved. The default
 
 
 Metadata is the metadata for connection secret.
-<h4>`.spec.publishConnectionDetailsTo.metadata.annotations`</h4>
+
+#### `.spec.publishConnectionDetailsTo.metadata.annotations`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3230,7 +3517,8 @@ Metadata is the metadata for connection secret.
 Annotations are the annotations to be added to connection secret.
   - For Kubernetes secrets, this will be used as "metadata.annotations".
   - It is up to Secret Store implementation for others store types.
-<h4>`.spec.publishConnectionDetailsTo.metadata.labels`</h4>
+
+#### `.spec.publishConnectionDetailsTo.metadata.labels`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3241,7 +3529,8 @@ Annotations are the annotations to be added to connection secret.
 Labels are the labels/tags to be added to connection secret.
   - For Kubernetes secrets, this will be used as "metadata.labels".
   - It is up to Secret Store implementation for others store types.
-<h4>`.spec.publishConnectionDetailsTo.metadata.type`</h4>
+
+#### `.spec.publishConnectionDetailsTo.metadata.type`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3251,7 +3540,8 @@ Labels are the labels/tags to be added to connection secret.
 
 Type is the SecretType for the connection secret.
   - Only valid for Kubernetes Secret Stores.
-<h4>`.spec.publishConnectionDetailsTo.name`</h4>
+
+#### `.spec.publishConnectionDetailsTo.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3260,7 +3550,8 @@ Type is the SecretType for the connection secret.
 
 
 Name is the name of the connection secret.
-<h4>`.spec.region`</h4>
+
+#### `.spec.region`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3269,7 +3560,8 @@ Name is the name of the connection secret.
 
 
 Region is the region in which this collection will be created
-<h4>`.spec.subnetGroupIndexes`</h4>
+
+#### `.spec.subnetGroupIndexes`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3278,7 +3570,8 @@ Region is the region in which this collection will be created
 
 
 SubnetGroupIndexes is a map of service name to subnet set indexes
-<h4>`.spec.subnetGroupIndexes.cache`</h4>
+
+#### `.spec.subnetGroupIndexes.cache`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3287,7 +3580,8 @@ SubnetGroupIndexes is a map of service name to subnet set indexes
 
 
 Cache is the subnet group index to use for the cache
-<h4>`.spec.subnetGroupIndexes.database`</h4>
+
+#### `.spec.subnetGroupIndexes.database`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3296,7 +3590,8 @@ Cache is the subnet group index to use for the cache
 
 
 Database is the subnet group index to use for the database
-<h4>`.spec.vpc`</h4>
+
+#### `.spec.vpc`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3305,7 +3600,8 @@ Database is the subnet group index to use for the database
 
 
 Vpc defines the VPC settings
-<h4>`.spec.vpc.peering`</h4>
+
+#### `.spec.vpc.peering`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3314,7 +3610,8 @@ Vpc defines the VPC settings
 
 
 Peering is the VPC to peer with.
-<h4>`.spec.vpc.peering.allowPublic`</h4>
+
+#### `.spec.vpc.peering.allowPublic`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3325,7 +3622,8 @@ Peering is the VPC to peer with.
 AllowPublic specifies if the VPC peering connections should be allowed to
   be linked to the public subnets
   Defaults to false
-<h4>`.spec.vpc.peering.enabled`</h4>
+
+#### `.spec.vpc.peering.enabled`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3336,7 +3634,8 @@ AllowPublic specifies if the VPC peering connections should be allowed to
 Enabled specifies if the VPC peering connections should be enabled for
   this VPC.
   Defaults to false
-<h4>`.spec.vpc.peering.groupBy`</h4>
+
+#### `.spec.vpc.peering.groupBy`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3345,7 +3644,8 @@ Enabled specifies if the VPC peering connections should be enabled for
 
 
 GroupBy specifies the key to group the remote subnets by
-<h4>`.spec.vpc.peering.remoteVpcs`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3356,7 +3656,8 @@ GroupBy specifies the key to group the remote subnets by
 
 
 RemoteVpcs is a list of VPCs to peer with.
-<h4>`.spec.vpc.peering.remoteVpcs[*]`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3365,7 +3666,8 @@ RemoteVpcs is a list of VPCs to peer with.
 
 
 VpcPeer defines the parameters for peering with a VPC.
-<h4>`.spec.vpc.peering.remoteVpcs[*].allowPublic`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].allowPublic`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3375,7 +3677,8 @@ VpcPeer defines the parameters for peering with a VPC.
 
 Disabled specifies if the peering connection should be disabled.
   Defaults to true
-<h4>`.spec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3385,7 +3688,8 @@ Disabled specifies if the peering connection should be disabled.
 
 ExcludeFromLocalPeering specifies the indexes of subnetsets for this VPC to
   exclude from routing to the peering connection
-<h4>`.spec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.private`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.private`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3396,7 +3700,8 @@ ExcludeFromLocalPeering specifies the indexes of subnetsets for this VPC to
 
 
 private subnets to exclude from peering
-<h4>`.spec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.private[*]`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.private[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3404,7 +3709,8 @@ private subnets to exclude from peering
 |Required |No|
 
 
-<h4>`.spec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.public`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.public`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3415,7 +3721,8 @@ private subnets to exclude from peering
 
 
 public subnets to exclude from peering
-<h4>`.spec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.public[*]`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.public[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3423,7 +3730,8 @@ public subnets to exclude from peering
 |Required |No|
 
 
-<h4>`.spec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3436,7 +3744,8 @@ public subnets to exclude from peering
 ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
   VPC to exclude from routing to the peering connection. If emmpty, all
   subnetsets will be included by default
-<h4>`.spec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*]`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3444,7 +3753,8 @@ ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
 |Required |No|
 
 
-<h4>`.spec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].private`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].private`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3455,7 +3765,8 @@ ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
 
 
 private subnets to exclude from peering
-<h4>`.spec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].private[*]`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].private[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3463,7 +3774,8 @@ private subnets to exclude from peering
 |Required |No|
 
 
-<h4>`.spec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].public`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].public`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3474,7 +3786,8 @@ private subnets to exclude from peering
 
 
 public subnets to exclude from peering
-<h4>`.spec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].public[*]`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].public[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3482,7 +3795,8 @@ public subnets to exclude from peering
 |Required |No|
 
 
-<h4>`.spec.vpc.peering.remoteVpcs[*].name`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3491,7 +3805,8 @@ public subnets to exclude from peering
 
 
 Name specifies the name of the VPC to peer with.
-<h4>`.spec.vpc.peering.remoteVpcs[*].providerConfigRef`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].providerConfigRef`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3501,7 +3816,8 @@ Name specifies the name of the VPC to peer with.
 
 ProviderConfigRef specifies the provider config to use for the peering
   connection.
-<h4>`.spec.vpc.peering.remoteVpcs[*].region`</h4>
+
+#### `.spec.vpc.peering.remoteVpcs[*].region`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3514,7 +3830,8 @@ Region specifies the region the VPC is found in.
   
   If not defined, the region of the VPC will be assumed to be the same as
   the region of the peered VPC.
-<h4>`.spec.vpc.subnetsets`</h4>
+
+#### `.spec.vpc.subnetsets`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3523,7 +3840,8 @@ Region specifies the region the VPC is found in.
 
 
 PeeredSubnets defines how many public and private subnet sets to create.
-<h4>`.spec.vpc.subnetsets.cidrs`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3534,7 +3852,8 @@ PeeredSubnets defines how many public and private subnet sets to create.
 
 
 Cidrs is a list of PeeredSubnetSets to create in the VPC
-<h4>`.spec.vpc.subnetsets.cidrs[*]`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3544,7 +3863,8 @@ Cidrs is a list of PeeredSubnetSets to create in the VPC
 
 PeeredSubnetSet defines the parameters for creating a set of subnets with the
   same mask.
-<h4>`.spec.vpc.subnetsets.cidrs[*].prefix`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].prefix`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3554,7 +3874,8 @@ PeeredSubnetSet defines the parameters for creating a set of subnets with the
 
 
 Prefix is the CIDR prefix to use for the subnet set
-<h4>`.spec.vpc.subnetsets.cidrs[*].private`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].private`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3563,7 +3884,8 @@ Prefix is the CIDR prefix to use for the subnet set
 
 
 Private is the number of private subnets to create in this set
-<h4>`.spec.vpc.subnetsets.cidrs[*].private.clusterNames`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].private.clusterNames`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3574,7 +3896,8 @@ Private is the number of private subnets to create in this set
 
 
 ClusterNames is a list of EKS cluster names to add shared LB tags for
-<h4>`.spec.vpc.subnetsets.cidrs[*].private.clusterNames[*]`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].private.clusterNames[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3582,7 +3905,8 @@ ClusterNames is a list of EKS cluster names to add shared LB tags for
 |Required |No|
 
 
-<h4>`.spec.vpc.subnetsets.cidrs[*].private.count`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].private.count`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3591,7 +3915,8 @@ ClusterNames is a list of EKS cluster names to add shared LB tags for
 
 
 Count is the number of subnet sets to create with this mask
-<h4>`.spec.vpc.subnetsets.cidrs[*].private.lbSetIndex`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].private.lbSetIndex`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3601,7 +3926,8 @@ Count is the number of subnet sets to create with this mask
 
 Determines which subnet set in this range to use for kubernetes load
   balancers. -1 means no load balancer tag is defined on this group
-<h4>`.spec.vpc.subnetsets.cidrs[*].private.mask`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].private.mask`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3610,7 +3936,8 @@ Determines which subnet set in this range to use for kubernetes load
 
 
 Mask is the CIDR mask to use for the subnet set
-<h4>`.spec.vpc.subnetsets.cidrs[*].private.offset`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].private.offset`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3619,7 +3946,8 @@ Mask is the CIDR mask to use for the subnet set
 
 
 Offset is the number of bits to offset the subnet mask by
-<h4>`.spec.vpc.subnetsets.cidrs[*].public`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].public`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3628,7 +3956,8 @@ Offset is the number of bits to offset the subnet mask by
 
 
 Public is the number of public subnets to create in this set
-<h4>`.spec.vpc.subnetsets.cidrs[*].public.clusterNames`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].public.clusterNames`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3639,7 +3968,8 @@ Public is the number of public subnets to create in this set
 
 
 ClusterNames is a list of EKS cluster names to add shared LB tags for
-<h4>`.spec.vpc.subnetsets.cidrs[*].public.clusterNames[*]`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].public.clusterNames[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3647,7 +3977,8 @@ ClusterNames is a list of EKS cluster names to add shared LB tags for
 |Required |No|
 
 
-<h4>`.spec.vpc.subnetsets.cidrs[*].public.count`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].public.count`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3656,7 +3987,8 @@ ClusterNames is a list of EKS cluster names to add shared LB tags for
 
 
 Count is the number of subnet sets to create with this mask
-<h4>`.spec.vpc.subnetsets.cidrs[*].public.lbSetIndex`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].public.lbSetIndex`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3666,7 +3998,8 @@ Count is the number of subnet sets to create with this mask
 
 Determines which subnet set in this range to use for kubernetes load
   balancers. -1 means no load balancer tag is defined on this group
-<h4>`.spec.vpc.subnetsets.cidrs[*].public.mask`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].public.mask`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3675,7 +4008,8 @@ Determines which subnet set in this range to use for kubernetes load
 
 
 Mask is the CIDR mask to use for the subnet set
-<h4>`.spec.vpc.subnetsets.cidrs[*].public.offset`</h4>
+
+#### `.spec.vpc.subnetsets.cidrs[*].public.offset`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3684,7 +4018,8 @@ Mask is the CIDR mask to use for the subnet set
 
 
 Offset is the number of bits to offset the subnet mask by
-<h4>`.spec.vpc.subnetsets.function`</h4>
+
+#### `.spec.vpc.subnetsets.function`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3703,7 +4038,8 @@ Function defines the function to use to calculate the CIDR blocks for the
   this XRD and as it's defaulted it can be hidden from the user. The
   function input expects a path though so this has to exist but isn't
   expected to be defined on the claim.
-<h4>`.spec.vpc.tags`</h4>
+
+#### `.spec.vpc.tags`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3712,7 +4048,8 @@ Function defines the function to use to calculate the CIDR blocks for the
 
 
 Tags is a map of additional tags to assign to the VPC.
-<h4>`.spec.vpc.tags.cluster`</h4>
+
+#### `.spec.vpc.tags.cluster`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3721,7 +4058,8 @@ Tags is a map of additional tags to assign to the VPC.
 
 
 Cluster tags to apply subnets for autodiscovery of load balancers
-<h4>`.spec.vpc.tags.common`</h4>
+
+#### `.spec.vpc.tags.common`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3730,7 +4068,8 @@ Cluster tags to apply subnets for autodiscovery of load balancers
 
 
 common tags apoplied to all resources
-<h4>`.spec.vpc.tags.subnet`</h4>
+
+#### `.spec.vpc.tags.subnet`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3739,7 +4078,8 @@ common tags apoplied to all resources
 
 
 Subnet tags to apply to all subnetsets
-<h4>`.spec.writeConnectionSecretToRef`</h4>
+
+#### `.spec.writeConnectionSecretToRef`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3755,7 +4095,8 @@ WriteConnectionSecretToReference specifies the namespace and name of a
   PublishConnectionDetailsTo. Currently, both could be set independently
   and connection details would be published to both without affecting
   each other.
-<h4>`.spec.writeConnectionSecretToRef.name`</h4>
+
+#### `.spec.writeConnectionSecretToRef.name`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3764,7 +4105,8 @@ WriteConnectionSecretToReference specifies the namespace and name of a
 
 
 Name of the secret.
-<h4>`.spec.writeConnectionSecretToRef.namespace`</h4>
+
+#### `.spec.writeConnectionSecretToRef.namespace`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3775,7 +4117,8 @@ Name of the secret.
 Namespace of the secret.
 
 ### Status Properties
-<h4>`.status.cacheClusterEndpoints`</h4>
+
+#### `.status.cacheClusterEndpoints`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3787,7 +4130,8 @@ Namespace of the secret.
 
 CacheClusterEndpoints is a list of endpoints of the Elasticache clusters
   when the cache is configured in cluster mode
-<h4>`.status.cacheClusterEndpoints[*]`</h4>
+
+#### `.status.cacheClusterEndpoints[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3795,7 +4139,8 @@ CacheClusterEndpoints is a list of endpoints of the Elasticache clusters
 |Required |No|
 
 
-<h4>`.status.cacheConnectionSecret`</h4>
+
+#### `.status.cacheConnectionSecret`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3805,7 +4150,8 @@ CacheClusterEndpoints is a list of endpoints of the Elasticache clusters
 
 CacheConnectionSecret is the secret containing the connection details for
   the Elasticache replication group
-<h4>`.status.cacheEndpoint`</h4>
+
+#### `.status.cacheEndpoint`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3814,7 +4160,8 @@ CacheConnectionSecret is the secret containing the connection details for
 
 
 CacheEndpoint is the endpoint of the Elasticache replication group
-<h4>`.status.cacheGlobalConnectionSecret`</h4>
+
+#### `.status.cacheGlobalConnectionSecret`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3824,7 +4171,8 @@ CacheEndpoint is the endpoint of the Elasticache replication group
 
 CacheGlobalConnectionSecret is the secret containing the connection
   details for the global Elasticache replication group
-<h4>`.status.cacheGlobalEndpoint`</h4>
+
+#### `.status.cacheGlobalEndpoint`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3834,7 +4182,8 @@ CacheGlobalConnectionSecret is the secret containing the connection
 
 CacheGlobalEndpoint is the global (RW) endpoint of the Elasticache
   global replication group
-<h4>`.status.cacheGlobalReaderEndpoint`</h4>
+
+#### `.status.cacheGlobalReaderEndpoint`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3844,7 +4193,8 @@ CacheGlobalEndpoint is the global (RW) endpoint of the Elasticache
 
 CacheGlobalReaderEndpoint is the global (RO) endpoint of the Elasticache
   global replication group
-<h4>`.status.cachePort`</h4>
+
+#### `.status.cachePort`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3853,7 +4203,8 @@ CacheGlobalReaderEndpoint is the global (RO) endpoint of the Elasticache
 
 
 CachePort is the port of the Elasticache
-<h4>`.status.cacheReaderEndpoint`</h4>
+
+#### `.status.cacheReaderEndpoint`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3863,7 +4214,8 @@ CachePort is the port of the Elasticache
 
 CacheReaderEndpoint is the reader endpoint of the Elasticache replication
   group
-<h4>`.status.cacheSubnets`</h4>
+
+#### `.status.cacheSubnets`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3874,7 +4226,8 @@ CacheReaderEndpoint is the reader endpoint of the Elasticache replication
 
 
 CacheSubnets is the list of subnets to be used by ElasticSearch
-<h4>`.status.cacheSubnets[*]`</h4>
+
+#### `.status.cacheSubnets[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3882,7 +4235,8 @@ CacheSubnets is the list of subnets to be used by ElasticSearch
 |Required |No|
 
 
-<h4>`.status.conditions`</h4>
+
+#### `.status.conditions`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3893,7 +4247,8 @@ CacheSubnets is the list of subnets to be used by ElasticSearch
 
 
 Conditions of the resource.
-<h4>`.status.conditions[*]`</h4>
+
+#### `.status.conditions[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3902,7 +4257,8 @@ Conditions of the resource.
 
 
 A Condition that may apply to a resource.
-<h4>`.status.conditions[*].lastTransitionTime`</h4>
+
+#### `.status.conditions[*].lastTransitionTime`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3912,7 +4268,8 @@ A Condition that may apply to a resource.
 
 LastTransitionTime is the last time this condition transitioned from one
   status to another.
-<h4>`.status.conditions[*].message`</h4>
+
+#### `.status.conditions[*].message`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3922,7 +4279,8 @@ LastTransitionTime is the last time this condition transitioned from one
 
 A Message containing details about this condition's last transition from
   one status to another, if any.
-<h4>`.status.conditions[*].reason`</h4>
+
+#### `.status.conditions[*].reason`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3931,7 +4289,8 @@ A Message containing details about this condition's last transition from
 
 
 A Reason for this condition's last transition from one status to another.
-<h4>`.status.conditions[*].status`</h4>
+
+#### `.status.conditions[*].status`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3940,7 +4299,8 @@ A Reason for this condition's last transition from one status to another.
 
 
 Status of this condition; is it currently True, False, or Unknown?
-<h4>`.status.conditions[*].type`</h4>
+
+#### `.status.conditions[*].type`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3950,7 +4310,8 @@ Status of this condition; is it currently True, False, or Unknown?
 
 Type of this condition. At most one of each condition type may apply to
   a resource at any point in time.
-<h4>`.status.rdsConnectionSecret`</h4>
+
+#### `.status.rdsConnectionSecret`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3960,7 +4321,8 @@ Type of this condition. At most one of each condition type may apply to
 
 RdsConnectionSecret is the secret containing the connection details
   for the database
-<h4>`.status.rdsEndpoint`</h4>
+
+#### `.status.rdsEndpoint`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3969,7 +4331,8 @@ RdsConnectionSecret is the secret containing the connection details
 
 
 RdsEndpoint is the endpoint of the database
-<h4>`.status.rdsPort`</h4>
+
+#### `.status.rdsPort`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3978,7 +4341,8 @@ RdsEndpoint is the endpoint of the database
 
 
 RdsPort is the port of the database
-<h4>`.status.rdsSubnets`</h4>
+
+#### `.status.rdsSubnets`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3989,7 +4353,8 @@ RdsPort is the port of the database
 
 
 RdsSubnets is the list of subnets to be used by the database
-<h4>`.status.rdsSubnets[*]`</h4>
+
+#### `.status.rdsSubnets[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -3997,7 +4362,8 @@ RdsSubnets is the list of subnets to be used by the database
 |Required |No|
 
 
-<h4>`.status.vpc`</h4>
+
+#### `.status.vpc`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4006,7 +4372,8 @@ RdsSubnets is the list of subnets to be used by the database
 
 
 Vpc is a VPC configuration to bind the cluster to
-<h4>`.status.vpc.additionalCidrBlocks`</h4>
+
+#### `.status.vpc.additionalCidrBlocks`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4017,7 +4384,8 @@ Vpc is a VPC configuration to bind the cluster to
 
 
 A list of additional VPC CIDR blocks defined in this VPC
-<h4>`.status.vpc.additionalCidrBlocks[*]`</h4>
+
+#### `.status.vpc.additionalCidrBlocks[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4025,7 +4393,8 @@ A list of additional VPC CIDR blocks defined in this VPC
 |Required |No|
 
 
-<h4>`.status.vpc.cidrBlock`</h4>
+
+#### `.status.vpc.cidrBlock`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4034,7 +4403,8 @@ A list of additional VPC CIDR blocks defined in this VPC
 
 
 The Ipv4 cidr block defined for this VPC
-<h4>`.status.vpc.id`</h4>
+
+#### `.status.vpc.id`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4043,7 +4413,8 @@ The Ipv4 cidr block defined for this VPC
 
 
 ID The VPC ID
-<h4>`.status.vpc.internetGateway`</h4>
+
+#### `.status.vpc.internetGateway`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4052,7 +4423,8 @@ ID The VPC ID
 
 
 The internet gateway defined in this VPC
-<h4>`.status.vpc.natGateways`</h4>
+
+#### `.status.vpc.natGateways`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4061,7 +4433,8 @@ The internet gateway defined in this VPC
 
 
 A map of NAT gateways defined in this VPC
-<h4>`.status.vpc.privateRouteTables`</h4>
+
+#### `.status.vpc.privateRouteTables`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4072,7 +4445,8 @@ A map of NAT gateways defined in this VPC
 
 
 A map of private route tables defined in this VPC
-<h4>`.status.vpc.privateRouteTables[*]`</h4>
+
+#### `.status.vpc.privateRouteTables[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4081,7 +4455,8 @@ A map of private route tables defined in this VPC
 
 
 StatusRouteTables is a map of route tables and their status
-<h4>`.status.vpc.privateSubnets`</h4>
+
+#### `.status.vpc.privateSubnets`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4092,7 +4467,8 @@ StatusRouteTables is a map of route tables and their status
 
 
 A map of private subnets defined in this VPC
-<h4>`.status.vpc.privateSubnets[*]`</h4>
+
+#### `.status.vpc.privateSubnets[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4101,7 +4477,8 @@ A map of private subnets defined in this VPC
 
 
 StatusSubnets is a map of subnets and their status
-<h4>`.status.vpc.providerConfig`</h4>
+
+#### `.status.vpc.providerConfig`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4110,7 +4487,8 @@ StatusSubnets is a map of subnets and their status
 
 
 The provider config used to look up this VPC
-<h4>`.status.vpc.publicRouteTables`</h4>
+
+#### `.status.vpc.publicRouteTables`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4121,7 +4499,8 @@ The provider config used to look up this VPC
 
 
 A map of public route tables defined in this VPC
-<h4>`.status.vpc.publicRouteTables[*]`</h4>
+
+#### `.status.vpc.publicRouteTables[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4130,7 +4509,8 @@ A map of public route tables defined in this VPC
 
 
 StatusRouteTables is a map of route tables and their status
-<h4>`.status.vpc.publicSubnets`</h4>
+
+#### `.status.vpc.publicSubnets`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4141,7 +4521,8 @@ StatusRouteTables is a map of route tables and their status
 
 
 A list of maps of public subnets defined in this VPC
-<h4>`.status.vpc.publicSubnets[*]`</h4>
+
+#### `.status.vpc.publicSubnets[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4150,7 +4531,8 @@ A list of maps of public subnets defined in this VPC
 
 
 StatusSubnets is a map of subnets and their status
-<h4>`.status.vpc.region`</h4>
+
+#### `.status.vpc.region`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4159,7 +4541,8 @@ StatusSubnets is a map of subnets and their status
 
 
 The region this VPC is located in
-<h4>`.status.vpc.securityGroups`</h4>
+
+#### `.status.vpc.securityGroups`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4168,7 +4551,8 @@ The region this VPC is located in
 
 
 A map of security groups defined in this VPC
-<h4>`.status.vpc.transitGateways`</h4>
+
+#### `.status.vpc.transitGateways`
 
 |Property |Value    |
 |:--------|:--------|
@@ -4177,7 +4561,8 @@ A map of security groups defined in this VPC
 
 
 A map of transit gateways defined in this VPC
-<h4>`.status.vpc.vpcPeeringConnections`</h4>
+
+#### `.status.vpc.vpcPeeringConnections`
 
 |Property |Value    |
 |:--------|:--------|
