@@ -133,6 +133,7 @@ This CRD is being replaced by <a href="../{{ .FullName }}/">{{ .ShortName }}</a>
 {{- if eq .Path ".spec" }}
 ### Spec Properties
 {{- else if eq .Path ".status" }}
+
 ### Status Properties
 {{- else }}
 <details>

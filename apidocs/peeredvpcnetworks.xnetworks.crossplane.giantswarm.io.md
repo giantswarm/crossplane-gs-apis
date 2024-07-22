@@ -1125,6 +1125,7 @@ Name of the secret.
 
 Namespace of the secret.
 </details>
+
 ### Status Properties
 <details>
 <summary>
