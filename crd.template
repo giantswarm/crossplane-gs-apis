@@ -150,8 +150,11 @@ This CRD is being replaced by <a href="../{{ .FullName }}/">{{ .ShortName }}</a>
 {{- if not (eq (len .Pattern) 0)}}
 |Validation|`{{ .Pattern }}`|
 {{- end}}
-{{- if not (eq (len .Default ) 0)}}
+{{- if not (eq (len .Default) 0)}}
 |Default Value|{{.Default}}|
+{{- end}}
+{{- if not (eq .Immutability "None")}}
+|Immutability|{{.Immutability}}|
 {{- end}}
 
 {{ if not (eq (len .Enum) 0) }}

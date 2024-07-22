@@ -720,7 +720,9 @@ A list of cluster names that may add load balancers in the tagged subnet
   in this set.
   
   
-  See #lbSetIndex for deciding which subnetset gets these tags.
+  See [public.lbSetIndex](#specsubnetsetscidrspubliclbsetindex) and
+  [private.lbSetIndex](#specsubnetsetscidrsprivatelbsetindex) for deciding
+  which subnetset gets these tags.
 
 #### `.spec.subnetsets.cidrs[*].private.clusterNames[*]`
 
@@ -737,6 +739,7 @@ A list of cluster names that may add load balancers in the tagged subnet
 |:--------|:--------|
 |Type     |integer|
 |Required |**Yes**|
+|Immutability|increment only|
 
 
 Count is the number of subnet sets to create with this mask.
@@ -756,7 +759,14 @@ Count is the number of subnet sets to create with this mask.
 
 
 Identifies which subnet set to use for public EKS load balancers. Subnets
-  in this set will recieve the `kubernetes.io/role/elb: 1` tag
+  in this set will recieve either the `kubernetes.io/role/elb: 1` or
+  `kubernetes.io/role/internal-elb: 1` tag depending on if these are public
+  or private subnets.
+  
+  
+  If this is not set, or set to -1 (the default value), no subnets will be
+  tagged as load balancer subnets otherwise it should be the index of the
+  subnet set to tag, starting from index 0.
 
 #### `.spec.subnetsets.cidrs[*].private.mask`
 
@@ -764,6 +774,7 @@ Identifies which subnet set to use for public EKS load balancers. Subnets
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
+|Immutability|immutable|
 
 
 This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
@@ -818,7 +829,9 @@ A list of cluster names that may add load balancers in the tagged subnet
   in this set.
   
   
-  See #lbSetIndex for deciding which subnetset gets these tags.
+  See [public.lbSetIndex](#specsubnetsetscidrspubliclbsetindex) and
+  [private.lbSetIndex](#specsubnetsetscidrsprivatelbsetindex) for deciding
+  which subnetset gets these tags.
 
 #### `.spec.subnetsets.cidrs[*].public.clusterNames[*]`
 
@@ -835,6 +848,7 @@ A list of cluster names that may add load balancers in the tagged subnet
 |:--------|:--------|
 |Type     |integer|
 |Required |**Yes**|
+|Immutability|increment only|
 
 
 Count is the number of subnet sets to create with this mask.
@@ -854,7 +868,14 @@ Count is the number of subnet sets to create with this mask.
 
 
 Identifies which subnet set to use for public EKS load balancers. Subnets
-  in this set will recieve the `kubernetes.io/role/elb: 1` tag
+  in this set will recieve either the `kubernetes.io/role/elb: 1` or
+  `kubernetes.io/role/internal-elb: 1` tag depending on if these are public
+  or private subnets.
+  
+  
+  If this is not set, or set to -1 (the default value), no subnets will be
+  tagged as load balancer subnets otherwise it should be the index of the
+  subnet set to tag, starting from index 0.
 
 #### `.spec.subnetsets.cidrs[*].public.mask`
 
@@ -862,6 +883,7 @@ Identifies which subnet set to use for public EKS load balancers. Subnets
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
+|Immutability|immutable|
 
 
 This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
