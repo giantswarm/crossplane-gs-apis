@@ -49,10 +49,8 @@ type PeeredVpcNetwork struct {
 type PeeredVpcNetworkSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
 
-	// AvailabilityZones is a list of availability zones in the region. The
-	// number of availability zones must match the number of bits x the number
-	// of subnetsets (public + private). The VPC Cidr must be big enough to
-	// encompass all the subnet CIDR blocks.
+	// AvailabilityZones is a list of availability zones in the region to be
+	// used for this VPC. This should be a list of single character strings
 	//
 	// +required
 	// +kubebuilder:validation:MinItems=3
@@ -204,13 +202,23 @@ type VpcPeer struct {
 // PeeredSubnetSet defines the parameters for creating a set of subnets with the
 // same mask.
 type PeeredSubnetSet struct {
-	// Prefix is the CIDR prefix to use for the subnet set
+	// A VPC CIDR or Additional CIDR to use for the VPC. If this is the first
+	// entry in the list, it will be used as the default VPC CIDR, otherwise it
+	// will be assigned as an additional CIDR to the VPC.
 	//
 	// +required
 	// +immutable
 	Prefix Cidr `json:"prefix"`
 
-	// Public is the number of public subnets to create in this set
+	// Details on how to build the public subnets.
+	//
+	// Public subnets are subnets with a route to the internet gateway.
+	//
+	// > [!IMPORTANT]
+	// > If this is the default VPC CIDR, the first entry in the list, the
+	// > public subnets will be used for the NAT gateways. Setting this value to
+	// > 0 on the default VPC CIDR may result in the creation of fully private
+	// > networks with no route to the outside world.
 	//
 	// +required
 	Public PeeredSubnetBuilder `json:"public"`
@@ -235,25 +243,38 @@ type PeeredSubnetSet struct {
 // If no offset is specified, the subnets will be created from the start of the
 // cidr range
 type PeeredSubnetBuilder struct {
-	// ClusterNames is a list of EKS cluster names to add shared LB tags for
+	// A list of cluster names that may add load balancers in the tagged subnet
+	// set. Each entry will result in the tag
+	// `kubernetes.io/cluster/$CLUSTER_NAME shared` being added to the subnets
+	// in this set.
+	//
+	// See #lbSetIndex for deciding which subnetset gets these tags.
 	//
 	// +optional
 	// +listType=atomic
 	ClusterNames []string `json:"clusterNames"`
 
-	// Count is the number of subnet sets to create with this mask
+	// Count is the number of subnet sets to create with this mask.
+	//
+	// > [!WARNING]
+	// > Whilst this field is not `immutable`, care should be taken to never
+	// > decrease its value once set as this will result in the destruction of
+	// > subnet sets which may fail if there are attached resources.
 	//
 	// +required
 	Count int `json:"count"`
 
-	// Determines which subnet set in this range to use for kubernetes load
-	// balancers. -1 means no load balancer tag is defined on this group
+	// Identifies which subnet set to use for public EKS load balancers. Subnets
+	// in this set will recieve the `kubernetes.io/role/elb: 1` tag
 	//
 	// +optional
 	// +default=-1
 	LoadBalancerIndex int `json:"lbSetIndex"`
 
-	// Mask is the CIDR mask to use for the subnet set
+	// This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
+	// use as a mask for the subnet.
+	//
+	// To prevent subnets being destroyed and recreated *This field is immutable*
 	//
 	// +required
 	// +immutable
@@ -269,7 +290,16 @@ type PeeredSubnetBuilder struct {
 // PeeredSubnets defines the parameters for creating a set of subnets with the
 // same mask.
 type PeeredSubnets struct {
-	// Cidrs is a list of PeeredSubnetSets to create in the VPC
+	// A list of PeeredSubnetSets to create in the VPC
+	//
+	// Each VPC Cidr may be split into *n* public and *n* private subnets as long
+	// as there is enough room on the cidr for it to be split at that level. Any
+	// overflow will cause the composition to fail and this will be reflected in
+	// the status of the XR.
+	//
+	// > [!IMPORTANT]
+	// > There must be at least 1 entry in this set which will be used as the VPC
+	// > default CIDR range, and you may define a maximum of 4 additional entries.
 	//
 	// +required
 	// +kubebuilder:validation:MinItems=1

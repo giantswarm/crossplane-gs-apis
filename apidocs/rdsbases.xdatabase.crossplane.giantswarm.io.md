@@ -127,8 +127,8 @@ EngineNativeAuditFieldsIncluded is whether engine native audit fields are
 
 
 Allowed Values:
-- &#34;sync&#34;
-- &#34;async&#34;
+- sync
+- async
 
 Mode is the mode of the activity stream. Valid values are `sync` and `async`.
 </details>
@@ -236,8 +236,8 @@ MaxCapacity is the maximum capacity for autoscaling.
 
 
 Allowed Values:
-- &#34;RDSReaderAverageCPUUtilization&#34;
-- &#34;RDSReaderAverageDatabaseConnections&#34;
+- RDSReaderAverageCPUUtilization
+- RDSReaderAverageDatabaseConnections
 
 MetricType is the type of metric to use for autoscaling.
 </details>
@@ -562,8 +562,8 @@ DbClusterParameterGroup defines the parameters for the DB cluster.
 
 
 Allowed Values:
-- &#34;immediate&#34;
-- &#34;pending-reboot&#34;
+- immediate
+- pending-reboot
 
 ApplyMethod is the apply method for the parameter group. Some engines
   cannot apply changes immediately, and require a reboot in which case you
@@ -794,11 +794,12 @@ DeleteAutomatedBackups is whether automated backups should be deleted.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Delete|
 
 
 Allowed Values:
-- &#34;Orphan&#34;
-- &#34;Delete&#34;
+- Orphan
+- Delete
 
 DeletionPolicy specifies what will happen to the underlying external
   when this managed resource is deleted - either "Delete" or "Orphan" the
@@ -953,8 +954,8 @@ Endpoints is a list of custom endpoints to create.
 
 
 Allowed Values:
-- &#34;READER&#34;
-- &#34;ANY&#34;
+- READER
+- ANY
 
 CustomEndpointType is the type of the custom endpoint.
 </details>
@@ -1052,9 +1053,9 @@ Engine is the database engine to use.
 
 
 Allowed Values:
-- &#34;parallelquery&#34;
-- &#34;provisioned&#34;
-- &#34;serverless&#34;
+- parallelquery
+- provisioned
+- serverless
 
 EngineMode is the database engine mode to use.
 </details>
@@ -2013,6 +2014,7 @@ KubernetesProviderConfig is the provider config for the Kubernetes provider.
 |Required |No|
 |Min Items|0|
 |Max Items|Unlimited|
+|Default Value|[*]|
 
 
 THIS IS A BETA FIELD. It is on by default but can be opted out
@@ -2078,9 +2080,9 @@ MultiAZ is whether the DB instance is a Multi-AZ deployment.
 
 
 Allowed Values:
-- &#34;aws&#34;
-- &#34;aws-cn&#34;
-- &#34;aws-us-gov&#34;
+- aws
+- aws-cn
+- aws-us-gov
 
 Partition is the AWS partition to use.
 </details>
@@ -2158,6 +2160,7 @@ PreferredMaintenanceWindow is the preferred maintenance window.
 |:--------|:--------|
 |Type     |object|
 |Required |No|
+|Default Value|{name:default}|
 
 
 ProviderConfigReference specifies how the provider that will be used to
@@ -2199,11 +2202,12 @@ Policies for referencing.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Required|
 
 
 Allowed Values:
-- &#34;Required&#34;
-- &#34;Optional&#34;
+- Required
+- Optional
 
 Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
@@ -2222,8 +2226,8 @@ Resolution specifies whether resolution of this reference is required.
 
 
 Allowed Values:
-- &#34;Always&#34;
-- &#34;IfNotPresent&#34;
+- Always
+- IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
@@ -2283,6 +2287,7 @@ PublishConnectionDetailsTo specifies the connection secret config which
 |:--------|:--------|
 |Type     |object|
 |Required |No|
+|Default Value|{name:default}|
 
 
 SecretStoreConfigRef specifies which secret store config should be used
@@ -2323,11 +2328,12 @@ Policies for referencing.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Required|
 
 
 Allowed Values:
-- &#34;Required&#34;
-- &#34;Optional&#34;
+- Required
+- Optional
 
 Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
@@ -2346,8 +2352,8 @@ Resolution specifies whether resolution of this reference is required.
 
 
 Allowed Values:
-- &#34;Always&#34;
-- &#34;IfNotPresent&#34;
+- Always
+- IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
@@ -2504,8 +2510,8 @@ RestoreToTime is the time to restore to.
 
 
 Allowed Values:
-- &#34;full-copy&#34;
-- &#34;copy-on-write&#34;
+- full-copy
+- copy-on-write
 
 RestoreType is the type of restore to perform. This option is ignored if
   not running in cluster mode.

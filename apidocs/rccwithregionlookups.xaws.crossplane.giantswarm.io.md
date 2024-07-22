@@ -99,11 +99,12 @@ ClusterDiscovery is the reference to the cluster to discover
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Delete|
 
 
 Allowed Values:
-- &#34;Orphan&#34;
-- &#34;Delete&#34;
+- Orphan
+- Delete
 
 DeletionPolicy specifies what will happen to the underlying external
   when this managed resource is deleted - either "Delete" or "Orphan" the
@@ -124,6 +125,7 @@ DeletionPolicy specifies what will happen to the underlying external
 |Required |No|
 |Min Items|0|
 |Max Items|Unlimited|
+|Default Value|[*]|
 
 
 THIS IS A BETA FIELD. It is on by default but can be opted out
@@ -186,6 +188,7 @@ Namespace is the namespace of the cluster to discover
 |:--------|:--------|
 |Type     |object|
 |Required |No|
+|Default Value|{name:default}|
 
 
 ProviderConfigReference specifies how the provider that will be used to
@@ -227,11 +230,12 @@ Policies for referencing.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Required|
 
 
 Allowed Values:
-- &#34;Required&#34;
-- &#34;Optional&#34;
+- Required
+- Optional
 
 Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
@@ -250,8 +254,8 @@ Resolution specifies whether resolution of this reference is required.
 
 
 Allowed Values:
-- &#34;Always&#34;
-- &#34;IfNotPresent&#34;
+- Always
+- IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
@@ -284,6 +288,7 @@ PublishConnectionDetailsTo specifies the connection secret config which
 |:--------|:--------|
 |Type     |object|
 |Required |No|
+|Default Value|{name:default}|
 
 
 SecretStoreConfigRef specifies which secret store config should be used
@@ -324,11 +329,12 @@ Policies for referencing.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Required|
 
 
 Allowed Values:
-- &#34;Required&#34;
-- &#34;Optional&#34;
+- Required
+- Optional
 
 Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
@@ -347,8 +353,8 @@ Resolution specifies whether resolution of this reference is required.
 
 
 Allowed Values:
-- &#34;Always&#34;
-- &#34;IfNotPresent&#34;
+- Always
+- IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
@@ -564,8 +570,8 @@ AtRestEncryptionEnabled specifies whether data stored in the cluster is
 
 
 Allowed Values:
-- &#34;rotate&#34;
-- &#34;set&#34;
+- rotate
+- set
 
 AuthTokenUpdateStrategy specifies how the auth token should be updated.
   
@@ -700,8 +706,8 @@ AvailabilityZone is the name of the Availability Zone in which the
 
 
 Allowed Values:
-- &#34;single-az&#34;
-- &#34;cross-az&#34;
+- single-az
+- cross-az
 
 AzMode specifies the Availability Zone mode of the cluster.
   
@@ -729,8 +735,8 @@ AzMode specifies the Availability Zone mode of the cluster.
 
 
 Allowed Values:
-- &#34;memcached&#34;
-- &#34;redis&#34;
+- memcached
+- redis
 
 Engine is the name of the cache engine to be used for the clusters in
   this group.
@@ -783,8 +789,8 @@ FinalSnapshotIdentifier is the user-supplied name for the final snapshot
 
 
 Allowed Values:
-- &#34;ipv4&#34;
-- &#34;ipv6&#34;
+- ipv4
+- ipv6
 
 IpDiscovery is the method used to discover cluster nodes.
   
@@ -849,8 +855,8 @@ Destination Name of the cloudwatch log group or for kinesis firehose resource.
 
 
 Allowed Values:
-- &#34;cloudwatch-logs&#34;
-- &#34;kinesis-firehose&#34;
+- cloudwatch-logs
+- kinesis-firehose
 
 DestinationType The destination type for the logs.
   
@@ -871,8 +877,8 @@ DestinationType The destination type for the logs.
 
 
 Allowed Values:
-- &#34;text&#34;
-- &#34;json&#34;
+- text
+- json
 
 LogFormat The log format to use.
   
@@ -893,8 +899,8 @@ LogFormat The log format to use.
 
 
 Allowed Values:
-- &#34;slow-log&#34;
-- &#34;engine-log&#34;
+- slow-log
+- engine-log
 
 LogType The type of log to deliver.
   
@@ -929,9 +935,9 @@ MaintenanceWindow specifies the weekly time range during which system
 
 
 Allowed Values:
-- &#34;ipv4&#34;
-- &#34;ipv6&#34;
-- &#34;dual_stack&#34;
+- ipv4
+- ipv6
+- dual_stack
 
 NetworkType specifies the network configuration for the cluster.
   
@@ -999,8 +1005,8 @@ NumCacheNodes is the number of cache nodes in the cluster.
 
 
 Allowed Values:
-- &#34;single-outpost&#34;
-- &#34;cross-outpost&#34;
+- single-outpost
+- cross-outpost
 
 OutpostMode specifies the outpost mode that will apply to the cache
   cluster creation.
@@ -1309,8 +1315,8 @@ DataTieringEnabled specifies whether data tiering is enabled for the
 
 
 Allowed Values:
-- &#34;memcached&#34;
-- &#34;redis&#34;
+- memcached
+- redis
 
 Engine is the name of the cache engine to be used for the clusters in
   this group.
@@ -1498,8 +1504,8 @@ GlobalReplicationGroupId is the id of the global replication group to
 
 
 Allowed Values:
-- &#34;ipv4&#34;
-- &#34;ipv6&#34;
+- ipv4
+- ipv6
 
 IpDiscovery is the method used to discover cluster nodes.
   
@@ -1581,8 +1587,8 @@ Destination Name of the cloudwatch log group or for kinesis firehose resource.
 
 
 Allowed Values:
-- &#34;cloudwatch-logs&#34;
-- &#34;kinesis-firehose&#34;
+- cloudwatch-logs
+- kinesis-firehose
 
 DestinationType The destination type for the logs.
   
@@ -1603,8 +1609,8 @@ DestinationType The destination type for the logs.
 
 
 Allowed Values:
-- &#34;text&#34;
-- &#34;json&#34;
+- text
+- json
 
 LogFormat The log format to use.
   
@@ -1625,8 +1631,8 @@ LogFormat The log format to use.
 
 
 Allowed Values:
-- &#34;slow-log&#34;
-- &#34;engine-log&#34;
+- slow-log
+- engine-log
 
 LogType The type of log to deliver.
   
@@ -1678,9 +1684,9 @@ MultiAzEnabled specifies whether the cluster should be created in
 
 
 Allowed Values:
-- &#34;ipv4&#34;
-- &#34;ipv6&#34;
-- &#34;dual_stack&#34;
+- ipv4
+- ipv6
+- dual_stack
 
 NetworkType specifies the network configuration for the cluster.
   
@@ -2159,8 +2165,8 @@ EngineNativeAuditFieldsIncluded is whether engine native audit fields are
 
 
 Allowed Values:
-- &#34;sync&#34;
-- &#34;async&#34;
+- sync
+- async
 
 Mode is the mode of the activity stream. Valid values are `sync` and `async`.
 </details>
@@ -2268,8 +2274,8 @@ MaxCapacity is the maximum capacity for autoscaling.
 
 
 Allowed Values:
-- &#34;RDSReaderAverageCPUUtilization&#34;
-- &#34;RDSReaderAverageDatabaseConnections&#34;
+- RDSReaderAverageCPUUtilization
+- RDSReaderAverageDatabaseConnections
 
 MetricType is the type of metric to use for autoscaling.
 </details>
@@ -2540,8 +2546,8 @@ DbClusterParameterGroup defines the parameters for the DB cluster.
 
 
 Allowed Values:
-- &#34;immediate&#34;
-- &#34;pending-reboot&#34;
+- immediate
+- pending-reboot
 
 ApplyMethod is the apply method for the parameter group. Some engines
   cannot apply changes immediately, and require a reboot in which case you
@@ -2908,8 +2914,8 @@ Endpoints is a list of custom endpoints to create.
 
 
 Allowed Values:
-- &#34;READER&#34;
-- &#34;ANY&#34;
+- READER
+- ANY
 
 CustomEndpointType is the type of the custom endpoint.
 </details>
@@ -3007,9 +3013,9 @@ Engine is the database engine to use.
 
 
 Allowed Values:
-- &#34;parallelquery&#34;
-- &#34;provisioned&#34;
-- &#34;serverless&#34;
+- parallelquery
+- provisioned
+- serverless
 
 EngineMode is the database engine mode to use.
 </details>
@@ -3970,9 +3976,9 @@ MultiAZ is whether the DB instance is a Multi-AZ deployment.
 
 
 Allowed Values:
-- &#34;aws&#34;
-- &#34;aws-cn&#34;
-- &#34;aws-us-gov&#34;
+- aws
+- aws-cn
+- aws-us-gov
 
 Partition is the AWS partition to use.
 </details>
@@ -4135,8 +4141,8 @@ RestoreToTime is the time to restore to.
 
 
 Allowed Values:
-- &#34;full-copy&#34;
-- &#34;copy-on-write&#34;
+- full-copy
+- copy-on-write
 
 RestoreType is the type of restore to perform. This option is ignored if
   not running in cluster mode.
@@ -4496,11 +4502,12 @@ Tags is a set of tags to associate with the DB cluster.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Delete|
 
 
 Allowed Values:
-- &#34;Orphan&#34;
-- &#34;Delete&#34;
+- Orphan
+- Delete
 
 DeletionPolicy specifies what will happen to the underlying external
   when this managed resource is deleted - either "Delete" or "Orphan" the
@@ -4546,6 +4553,7 @@ KubernetesProviderConfig
 |Required |No|
 |Min Items|0|
 |Max Items|Unlimited|
+|Default Value|[*]|
 
 
 THIS IS A BETA FIELD. It is on by default but can be opted out
@@ -4582,6 +4590,7 @@ A ManagementAction represents an action that the Crossplane controllers
 |:--------|:--------|
 |Type     |object|
 |Required |No|
+|Default Value|{name:default}|
 
 
 ProviderConfigReference specifies how the provider that will be used to
@@ -4623,11 +4632,12 @@ Policies for referencing.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Required|
 
 
 Allowed Values:
-- &#34;Required&#34;
-- &#34;Optional&#34;
+- Required
+- Optional
 
 Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
@@ -4646,8 +4656,8 @@ Resolution specifies whether resolution of this reference is required.
 
 
 Allowed Values:
-- &#34;Always&#34;
-- &#34;IfNotPresent&#34;
+- Always
+- IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
@@ -4680,6 +4690,7 @@ PublishConnectionDetailsTo specifies the connection secret config which
 |:--------|:--------|
 |Type     |object|
 |Required |No|
+|Default Value|{name:default}|
 
 
 SecretStoreConfigRef specifies which secret store config should be used
@@ -4720,11 +4731,12 @@ Policies for referencing.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Required|
 
 
 Allowed Values:
-- &#34;Required&#34;
-- &#34;Optional&#34;
+- Required
+- Optional
 
 Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
@@ -4743,8 +4755,8 @@ Resolution specifies whether resolution of this reference is required.
 
 
 Allowed Values:
-- &#34;Always&#34;
-- &#34;IfNotPresent&#34;
+- Always
+- IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
@@ -5430,10 +5442,11 @@ Offset is the number of bits to offset the subnet mask by
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|multiprefixloop|
 
 
 Allowed Values:
-- &#34;multiprefixloop&#34;
+- multiprefixloop
 
 Function defines the function to use to calculate the CIDR blocks for the
   subnets. The default is "multiprefixloop" which will split multiple CIDRs

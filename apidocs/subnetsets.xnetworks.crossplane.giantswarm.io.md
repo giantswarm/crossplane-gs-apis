@@ -100,11 +100,12 @@ AppIndex is the index of the application that the subnet is being created for.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Delete|
 
 
 Allowed Values:
-- &#34;Orphan&#34;
-- &#34;Delete&#34;
+- Orphan
+- Delete
 
 DeletionPolicy specifies what will happen to the underlying external
   when this managed resource is deleted - either "Delete" or "Orphan" the
@@ -125,6 +126,7 @@ DeletionPolicy specifies what will happen to the underlying external
 |Required |No|
 |Min Items|0|
 |Max Items|Unlimited|
+|Default Value|[*]|
 
 
 THIS IS A BETA FIELD. It is on by default but can be opted out
@@ -161,6 +163,7 @@ A ManagementAction represents an action that the Crossplane controllers
 |:--------|:--------|
 |Type     |object|
 |Required |No|
+|Default Value|{name:default}|
 
 
 ProviderConfigReference specifies how the provider that will be used to
@@ -202,11 +205,12 @@ Policies for referencing.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Required|
 
 
 Allowed Values:
-- &#34;Required&#34;
-- &#34;Optional&#34;
+- Required
+- Optional
 
 Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
@@ -225,8 +229,8 @@ Resolution specifies whether resolution of this reference is required.
 
 
 Allowed Values:
-- &#34;Always&#34;
-- &#34;IfNotPresent&#34;
+- Always
+- IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
@@ -259,6 +263,7 @@ PublishConnectionDetailsTo specifies the connection secret config which
 |:--------|:--------|
 |Type     |object|
 |Required |No|
+|Default Value|{name:default}|
 
 
 SecretStoreConfigRef specifies which secret store config should be used
@@ -299,11 +304,12 @@ Policies for referencing.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Required|
 
 
 Allowed Values:
-- &#34;Required&#34;
-- &#34;Optional&#34;
+- Required
+- Optional
 
 Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
@@ -322,8 +328,8 @@ Resolution specifies whether resolution of this reference is required.
 
 
 Allowed Values:
-- &#34;Always&#34;
-- &#34;IfNotPresent&#34;
+- Always
+- IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
@@ -475,11 +481,12 @@ Subnet is a map of tags to apply only to the subnet resources
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|public|
 
 
 Allowed Values:
-- &#34;public&#34;
-- &#34;private&#34;
+- public
+- private
 
 Type is the type of VPC Subnet to create.
 </details>

@@ -157,11 +157,12 @@ ShortAz is a string type that represents the short name of an availability
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Delete|
 
 
 Allowed Values:
-- &#34;Orphan&#34;
-- &#34;Delete&#34;
+- Orphan
+- Delete
 
 DeletionPolicy specifies what will happen to the underlying external
   when this managed resource is deleted - either "Delete" or "Orphan" the
@@ -182,6 +183,7 @@ DeletionPolicy specifies what will happen to the underlying external
 |Required |No|
 |Min Items|0|
 |Max Items|Unlimited|
+|Default Value|[*]|
 
 
 THIS IS A BETA FIELD. It is on by default but can be opted out
@@ -511,6 +513,7 @@ Region specifies the region the VPC is found in.
 |:--------|:--------|
 |Type     |object|
 |Required |No|
+|Default Value|{name:default}|
 
 
 ProviderConfigReference specifies how the provider that will be used to
@@ -552,11 +555,12 @@ Policies for referencing.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Required|
 
 
 Allowed Values:
-- &#34;Required&#34;
-- &#34;Optional&#34;
+- Required
+- Optional
 
 Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
@@ -575,8 +579,8 @@ Resolution specifies whether resolution of this reference is required.
 
 
 Allowed Values:
-- &#34;Always&#34;
-- &#34;IfNotPresent&#34;
+- Always
+- IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
@@ -609,6 +613,7 @@ PublishConnectionDetailsTo specifies the connection secret config which
 |:--------|:--------|
 |Type     |object|
 |Required |No|
+|Default Value|{name:default}|
 
 
 SecretStoreConfigRef specifies which secret store config should be used
@@ -649,11 +654,12 @@ Policies for referencing.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Required|
 
 
 Allowed Values:
-- &#34;Required&#34;
-- &#34;Optional&#34;
+- Required
+- Optional
 
 Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
@@ -672,8 +678,8 @@ Resolution specifies whether resolution of this reference is required.
 
 
 Allowed Values:
-- &#34;Always&#34;
-- &#34;IfNotPresent&#34;
+- Always
+- IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
@@ -1014,10 +1020,11 @@ Offset is the number of bits to offset the subnet mask by
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|multiprefixloop|
 
 
 Allowed Values:
-- &#34;multiprefixloop&#34;
+- multiprefixloop
 
 Function defines the function to use to calculate the CIDR blocks for the
   subnets. The default is "multiprefixloop" which will split multiple CIDRs
@@ -1300,6 +1307,7 @@ NewBits is a list of bits to allocate to the subnet
 |:--------|:--------|
 |Type     |integer|
 |Required |No|
+|Default Value|0|
 
 
 Offset is the number of bits to offset the subnet mask by when generating

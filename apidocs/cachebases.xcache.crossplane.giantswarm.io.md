@@ -115,8 +115,8 @@ AtRestEncryptionEnabled specifies whether data stored in the cluster is
 
 
 Allowed Values:
-- &#34;rotate&#34;
-- &#34;set&#34;
+- rotate
+- set
 
 AuthTokenUpdateStrategy specifies how the auth token should be updated.
   
@@ -279,8 +279,8 @@ AvailabilityZone is the name of the Availability Zone in which the
 
 
 Allowed Values:
-- &#34;single-az&#34;
-- &#34;cross-az&#34;
+- single-az
+- cross-az
 
 AzMode specifies the Availability Zone mode of the cluster.
   
@@ -308,8 +308,8 @@ AzMode specifies the Availability Zone mode of the cluster.
 
 
 Allowed Values:
-- &#34;memcached&#34;
-- &#34;redis&#34;
+- memcached
+- redis
 
 Engine is the name of the cache engine to be used for the clusters in
   this group.
@@ -362,8 +362,8 @@ FinalSnapshotIdentifier is the user-supplied name for the final snapshot
 
 
 Allowed Values:
-- &#34;ipv4&#34;
-- &#34;ipv6&#34;
+- ipv4
+- ipv6
 
 IpDiscovery is the method used to discover cluster nodes.
   
@@ -428,8 +428,8 @@ Destination Name of the cloudwatch log group or for kinesis firehose resource.
 
 
 Allowed Values:
-- &#34;cloudwatch-logs&#34;
-- &#34;kinesis-firehose&#34;
+- cloudwatch-logs
+- kinesis-firehose
 
 DestinationType The destination type for the logs.
   
@@ -450,8 +450,8 @@ DestinationType The destination type for the logs.
 
 
 Allowed Values:
-- &#34;text&#34;
-- &#34;json&#34;
+- text
+- json
 
 LogFormat The log format to use.
   
@@ -472,8 +472,8 @@ LogFormat The log format to use.
 
 
 Allowed Values:
-- &#34;slow-log&#34;
-- &#34;engine-log&#34;
+- slow-log
+- engine-log
 
 LogType The type of log to deliver.
   
@@ -508,9 +508,9 @@ MaintenanceWindow specifies the weekly time range during which system
 
 
 Allowed Values:
-- &#34;ipv4&#34;
-- &#34;ipv6&#34;
-- &#34;dual_stack&#34;
+- ipv4
+- ipv6
+- dual_stack
 
 NetworkType specifies the network configuration for the cluster.
   
@@ -578,8 +578,8 @@ NumCacheNodes is the number of cache nodes in the cluster.
 
 
 Allowed Values:
-- &#34;single-outpost&#34;
-- &#34;cross-outpost&#34;
+- single-outpost
+- cross-outpost
 
 OutpostMode specifies the outpost mode that will apply to the cache
   cluster creation.
@@ -913,11 +913,12 @@ DataTieringEnabled specifies whether data tiering is enabled for the
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Delete|
 
 
 Allowed Values:
-- &#34;Orphan&#34;
-- &#34;Delete&#34;
+- Orphan
+- Delete
 
 DeletionPolicy specifies what will happen to the underlying external
   when this managed resource is deleted - either "Delete" or "Orphan" the
@@ -939,8 +940,8 @@ DeletionPolicy specifies what will happen to the underlying external
 
 
 Allowed Values:
-- &#34;memcached&#34;
-- &#34;redis&#34;
+- memcached
+- redis
 
 Engine is the name of the cache engine to be used for the clusters in
   this group.
@@ -1128,8 +1129,8 @@ GlobalReplicationGroupId is the id of the global replication group to
 
 
 Allowed Values:
-- &#34;ipv4&#34;
-- &#34;ipv6&#34;
+- ipv4
+- ipv6
 
 IpDiscovery is the method used to discover cluster nodes.
   
@@ -1211,8 +1212,8 @@ Destination Name of the cloudwatch log group or for kinesis firehose resource.
 
 
 Allowed Values:
-- &#34;cloudwatch-logs&#34;
-- &#34;kinesis-firehose&#34;
+- cloudwatch-logs
+- kinesis-firehose
 
 DestinationType The destination type for the logs.
   
@@ -1233,8 +1234,8 @@ DestinationType The destination type for the logs.
 
 
 Allowed Values:
-- &#34;text&#34;
-- &#34;json&#34;
+- text
+- json
 
 LogFormat The log format to use.
   
@@ -1255,8 +1256,8 @@ LogFormat The log format to use.
 
 
 Allowed Values:
-- &#34;slow-log&#34;
-- &#34;engine-log&#34;
+- slow-log
+- engine-log
 
 LogType The type of log to deliver.
   
@@ -1290,6 +1291,7 @@ MaintenanceWindow specifies the weekly time range during which system
 |Required |No|
 |Min Items|0|
 |Max Items|Unlimited|
+|Default Value|[*]|
 
 
 THIS IS A BETA FIELD. It is on by default but can be opted out
@@ -1346,9 +1348,9 @@ MultiAzEnabled specifies whether the cluster should be created in
 
 
 Allowed Values:
-- &#34;ipv4&#34;
-- &#34;ipv6&#34;
-- &#34;dual_stack&#34;
+- ipv4
+- ipv6
+- dual_stack
 
 NetworkType specifies the network configuration for the cluster.
   
@@ -1591,6 +1593,7 @@ PreferredCacheClusterAzs is a list ec2 availability zones in which the
 |:--------|:--------|
 |Type     |object|
 |Required |No|
+|Default Value|{name:default}|
 
 
 ProviderConfigReference specifies how the provider that will be used to
@@ -1632,11 +1635,12 @@ Policies for referencing.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Required|
 
 
 Allowed Values:
-- &#34;Required&#34;
-- &#34;Optional&#34;
+- Required
+- Optional
 
 Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
@@ -1655,8 +1659,8 @@ Resolution specifies whether resolution of this reference is required.
 
 
 Allowed Values:
-- &#34;Always&#34;
-- &#34;IfNotPresent&#34;
+- Always
+- IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
@@ -1689,6 +1693,7 @@ PublishConnectionDetailsTo specifies the connection secret config which
 |:--------|:--------|
 |Type     |object|
 |Required |No|
+|Default Value|{name:default}|
 
 
 SecretStoreConfigRef specifies which secret store config should be used
@@ -1729,11 +1734,12 @@ Policies for referencing.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
+|Default Value|Required|
 
 
 Allowed Values:
-- &#34;Required&#34;
-- &#34;Optional&#34;
+- Required
+- Optional
 
 Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
@@ -1752,8 +1758,8 @@ Resolution specifies whether resolution of this reference is required.
 
 
 Allowed Values:
-- &#34;Always&#34;
-- &#34;IfNotPresent&#34;
+- Always
+- IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
