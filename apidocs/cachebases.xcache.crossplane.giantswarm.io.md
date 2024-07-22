@@ -75,7 +75,7 @@ source_repository_ref: main
 
 
 ### Spec Properties
-<h4>.spec.applyImmediately</h4>
+<h4>`.spec.applyImmediately`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -85,7 +85,7 @@ source_repository_ref: main
 
 ApplyImmediately specifies whether the changes should be applied
   immediately or during the next maintenance window.
-<h4>.spec.atRestEncryptionEnabled</h4>
+<h4>`.spec.atRestEncryptionEnabled`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -95,7 +95,7 @@ ApplyImmediately specifies whether the changes should be applied
 
 AtRestEncryptionEnabled specifies whether data stored in the cluster is
   encrypted at rest.
-<h4>.spec.authTokenUpdateStrategy</h4>
+<h4>`.spec.authTokenUpdateStrategy`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -114,7 +114,7 @@ AuthTokenUpdateStrategy specifies how the auth token should be updated.
   - ROTATE
   - SET
   - DELETE
-<h4>.spec.autoMinorVersionUpgrade</h4>
+<h4>`.spec.autoMinorVersionUpgrade`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -124,7 +124,7 @@ AuthTokenUpdateStrategy specifies how the auth token should be updated.
 
 AutoMinorVersionUpgrade specifies whether minor engine upgrades will be
   applied automatically to the cluster during the maintenance window.
-<h4>.spec.automaticFailoverEnabled</h4>
+<h4>`.spec.automaticFailoverEnabled`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -139,7 +139,7 @@ AutomaticFailoverEnabled specifies whether a read replica will be
   
   If enabled, NumCacheNodes must be greater than 1. Must be enabled for
   Redis (cluster mode enabled) replication groups.
-<h4>.spec.availabilityZones</h4>
+<h4>`.spec.availabilityZones`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -151,7 +151,7 @@ AutomaticFailoverEnabled specifies whether a read replica will be
 
 AvailabilityZones is a list of Availability Zones in which the
   cluster's nodes will be created.
-<h4>.spec.availabilityZones[*]</h4>
+<h4>`.spec.availabilityZones[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -159,7 +159,7 @@ AvailabilityZones is a list of Availability Zones in which the
 |Required |No|
 
 
-<h4>.spec.cacheClusters</h4>
+<h4>`.spec.cacheClusters`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -176,7 +176,7 @@ CacheClusters is a list of cache clusters in the replication group.
   
   
   May be used to specify cluster specific configuration.
-<h4>.spec.cacheClusters[*]</h4>
+<h4>`.spec.cacheClusters[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -184,7 +184,7 @@ CacheClusters is a list of cache clusters in the replication group.
 |Required |No|
 
 
-<h4>.spec.cacheClusters[*].applyImmediately</h4>
+<h4>`.spec.cacheClusters[*].applyImmediately`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -194,7 +194,7 @@ CacheClusters is a list of cache clusters in the replication group.
 
 ApplyImmediately specifies whether the changes should be applied
   immediately or during the next maintenance window.
-<h4>.spec.cacheClusters[*].autoMinorVersionUpgrade</h4>
+<h4>`.spec.cacheClusters[*].autoMinorVersionUpgrade`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -204,7 +204,7 @@ ApplyImmediately specifies whether the changes should be applied
 
 AutoMinorVersionUpgrade specifies whether minor engine upgrades will be
   applied automatically to the cluster during the maintenance window.
-<h4>.spec.cacheClusters[*].availabilityZone</h4>
+<h4>`.spec.cacheClusters[*].availabilityZone`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -219,7 +219,7 @@ AvailabilityZone is the name of the Availability Zone in which the
   If you want to create cache nodes in multi-az, use
   preferred_availability_zones instead.
   Default: System chosen Availability Zone.
-<h4>.spec.cacheClusters[*].azMode</h4>
+<h4>`.spec.cacheClusters[*].azMode`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -244,7 +244,7 @@ AzMode specifies the Availability Zone mode of the cluster.
   Valid values are:
   - single-az: The cluster is created in a single Availability Zone.
   - cross-az: The cluster is created across multiple Availability Zones.
-<h4>.spec.cacheClusters[*].engine</h4>
+<h4>`.spec.cacheClusters[*].engine`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -263,7 +263,7 @@ Engine is the name of the cache engine to be used for the clusters in
   Valid values are:
   - memcached
   - redis
-<h4>.spec.cacheClusters[*].engineVersion</h4>
+<h4>`.spec.cacheClusters[*].engineVersion`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -276,7 +276,7 @@ EngineVersion is the version number of the cache engine to be used for
   
   
   This value will be ignored once the cluster is created.
-<h4>.spec.cacheClusters[*].finalSnapshotIdentifier</h4>
+<h4>`.spec.cacheClusters[*].finalSnapshotIdentifier`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -286,7 +286,7 @@ EngineVersion is the version number of the cache engine to be used for
 
 FinalSnapshotIdentifier is the user-supplied name for the final snapshot
   that is created immediately before the cluster is deleted.
-<h4>.spec.cacheClusters[*].ipDiscovery</h4>
+<h4>`.spec.cacheClusters[*].ipDiscovery`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -304,7 +304,7 @@ IpDiscovery is the method used to discover cluster nodes.
   Valid values are:
   - ipv4 (default)
   - ipv6
-<h4>.spec.cacheClusters[*].logDeliveryConfigurations</h4>
+<h4>`.spec.cacheClusters[*].logDeliveryConfigurations`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -319,7 +319,7 @@ LogDeliveryConfiguration is a list of log delivery configurations for
   
   
   This is only applicable when the Engine parameter is redis.
-<h4>.spec.cacheClusters[*].logDeliveryConfigurations[*]</h4>
+<h4>`.spec.cacheClusters[*].logDeliveryConfigurations[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -327,7 +327,7 @@ LogDeliveryConfiguration is a list of log delivery configurations for
 |Required |No|
 
 
-<h4>.spec.cacheClusters[*].logDeliveryConfigurations[*].destination</h4>
+<h4>`.spec.cacheClusters[*].logDeliveryConfigurations[*].destination`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -336,7 +336,7 @@ LogDeliveryConfiguration is a list of log delivery configurations for
 
 
 Destination Name of the cloudwatch log group or for kinesis firehose resource.
-<h4>.spec.cacheClusters[*].logDeliveryConfigurations[*].destinationType</h4>
+<h4>`.spec.cacheClusters[*].logDeliveryConfigurations[*].destinationType`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -354,7 +354,7 @@ DestinationType The destination type for the logs.
   Valid values are:
   - cloudwatch-logs
   - kinesis-firehose
-<h4>.spec.cacheClusters[*].logDeliveryConfigurations[*].logFormat</h4>
+<h4>`.spec.cacheClusters[*].logDeliveryConfigurations[*].logFormat`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -372,7 +372,7 @@ LogFormat The log format to use.
   Valid values are:
   - text
   - json
-<h4>.spec.cacheClusters[*].logDeliveryConfigurations[*].logType</h4>
+<h4>`.spec.cacheClusters[*].logDeliveryConfigurations[*].logType`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -390,7 +390,7 @@ LogType The type of log to deliver.
   Valid values are:
   - slow-log
   - engine-log
-<h4>.spec.cacheClusters[*].maintenanceWindow</h4>
+<h4>`.spec.cacheClusters[*].maintenanceWindow`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -400,7 +400,7 @@ LogType The type of log to deliver.
 
 MaintenanceWindow specifies the weekly time range during which system
   maintenance can occur.
-<h4>.spec.cacheClusters[*].networkType</h4>
+<h4>`.spec.cacheClusters[*].networkType`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -420,7 +420,7 @@ NetworkType specifies the network configuration for the cluster.
   - ipv4
   - ipv6
   - dual_stack
-<h4>.spec.cacheClusters[*].nodeType</h4>
+<h4>`.spec.cacheClusters[*].nodeType`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -432,7 +432,7 @@ NodeType is the instance class to use for the cache nodes.
   
   
   Requried unless replication group is specified.
-<h4>.spec.cacheClusters[*].notificationTopicArn</h4>
+<h4>`.spec.cacheClusters[*].notificationTopicArn`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -442,7 +442,7 @@ NodeType is the instance class to use for the cache nodes.
 
 NotificationTopicArn is the Amazon Resource Name (ARN) of the Amazon SNS
   topic to which notifications will be sent.
-<h4>.spec.cacheClusters[*].numCacheNodes</h4>
+<h4>`.spec.cacheClusters[*].numCacheNodes`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -454,7 +454,7 @@ NumCacheNodes is the number of cache nodes in the cluster.
   
   
   Required unless replication group is specified.
-<h4>.spec.cacheClusters[*].outpostMode</h4>
+<h4>`.spec.cacheClusters[*].outpostMode`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -476,7 +476,7 @@ OutpostMode specifies the outpost mode that will apply to the cache
   
   
   Currently only single-outpost is supported.
-<h4>.spec.cacheClusters[*].parameterGroupName</h4>
+<h4>`.spec.cacheClusters[*].parameterGroupName`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -489,7 +489,7 @@ ParameterGroupName is the name of the parameter group to associate with
   
   
   Required unless replication group is specified.
-<h4>.spec.cacheClusters[*].port</h4>
+<h4>`.spec.cacheClusters[*].port`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -499,7 +499,7 @@ ParameterGroupName is the name of the parameter group to associate with
 
 Port is the port number on which each of the cache nodes will accept
   connections.
-<h4>.spec.cacheClusters[*].preferredAvailabilityZones</h4>
+<h4>`.spec.cacheClusters[*].preferredAvailabilityZones`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -515,7 +515,7 @@ PreferredAvailabilityZones is a list of Availability Zones in which the
   
   Memcached only. The number of availability zones must equal the number of
   nodes specified in the NumCacheNodes parameter.
-<h4>.spec.cacheClusters[*].preferredAvailabilityZones[*]</h4>
+<h4>`.spec.cacheClusters[*].preferredAvailabilityZones[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -523,7 +523,7 @@ PreferredAvailabilityZones is a list of Availability Zones in which the
 |Required |No|
 
 
-<h4>.spec.cacheClusters[*].preferredOutpostArn</h4>
+<h4>`.spec.cacheClusters[*].preferredOutpostArn`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -533,7 +533,7 @@ PreferredAvailabilityZones is a list of Availability Zones in which the
 
 PreferredOutpostArn is the Amazon Resource Name (ARN) of the outpost in
   which the cache cluster will be created.
-<h4>.spec.cacheClusters[*].securityGroupIds</h4>
+<h4>`.spec.cacheClusters[*].securityGroupIds`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -545,7 +545,7 @@ PreferredOutpostArn is the Amazon Resource Name (ARN) of the outpost in
 
 SecurityGroupIds is a list of security group IDs to associate with the
   cluster.
-<h4>.spec.cacheClusters[*].securityGroupIds[*]</h4>
+<h4>`.spec.cacheClusters[*].securityGroupIds[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -553,7 +553,7 @@ SecurityGroupIds is a list of security group IDs to associate with the
 |Required |No|
 
 
-<h4>.spec.cacheClusters[*].snapshotArns</h4>
+<h4>`.spec.cacheClusters[*].snapshotArns`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -568,7 +568,7 @@ SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
   
   
   Optional, Redis only
-<h4>.spec.cacheClusters[*].snapshotArns[*]</h4>
+<h4>`.spec.cacheClusters[*].snapshotArns[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -576,7 +576,7 @@ SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
 |Required |No|
 
 
-<h4>.spec.cacheClusters[*].snapshotName</h4>
+<h4>`.spec.cacheClusters[*].snapshotName`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -589,7 +589,7 @@ SnapshotName is the name of the snapshot from which to restore data into
   
   
   Optional, Redis only
-<h4>.spec.cacheClusters[*].snapshotRetentionLimit</h4>
+<h4>`.spec.cacheClusters[*].snapshotRetentionLimit`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -602,7 +602,7 @@ SnapshotRetentionLimit is the number of days for which ElastiCache will
   
   
   Optional, Redis only
-<h4>.spec.cacheClusters[*].snapshotWindow</h4>
+<h4>`.spec.cacheClusters[*].snapshotWindow`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -615,7 +615,7 @@ SnapshotWindow is the daily time range (in UTC) during which ElastiCache
   
   
   Optional, Redis only
-<h4>.spec.cacheClusters[*].subnetGroupName</h4>
+<h4>`.spec.cacheClusters[*].subnetGroupName`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -629,7 +629,7 @@ SubnetGroupName is the name of the subnet group to associate with this
   
   Required unless replication group is specified in which case it will be
   ignored.
-<h4>.spec.cacheClusters[*].tags</h4>
+<h4>`.spec.cacheClusters[*].tags`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -638,7 +638,7 @@ SubnetGroupName is the name of the subnet group to associate with this
 
 
 Tags is a list of key-value pairs to associate with the cluster.
-<h4>.spec.cacheClusters[*].transitEncryptionEnabled</h4>
+<h4>`.spec.cacheClusters[*].transitEncryptionEnabled`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -651,7 +651,7 @@ TransitEncryptionEnabled specifies whether data in the cluster is
   
   
   Optional, Memcached only
-<h4>.spec.cidrBlocks</h4>
+<h4>`.spec.cidrBlocks`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -663,7 +663,7 @@ TransitEncryptionEnabled specifies whether data in the cluster is
 
 CidrBlocks is a list of CIDR blocks that are allowed to access the
   cluster.
-<h4>.spec.cidrBlocks[*]</h4>
+<h4>`.spec.cidrBlocks[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -671,7 +671,7 @@ CidrBlocks is a list of CIDR blocks that are allowed to access the
 |Required |No|
 
 
-<h4>.spec.clusterModeEnabled</h4>
+<h4>`.spec.clusterModeEnabled`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -681,7 +681,7 @@ CidrBlocks is a list of CIDR blocks that are allowed to access the
 
 ClusterModeEnabled specifies whether cluster mode is enabled for the
   replication group.
-<h4>.spec.createReplicationGroup</h4>
+<h4>`.spec.createReplicationGroup`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -695,7 +695,7 @@ CreateReplicationGroup specifies whether a replication group should be
   
   If set false, the replication group configuration will be used for
   creating a single cluster
-<h4>.spec.dataTieringEnabled</h4>
+<h4>`.spec.dataTieringEnabled`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -708,7 +708,7 @@ DataTieringEnabled specifies whether data tiering is enabled for the
   
   
   Must be true if the replcation group is using r6gd nodes
-<h4>.spec.deletionPolicy</h4>
+<h4>`.spec.deletionPolicy`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -728,7 +728,7 @@ DeletionPolicy specifies what will happen to the underlying external
   field in a future release. Currently, both could be set independently and
   non-default values would be honored if the feature flag is enabled.
   See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
-<h4>.spec.engine</h4>
+<h4>`.spec.engine`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -747,7 +747,7 @@ Engine is the name of the cache engine to be used for the clusters in
   Valid values are:
   - memcached
   - redis
-<h4>.spec.engineVersion</h4>
+<h4>`.spec.engineVersion`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -760,7 +760,7 @@ EngineVersion is the version number of the cache engine to be used for
   
   
   This value will be ignored once the cluster is created.
-<h4>.spec.finalSnapshotIdentifier</h4>
+<h4>`.spec.finalSnapshotIdentifier`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -770,7 +770,7 @@ EngineVersion is the version number of the cache engine to be used for
 
 FinalSnapshotIdentifier is the user-supplied name for the final snapshot
   that is created immediately before the cluster is deleted.
-<h4>.spec.globalReplicationGroup</h4>
+<h4>`.spec.globalReplicationGroup`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -779,7 +779,7 @@ FinalSnapshotIdentifier is the user-supplied name for the final snapshot
 
 
 GlobalReplicationGroup is the global replication group configuration.
-<h4>.spec.globalReplicationGroup.automaticFailoverEnabled</h4>
+<h4>`.spec.globalReplicationGroup.automaticFailoverEnabled`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -790,7 +790,7 @@ GlobalReplicationGroup is the global replication group configuration.
 AutomaticFailoverEnabled specifies whether a read replica will be
   automatically promoted to the primary cluster if the existing primary
   cluster fails.
-<h4>.spec.globalReplicationGroup.cacheNodeType</h4>
+<h4>`.spec.globalReplicationGroup.cacheNodeType`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -799,7 +799,7 @@ AutomaticFailoverEnabled specifies whether a read replica will be
 
 
 CacheNodeType is the instance class to use for the cache nodes.
-<h4>.spec.globalReplicationGroup.enabled</h4>
+<h4>`.spec.globalReplicationGroup.enabled`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -808,7 +808,7 @@ CacheNodeType is the instance class to use for the cache nodes.
 
 
 Enabled is a flag that enables the global replication group.
-<h4>.spec.globalReplicationGroup.engineVersion</h4>
+<h4>`.spec.globalReplicationGroup.engineVersion`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -818,7 +818,7 @@ Enabled is a flag that enables the global replication group.
 
 EngineVersion is the version number of the cache engine to be used for
   the cluster. If not set this will default to the latest version.
-<h4>.spec.globalReplicationGroup.numNodeGroups</h4>
+<h4>`.spec.globalReplicationGroup.numNodeGroups`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -827,7 +827,7 @@ EngineVersion is the version number of the cache engine to be used for
 
 
 NumNodeGroups is the number of node groups in the replication group.
-<h4>.spec.globalReplicationGroup.parameterGroupName</h4>
+<h4>`.spec.globalReplicationGroup.parameterGroupName`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -845,7 +845,7 @@ ParameterGroupName is the name of the parameter group to associate with
   
   Specifying this parameter will result in an error if a major engine version
   is not specified.
-<h4>.spec.globalReplicationGroup.suffix</h4>
+<h4>`.spec.globalReplicationGroup.suffix`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -855,7 +855,7 @@ ParameterGroupName is the name of the parameter group to associate with
 
 GlobalReplicationGroupIdSuffix is the suffix to append to the global
   replication group id.
-<h4>.spec.globalReplicationGroupId</h4>
+<h4>`.spec.globalReplicationGroupId`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -869,7 +869,7 @@ GlobalReplicationGroupId is the id of the global replication group to
   
   If this value is specified, the number of node groups parameter must not
   be specified.
-<h4>.spec.ipDiscovery</h4>
+<h4>`.spec.ipDiscovery`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -887,7 +887,7 @@ IpDiscovery is the method used to discover cluster nodes.
   Valid values are:
   - ipv4 (default)
   - ipv6
-<h4>.spec.kmsKeyId</h4>
+<h4>`.spec.kmsKeyId`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -900,7 +900,7 @@ KmsKeyId is the ID of the AWS Key Management Service (KMS) key used to
   
   
   Ignored unless AtRestEncryptionEnabled is set to true.
-<h4>.spec.logDeliveryConfigurations</h4>
+<h4>`.spec.logDeliveryConfigurations`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -915,7 +915,7 @@ LogDeliveryConfiguration is a list of log delivery configurations for
   
   
   This is only applicable when the Engine parameter is redis.
-<h4>.spec.logDeliveryConfigurations[*]</h4>
+<h4>`.spec.logDeliveryConfigurations[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -923,7 +923,7 @@ LogDeliveryConfiguration is a list of log delivery configurations for
 |Required |No|
 
 
-<h4>.spec.logDeliveryConfigurations[*].destination</h4>
+<h4>`.spec.logDeliveryConfigurations[*].destination`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -932,7 +932,7 @@ LogDeliveryConfiguration is a list of log delivery configurations for
 
 
 Destination Name of the cloudwatch log group or for kinesis firehose resource.
-<h4>.spec.logDeliveryConfigurations[*].destinationType</h4>
+<h4>`.spec.logDeliveryConfigurations[*].destinationType`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -950,7 +950,7 @@ DestinationType The destination type for the logs.
   Valid values are:
   - cloudwatch-logs
   - kinesis-firehose
-<h4>.spec.logDeliveryConfigurations[*].logFormat</h4>
+<h4>`.spec.logDeliveryConfigurations[*].logFormat`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -968,7 +968,7 @@ LogFormat The log format to use.
   Valid values are:
   - text
   - json
-<h4>.spec.logDeliveryConfigurations[*].logType</h4>
+<h4>`.spec.logDeliveryConfigurations[*].logType`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -986,7 +986,7 @@ LogType The type of log to deliver.
   Valid values are:
   - slow-log
   - engine-log
-<h4>.spec.maintenanceWindow</h4>
+<h4>`.spec.maintenanceWindow`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -996,7 +996,7 @@ LogType The type of log to deliver.
 
 MaintenanceWindow specifies the weekly time range during which system
   maintenance can occur.
-<h4>.spec.managementPolicies</h4>
+<h4>`.spec.managementPolicies`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1017,7 +1017,7 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
   custom, the DeletionPolicy field will be ignored.
   See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
   and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
-<h4>.spec.managementPolicies[*]</h4>
+<h4>`.spec.managementPolicies[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1027,7 +1027,7 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
 
 A ManagementAction represents an action that the Crossplane controllers
   can take on an external resource.
-<h4>.spec.multiAzEnabled</h4>
+<h4>`.spec.multiAzEnabled`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1040,7 +1040,7 @@ MultiAzEnabled specifies whether the cluster should be created in
   
   
   If true, AutomaticFailoverEnabled must also be true.
-<h4>.spec.networkType</h4>
+<h4>`.spec.networkType`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1060,7 +1060,7 @@ NetworkType specifies the network configuration for the cluster.
   - ipv4
   - ipv6
   - dual_stack
-<h4>.spec.nodeType</h4>
+<h4>`.spec.nodeType`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1072,7 +1072,7 @@ NodeType is the instance class to use for the cache nodes.
   
   
   Requried unless global replication group is specified.
-<h4>.spec.notificationTopicArn</h4>
+<h4>`.spec.notificationTopicArn`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1082,7 +1082,7 @@ NodeType is the instance class to use for the cache nodes.
 
 NotificationTopicArn is the Amazon Resource Name (ARN) of the Amazon SNS
   topic to which notifications will be sent.
-<h4>.spec.numCacheClusters</h4>
+<h4>`.spec.numCacheClusters`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1098,7 +1098,7 @@ NumCacheClusters is the number of cache clusters in the replication group.
   
   
   Conflicts with NumNodeGroups.
-<h4>.spec.numCacheNodes</h4>
+<h4>`.spec.numCacheNodes`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1111,7 +1111,7 @@ NumCacheNodes is the number of cache nodes in the cluster.
   
   Ignored if replication group is specified or being created
   This is a convenience parameter when building a single cluster.
-<h4>.spec.numNodeGroups</h4>
+<h4>`.spec.numNodeGroups`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1127,7 +1127,7 @@ NumNodeGroups is the number of node groups in the replication group.
   
   
   Conflicts with NumCacheClusters.
-<h4>.spec.parameterGroupConfiguration</h4>
+<h4>`.spec.parameterGroupConfiguration`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1137,7 +1137,7 @@ NumNodeGroups is the number of node groups in the replication group.
 
 ParameterGroupConfiguration defines the configuration for the parameter
   group.
-<h4>.spec.parameterGroupConfiguration.description</h4>
+<h4>`.spec.parameterGroupConfiguration.description`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1146,7 +1146,7 @@ ParameterGroupConfiguration defines the configuration for the parameter
 
 
 Description is a description of the parameter group.
-<h4>.spec.parameterGroupConfiguration.family</h4>
+<h4>`.spec.parameterGroupConfiguration.family`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1156,7 +1156,7 @@ Description is a description of the parameter group.
 
 Family is the name of the parameter group family that this parameter
   group is compatible with.
-<h4>.spec.parameterGroupConfiguration.name</h4>
+<h4>`.spec.parameterGroupConfiguration.name`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1165,7 +1165,7 @@ Family is the name of the parameter group family that this parameter
 
 
 Name is the name of the parameter group.
-<h4>.spec.parameterGroupConfiguration.parameters</h4>
+<h4>`.spec.parameterGroupConfiguration.parameters`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1174,7 +1174,7 @@ Name is the name of the parameter group.
 
 
 Parameters is a list of parameters in the parameter group.
-<h4>.spec.parameterGroupConfiguration.tags</h4>
+<h4>`.spec.parameterGroupConfiguration.tags`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1183,7 +1183,7 @@ Parameters is a list of parameters in the parameter group.
 
 
 Tags is a list of key-value pairs to associate with the parameter group.
-<h4>.spec.parameterGroupName</h4>
+<h4>`.spec.parameterGroupName`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1194,7 +1194,7 @@ Tags is a list of key-value pairs to associate with the parameter group.
 ParameterGroupName is the name of the parameter group to associate with
   this cluster. To create a new parameter group, use the
   `ParameterGroupConfiguration` option instead.
-<h4>.spec.port</h4>
+<h4>`.spec.port`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1204,7 +1204,7 @@ ParameterGroupName is the name of the parameter group to associate with
 
 Port is the port number on which each of the cache nodes will accept
   connections.
-<h4>.spec.preferredCacheClusterAzs</h4>
+<h4>`.spec.preferredCacheClusterAzs`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1216,7 +1216,7 @@ Port is the port number on which each of the cache nodes will accept
 
 PreferredCacheClusterAzs is a list ec2 availability zones in which the
   cache clusters will be created.
-<h4>.spec.preferredCacheClusterAzs[*]</h4>
+<h4>`.spec.preferredCacheClusterAzs[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1224,7 +1224,7 @@ PreferredCacheClusterAzs is a list ec2 availability zones in which the
 |Required |No|
 
 
-<h4>.spec.providerConfigRef</h4>
+<h4>`.spec.providerConfigRef`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1236,7 +1236,7 @@ PreferredCacheClusterAzs is a list ec2 availability zones in which the
 ProviderConfigReference specifies how the provider that will be used to
   create, observe, update, and delete this managed resource should be
   configured.
-<h4>.spec.providerConfigRef.name</h4>
+<h4>`.spec.providerConfigRef.name`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1245,7 +1245,7 @@ ProviderConfigReference specifies how the provider that will be used to
 
 
 Name of the referenced object.
-<h4>.spec.providerConfigRef.policy</h4>
+<h4>`.spec.providerConfigRef.policy`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1254,7 +1254,7 @@ Name of the referenced object.
 
 
 Policies for referencing.
-<h4>.spec.providerConfigRef.policy.resolution</h4>
+<h4>`.spec.providerConfigRef.policy.resolution`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1271,7 +1271,7 @@ Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
   reference cannot be resolved. 'Optional' means this reference will be
   a no-op if it cannot be resolved.
-<h4>.spec.providerConfigRef.policy.resolve</h4>
+<h4>`.spec.providerConfigRef.policy.resolve`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1287,7 +1287,7 @@ Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
   the corresponding field is not present. Use 'Always' to resolve the
   reference on every reconcile.
-<h4>.spec.publishConnectionDetailsTo</h4>
+<h4>`.spec.publishConnectionDetailsTo`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1300,7 +1300,7 @@ PublishConnectionDetailsTo specifies the connection secret config which
   which any connection details for this managed resource should be written.
   Connection details frequently include the endpoint, username,
   and password required to connect to the managed resource.
-<h4>.spec.publishConnectionDetailsTo.configRef</h4>
+<h4>`.spec.publishConnectionDetailsTo.configRef`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1311,7 +1311,7 @@ PublishConnectionDetailsTo specifies the connection secret config which
 
 SecretStoreConfigRef specifies which secret store config should be used
   for this ConnectionSecret.
-<h4>.spec.publishConnectionDetailsTo.configRef.name</h4>
+<h4>`.spec.publishConnectionDetailsTo.configRef.name`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1320,7 +1320,7 @@ SecretStoreConfigRef specifies which secret store config should be used
 
 
 Name of the referenced object.
-<h4>.spec.publishConnectionDetailsTo.configRef.policy</h4>
+<h4>`.spec.publishConnectionDetailsTo.configRef.policy`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1329,7 +1329,7 @@ Name of the referenced object.
 
 
 Policies for referencing.
-<h4>.spec.publishConnectionDetailsTo.configRef.policy.resolution</h4>
+<h4>`.spec.publishConnectionDetailsTo.configRef.policy.resolution`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1346,7 +1346,7 @@ Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
   reference cannot be resolved. 'Optional' means this reference will be
   a no-op if it cannot be resolved.
-<h4>.spec.publishConnectionDetailsTo.configRef.policy.resolve</h4>
+<h4>`.spec.publishConnectionDetailsTo.configRef.policy.resolve`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1362,7 +1362,7 @@ Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
   the corresponding field is not present. Use 'Always' to resolve the
   reference on every reconcile.
-<h4>.spec.publishConnectionDetailsTo.metadata</h4>
+<h4>`.spec.publishConnectionDetailsTo.metadata`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1371,7 +1371,7 @@ Resolve specifies when this reference should be resolved. The default
 
 
 Metadata is the metadata for connection secret.
-<h4>.spec.publishConnectionDetailsTo.metadata.annotations</h4>
+<h4>`.spec.publishConnectionDetailsTo.metadata.annotations`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1382,7 +1382,7 @@ Metadata is the metadata for connection secret.
 Annotations are the annotations to be added to connection secret.
   - For Kubernetes secrets, this will be used as "metadata.annotations".
   - It is up to Secret Store implementation for others store types.
-<h4>.spec.publishConnectionDetailsTo.metadata.labels</h4>
+<h4>`.spec.publishConnectionDetailsTo.metadata.labels`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1393,7 +1393,7 @@ Annotations are the annotations to be added to connection secret.
 Labels are the labels/tags to be added to connection secret.
   - For Kubernetes secrets, this will be used as "metadata.labels".
   - It is up to Secret Store implementation for others store types.
-<h4>.spec.publishConnectionDetailsTo.metadata.type</h4>
+<h4>`.spec.publishConnectionDetailsTo.metadata.type`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1403,7 +1403,7 @@ Labels are the labels/tags to be added to connection secret.
 
 Type is the SecretType for the connection secret.
   - Only valid for Kubernetes Secret Stores.
-<h4>.spec.publishConnectionDetailsTo.name</h4>
+<h4>`.spec.publishConnectionDetailsTo.name`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1412,7 +1412,7 @@ Type is the SecretType for the connection secret.
 
 
 Name is the name of the connection secret.
-<h4>.spec.region</h4>
+<h4>`.spec.region`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1421,7 +1421,7 @@ Name is the name of the connection secret.
 
 
 Region is the region in which the cluster will be created.
-<h4>.spec.replicasPerNodeGroup</h4>
+<h4>`.spec.replicasPerNodeGroup`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1430,7 +1430,7 @@ Region is the region in which the cluster will be created.
 
 
 ReplicasPerNodeGroup is the number of read replicas per node group.
-<h4>.spec.securityGroupIds</h4>
+<h4>`.spec.securityGroupIds`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1442,7 +1442,7 @@ ReplicasPerNodeGroup is the number of read replicas per node group.
 
 SecurityGroupIds is a list of security group IDs to associate with the
   cluster.
-<h4>.spec.securityGroupIds[*]</h4>
+<h4>`.spec.securityGroupIds[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1450,7 +1450,7 @@ SecurityGroupIds is a list of security group IDs to associate with the
 |Required |No|
 
 
-<h4>.spec.snapshotArns</h4>
+<h4>`.spec.snapshotArns`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1465,7 +1465,7 @@ SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
   
   
   Optional, Redis only
-<h4>.spec.snapshotArns[*]</h4>
+<h4>`.spec.snapshotArns[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1473,7 +1473,7 @@ SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
 |Required |No|
 
 
-<h4>.spec.snapshotName</h4>
+<h4>`.spec.snapshotName`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1486,7 +1486,7 @@ SnapshotName is the name of the snapshot from which to restore data into
   
   
   Optional, Redis only
-<h4>.spec.snapshotRetentionLimit</h4>
+<h4>`.spec.snapshotRetentionLimit`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1499,7 +1499,7 @@ SnapshotRetentionLimit is the number of days for which ElastiCache will
   
   
   Optional, Redis only
-<h4>.spec.snapshotWindow</h4>
+<h4>`.spec.snapshotWindow`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1512,7 +1512,7 @@ SnapshotWindow is the daily time range (in UTC) during which ElastiCache
   
   
   Optional, Redis only
-<h4>.spec.subnetIds</h4>
+<h4>`.spec.subnetIds`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1524,7 +1524,7 @@ SnapshotWindow is the daily time range (in UTC) during which ElastiCache
 
 SubnetIds is a list of subnet IDs in which the cluster's nodes will be
   created.
-<h4>.spec.subnetIds[*]</h4>
+<h4>`.spec.subnetIds[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1532,7 +1532,7 @@ SubnetIds is a list of subnet IDs in which the cluster's nodes will be
 |Required |No|
 
 
-<h4>.spec.tags</h4>
+<h4>`.spec.tags`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1541,7 +1541,7 @@ SubnetIds is a list of subnet IDs in which the cluster's nodes will be
 
 
 Tags is a list of key-value pairs to associate with the cluster.
-<h4>.spec.transitEncryptionEnabled</h4>
+<h4>`.spec.transitEncryptionEnabled`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1554,7 +1554,7 @@ TransitEncryptionEnabled specifies whether data in the cluster is
   
   
   Optional, Memcached only
-<h4>.spec.usernames</h4>
+<h4>`.spec.usernames`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1565,7 +1565,7 @@ TransitEncryptionEnabled specifies whether data in the cluster is
 
 
 Usernames is a list of users to associate with the cluster.
-<h4>.spec.usernames[*]</h4>
+<h4>`.spec.usernames[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1573,7 +1573,7 @@ Usernames is a list of users to associate with the cluster.
 |Required |No|
 
 
-<h4>.spec.vpcId</h4>
+<h4>`.spec.vpcId`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1582,7 +1582,7 @@ Usernames is a list of users to associate with the cluster.
 
 
 VpcId is the ID of the VPC in which the cluster will be created.
-<h4>.spec.writeConnectionSecretToRef</h4>
+<h4>`.spec.writeConnectionSecretToRef`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1598,7 +1598,7 @@ WriteConnectionSecretToReference specifies the namespace and name of a
   PublishConnectionDetailsTo. Currently, both could be set independently
   and connection details would be published to both without affecting
   each other.
-<h4>.spec.writeConnectionSecretToRef.name</h4>
+<h4>`.spec.writeConnectionSecretToRef.name`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1607,7 +1607,7 @@ WriteConnectionSecretToReference specifies the namespace and name of a
 
 
 Name of the secret.
-<h4>.spec.writeConnectionSecretToRef.namespace</h4>
+<h4>`.spec.writeConnectionSecretToRef.namespace`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1618,7 +1618,7 @@ Name of the secret.
 Namespace of the secret.
 
 ### Status Properties
-<h4>.status.clusterEndpoints</h4>
+<h4>`.status.clusterEndpoints`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1629,7 +1629,7 @@ Namespace of the secret.
 
 
 ClusterEndpoints is a list of endpoints for the clusters.
-<h4>.status.clusterEndpoints[*]</h4>
+<h4>`.status.clusterEndpoints[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1637,7 +1637,7 @@ ClusterEndpoints is a list of endpoints for the clusters.
 |Required |No|
 
 
-<h4>.status.clusterName</h4>
+<h4>`.status.clusterName`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1646,7 +1646,7 @@ ClusterEndpoints is a list of endpoints for the clusters.
 
 
 ClusterName is the name of the cluster.
-<h4>.status.conditions</h4>
+<h4>`.status.conditions`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1657,7 +1657,7 @@ ClusterName is the name of the cluster.
 
 
 Conditions of the resource.
-<h4>.status.conditions[*]</h4>
+<h4>`.status.conditions[*]`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1666,7 +1666,7 @@ Conditions of the resource.
 
 
 A Condition that may apply to a resource.
-<h4>.status.conditions[*].lastTransitionTime</h4>
+<h4>`.status.conditions[*].lastTransitionTime`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1676,7 +1676,7 @@ A Condition that may apply to a resource.
 
 LastTransitionTime is the last time this condition transitioned from one
   status to another.
-<h4>.status.conditions[*].message</h4>
+<h4>`.status.conditions[*].message`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1686,7 +1686,7 @@ LastTransitionTime is the last time this condition transitioned from one
 
 A Message containing details about this condition's last transition from
   one status to another, if any.
-<h4>.status.conditions[*].reason</h4>
+<h4>`.status.conditions[*].reason`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1695,7 +1695,7 @@ A Message containing details about this condition's last transition from
 
 
 A Reason for this condition's last transition from one status to another.
-<h4>.status.conditions[*].status</h4>
+<h4>`.status.conditions[*].status`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1704,7 +1704,7 @@ A Reason for this condition's last transition from one status to another.
 
 
 Status of this condition; is it currently True, False, or Unknown?
-<h4>.status.conditions[*].type</h4>
+<h4>`.status.conditions[*].type`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1714,7 +1714,7 @@ Status of this condition; is it currently True, False, or Unknown?
 
 Type of this condition. At most one of each condition type may apply to
   a resource at any point in time.
-<h4>.status.connectionSecret</h4>
+<h4>`.status.connectionSecret`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1723,7 +1723,7 @@ Type of this condition. At most one of each condition type may apply to
 
 
 ConnectionSecret is the name of the connection secret.
-<h4>.status.endpoint</h4>
+<h4>`.status.endpoint`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1732,7 +1732,7 @@ ConnectionSecret is the name of the connection secret.
 
 
 Endpoint is the DNS name of the endpoint for the cluster.
-<h4>.status.globalConnectionSecret</h4>
+<h4>`.status.globalConnectionSecret`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1741,7 +1741,7 @@ Endpoint is the DNS name of the endpoint for the cluster.
 
 
 GlobalConnectionSecret is the name of the global connection secret.
-<h4>.status.globalEndpoint</h4>
+<h4>`.status.globalEndpoint`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1751,7 +1751,7 @@ GlobalConnectionSecret is the name of the global connection secret.
 
 GlobalEndpoint is the DNS name of the endpoint for the cluster at global
   scope
-<h4>.status.globalReaderEndpoint</h4>
+<h4>`.status.globalReaderEndpoint`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1761,7 +1761,7 @@ GlobalEndpoint is the DNS name of the endpoint for the cluster at global
 
 GlobalReaderEndpoint is the DNS name of the reader endpoint for the
   cluster at global scope
-<h4>.status.globalReplicationGroupId</h4>
+<h4>`.status.globalReplicationGroupId`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1770,7 +1770,7 @@ GlobalReaderEndpoint is the DNS name of the reader endpoint for the
 
 
 GlobalReplicationGroupId is the ID of the global replication group.
-<h4>.status.kmsKeyId</h4>
+<h4>`.status.kmsKeyId`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1780,7 +1780,7 @@ GlobalReplicationGroupId is the ID of the global replication group.
 
 kmsKeyId is the ID of the AWS Key Management Service (KMS) key used to
   encrypt the data in the cluster.
-<h4>.status.parameterGroupName</h4>
+<h4>`.status.parameterGroupName`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1790,7 +1790,7 @@ kmsKeyId is the ID of the AWS Key Management Service (KMS) key used to
 
 ParameterGroupName is the name of the parameter group associated with the
   cluster.
-<h4>.status.port</h4>
+<h4>`.status.port`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1800,7 +1800,7 @@ ParameterGroupName is the name of the parameter group associated with the
 
 Port is the port number on which each of the cache nodes will accept
   connections.
-<h4>.status.readerEndpoint</h4>
+<h4>`.status.readerEndpoint`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1809,7 +1809,7 @@ Port is the port number on which each of the cache nodes will accept
 
 
 ReaderEndpoint is the DNS name of the reader endpoint for the cluster.
-<h4>.status.replicationGroupId</h4>
+<h4>`.status.replicationGroupId`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1818,7 +1818,7 @@ ReaderEndpoint is the DNS name of the reader endpoint for the cluster.
 
 
 ReplicationGroupId is the ID of the replication group.
-<h4>.status.securityGroupId</h4>
+<h4>`.status.securityGroupId`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1827,7 +1827,7 @@ ReplicationGroupId is the ID of the replication group.
 
 
 SecurityGroupId is the ID of the security group for the cluster.
-<h4>.status.subnetGroupName</h4>
+<h4>`.status.subnetGroupName`</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1836,7 +1836,7 @@ SecurityGroupId is the ID of the security group for the cluster.
 
 
 SubnetGroupName is the name of the subnet group for the cluster.
-<h4>.status.userGroupId</h4>
+<h4>`.status.userGroupId`</h4>
 
 |Property |Value    |
 |:--------|:--------|
