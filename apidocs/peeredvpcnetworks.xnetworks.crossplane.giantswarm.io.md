@@ -2,16 +2,15 @@
 title: PeeredVpcNetwork CRD schema reference (group xnetworks.crossplane.giantswarm.io)
 linkTitle: PeeredVpcNetwork
 description: |
-  PeerVpcNetworkSpec defines the desired state of PeerVpcNetwork
+  PeeredVpcNetwork defines the desired state of a VPC.
   
   
-  This is a more advanced composition that uses KCL language to calculate the
-  overall structure of the VPC and subnets, utilising dynamic calculation for
-  the components of the VPC.
+  This composition can be used to create an *n-dimensional* VPC with optional
+  peering to other VPCs.
   
   
   A claim made against this composition will result in the creation of a VPC
-  with a number of subnets grouped into sets of 3 availability zones.
+  with a number of subnets grouped into sets across *n* availability zones.
   
   
   If VPC Peering is enabled, the VPC will be peered with the VPCs specified in
@@ -58,16 +57,15 @@ source_repository_ref: main
 # PeeredVpcNetwork
 
 
-PeerVpcNetworkSpec defines the desired state of PeerVpcNetwork
+PeeredVpcNetwork defines the desired state of a VPC.
 
 
-This is a more advanced composition that uses KCL language to calculate the
-overall structure of the VPC and subnets, utilising dynamic calculation for
-the components of the VPC.
+This composition can be used to create an *n-dimensional* VPC with optional
+peering to other VPCs.
 
 
 A claim made against this composition will result in the creation of a VPC
-with a number of subnets grouped into sets of 3 availability zones.
+with a number of subnets grouped into sets across *n* availability zones.
 
 
 If VPC Peering is enabled, the VPC will be peered with the VPCs specified in
@@ -128,10 +126,8 @@ VPC CIDRs.
 |Max Items|3|
 
 
-AvailabilityZones is a list of availability zones in the region. The
-  number of availability zones must match the number of bits x the number
-  of subnetsets (public + private). The VPC Cidr must be big enough to
-  encompass all the subnet CIDR blocks.
+AvailabilityZones is a list of availability zones in the region to be
+  used for this VPC. This should be a list of single character strings
 </details>
 <details>
 <summary>
@@ -145,8 +141,8 @@ AvailabilityZones is a list of availability zones in the region. The
 |Validation|`^[a-z]$`|
 
 
-ShortAz is a string type that represents the short name of an availability
-  zone.
+A single character representation of the short name of an availability zone.
+  For example, "a" for "eu-west-1a".
 </details>
 <details>
 <summary>
@@ -795,7 +791,18 @@ PeeredSubnets defines how many public and private subnet sets to create.
 |Max Items|5|
 
 
-Cidrs is a list of PeeredSubnetSets to create in the VPC
+A list of PeeredSubnetSets to create in the VPC
+  
+  
+  Each VPC Cidr may be split into *n* public and *n* private subnets as long
+  as there is enough room on the cidr for it to be split at that level. Any
+  overflow will cause the composition to fail and this will be reflected in
+  the status of the XR.
+  
+  
+  > [!IMPORTANT]
+  > There must be at least 1 entry in this set which will be used as the VPC
+  > default CIDR range, and you may define a maximum of 4 additional entries.
 </details>
 <details>
 <summary>
@@ -823,7 +830,9 @@ PeeredSubnetSet defines the parameters for creating a set of subnets with the
 |Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
 
 
-Prefix is the CIDR prefix to use for the subnet set
+A VPC CIDR or Additional CIDR to use for the VPC. If this is the first
+  entry in the list, it will be used as the default VPC CIDR, otherwise it
+  will be assigned as an additional CIDR to the VPC.
 </details>
 <details>
 <summary>
@@ -851,7 +860,13 @@ Private is the number of private subnets to create in this set
 |Max Items|Unlimited|
 
 
-ClusterNames is a list of EKS cluster names to add shared LB tags for
+A list of cluster names that may add load balancers in the tagged subnet
+  set. Each entry will result in the tag
+  `kubernetes.io/cluster/$CLUSTER_NAME shared` being added to the subnets
+  in this set.
+  
+  
+  See #lbSetIndex for deciding which subnetset gets these tags.
 </details>
 <details>
 <summary>
@@ -876,7 +891,13 @@ ClusterNames is a list of EKS cluster names to add shared LB tags for
 |Required |**Yes**|
 
 
-Count is the number of subnet sets to create with this mask
+Count is the number of subnet sets to create with this mask.
+  
+  
+  > [!WARNING]
+  > Whilst this field is not `immutable`, care should be taken to never
+  > decrease its value once set as this will result in the destruction of
+  > subnet sets which may fail if there are attached resources.
 </details>
 <details>
 <summary>
@@ -889,8 +910,8 @@ Count is the number of subnet sets to create with this mask
 |Required |No|
 
 
-Determines which subnet set in this range to use for kubernetes load
-  balancers. -1 means no load balancer tag is defined on this group
+Identifies which subnet set to use for public EKS load balancers. Subnets
+  in this set will recieve the `kubernetes.io/role/elb: 1` tag
 </details>
 <details>
 <summary>
@@ -903,7 +924,11 @@ Determines which subnet set in this range to use for kubernetes load
 |Required |**Yes**|
 
 
-Mask is the CIDR mask to use for the subnet set
+This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
+  use as a mask for the subnet.
+  
+  
+  To prevent subnets being destroyed and recreated *This field is immutable*
 </details>
 <details>
 <summary>
@@ -929,7 +954,17 @@ Offset is the number of bits to offset the subnet mask by
 |Required |**Yes**|
 
 
-Public is the number of public subnets to create in this set
+Details on how to build the public subnets.
+  
+  
+  Public subnets are subnets with a route to the internet gateway.
+  
+  
+  > [!IMPORTANT]
+  > If this is the default VPC CIDR, the first entry in the list, the
+  > public subnets will be used for the NAT gateways. Setting this value to
+  > 0 on the default VPC CIDR may result in the creation of fully private
+  > networks with no route to the outside world.
 </details>
 <details>
 <summary>
@@ -944,7 +979,13 @@ Public is the number of public subnets to create in this set
 |Max Items|Unlimited|
 
 
-ClusterNames is a list of EKS cluster names to add shared LB tags for
+A list of cluster names that may add load balancers in the tagged subnet
+  set. Each entry will result in the tag
+  `kubernetes.io/cluster/$CLUSTER_NAME shared` being added to the subnets
+  in this set.
+  
+  
+  See #lbSetIndex for deciding which subnetset gets these tags.
 </details>
 <details>
 <summary>
@@ -969,7 +1010,13 @@ ClusterNames is a list of EKS cluster names to add shared LB tags for
 |Required |**Yes**|
 
 
-Count is the number of subnet sets to create with this mask
+Count is the number of subnet sets to create with this mask.
+  
+  
+  > [!WARNING]
+  > Whilst this field is not `immutable`, care should be taken to never
+  > decrease its value once set as this will result in the destruction of
+  > subnet sets which may fail if there are attached resources.
 </details>
 <details>
 <summary>
@@ -982,8 +1029,8 @@ Count is the number of subnet sets to create with this mask
 |Required |No|
 
 
-Determines which subnet set in this range to use for kubernetes load
-  balancers. -1 means no load balancer tag is defined on this group
+Identifies which subnet set to use for public EKS load balancers. Subnets
+  in this set will recieve the `kubernetes.io/role/elb: 1` tag
 </details>
 <details>
 <summary>
@@ -996,7 +1043,11 @@ Determines which subnet set in this range to use for kubernetes load
 |Required |**Yes**|
 
 
-Mask is the CIDR mask to use for the subnet set
+This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
+  use as a mask for the subnet.
+  
+  
+  To prevent subnets being destroyed and recreated *This field is immutable*
 </details>
 <details>
 <summary>
