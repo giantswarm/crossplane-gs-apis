@@ -62,8 +62,8 @@ type SubnetSetParameters struct {
 
 	// VpcId is the unique identifier for the VPC.
 	//
-	// +immutable
 	// +required
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="vpcId is immutable"
 	VpcId VpcId `json:"vpcId"`
 }
 
@@ -72,7 +72,7 @@ type SubnetSetStatus struct {
 
 	// VpcID is the unique identifier for the VPC.
 	//
-	// +required
+	// +optional
 	VpcID VpcId `json:"vpcId,omitempty"`
 
 	// Subnets is a map of subnets discovered by the composite.

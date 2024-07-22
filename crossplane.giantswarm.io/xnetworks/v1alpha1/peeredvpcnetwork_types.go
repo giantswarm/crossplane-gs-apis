@@ -207,7 +207,7 @@ type PeeredSubnetSet struct {
 	// will be assigned as an additional CIDR to the VPC.
 	//
 	// +required
-	// +immutable
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="mask is immutable"
 	Prefix Cidr `json:"prefix"`
 
 	// Details on how to build the public subnets.
@@ -316,9 +316,11 @@ type PeeredSubnets struct {
 	// +listType=atomic
 	Cidrs []PeeredSubnetSet `json:"cidrs"`
 
-	// Function defines the function to use to calculate the CIDR blocks for the
-	// subnets. The default is "multiprefixloop" which will split multiple CIDRs
+	// Defines the function to use to calculate the CIDR blocks for thesubnets.
+	//
+	// The default value is "multiprefixloop" which will split multiple CIDRs
 	// into equal parts based on the number of bits provided.
+	//
 	// `multiprefixloop` is the only function being made available as part of
 	// this XRD and as it's defaulted it can be hidden from the user. The
 	// function input expects a path though so this has to exist but isn't

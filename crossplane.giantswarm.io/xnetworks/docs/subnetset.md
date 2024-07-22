@@ -29,61 +29,8 @@ This composition relies on the following providers and functions:
 
 ## Configuration parameters
 
-> For a full set of configuration options, see the api documentation at
-> [apidocs/subnetsets.xnetworks.crossplane.giantswarm.io](../../../apidocs/subnetsets.xnetworks.crossplane.giantswarm.io.md)
-
-The following parameters are defined specifically for controlling the subnet set
-
-- `appIndex` \[*optional*\] A unique index for the subnetset. When used from the
-  VPC subnet this is formed from the start and end cidr blocks provided for each
-  subnet in the set. For example if availability zone A had CIDR `10.20.102.0/24`
-  and availability zone C had `10.20.104.0/24` then `appIndex` would be
-  `10-20-102-0-104-0`.
-
-  The default value for this is an empty string.
-
-- `region` \[**required**\] is the region to build the subnetset in. *This field
-  is immutable*.
-
-- `subnets` \[**required**\] A map of availability zones to CIDR blocks. The map
-  key should be a single character representing the availability zone to use;
-  this will be prefixed with the region automatically. The value must be a valid
-  CIDR range, e.g. `10.0.0.0/20`
-
-- `tags` Denotes tags to apply to resources inside the set. These are grouped
-  into two catagories:
-
-  - `all` These tags apply to all resources
-  - `subnet` These tags are applied to just the subnet resources
-  The combined total of all tags must not exceed 50 tags as this is the largest
-  number that may be applied to AWS resources.
-
-- `type` \[*optional*\] default public. Denote whether or not subnets in this
-  set are public or private. A public subnet is determined by the existence of
-  a route to the internet gateway.
-
-- `vpcId` \[**required**\] The VPC Id in which to build the resources. *This
-  field is immutable*.
-
-In addition to the above, the following properties are defined by crossplane
-system.
-
-- `deletionPolicy`
-- `managementPolicies`
-- `providerConfigRef`
-- `publishConnectionDetailsTo`
-- `writeConnectionSecretToRef`
-
-## Status Parameters
-
-The following parameters are exposed via the status of the XR:
-
-- `subnets` A map of `availabilityZone` to `subnetId` of the subnets in the set.
-
-- `routeTables` A map of `availabilityZone` to `routeTableId` of route tables in
-  the set.
-
-- `vpcId` The VPC this subnet set is built in.
+Configuration parameters are documented as part of the API documentation here:
+[apidocs/subnetsets.xnetworks.crossplane.giantswarm.io](../../../apidocs/subnetsets.xnetworks.crossplane.giantswarm.io.md)
 
 ## Examples
 
