@@ -136,10 +136,7 @@ This CRD is being replaced by <a href="../{{ .FullName }}/">{{ .ShortName }}</a>
 
 ### Status Properties
 {{- else }}
-<details>
-<summary>
-  <h4>{{.Path}}</h4>
-</summary>
+<h4>{{.Path}}</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -166,7 +163,7 @@ Allowed Values:
 {{- with .Description}}
 {{.|rawindent}}
 {{- end }}
-</details>
+
 {{- end }}
 {{- end }}
 

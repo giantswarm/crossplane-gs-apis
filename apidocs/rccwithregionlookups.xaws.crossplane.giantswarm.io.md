@@ -77,10 +77,7 @@ source_repository_ref: main
 
 
 ### Spec Properties
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery</h4>
-</summary>
+<h4>.spec.clusterDiscovery</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -89,11 +86,7 @@ source_repository_ref: main
 
 
 ClusterDiscovery is the reference to the cluster to discover
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.deletionPolicy</h4>
-</summary>
+<h4>.spec.clusterDiscovery.deletionPolicy</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -113,11 +106,7 @@ DeletionPolicy specifies what will happen to the underlying external
   field in a future release. Currently, both could be set independently and
   non-default values would be honored if the feature flag is enabled.
   See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.managementPolicies</h4>
-</summary>
+<h4>.spec.clusterDiscovery.managementPolicies</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -138,11 +127,7 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
   custom, the DeletionPolicy field will be ignored.
   See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
   and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.managementPolicies[*]</h4>
-</summary>
+<h4>.spec.clusterDiscovery.managementPolicies[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -152,11 +137,7 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
 
 A ManagementAction represents an action that the Crossplane controllers
   can take on an external resource.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.name</h4>
-</summary>
+<h4>.spec.clusterDiscovery.name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -165,11 +146,7 @@ A ManagementAction represents an action that the Crossplane controllers
 
 
 Name is the name of the cluster to discover
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.namespace</h4>
-</summary>
+<h4>.spec.clusterDiscovery.namespace</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -178,11 +155,7 @@ Name is the name of the cluster to discover
 
 
 Namespace is the namespace of the cluster to discover
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.providerConfigRef</h4>
-</summary>
+<h4>.spec.clusterDiscovery.providerConfigRef</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -194,11 +167,7 @@ Namespace is the namespace of the cluster to discover
 ProviderConfigReference specifies how the provider that will be used to
   create, observe, update, and delete this managed resource should be
   configured.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.providerConfigRef.name</h4>
-</summary>
+<h4>.spec.clusterDiscovery.providerConfigRef.name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -207,11 +176,7 @@ ProviderConfigReference specifies how the provider that will be used to
 
 
 Name of the referenced object.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.providerConfigRef.policy</h4>
-</summary>
+<h4>.spec.clusterDiscovery.providerConfigRef.policy</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -220,11 +185,7 @@ Name of the referenced object.
 
 
 Policies for referencing.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.providerConfigRef.policy.resolution</h4>
-</summary>
+<h4>.spec.clusterDiscovery.providerConfigRef.policy.resolution</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -241,11 +202,7 @@ Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
   reference cannot be resolved. 'Optional' means this reference will be
   a no-op if it cannot be resolved.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.providerConfigRef.policy.resolve</h4>
-</summary>
+<h4>.spec.clusterDiscovery.providerConfigRef.policy.resolve</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -261,11 +218,7 @@ Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
   the corresponding field is not present. Use 'Always' to resolve the
   reference on every reconcile.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.publishConnectionDetailsTo</h4>
-</summary>
+<h4>.spec.clusterDiscovery.publishConnectionDetailsTo</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -278,11 +231,7 @@ PublishConnectionDetailsTo specifies the connection secret config which
   which any connection details for this managed resource should be written.
   Connection details frequently include the endpoint, username,
   and password required to connect to the managed resource.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.publishConnectionDetailsTo.configRef</h4>
-</summary>
+<h4>.spec.clusterDiscovery.publishConnectionDetailsTo.configRef</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -293,11 +242,7 @@ PublishConnectionDetailsTo specifies the connection secret config which
 
 SecretStoreConfigRef specifies which secret store config should be used
   for this ConnectionSecret.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.publishConnectionDetailsTo.configRef.name</h4>
-</summary>
+<h4>.spec.clusterDiscovery.publishConnectionDetailsTo.configRef.name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -306,11 +251,7 @@ SecretStoreConfigRef specifies which secret store config should be used
 
 
 Name of the referenced object.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.publishConnectionDetailsTo.configRef.policy</h4>
-</summary>
+<h4>.spec.clusterDiscovery.publishConnectionDetailsTo.configRef.policy</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -319,11 +260,7 @@ Name of the referenced object.
 
 
 Policies for referencing.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.publishConnectionDetailsTo.configRef.policy.resolution</h4>
-</summary>
+<h4>.spec.clusterDiscovery.publishConnectionDetailsTo.configRef.policy.resolution</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -340,11 +277,7 @@ Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
   reference cannot be resolved. 'Optional' means this reference will be
   a no-op if it cannot be resolved.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.publishConnectionDetailsTo.configRef.policy.resolve</h4>
-</summary>
+<h4>.spec.clusterDiscovery.publishConnectionDetailsTo.configRef.policy.resolve</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -360,11 +293,7 @@ Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
   the corresponding field is not present. Use 'Always' to resolve the
   reference on every reconcile.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.publishConnectionDetailsTo.metadata</h4>
-</summary>
+<h4>.spec.clusterDiscovery.publishConnectionDetailsTo.metadata</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -373,11 +302,7 @@ Resolve specifies when this reference should be resolved. The default
 
 
 Metadata is the metadata for connection secret.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.publishConnectionDetailsTo.metadata.annotations</h4>
-</summary>
+<h4>.spec.clusterDiscovery.publishConnectionDetailsTo.metadata.annotations</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -388,11 +313,7 @@ Metadata is the metadata for connection secret.
 Annotations are the annotations to be added to connection secret.
   - For Kubernetes secrets, this will be used as "metadata.annotations".
   - It is up to Secret Store implementation for others store types.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.publishConnectionDetailsTo.metadata.labels</h4>
-</summary>
+<h4>.spec.clusterDiscovery.publishConnectionDetailsTo.metadata.labels</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -403,11 +324,7 @@ Annotations are the annotations to be added to connection secret.
 Labels are the labels/tags to be added to connection secret.
   - For Kubernetes secrets, this will be used as "metadata.labels".
   - It is up to Secret Store implementation for others store types.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.publishConnectionDetailsTo.metadata.type</h4>
-</summary>
+<h4>.spec.clusterDiscovery.publishConnectionDetailsTo.metadata.type</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -417,11 +334,7 @@ Labels are the labels/tags to be added to connection secret.
 
 Type is the SecretType for the connection secret.
   - Only valid for Kubernetes Secret Stores.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.publishConnectionDetailsTo.name</h4>
-</summary>
+<h4>.spec.clusterDiscovery.publishConnectionDetailsTo.name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -430,11 +343,7 @@ Type is the SecretType for the connection secret.
 
 
 Name is the name of the connection secret.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.writeConnectionSecretToRef</h4>
-</summary>
+<h4>.spec.clusterDiscovery.writeConnectionSecretToRef</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -450,11 +359,7 @@ WriteConnectionSecretToReference specifies the namespace and name of a
   PublishConnectionDetailsTo. Currently, both could be set independently
   and connection details would be published to both without affecting
   each other.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.writeConnectionSecretToRef.name</h4>
-</summary>
+<h4>.spec.clusterDiscovery.writeConnectionSecretToRef.name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -463,11 +368,7 @@ WriteConnectionSecretToReference specifies the namespace and name of a
 
 
 Name of the secret.
-</details>
-<details>
-<summary>
-  <h4>.spec.clusterDiscovery.writeConnectionSecretToRef.namespace</h4>
-</summary>
+<h4>.spec.clusterDiscovery.writeConnectionSecretToRef.namespace</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -476,11 +377,7 @@ Name of the secret.
 
 
 Namespace of the secret.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -489,11 +386,7 @@ Namespace of the secret.
 
 
 RdsCacheClusterSpec is the spec for the RDS Cache Cluster
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.availabilityZones</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.availabilityZones</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -504,11 +397,7 @@ RdsCacheClusterSpec is the spec for the RDS Cache Cluster
 
 
 AvailabilityZones is the list of availability zones to be used by the cluster
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.availabilityZones[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.availabilityZones[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -516,11 +405,7 @@ AvailabilityZones is the list of availability zones to be used by the cluster
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -529,11 +414,7 @@ AvailabilityZones is the list of availability zones to be used by the cluster
 
 
 Cache defines the cache settings
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.applyImmediately</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.applyImmediately</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -543,11 +424,7 @@ Cache defines the cache settings
 
 ApplyImmediately specifies whether the changes should be applied
   immediately or during the next maintenance window.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.atRestEncryptionEnabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.atRestEncryptionEnabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -557,11 +434,7 @@ ApplyImmediately specifies whether the changes should be applied
 
 AtRestEncryptionEnabled specifies whether data stored in the cluster is
   encrypted at rest.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.authTokenUpdateStrategy</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.authTokenUpdateStrategy</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -580,11 +453,7 @@ AuthTokenUpdateStrategy specifies how the auth token should be updated.
   - ROTATE
   - SET
   - DELETE
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.autoMinorVersionUpgrade</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.autoMinorVersionUpgrade</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -594,11 +463,7 @@ AuthTokenUpdateStrategy specifies how the auth token should be updated.
 
 AutoMinorVersionUpgrade specifies whether minor engine upgrades will be
   applied automatically to the cluster during the maintenance window.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.automaticFailoverEnabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.automaticFailoverEnabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -613,11 +478,7 @@ AutomaticFailoverEnabled specifies whether a read replica will be
   
   If enabled, NumCacheNodes must be greater than 1. Must be enabled for
   Redis (cluster mode enabled) replication groups.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -634,11 +495,7 @@ CacheClusters is a list of cache clusters in the replication group.
   
   
   May be used to specify cluster specific configuration.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -646,11 +503,7 @@ CacheClusters is a list of cache clusters in the replication group.
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].applyImmediately</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].applyImmediately</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -660,11 +513,7 @@ CacheClusters is a list of cache clusters in the replication group.
 
 ApplyImmediately specifies whether the changes should be applied
   immediately or during the next maintenance window.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].autoMinorVersionUpgrade</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].autoMinorVersionUpgrade</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -674,11 +523,7 @@ ApplyImmediately specifies whether the changes should be applied
 
 AutoMinorVersionUpgrade specifies whether minor engine upgrades will be
   applied automatically to the cluster during the maintenance window.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].availabilityZone</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].availabilityZone</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -693,11 +538,7 @@ AvailabilityZone is the name of the Availability Zone in which the
   If you want to create cache nodes in multi-az, use
   preferred_availability_zones instead.
   Default: System chosen Availability Zone.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].azMode</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].azMode</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -722,11 +563,7 @@ AzMode specifies the Availability Zone mode of the cluster.
   Valid values are:
   - single-az: The cluster is created in a single Availability Zone.
   - cross-az: The cluster is created across multiple Availability Zones.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].engine</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].engine</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -745,11 +582,7 @@ Engine is the name of the cache engine to be used for the clusters in
   Valid values are:
   - memcached
   - redis
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].engineVersion</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].engineVersion</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -762,11 +595,7 @@ EngineVersion is the version number of the cache engine to be used for
   
   
   This value will be ignored once the cluster is created.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].finalSnapshotIdentifier</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].finalSnapshotIdentifier</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -776,11 +605,7 @@ EngineVersion is the version number of the cache engine to be used for
 
 FinalSnapshotIdentifier is the user-supplied name for the final snapshot
   that is created immediately before the cluster is deleted.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].ipDiscovery</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].ipDiscovery</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -798,11 +623,7 @@ IpDiscovery is the method used to discover cluster nodes.
   Valid values are:
   - ipv4 (default)
   - ipv6
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].logDeliveryConfigurations</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].logDeliveryConfigurations</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -817,11 +638,7 @@ LogDeliveryConfiguration is a list of log delivery configurations for
   
   
   This is only applicable when the Engine parameter is redis.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].logDeliveryConfigurations[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].logDeliveryConfigurations[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -829,11 +646,7 @@ LogDeliveryConfiguration is a list of log delivery configurations for
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].logDeliveryConfigurations[*].destination</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].logDeliveryConfigurations[*].destination</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -842,11 +655,7 @@ LogDeliveryConfiguration is a list of log delivery configurations for
 
 
 Destination Name of the cloudwatch log group or for kinesis firehose resource.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].logDeliveryConfigurations[*].destinationType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].logDeliveryConfigurations[*].destinationType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -864,11 +673,7 @@ DestinationType The destination type for the logs.
   Valid values are:
   - cloudwatch-logs
   - kinesis-firehose
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].logDeliveryConfigurations[*].logFormat</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].logDeliveryConfigurations[*].logFormat</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -886,11 +691,7 @@ LogFormat The log format to use.
   Valid values are:
   - text
   - json
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].logDeliveryConfigurations[*].logType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].logDeliveryConfigurations[*].logType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -908,11 +709,7 @@ LogType The type of log to deliver.
   Valid values are:
   - slow-log
   - engine-log
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].maintenanceWindow</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].maintenanceWindow</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -922,11 +719,7 @@ LogType The type of log to deliver.
 
 MaintenanceWindow specifies the weekly time range during which system
   maintenance can occur.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].networkType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].networkType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -946,11 +739,7 @@ NetworkType specifies the network configuration for the cluster.
   - ipv4
   - ipv6
   - dual_stack
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].nodeType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].nodeType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -962,11 +751,7 @@ NodeType is the instance class to use for the cache nodes.
   
   
   Requried unless replication group is specified.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].notificationTopicArn</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].notificationTopicArn</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -976,11 +761,7 @@ NodeType is the instance class to use for the cache nodes.
 
 NotificationTopicArn is the Amazon Resource Name (ARN) of the Amazon SNS
   topic to which notifications will be sent.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].numCacheNodes</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].numCacheNodes</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -992,11 +773,7 @@ NumCacheNodes is the number of cache nodes in the cluster.
   
   
   Required unless replication group is specified.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].outpostMode</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].outpostMode</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1018,11 +795,7 @@ OutpostMode specifies the outpost mode that will apply to the cache
   
   
   Currently only single-outpost is supported.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].parameterGroupName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].parameterGroupName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1035,11 +808,7 @@ ParameterGroupName is the name of the parameter group to associate with
   
   
   Required unless replication group is specified.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].port</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].port</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1049,11 +818,7 @@ ParameterGroupName is the name of the parameter group to associate with
 
 Port is the port number on which each of the cache nodes will accept
   connections.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].preferredAvailabilityZones</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].preferredAvailabilityZones</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1069,11 +834,7 @@ PreferredAvailabilityZones is a list of Availability Zones in which the
   
   Memcached only. The number of availability zones must equal the number of
   nodes specified in the NumCacheNodes parameter.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].preferredAvailabilityZones[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].preferredAvailabilityZones[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1081,11 +842,7 @@ PreferredAvailabilityZones is a list of Availability Zones in which the
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].preferredOutpostArn</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].preferredOutpostArn</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1095,11 +852,7 @@ PreferredAvailabilityZones is a list of Availability Zones in which the
 
 PreferredOutpostArn is the Amazon Resource Name (ARN) of the outpost in
   which the cache cluster will be created.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].securityGroupIds</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].securityGroupIds</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1111,11 +864,7 @@ PreferredOutpostArn is the Amazon Resource Name (ARN) of the outpost in
 
 SecurityGroupIds is a list of security group IDs to associate with the
   cluster.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].securityGroupIds[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].securityGroupIds[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1123,11 +872,7 @@ SecurityGroupIds is a list of security group IDs to associate with the
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].snapshotArns</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].snapshotArns</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1142,11 +887,7 @@ SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
   
   
   Optional, Redis only
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].snapshotArns[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].snapshotArns[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1154,11 +895,7 @@ SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].snapshotName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].snapshotName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1171,11 +908,7 @@ SnapshotName is the name of the snapshot from which to restore data into
   
   
   Optional, Redis only
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].snapshotRetentionLimit</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].snapshotRetentionLimit</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1188,11 +921,7 @@ SnapshotRetentionLimit is the number of days for which ElastiCache will
   
   
   Optional, Redis only
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].snapshotWindow</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].snapshotWindow</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1205,11 +934,7 @@ SnapshotWindow is the daily time range (in UTC) during which ElastiCache
   
   
   Optional, Redis only
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].subnetGroupName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].subnetGroupName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1223,11 +948,7 @@ SubnetGroupName is the name of the subnet group to associate with this
   
   Required unless replication group is specified in which case it will be
   ignored.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].tags</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].tags</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1236,11 +957,7 @@ SubnetGroupName is the name of the subnet group to associate with this
 
 
 Tags is a list of key-value pairs to associate with the cluster.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].transitEncryptionEnabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.cacheClusters[*].transitEncryptionEnabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1253,11 +970,7 @@ TransitEncryptionEnabled specifies whether data in the cluster is
   
   
   Optional, Memcached only
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.clusterModeEnabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.clusterModeEnabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1267,11 +980,7 @@ TransitEncryptionEnabled specifies whether data in the cluster is
 
 ClusterModeEnabled specifies whether cluster mode is enabled for the
   replication group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.createReplicationGroup</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.createReplicationGroup</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1285,11 +994,7 @@ CreateReplicationGroup specifies whether a replication group should be
   
   If set false, the replication group configuration will be used for
   creating a single cluster
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.dataTieringEnabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.dataTieringEnabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1302,11 +1007,7 @@ DataTieringEnabled specifies whether data tiering is enabled for the
   
   
   Must be true if the replcation group is using r6gd nodes
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.engine</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.engine</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1325,11 +1026,7 @@ Engine is the name of the cache engine to be used for the clusters in
   Valid values are:
   - memcached
   - redis
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.engineVersion</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.engineVersion</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1342,11 +1039,7 @@ EngineVersion is the version number of the cache engine to be used for
   
   
   This value will be ignored once the cluster is created.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.finalSnapshotIdentifier</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.finalSnapshotIdentifier</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1356,11 +1049,7 @@ EngineVersion is the version number of the cache engine to be used for
 
 FinalSnapshotIdentifier is the user-supplied name for the final snapshot
   that is created immediately before the cluster is deleted.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1369,11 +1058,7 @@ FinalSnapshotIdentifier is the user-supplied name for the final snapshot
 
 
 GlobalReplicationGroup is the global replication group configuration.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.automaticFailoverEnabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.automaticFailoverEnabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1384,11 +1069,7 @@ GlobalReplicationGroup is the global replication group configuration.
 AutomaticFailoverEnabled specifies whether a read replica will be
   automatically promoted to the primary cluster if the existing primary
   cluster fails.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.cacheNodeType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.cacheNodeType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1397,11 +1078,7 @@ AutomaticFailoverEnabled specifies whether a read replica will be
 
 
 CacheNodeType is the instance class to use for the cache nodes.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.enabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.enabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1410,11 +1087,7 @@ CacheNodeType is the instance class to use for the cache nodes.
 
 
 Enabled is a flag that enables the global replication group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.engineVersion</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.engineVersion</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1424,11 +1097,7 @@ Enabled is a flag that enables the global replication group.
 
 EngineVersion is the version number of the cache engine to be used for
   the cluster. If not set this will default to the latest version.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.numNodeGroups</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.numNodeGroups</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1437,11 +1106,7 @@ EngineVersion is the version number of the cache engine to be used for
 
 
 NumNodeGroups is the number of node groups in the replication group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.parameterGroupName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.parameterGroupName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1459,11 +1124,7 @@ ParameterGroupName is the name of the parameter group to associate with
   
   Specifying this parameter will result in an error if a major engine version
   is not specified.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.suffix</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroup.suffix</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1473,11 +1134,7 @@ ParameterGroupName is the name of the parameter group to associate with
 
 GlobalReplicationGroupIdSuffix is the suffix to append to the global
   replication group id.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroupId</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.globalReplicationGroupId</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1491,11 +1148,7 @@ GlobalReplicationGroupId is the id of the global replication group to
   
   If this value is specified, the number of node groups parameter must not
   be specified.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.ipDiscovery</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.ipDiscovery</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1513,11 +1166,7 @@ IpDiscovery is the method used to discover cluster nodes.
   Valid values are:
   - ipv4 (default)
   - ipv6
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.kmsKeyId</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.kmsKeyId</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1530,11 +1179,7 @@ KmsKeyId is the ID of the AWS Key Management Service (KMS) key used to
   
   
   Ignored unless AtRestEncryptionEnabled is set to true.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.logDeliveryConfigurations</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.logDeliveryConfigurations</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1549,11 +1194,7 @@ LogDeliveryConfiguration is a list of log delivery configurations for
   
   
   This is only applicable when the Engine parameter is redis.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.logDeliveryConfigurations[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.logDeliveryConfigurations[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1561,11 +1202,7 @@ LogDeliveryConfiguration is a list of log delivery configurations for
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.logDeliveryConfigurations[*].destination</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.logDeliveryConfigurations[*].destination</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1574,11 +1211,7 @@ LogDeliveryConfiguration is a list of log delivery configurations for
 
 
 Destination Name of the cloudwatch log group or for kinesis firehose resource.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.logDeliveryConfigurations[*].destinationType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.logDeliveryConfigurations[*].destinationType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1596,11 +1229,7 @@ DestinationType The destination type for the logs.
   Valid values are:
   - cloudwatch-logs
   - kinesis-firehose
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.logDeliveryConfigurations[*].logFormat</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.logDeliveryConfigurations[*].logFormat</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1618,11 +1247,7 @@ LogFormat The log format to use.
   Valid values are:
   - text
   - json
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.logDeliveryConfigurations[*].logType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.logDeliveryConfigurations[*].logType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1640,11 +1265,7 @@ LogType The type of log to deliver.
   Valid values are:
   - slow-log
   - engine-log
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.maintenanceWindow</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.maintenanceWindow</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1654,11 +1275,7 @@ LogType The type of log to deliver.
 
 MaintenanceWindow specifies the weekly time range during which system
   maintenance can occur.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.multiAzEnabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.multiAzEnabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1671,11 +1288,7 @@ MultiAzEnabled specifies whether the cluster should be created in
   
   
   If true, AutomaticFailoverEnabled must also be true.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.networkType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.networkType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1695,11 +1308,7 @@ NetworkType specifies the network configuration for the cluster.
   - ipv4
   - ipv6
   - dual_stack
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.nodeType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.nodeType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1711,11 +1320,7 @@ NodeType is the instance class to use for the cache nodes.
   
   
   Requried unless global replication group is specified.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.notificationTopicArn</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.notificationTopicArn</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1725,11 +1330,7 @@ NodeType is the instance class to use for the cache nodes.
 
 NotificationTopicArn is the Amazon Resource Name (ARN) of the Amazon SNS
   topic to which notifications will be sent.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.numCacheClusters</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.numCacheClusters</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1745,11 +1346,7 @@ NumCacheClusters is the number of cache clusters in the replication group.
   
   
   Conflicts with NumNodeGroups.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.numCacheNodes</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.numCacheNodes</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1762,11 +1359,7 @@ NumCacheNodes is the number of cache nodes in the cluster.
   
   Ignored if replication group is specified or being created
   This is a convenience parameter when building a single cluster.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.numNodeGroups</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.numNodeGroups</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1782,11 +1375,7 @@ NumNodeGroups is the number of node groups in the replication group.
   
   
   Conflicts with NumCacheClusters.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.parameterGroupConfiguration</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.parameterGroupConfiguration</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1796,11 +1385,7 @@ NumNodeGroups is the number of node groups in the replication group.
 
 ParameterGroupConfiguration defines the configuration for the parameter
   group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.parameterGroupConfiguration.description</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.parameterGroupConfiguration.description</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1809,11 +1394,7 @@ ParameterGroupConfiguration defines the configuration for the parameter
 
 
 Description is a description of the parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.parameterGroupConfiguration.family</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.parameterGroupConfiguration.family</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1823,11 +1404,7 @@ Description is a description of the parameter group.
 
 Family is the name of the parameter group family that this parameter
   group is compatible with.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.parameterGroupConfiguration.name</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.parameterGroupConfiguration.name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1836,11 +1413,7 @@ Family is the name of the parameter group family that this parameter
 
 
 Name is the name of the parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.parameterGroupConfiguration.parameters</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.parameterGroupConfiguration.parameters</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1849,11 +1422,7 @@ Name is the name of the parameter group.
 
 
 Parameters is a list of parameters in the parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.parameterGroupConfiguration.tags</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.parameterGroupConfiguration.tags</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1862,11 +1431,7 @@ Parameters is a list of parameters in the parameter group.
 
 
 Tags is a list of key-value pairs to associate with the parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.parameterGroupName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.parameterGroupName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1877,11 +1442,7 @@ Tags is a list of key-value pairs to associate with the parameter group.
 ParameterGroupName is the name of the parameter group to associate with
   this cluster. To create a new parameter group, use the
   `ParameterGroupConfiguration` option instead.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.port</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.port</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1891,11 +1452,7 @@ ParameterGroupName is the name of the parameter group to associate with
 
 Port is the port number on which each of the cache nodes will accept
   connections.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.preferredCacheClusterAzs</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.preferredCacheClusterAzs</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1907,11 +1464,7 @@ Port is the port number on which each of the cache nodes will accept
 
 PreferredCacheClusterAzs is a list ec2 availability zones in which the
   cache clusters will be created.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.preferredCacheClusterAzs[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.preferredCacheClusterAzs[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1919,11 +1472,7 @@ PreferredCacheClusterAzs is a list ec2 availability zones in which the
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.replicasPerNodeGroup</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.replicasPerNodeGroup</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1932,11 +1481,7 @@ PreferredCacheClusterAzs is a list ec2 availability zones in which the
 
 
 ReplicasPerNodeGroup is the number of read replicas per node group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.securityGroupIds</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.securityGroupIds</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1948,11 +1493,7 @@ ReplicasPerNodeGroup is the number of read replicas per node group.
 
 SecurityGroupIds is a list of security group IDs to associate with the
   cluster.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.securityGroupIds[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.securityGroupIds[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1960,11 +1501,7 @@ SecurityGroupIds is a list of security group IDs to associate with the
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.snapshotArns</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.snapshotArns</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1979,11 +1516,7 @@ SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
   
   
   Optional, Redis only
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.snapshotArns[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.snapshotArns[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -1991,11 +1524,7 @@ SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.snapshotName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.snapshotName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2008,11 +1537,7 @@ SnapshotName is the name of the snapshot from which to restore data into
   
   
   Optional, Redis only
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.snapshotRetentionLimit</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.snapshotRetentionLimit</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2025,11 +1550,7 @@ SnapshotRetentionLimit is the number of days for which ElastiCache will
   
   
   Optional, Redis only
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.snapshotWindow</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.snapshotWindow</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2042,11 +1563,7 @@ SnapshotWindow is the daily time range (in UTC) during which ElastiCache
   
   
   Optional, Redis only
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.tags</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.tags</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2055,11 +1572,7 @@ SnapshotWindow is the daily time range (in UTC) during which ElastiCache
 
 
 Tags is a list of key-value pairs to associate with the cluster.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.transitEncryptionEnabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.transitEncryptionEnabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2072,11 +1585,7 @@ TransitEncryptionEnabled specifies whether data in the cluster is
   
   
   Optional, Memcached only
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.usernames</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.usernames</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2087,11 +1596,7 @@ TransitEncryptionEnabled specifies whether data in the cluster is
 
 
 Usernames is a list of users to associate with the cluster.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.cache.usernames[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.cache.usernames[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2099,11 +1604,7 @@ Usernames is a list of users to associate with the cluster.
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2112,11 +1613,7 @@ Usernames is a list of users to associate with the cluster.
 
 
 Database defines the database settings
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.activityStream</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.activityStream</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2125,11 +1622,7 @@ Database defines the database settings
 
 
 ActivityStream is the activity stream configuration.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.activityStream.enabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.activityStream.enabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2138,11 +1631,7 @@ ActivityStream is the activity stream configuration.
 
 
 Enabled is whether activity stream is enabled.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.activityStream.engineNativeAuditFieldsIncluded</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.activityStream.engineNativeAuditFieldsIncluded</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2152,11 +1641,7 @@ Enabled is whether activity stream is enabled.
 
 EngineNativeAuditFieldsIncluded is whether engine native audit fields are
   included. This option only applies to Oracle databases.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.activityStream.mode</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.activityStream.mode</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2169,11 +1654,7 @@ Allowed Values:
 - async
 
 Mode is the mode of the activity stream. Valid values are `sync` and `async`.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.allocatedStorage</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.allocatedStorage</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2182,11 +1663,7 @@ Mode is the mode of the activity stream. Valid values are `sync` and `async`.
 
 
 AllocatedStorage is the size of the database.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.allowMajorVersionUpgrade</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.allowMajorVersionUpgrade</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2195,11 +1672,7 @@ AllocatedStorage is the size of the database.
 
 
 AllowMajorVersionUpgrade is whether major version upgrades are allowed.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.applyImmediately</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.applyImmediately</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2208,11 +1681,7 @@ AllowMajorVersionUpgrade is whether major version upgrades are allowed.
 
 
 ApplyImmediately is whether changes should be applied immediately.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.autoMinorVersionUpgrade</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.autoMinorVersionUpgrade</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2222,11 +1691,7 @@ ApplyImmediately is whether changes should be applied immediately.
 
 AutoMinorVersionUpgrade is whether minor version upgrades are applied
   automatically. This value can be overridden on a per instance basis.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.autoscaling</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.autoscaling</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2235,11 +1700,7 @@ AutoMinorVersionUpgrade is whether minor version upgrades are applied
 
 
 Autoscaling is the autoscaling configuration.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.autoscaling.enabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.autoscaling.enabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2248,11 +1709,7 @@ Autoscaling is the autoscaling configuration.
 
 
 Autoscaling is whether autoscaling is enabled.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.autoscaling.maxCapacity</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.autoscaling.maxCapacity</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2261,11 +1718,7 @@ Autoscaling is whether autoscaling is enabled.
 
 
 MaxCapacity is the maximum capacity for autoscaling.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.autoscaling.metricType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.autoscaling.metricType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2278,11 +1731,7 @@ Allowed Values:
 - RDSReaderAverageDatabaseConnections
 
 MetricType is the type of metric to use for autoscaling.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.autoscaling.minCapacity</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.autoscaling.minCapacity</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2291,11 +1740,7 @@ MetricType is the type of metric to use for autoscaling.
 
 
 MinCapacity is the minimum capacity for autoscaling.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.autoscaling.policyName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.autoscaling.policyName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2304,11 +1749,7 @@ MinCapacity is the minimum capacity for autoscaling.
 
 
 PolicyName is the name of the autoscaling policy.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.autoscaling.scaleInCooldown</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.autoscaling.scaleInCooldown</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2318,11 +1759,7 @@ PolicyName is the name of the autoscaling policy.
 
 ScaleInCooldown is the amount of time, in seconds, after a scaling in
   activity completes before another scaling activity can start.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.autoscaling.scaleOutCooldown</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.autoscaling.scaleOutCooldown</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2332,11 +1769,7 @@ ScaleInCooldown is the amount of time, in seconds, after a scaling in
 
 ScaleOutCooldown is the amount of time, in seconds, after a scaling out
   activity completes before another scaling activity can start.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.autoscaling.targetCPU</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.autoscaling.targetCPU</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2345,11 +1778,7 @@ ScaleOutCooldown is the amount of time, in seconds, after a scaling out
 
 
 TargetCPU is CPU threshold which will initiate autoscaling.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.autoscaling.targetConnections</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.autoscaling.targetConnections</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2360,11 +1789,7 @@ TargetCPU is CPU threshold which will initiate autoscaling.
 TargetConnections is the average number of connections threshold which
   will initiate autoscaling. Default value is 70% of db.r4/r5/r6g.large's
   default max_connections
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.backtrackWindow</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.backtrackWindow</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2374,11 +1799,7 @@ TargetConnections is the average number of connections threshold which
 
 BacktrackWindow is the target backtrack window, in seconds.
   Only available for Aurora engine. To disable backtracking, set this value to 0.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.backupRetentionPeriod</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.backupRetentionPeriod</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2387,11 +1808,7 @@ BacktrackWindow is the target backtrack window, in seconds.
 
 
 BackupRetentionPeriod is the number of days to retain backups for.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.cloudwatchLogGroupParameters</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.cloudwatchLogGroupParameters</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2400,11 +1817,7 @@ BackupRetentionPeriod is the number of days to retain backups for.
 
 
 CloudwatchLogGroup defines the parameters for the log groups
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.cloudwatchLogGroupParameters.class</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.cloudwatchLogGroupParameters.class</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2413,11 +1826,7 @@ CloudwatchLogGroup defines the parameters for the log groups
 
 
 Class is the class of the log group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.cloudwatchLogGroupParameters.create</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.cloudwatchLogGroupParameters.create</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2426,11 +1835,7 @@ Class is the class of the log group.
 
 
 Create is whether the log group is to be created.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.cloudwatchLogGroupParameters.retentionInDays</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.cloudwatchLogGroupParameters.retentionInDays</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2439,11 +1844,7 @@ Create is whether the log group is to be created.
 
 
 RetentionInDays is the number of days to retain logs for.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.cloudwatchLogGroupParameters.skipDestroy</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.cloudwatchLogGroupParameters.skipDestroy</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2452,11 +1853,7 @@ RetentionInDays is the number of days to retain logs for.
 
 
 SkipDestroy is whether the log group should be skipped during destroy.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.copyTagsToSnapshot</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.copyTagsToSnapshot</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2465,11 +1862,7 @@ SkipDestroy is whether the log group should be skipped during destroy.
 
 
 CopyTagsToSnapshot is whether tags should be copied to snapshots.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.createCluster</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.createCluster</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2481,11 +1874,7 @@ CreateCluster is whether the cluster should be created.
   By default this is true but for non-aurora clusters, the DB Cluster
   resource is optional and can be omitted. In this case, the DB instances
   will be created as `instance.rds` types.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.databaseName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.databaseName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2494,11 +1883,7 @@ CreateCluster is whether the cluster should be created.
 
 
 DatabaseName is the name of the database to create.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.databases</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.databases</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2507,11 +1892,7 @@ DatabaseName is the name of the database to create.
 
 
 Databases is a map of databases to create.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbClusterInstanceClass</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbClusterInstanceClass</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2520,11 +1901,7 @@ Databases is a map of databases to create.
 
 
 DbClusterInstanceClass is the instance class to use.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2533,11 +1910,7 @@ DbClusterInstanceClass is the instance class to use.
 
 
 DbClusterParameterGroup defines the parameters for the DB cluster.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.applyMethod</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.applyMethod</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2552,11 +1925,7 @@ Allowed Values:
 ApplyMethod is the apply method for the parameter group. Some engines
   cannot apply changes immediately, and require a reboot in which case you
   must set this value to `pending-reboot`.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.create</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.create</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2565,11 +1934,7 @@ ApplyMethod is the apply method for the parameter group. Some engines
 
 
 Create is whether the parameter group is to be created.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.description</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.description</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2578,11 +1943,7 @@ Create is whether the parameter group is to be created.
 
 
 Description is the description of the parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.family</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.family</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2591,11 +1952,7 @@ Description is the description of the parameter group.
 
 
 Family is the family of the parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.name</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2604,11 +1961,7 @@ Family is the family of the parameter group.
 
 
 Name is the name of the parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.parameters</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.parameters</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2620,11 +1973,7 @@ Name is the name of the parameter group.
 
 Parameters is a list of parameters to associate with the parameter group.
   Note that parameters may differ between families
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.parameters[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.parameters[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2634,11 +1983,7 @@ Parameters is a list of parameters to associate with the parameter group.
 
 
 Parameter is a parameter to associate with a parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.tags</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbClusterParameterGroup.tags</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2647,11 +1992,7 @@ Parameter is a parameter to associate with a parameter group.
 
 
 Tags is a set of tags to associate with the parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2660,11 +2001,7 @@ Tags is a set of tags to associate with the parameter group.
 
 
 DbParameterGroup defines the parameters for the DB instance.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.create</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.create</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2673,11 +2010,7 @@ DbParameterGroup defines the parameters for the DB instance.
 
 
 Create is whether the parameter group is created.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.description</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.description</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2686,11 +2019,7 @@ Create is whether the parameter group is created.
 
 
 Description is the description of the parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.family</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.family</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2699,11 +2028,7 @@ Description is the description of the parameter group.
 
 
 Family is the family of the parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.name</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2712,11 +2037,7 @@ Family is the family of the parameter group.
 
 
 Name is the name of the parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.parameters</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.parameters</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2728,11 +2049,7 @@ Name is the name of the parameter group.
 
 Parameters is a list of parameters to associate with the parameter group.
   Note that parameters may differ between families
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.parameters[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.parameters[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2742,11 +2059,7 @@ Parameters is a list of parameters to associate with the parameter group.
 
 
 Parameter is a parameter to associate with a parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.tags</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.dbParameterGroup.tags</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2755,11 +2068,7 @@ Parameter is a parameter to associate with a parameter group.
 
 
 Tags is a set of tags to associate with the parameter group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.deleteAutomatedBackups</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.deleteAutomatedBackups</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2768,11 +2077,7 @@ Tags is a set of tags to associate with the parameter group.
 
 
 DeleteAutomatedBackups is whether automated backups should be deleted.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.deletionProtection</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.deletionProtection</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2781,11 +2086,7 @@ DeleteAutomatedBackups is whether automated backups should be deleted.
 
 
 DeletionProtection is whether deletion protection is enabled.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.domain</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.domain</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2794,11 +2095,7 @@ DeletionProtection is whether deletion protection is enabled.
 
 
 Domain is the domain to use.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.domainIAMRoleName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.domainIAMRoleName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2807,11 +2104,7 @@ Domain is the domain to use.
 
 
 DomainIAMRoleName is the name of the IAM role to use.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enableGlobalWriteForwarding</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enableGlobalWriteForwarding</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2820,11 +2113,7 @@ DomainIAMRoleName is the name of the IAM role to use.
 
 
 EnableGlobalWriteForwarding is whether global write forwarding is enabled.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enableHttpEndpoint</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enableHttpEndpoint</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2833,11 +2122,7 @@ EnableGlobalWriteForwarding is whether global write forwarding is enabled.
 
 
 EnableHttpEndpoint is whether the HTTP endpoint is enabled.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enableLocalWriteForwarding</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enableLocalWriteForwarding</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2846,11 +2131,7 @@ EnableHttpEndpoint is whether the HTTP endpoint is enabled.
 
 
 EnableLocalWriteForwarding is whether local write forwarding is enabled.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enabledCloudwatchLogsExports</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enabledCloudwatchLogsExports</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2861,11 +2142,7 @@ EnableLocalWriteForwarding is whether local write forwarding is enabled.
 
 
 EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Logs.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enabledCloudwatchLogsExports[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enabledCloudwatchLogsExports[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2874,11 +2151,7 @@ EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Lo
 
 
 LogGroup is the name of a log group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.endpoints</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.endpoints</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2889,11 +2162,7 @@ LogGroup is the name of a log group.
 
 
 Endpoints is a list of custom endpoints to create.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.endpoints[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.endpoints[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2901,11 +2170,7 @@ Endpoints is a list of custom endpoints to create.
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.endpoints[*].customEndpointType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.endpoints[*].customEndpointType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2918,11 +2183,7 @@ Allowed Values:
 - ANY
 
 CustomEndpointType is the type of the custom endpoint.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.endpoints[*].excludedMembers</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.endpoints[*].excludedMembers</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2934,11 +2195,7 @@ CustomEndpointType is the type of the custom endpoint.
 
 ExcludedMembers is a list of DB instances that aren't part of the custom
   endpoint group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.endpoints[*].excludedMembers[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.endpoints[*].excludedMembers[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2946,11 +2203,7 @@ ExcludedMembers is a list of DB instances that aren't part of the custom
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.endpoints[*].staticMembers</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.endpoints[*].staticMembers</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2962,11 +2215,7 @@ ExcludedMembers is a list of DB instances that aren't part of the custom
 
 StaticMembers is a list of DB instances that are part of the custom
   endpoint group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.endpoints[*].staticMembers[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.endpoints[*].staticMembers[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2974,11 +2223,7 @@ StaticMembers is a list of DB instances that are part of the custom
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.endpoints[*].tags</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.endpoints[*].tags</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -2987,11 +2232,7 @@ StaticMembers is a list of DB instances that are part of the custom
 
 
 Tags is a set of tags to associate with the custom endpoint.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.engine</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.engine</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3000,11 +2241,7 @@ Tags is a set of tags to associate with the custom endpoint.
 
 
 Engine is the database engine to use.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.engineMode</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.engineMode</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3018,11 +2255,7 @@ Allowed Values:
 - serverless
 
 EngineMode is the database engine mode to use.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.engineVersion</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.engineVersion</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3031,11 +2264,7 @@ EngineMode is the database engine mode to use.
 
 
 EngineVersion is the version of the database engine to use.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3044,11 +2273,7 @@ EngineVersion is the version of the database engine to use.
 
 
 EnhancedMonitoring is the enhanced monitoring configuration.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.description</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.description</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3057,11 +2282,7 @@ EnhancedMonitoring is the enhanced monitoring configuration.
 
 
 Description is the description of the monitoring role.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.enabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.enabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3070,11 +2291,7 @@ Description is the description of the monitoring role.
 
 
 Enabled is whether enhanced monitoring is enabled.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.forceDetachPolicies</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.forceDetachPolicies</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3083,11 +2300,7 @@ Enabled is whether enhanced monitoring is enabled.
 
 
 ForceDetachPolicies Whether to force detaching any policies the monitoring role has before destroying it
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.managedPolicyArns</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.managedPolicyArns</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3098,11 +2311,7 @@ ForceDetachPolicies Whether to force detaching any policies the monitoring role 
 
 
 ManagedPolicyArns is a list of ARNs for managed policies to attach to the monitoring role.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.managedPolicyArns[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.managedPolicyArns[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3110,11 +2319,7 @@ ManagedPolicyArns is a list of ARNs for managed policies to attach to the monito
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.maxSessionDuration</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.maxSessionDuration</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3123,11 +2328,7 @@ ManagedPolicyArns is a list of ARNs for managed policies to attach to the monito
 
 
 MaxSessionDuration is the maximum session duration (in seconds) that you want to set for the monitoring role.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.monitoringInterval</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.monitoringInterval</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3136,11 +2337,7 @@ MaxSessionDuration is the maximum session duration (in seconds) that you want to
 
 
 MonitoringInterval is the interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.path</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.path</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3149,11 +2346,7 @@ MonitoringInterval is the interval, in seconds, between points when Enhanced Mon
 
 
 Path is the path of the monitoring role.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.permissionsBoundary</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.enhancedMonitoring.permissionsBoundary</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3162,11 +2355,7 @@ Path is the path of the monitoring role.
 
 
 PermissionsBoundary is the ARN of the policy that is used to set the permissions boundary for the monitoring role.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.eso</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.eso</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3179,11 +2368,7 @@ Eso is the ESO configuration.
   
   This field is used to sync secrets using `external-secrets-operator`.
   External Secrets Operator must be installed if this value is set to true
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.eso.enabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.eso.enabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3193,11 +2378,7 @@ Eso is the ESO configuration.
 
 Enabled Whether or not to enable `external-secrets-operator` object
   deployments using `provider-kubernetes.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.eso.kubernetesSecretStore</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.eso.kubernetesSecretStore</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3210,11 +2391,7 @@ KubernetesSecretStore is the Kubernetes secret store to use.
   
   The kubernetes secret store is expected to be namespace scoped to prevent
   secrets leaking across namespaces.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.eso.stores</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.eso.stores</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3225,11 +2402,7 @@ KubernetesSecretStore is the Kubernetes secret store to use.
 
 
 Stores is a list of secret stores to use for push secrets.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.eso.stores[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.eso.stores[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3239,11 +2412,7 @@ Stores is a list of secret stores to use for push secrets.
 
 SecretsStore is a reference to a secrets store to be passed to External
   Secrets Operator for creating PushSecrets
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.eso.stores[*].enabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.eso.stores[*].enabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3252,11 +2421,7 @@ SecretsStore is a reference to a secrets store to be passed to External
 
 
 Enabled is whether the secrets store is enabled.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.eso.stores[*].isClusterSecretStore</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.eso.stores[*].isClusterSecretStore</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3265,11 +2430,7 @@ Enabled is whether the secrets store is enabled.
 
 
 IsClusterSecretStore is whether the secret store is a cluster secret store.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.eso.stores[*].secretStore</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.eso.stores[*].secretStore</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3278,11 +2439,7 @@ IsClusterSecretStore is whether the secret store is a cluster secret store.
 
 
 SecretStoreName is the name of the secret store.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.globalClusterIdentifier</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.globalClusterIdentifier</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3291,11 +2448,7 @@ SecretStoreName is the name of the secret store.
 
 
 GlobalClusterIdentifier is the global cluster identifier for an Aurora global database.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.iamDatabaseAuthenticationEnabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.iamDatabaseAuthenticationEnabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3304,11 +2457,7 @@ GlobalClusterIdentifier is the global cluster identifier for an Aurora global da
 
 
 IAMDatabaseAuthenticationEnabled is whether IAM database authentication is enabled.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.iamRoles</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.iamRoles</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3319,11 +2468,7 @@ IAMDatabaseAuthenticationEnabled is whether IAM database authentication is enabl
 
 
 IamRoles is a list of IAM roles to associate with the DB cluster.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.iamRoles[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.iamRoles[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3331,11 +2476,7 @@ IamRoles is a list of IAM roles to associate with the DB cluster.
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.iamRoles[*].featureName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.iamRoles[*].featureName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3344,11 +2485,7 @@ IamRoles is a list of IAM roles to associate with the DB cluster.
 
 
 FeatureName is the name of the feature.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.iamRoles[*].roleArn</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.iamRoles[*].roleArn</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3357,11 +2494,7 @@ FeatureName is the name of the feature.
 
 
 RoleArn is the ARN of the role.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instanceCount</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instanceCount</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3375,11 +2508,7 @@ InstanceCount is the number of instances to create.
   If set, this value will create the requested number of instances using
   defaults from the cluster configuration. If `instances` are specified,
   this value is ignored.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3390,11 +2519,7 @@ InstanceCount is the number of instances to create.
 
 
 Instances is a list of instances to create.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3402,11 +2527,7 @@ Instances is a list of instances to create.
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].allocatedStorage</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].allocatedStorage</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3422,11 +2543,7 @@ AllocatedStorage is the size of the database.
   
   
   Overrides `ClusterParameters.AllocatedStorage`
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].allowMajorVersionUpgrade</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].allowMajorVersionUpgrade</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3442,11 +2559,7 @@ AllowMajorVersionUpgrade is whether major version upgrades are allowed.
   
   
   Overrides `ClusterParameters.AllowMajorVersionUpgrade`
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].applyImmediately</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].applyImmediately</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3458,11 +2571,7 @@ ApplyImmediately is whether changes should be applied immediately.
   
   
   Overrides `ClusterParameters.ApplyImmediately`
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].autoMinorVersionUpgrade</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].autoMinorVersionUpgrade</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3475,11 +2584,7 @@ AutoMinorVersionUpgrade is whether minor version upgrades are applied
   
   
   Overrides `ClusterParameters.AutoMinorVersionUpgrade`
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].availabilityZone</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].availabilityZone</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3489,11 +2594,7 @@ AutoMinorVersionUpgrade is whether minor version upgrades are applied
 
 AvailabilityZone is the availability zone for this instance.
   Ignored if `multiAz` is true
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].backupRetentionPeriod</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].backupRetentionPeriod</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3505,11 +2606,7 @@ BackupRetentionPeriod is the number of days to retain backups for.
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].copyTagsToSnapshot</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].copyTagsToSnapshot</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3518,11 +2615,7 @@ BackupRetentionPeriod is the number of days to retain backups for.
 
 
 CopyTagsToSnapshot is whether tags should be copied to snapshots.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].databaseName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].databaseName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3531,11 +2624,7 @@ CopyTagsToSnapshot is whether tags should be copied to snapshots.
 
 
 DatabaseName is the name of the database to create.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].deleteAutomatedBackups</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].deleteAutomatedBackups</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3547,11 +2636,7 @@ DeleteAutomatedBackups is whether automated backups should be deleted.
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].deletionProtection</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].deletionProtection</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3563,11 +2648,7 @@ DeletionProtection is whether deletion protection is enabled.
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].domainIamRoleName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].domainIamRoleName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3579,11 +2660,7 @@ DomainIamRoleName is the name of the IAM role to use.
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].enabledCloudwatchLogsExports</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].enabledCloudwatchLogsExports</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3597,11 +2674,7 @@ EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Lo
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].enabledCloudwatchLogsExports[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].enabledCloudwatchLogsExports[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3610,11 +2683,7 @@ EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Lo
 
 
 LogGroup is the name of a log group.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].finalSnapshotIdentifier</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].finalSnapshotIdentifier</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3626,11 +2695,7 @@ FinalSnapshotIdentifier is the identifier of the final snapshot.
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].iamDatabaseAuthenticationEnabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].iamDatabaseAuthenticationEnabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3642,11 +2707,7 @@ IamDatabaseAuthenticationEnabled is whether IAM database authentication is enabl
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].instanceClass</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].instanceClass</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3655,11 +2716,7 @@ IamDatabaseAuthenticationEnabled is whether IAM database authentication is enabl
 
 
 InstanceClass is the instance class to use.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].iops</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].iops</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3671,11 +2728,7 @@ Iops is the amount of provisioned IOPS.
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].licenseModel</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].licenseModel</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3687,11 +2740,7 @@ LicenseModel is the license model to use.
   
   
   Only applicable if not running in cluster mode.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].monitoringInterval</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].monitoringInterval</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3701,11 +2750,7 @@ LicenseModel is the license model to use.
 
 MonitoringInterval is the interval, in seconds, between points when
   Enhanced Monitoring metrics are collected for the DB instance.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].multiAz</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].multiAz</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3717,11 +2762,7 @@ MultiAZ is whether the DB instance is a Multi-AZ deployment.
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].networkType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].networkType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3733,11 +2774,7 @@ NetworkType is the network type to use.
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].optionGroupName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].optionGroupName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3750,11 +2787,7 @@ OptionGroupName is the name of the option group to associate with this DB
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].parameterGroupName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].parameterGroupName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3765,11 +2798,7 @@ OptionGroupName is the name of the option group to associate with this DB
 ParameterGroupName is the name of the DB parameter group to associate
   with this DB instance. Must pre-exist in the account. Mutually exclusive
   with `RdsBaseDbCluster.dbParameterGroup`
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].performanceInsightsEnabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].performanceInsightsEnabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3778,11 +2807,7 @@ ParameterGroupName is the name of the DB parameter group to associate
 
 
 PerformanceInsightsEnabled is whether Performance Insights is enabled.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].performanceInsightsKmsKeyID</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].performanceInsightsKmsKeyID</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3792,11 +2817,7 @@ PerformanceInsightsEnabled is whether Performance Insights is enabled.
 
 PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption
   of Performance Insights data.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].performanceInsightsRetentionPeriod</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].performanceInsightsRetentionPeriod</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3806,11 +2827,7 @@ PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption
 
 PerformanceInsightsRetentionPeriod is the amount of time, in days, to
   retain Performance Insights data.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].preferredMaintenanceWindow</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].preferredMaintenanceWindow</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3819,11 +2836,7 @@ PerformanceInsightsRetentionPeriod is the amount of time, in days, to
 
 
 PreferredMaintenanceWindow is the preferred maintenance window.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].promotionTier</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].promotionTier</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3833,11 +2846,7 @@ PreferredMaintenanceWindow is the preferred maintenance window.
 
 PromotionTier is the order in which to promote an Aurora replica to the
   primary instance.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].publiclyAccessible</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].publiclyAccessible</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3846,11 +2855,7 @@ PromotionTier is the order in which to promote an Aurora replica to the
 
 
 PubliclyAccessible is whether the DB instance is publicly accessible.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].skipFinalSnapshot</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].skipFinalSnapshot</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3862,11 +2867,7 @@ SkipFinalSnapshot is whether to skip the final snapshot.
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].storageEncrypted</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].storageEncrypted</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3878,11 +2879,7 @@ StorageEncrypted is whether storage is encrypted.
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].storageThroughput</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].storageThroughput</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3895,11 +2892,7 @@ StorageThroughput is the amount of storage throughput. Only applicable if
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].storageType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].storageType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3911,11 +2904,7 @@ StorageType is the storage type to use.
   
   
   Only applicable if not running in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.instances[*].tags</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.instances[*].tags</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3924,11 +2913,7 @@ StorageType is the storage type to use.
 
 
 Tags is a set of tags to associate with the DB instance.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.iops</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.iops</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3937,11 +2922,7 @@ Tags is a set of tags to associate with the DB instance.
 
 
 Iops is the amount of provisioned IOPS.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.masterUsername</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.masterUsername</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3950,11 +2931,7 @@ Iops is the amount of provisioned IOPS.
 
 
 MasterUsername is the master username to use.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.multiAz</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.multiAz</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3963,11 +2940,7 @@ MasterUsername is the master username to use.
 
 
 MultiAZ is whether the DB instance is a Multi-AZ deployment.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.partition</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.partition</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3981,11 +2954,7 @@ Allowed Values:
 - aws-us-gov
 
 Partition is the AWS partition to use.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.performanceInsightsEnabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.performanceInsightsEnabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -3994,11 +2963,7 @@ Partition is the AWS partition to use.
 
 
 PerformanceInsightsEnabled is whether Performance Insights is enabled.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.performanceInsightsKmsKeyID</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.performanceInsightsKmsKeyID</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4007,11 +2972,7 @@ PerformanceInsightsEnabled is whether Performance Insights is enabled.
 
 
 PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption of Performance Insights data.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.performanceInsightsRetentionPeriod</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.performanceInsightsRetentionPeriod</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4020,11 +2981,7 @@ PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption of Perf
 
 
 PerformanceInsightsRetentionPeriod is the amount of time, in days, to retain Performance Insights data.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.preferredBackupWindow</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.preferredBackupWindow</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4033,11 +2990,7 @@ PerformanceInsightsRetentionPeriod is the amount of time, in days, to retain Per
 
 
 PreferredBackupWindow is the preferred backup window.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.preferredMaintenanceWindow</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.preferredMaintenanceWindow</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4046,11 +2999,7 @@ PreferredBackupWindow is the preferred backup window.
 
 
 PreferredMaintenanceWindow is the preferred maintenance window.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.provisionSql</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.provisionSql</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4060,11 +3009,7 @@ PreferredMaintenanceWindow is the preferred maintenance window.
 
 ProvisionSql determines whether or not to provision databases inside the
   RDS cluster.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.publiclyAccessible</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.publiclyAccessible</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4073,11 +3018,7 @@ ProvisionSql determines whether or not to provision databases inside the
 
 
 PubliclyAccessible is whether the DB instance is publicly accessible.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.replicationSourceIdentifier</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.replicationSourceIdentifier</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4087,11 +3028,7 @@ PubliclyAccessible is whether the DB instance is publicly accessible.
 
 ReplicationSourceIdentifier ARN of a source DB cluster or DB instance if
   this DB cluster is to be created as a Read Replica
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4100,11 +3037,7 @@ ReplicationSourceIdentifier ARN of a source DB cluster or DB instance if
 
 
 RestoreToPointInTime is the point in time to restore to.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.identifier</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.identifier</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4115,11 +3048,7 @@ RestoreToPointInTime is the point in time to restore to.
 Identifier is the identifier of the source DB cluster snapshot or DB
   instance snapshot to restore from. Only valid if not running in cluster
   mode.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.restoreToTime</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.restoreToTime</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4128,11 +3057,7 @@ Identifier is the identifier of the source DB cluster snapshot or DB
 
 
 RestoreToTime is the time to restore to.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.restoreType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.restoreType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4146,11 +3071,7 @@ Allowed Values:
 
 RestoreType is the type of restore to perform. This option is ignored if
   not running in cluster mode.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.sourceDbClusterIdentifier</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.sourceDbClusterIdentifier</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4160,11 +3081,7 @@ RestoreType is the type of restore to perform. This option is ignored if
 
 SourceDbClusterIdentifier is the identifier of the source DB cluster.
   This option is ignored if not running in cluster mode.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4174,11 +3091,7 @@ SourceDbClusterIdentifier is the identifier of the source DB cluster.
 
 sourceDbInstanceAutomatedBackupsArn is the ARN of the source DB instance
   automated backup to restore from. Only valid if not running in cluster mode.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.sourceDbInstanceIdentifier</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.sourceDbInstanceIdentifier</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4189,11 +3102,7 @@ sourceDbInstanceAutomatedBackupsArn is the ARN of the source DB instance
 SourceDbInstanceIdentifier is the identifier of the source DB instance.
   Only valid if not running in cluster mode. If running in cluster mode, use
   `SourceDbClusterIdentifier` instead.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.sourceDbiResourceId</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.sourceDbiResourceId</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4203,11 +3112,7 @@ SourceDbInstanceIdentifier is the identifier of the source DB instance.
 
 SourceDbiResourceId is the resource ID of the source DB instance. Only
   valid if not running in cluster mode.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.useLatestRestorableTime</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.restoreToPointInTime.useLatestRestorableTime</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4216,11 +3121,7 @@ SourceDbiResourceId is the resource ID of the source DB instance. Only
 
 
 UseLatestRestorableTime is whether to use the latest restorable time.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.s3Import</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.s3Import</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4229,11 +3130,7 @@ UseLatestRestorableTime is whether to use the latest restorable time.
 
 
 S3Import is the S3 import configuration.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.s3Import.bucketName</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.s3Import.bucketName</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4242,11 +3139,7 @@ S3Import is the S3 import configuration.
 
 
 BucketName is the name of the S3 bucket.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.s3Import.bucketPrefix</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.s3Import.bucketPrefix</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4256,11 +3149,7 @@ BucketName is the name of the S3 bucket.
 
 BucketPrefix is the prefix of the S3 bucket. Can be blank but is the path
   within the bucket where the data is located.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.s3Import.ingestionRole</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.s3Import.ingestionRole</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4269,11 +3158,7 @@ BucketPrefix is the prefix of the S3 bucket. Can be blank but is the path
 
 
 IngestionRole is the role to use for ingestion.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.s3Import.sourceEngine</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.s3Import.sourceEngine</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4282,11 +3167,7 @@ IngestionRole is the role to use for ingestion.
 
 
 SourceEngine is the source engine to use.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.s3Import.sourceEngineVersion</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.s3Import.sourceEngineVersion</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4295,11 +3176,7 @@ SourceEngine is the source engine to use.
 
 
 SourceEngineVersion is the source engine version to use.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.scalingConfiguration</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.scalingConfiguration</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4308,11 +3185,7 @@ SourceEngineVersion is the source engine version to use.
 
 
 ScalingConfiguration is the scaling configuration.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.scalingConfiguration.autoPause</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.scalingConfiguration.autoPause</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4321,11 +3194,7 @@ ScalingConfiguration is the scaling configuration.
 
 
 AutoPause is whether the database should automatically pause.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.scalingConfiguration.maxCapacity</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.scalingConfiguration.maxCapacity</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4334,11 +3203,7 @@ AutoPause is whether the database should automatically pause.
 
 
 MaxCapacity is the maximum capacity for the database.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.scalingConfiguration.minCapacity</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.scalingConfiguration.minCapacity</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4347,11 +3212,7 @@ MaxCapacity is the maximum capacity for the database.
 
 
 MinCapacity is the minimum capacity for the database.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.scalingConfiguration.secondsUntilAutoPause</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.scalingConfiguration.secondsUntilAutoPause</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4361,11 +3222,7 @@ MinCapacity is the minimum capacity for the database.
 
 SecondsUntilAutoPause is the number of seconds until the database
   automatically pauses.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.secretRotation</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.secretRotation</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4374,11 +3231,7 @@ SecondsUntilAutoPause is the number of seconds until the database
 
 
 SecretRotation is the secret rotation configuration.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.secretRotation.automaticallyAfterDays</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.secretRotation.automaticallyAfterDays</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4388,11 +3241,7 @@ SecretRotation is the secret rotation configuration.
 
 AutomaticallyAfterDays is the number of days after which the secret is
   rotated automatically.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.secretRotation.enabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.secretRotation.enabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4401,11 +3250,7 @@ AutomaticallyAfterDays is the number of days after which the secret is
 
 
 Enabled is whether secret rotation is enabled.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.secretRotation.rotateImmediately</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.secretRotation.rotateImmediately</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4414,11 +3259,7 @@ Enabled is whether secret rotation is enabled.
 
 
 RotateImmediately is whether the secret should be rotated immediately.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.secretRotation.scheduleExpression</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.secretRotation.scheduleExpression</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4427,11 +3268,7 @@ RotateImmediately is whether the secret should be rotated immediately.
 
 
 ScheduleExpression is the schedule expression for secret rotation.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.serverlessV2ScalingConfiguration</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.serverlessV2ScalingConfiguration</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4440,11 +3277,7 @@ ScheduleExpression is the schedule expression for secret rotation.
 
 
 ServerlessV2ScalingConfiguration is the serverless v2 scaling configuration.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.serverlessV2ScalingConfiguration.maxCapacity</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.serverlessV2ScalingConfiguration.maxCapacity</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4453,11 +3286,7 @@ ServerlessV2ScalingConfiguration is the serverless v2 scaling configuration.
 
 
 MaxCapacity is the maximum capacity for the database.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.serverlessV2ScalingConfiguration.minCapacity</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.serverlessV2ScalingConfiguration.minCapacity</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4466,11 +3295,7 @@ MaxCapacity is the maximum capacity for the database.
 
 
 MinCapacity is the minimum capacity for the database.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.storageType</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.storageType</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4479,11 +3304,7 @@ MinCapacity is the minimum capacity for the database.
 
 
 StorageType specifies the storage type to be associated with the cluster
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.database.tags</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.database.tags</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4492,11 +3313,7 @@ StorageType specifies the storage type to be associated with the cluster
 
 
 Tags is a set of tags to associate with the DB cluster.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.deletionPolicy</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.deletionPolicy</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4516,11 +3333,7 @@ DeletionPolicy specifies what will happen to the underlying external
   field in a future release. Currently, both could be set independently and
   non-default values would be honored if the feature flag is enabled.
   See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.kubernetesProviderConfig</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.kubernetesProviderConfig</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4529,11 +3342,7 @@ DeletionPolicy specifies what will happen to the underlying external
 
 
 KubernetesProviderConfig
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.kubernetesProviderConfig.name</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.kubernetesProviderConfig.name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4541,11 +3350,7 @@ KubernetesProviderConfig
 |Required |**Yes**|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.managementPolicies</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.managementPolicies</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4566,11 +3371,7 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
   custom, the DeletionPolicy field will be ignored.
   See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
   and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.managementPolicies[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.managementPolicies[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4580,11 +3381,7 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
 
 A ManagementAction represents an action that the Crossplane controllers
   can take on an external resource.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.providerConfigRef</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.providerConfigRef</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4596,11 +3393,7 @@ A ManagementAction represents an action that the Crossplane controllers
 ProviderConfigReference specifies how the provider that will be used to
   create, observe, update, and delete this managed resource should be
   configured.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.providerConfigRef.name</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.providerConfigRef.name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4609,11 +3402,7 @@ ProviderConfigReference specifies how the provider that will be used to
 
 
 Name of the referenced object.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.providerConfigRef.policy</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.providerConfigRef.policy</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4622,11 +3411,7 @@ Name of the referenced object.
 
 
 Policies for referencing.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.providerConfigRef.policy.resolution</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.providerConfigRef.policy.resolution</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4643,11 +3428,7 @@ Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
   reference cannot be resolved. 'Optional' means this reference will be
   a no-op if it cannot be resolved.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.providerConfigRef.policy.resolve</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.providerConfigRef.policy.resolve</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4663,11 +3444,7 @@ Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
   the corresponding field is not present. Use 'Always' to resolve the
   reference on every reconcile.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4680,11 +3457,7 @@ PublishConnectionDetailsTo specifies the connection secret config which
   which any connection details for this managed resource should be written.
   Connection details frequently include the endpoint, username,
   and password required to connect to the managed resource.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.configRef</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.configRef</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4695,11 +3468,7 @@ PublishConnectionDetailsTo specifies the connection secret config which
 
 SecretStoreConfigRef specifies which secret store config should be used
   for this ConnectionSecret.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.configRef.name</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.configRef.name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4708,11 +3477,7 @@ SecretStoreConfigRef specifies which secret store config should be used
 
 
 Name of the referenced object.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.configRef.policy</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.configRef.policy</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4721,11 +3486,7 @@ Name of the referenced object.
 
 
 Policies for referencing.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.configRef.policy.resolution</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.configRef.policy.resolution</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4742,11 +3503,7 @@ Resolution specifies whether resolution of this reference is required.
   The default is 'Required', which means the reconcile will fail if the
   reference cannot be resolved. 'Optional' means this reference will be
   a no-op if it cannot be resolved.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.configRef.policy.resolve</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.configRef.policy.resolve</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4762,11 +3519,7 @@ Resolve specifies when this reference should be resolved. The default
   is 'IfNotPresent', which will attempt to resolve the reference only when
   the corresponding field is not present. Use 'Always' to resolve the
   reference on every reconcile.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.metadata</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.metadata</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4775,11 +3528,7 @@ Resolve specifies when this reference should be resolved. The default
 
 
 Metadata is the metadata for connection secret.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.metadata.annotations</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.metadata.annotations</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4790,11 +3539,7 @@ Metadata is the metadata for connection secret.
 Annotations are the annotations to be added to connection secret.
   - For Kubernetes secrets, this will be used as "metadata.annotations".
   - It is up to Secret Store implementation for others store types.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.metadata.labels</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.metadata.labels</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4805,11 +3550,7 @@ Annotations are the annotations to be added to connection secret.
 Labels are the labels/tags to be added to connection secret.
   - For Kubernetes secrets, this will be used as "metadata.labels".
   - It is up to Secret Store implementation for others store types.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.metadata.type</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.metadata.type</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4819,11 +3560,7 @@ Labels are the labels/tags to be added to connection secret.
 
 Type is the SecretType for the connection secret.
   - Only valid for Kubernetes Secret Stores.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.name</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.publishConnectionDetailsTo.name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4832,11 +3569,7 @@ Type is the SecretType for the connection secret.
 
 
 Name is the name of the connection secret.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.region</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.region</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4845,11 +3578,7 @@ Name is the name of the connection secret.
 
 
 Region is the region in which this collection will be created
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.subnetGroupIndexes</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.subnetGroupIndexes</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4858,11 +3587,7 @@ Region is the region in which this collection will be created
 
 
 SubnetGroupIndexes is a map of service name to subnet set indexes
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.subnetGroupIndexes.cache</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.subnetGroupIndexes.cache</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4871,11 +3596,7 @@ SubnetGroupIndexes is a map of service name to subnet set indexes
 
 
 Cache is the subnet group index to use for the cache
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.subnetGroupIndexes.database</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.subnetGroupIndexes.database</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4884,11 +3605,7 @@ Cache is the subnet group index to use for the cache
 
 
 Database is the subnet group index to use for the database
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4897,11 +3614,7 @@ Database is the subnet group index to use for the database
 
 
 Vpc defines the VPC settings
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4910,11 +3623,7 @@ Vpc defines the VPC settings
 
 
 Peering is the VPC to peer with.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.allowPublic</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.allowPublic</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4925,11 +3634,7 @@ Peering is the VPC to peer with.
 AllowPublic specifies if the VPC peering connections should be allowed to
   be linked to the public subnets
   Defaults to false
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.enabled</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.enabled</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4940,11 +3645,7 @@ AllowPublic specifies if the VPC peering connections should be allowed to
 Enabled specifies if the VPC peering connections should be enabled for
   this VPC.
   Defaults to false
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.groupBy</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.groupBy</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4953,11 +3654,7 @@ Enabled specifies if the VPC peering connections should be enabled for
 
 
 GroupBy specifies the key to group the remote subnets by
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4968,11 +3665,7 @@ GroupBy specifies the key to group the remote subnets by
 
 
 RemoteVpcs is a list of VPCs to peer with.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4981,11 +3674,7 @@ RemoteVpcs is a list of VPCs to peer with.
 
 
 VpcPeer defines the parameters for peering with a VPC.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].allowPublic</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].allowPublic</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -4995,11 +3684,7 @@ VpcPeer defines the parameters for peering with a VPC.
 
 Disabled specifies if the peering connection should be disabled.
   Defaults to true
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5009,11 +3694,7 @@ Disabled specifies if the peering connection should be disabled.
 
 ExcludeFromLocalPeering specifies the indexes of subnetsets for this VPC to
   exclude from routing to the peering connection
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.private</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.private</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5024,11 +3705,7 @@ ExcludeFromLocalPeering specifies the indexes of subnetsets for this VPC to
 
 
 private subnets to exclude from peering
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.private[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.private[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5036,11 +3713,7 @@ private subnets to exclude from peering
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.public</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.public</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5051,11 +3724,7 @@ private subnets to exclude from peering
 
 
 public subnets to exclude from peering
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.public[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromLocalPeering.public[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5063,11 +3732,7 @@ public subnets to exclude from peering
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5080,11 +3745,7 @@ public subnets to exclude from peering
 ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
   VPC to exclude from routing to the peering connection. If emmpty, all
   subnetsets will be included by default
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5092,11 +3753,7 @@ ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].private</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].private</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5107,11 +3764,7 @@ ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
 
 
 private subnets to exclude from peering
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].private[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].private[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5119,11 +3772,7 @@ private subnets to exclude from peering
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].public</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].public</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5134,11 +3783,7 @@ private subnets to exclude from peering
 
 
 public subnets to exclude from peering
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].public[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].excludeFromRemotePeering[*].public[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5146,11 +3791,7 @@ public subnets to exclude from peering
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].name</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5159,11 +3800,7 @@ public subnets to exclude from peering
 
 
 Name specifies the name of the VPC to peer with.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].providerConfigRef</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].providerConfigRef</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5173,11 +3810,7 @@ Name specifies the name of the VPC to peer with.
 
 ProviderConfigRef specifies the provider config to use for the peering
   connection.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].region</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.peering.remoteVpcs[*].region</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5190,11 +3823,7 @@ Region specifies the region the VPC is found in.
   
   If not defined, the region of the VPC will be assumed to be the same as
   the region of the peered VPC.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5203,11 +3832,7 @@ Region specifies the region the VPC is found in.
 
 
 PeeredSubnets defines how many public and private subnet sets to create.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5218,11 +3843,7 @@ PeeredSubnets defines how many public and private subnet sets to create.
 
 
 Cidrs is a list of PeeredSubnetSets to create in the VPC
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5232,11 +3853,7 @@ Cidrs is a list of PeeredSubnetSets to create in the VPC
 
 PeeredSubnetSet defines the parameters for creating a set of subnets with the
   same mask.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].prefix</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].prefix</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5246,11 +3863,7 @@ PeeredSubnetSet defines the parameters for creating a set of subnets with the
 
 
 Prefix is the CIDR prefix to use for the subnet set
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5259,11 +3872,7 @@ Prefix is the CIDR prefix to use for the subnet set
 
 
 Private is the number of private subnets to create in this set
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private.clusterNames</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private.clusterNames</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5274,11 +3883,7 @@ Private is the number of private subnets to create in this set
 
 
 ClusterNames is a list of EKS cluster names to add shared LB tags for
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private.clusterNames[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private.clusterNames[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5286,11 +3891,7 @@ ClusterNames is a list of EKS cluster names to add shared LB tags for
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private.count</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private.count</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5299,11 +3900,7 @@ ClusterNames is a list of EKS cluster names to add shared LB tags for
 
 
 Count is the number of subnet sets to create with this mask
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private.lbSetIndex</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private.lbSetIndex</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5313,11 +3910,7 @@ Count is the number of subnet sets to create with this mask
 
 Determines which subnet set in this range to use for kubernetes load
   balancers. -1 means no load balancer tag is defined on this group
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private.mask</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private.mask</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5326,11 +3919,7 @@ Determines which subnet set in this range to use for kubernetes load
 
 
 Mask is the CIDR mask to use for the subnet set
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private.offset</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].private.offset</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5339,11 +3928,7 @@ Mask is the CIDR mask to use for the subnet set
 
 
 Offset is the number of bits to offset the subnet mask by
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5352,11 +3937,7 @@ Offset is the number of bits to offset the subnet mask by
 
 
 Public is the number of public subnets to create in this set
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public.clusterNames</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public.clusterNames</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5367,11 +3948,7 @@ Public is the number of public subnets to create in this set
 
 
 ClusterNames is a list of EKS cluster names to add shared LB tags for
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public.clusterNames[*]</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public.clusterNames[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5379,11 +3956,7 @@ ClusterNames is a list of EKS cluster names to add shared LB tags for
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public.count</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public.count</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5392,11 +3965,7 @@ ClusterNames is a list of EKS cluster names to add shared LB tags for
 
 
 Count is the number of subnet sets to create with this mask
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public.lbSetIndex</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public.lbSetIndex</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5406,11 +3975,7 @@ Count is the number of subnet sets to create with this mask
 
 Determines which subnet set in this range to use for kubernetes load
   balancers. -1 means no load balancer tag is defined on this group
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public.mask</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public.mask</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5419,11 +3984,7 @@ Determines which subnet set in this range to use for kubernetes load
 
 
 Mask is the CIDR mask to use for the subnet set
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public.offset</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.cidrs[*].public.offset</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5432,11 +3993,7 @@ Mask is the CIDR mask to use for the subnet set
 
 
 Offset is the number of bits to offset the subnet mask by
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.function</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.subnetsets.function</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5455,11 +4012,7 @@ Function defines the function to use to calculate the CIDR blocks for the
   this XRD and as it's defaulted it can be hidden from the user. The
   function input expects a path though so this has to exist but isn't
   expected to be defined on the claim.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.tags</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.tags</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5468,11 +4021,7 @@ Function defines the function to use to calculate the CIDR blocks for the
 
 
 Tags is a map of additional tags to assign to the VPC.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.tags.cluster</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.tags.cluster</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5481,11 +4030,7 @@ Tags is a map of additional tags to assign to the VPC.
 
 
 Cluster tags to apply subnets for autodiscovery of load balancers
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.tags.common</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.tags.common</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5494,11 +4039,7 @@ Cluster tags to apply subnets for autodiscovery of load balancers
 
 
 common tags apoplied to all resources
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.vpc.tags.subnet</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.vpc.tags.subnet</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5507,11 +4048,7 @@ common tags apoplied to all resources
 
 
 Subnet tags to apply to all subnetsets
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.writeConnectionSecretToRef</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.writeConnectionSecretToRef</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5527,11 +4064,7 @@ WriteConnectionSecretToReference specifies the namespace and name of a
   PublishConnectionDetailsTo. Currently, both could be set independently
   and connection details would be published to both without affecting
   each other.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.writeConnectionSecretToRef.name</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.writeConnectionSecretToRef.name</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5540,11 +4073,7 @@ WriteConnectionSecretToReference specifies the namespace and name of a
 
 
 Name of the secret.
-</details>
-<details>
-<summary>
-  <h4>.spec.rdsCacheClusterSpec.writeConnectionSecretToRef.namespace</h4>
-</summary>
+<h4>.spec.rdsCacheClusterSpec.writeConnectionSecretToRef.namespace</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5553,13 +4082,9 @@ Name of the secret.
 
 
 Namespace of the secret.
-</details>
 
 ### Status Properties
-<details>
-<summary>
-  <h4>.status.cacheClusterEndpoints</h4>
-</summary>
+<h4>.status.cacheClusterEndpoints</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5571,11 +4096,7 @@ Namespace of the secret.
 
 CacheClusterEndpoints is a list of endpoints of the Elasticache clusters
   when the cache is configured in cluster mode
-</details>
-<details>
-<summary>
-  <h4>.status.cacheClusterEndpoints[*]</h4>
-</summary>
+<h4>.status.cacheClusterEndpoints[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5583,11 +4104,7 @@ CacheClusterEndpoints is a list of endpoints of the Elasticache clusters
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.status.cacheConnectionSecret</h4>
-</summary>
+<h4>.status.cacheConnectionSecret</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5597,11 +4114,7 @@ CacheClusterEndpoints is a list of endpoints of the Elasticache clusters
 
 CacheConnectionSecret is the secret containing the connection details for
   the Elasticache replication group
-</details>
-<details>
-<summary>
-  <h4>.status.cacheEndpoint</h4>
-</summary>
+<h4>.status.cacheEndpoint</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5610,11 +4123,7 @@ CacheConnectionSecret is the secret containing the connection details for
 
 
 CacheEndpoint is the endpoint of the Elasticache replication group
-</details>
-<details>
-<summary>
-  <h4>.status.cacheGlobalConnectionSecret</h4>
-</summary>
+<h4>.status.cacheGlobalConnectionSecret</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5624,11 +4133,7 @@ CacheEndpoint is the endpoint of the Elasticache replication group
 
 CacheGlobalConnectionSecret is the name of the global connection secret for the
   Elasticache cluster
-</details>
-<details>
-<summary>
-  <h4>.status.cacheGlobalEndpoint</h4>
-</summary>
+<h4>.status.cacheGlobalEndpoint</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5638,11 +4143,7 @@ CacheGlobalConnectionSecret is the name of the global connection secret for the
 
 CacheGlobalEndpoint is the global (RW) endpoint of the Elasticache
   global replication group
-</details>
-<details>
-<summary>
-  <h4>.status.cacheGlobalReaderEndpoint</h4>
-</summary>
+<h4>.status.cacheGlobalReaderEndpoint</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5652,11 +4153,7 @@ CacheGlobalEndpoint is the global (RW) endpoint of the Elasticache
 
 CacheGlobalReaderEndpoint is the global (RO) endpoint of the Elasticache
   global replication group
-</details>
-<details>
-<summary>
-  <h4>.status.cachePort</h4>
-</summary>
+<h4>.status.cachePort</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5665,11 +4162,7 @@ CacheGlobalReaderEndpoint is the global (RO) endpoint of the Elasticache
 
 
 CachePort is the port of the Elasticache
-</details>
-<details>
-<summary>
-  <h4>.status.cacheReaderEndpoint</h4>
-</summary>
+<h4>.status.cacheReaderEndpoint</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5679,11 +4172,7 @@ CachePort is the port of the Elasticache
 
 CacheReaderEndpoint is the reader endpoint of the Elasticache replication
   group
-</details>
-<details>
-<summary>
-  <h4>.status.cacheSubnets</h4>
-</summary>
+<h4>.status.cacheSubnets</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5694,11 +4183,7 @@ CacheReaderEndpoint is the reader endpoint of the Elasticache replication
 
 
 CacheSubnets is the list of subnets to be used by ElasticSearch
-</details>
-<details>
-<summary>
-  <h4>.status.cacheSubnets[*]</h4>
-</summary>
+<h4>.status.cacheSubnets[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5706,11 +4191,7 @@ CacheSubnets is the list of subnets to be used by ElasticSearch
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.status.conditions</h4>
-</summary>
+<h4>.status.conditions</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5721,11 +4202,7 @@ CacheSubnets is the list of subnets to be used by ElasticSearch
 
 
 Conditions of the resource.
-</details>
-<details>
-<summary>
-  <h4>.status.conditions[*]</h4>
-</summary>
+<h4>.status.conditions[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5734,11 +4211,7 @@ Conditions of the resource.
 
 
 A Condition that may apply to a resource.
-</details>
-<details>
-<summary>
-  <h4>.status.conditions[*].lastTransitionTime</h4>
-</summary>
+<h4>.status.conditions[*].lastTransitionTime</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5748,11 +4221,7 @@ A Condition that may apply to a resource.
 
 LastTransitionTime is the last time this condition transitioned from one
   status to another.
-</details>
-<details>
-<summary>
-  <h4>.status.conditions[*].message</h4>
-</summary>
+<h4>.status.conditions[*].message</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5762,11 +4231,7 @@ LastTransitionTime is the last time this condition transitioned from one
 
 A Message containing details about this condition's last transition from
   one status to another, if any.
-</details>
-<details>
-<summary>
-  <h4>.status.conditions[*].reason</h4>
-</summary>
+<h4>.status.conditions[*].reason</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5775,11 +4240,7 @@ A Message containing details about this condition's last transition from
 
 
 A Reason for this condition's last transition from one status to another.
-</details>
-<details>
-<summary>
-  <h4>.status.conditions[*].status</h4>
-</summary>
+<h4>.status.conditions[*].status</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5788,11 +4249,7 @@ A Reason for this condition's last transition from one status to another.
 
 
 Status of this condition; is it currently True, False, or Unknown?
-</details>
-<details>
-<summary>
-  <h4>.status.conditions[*].type</h4>
-</summary>
+<h4>.status.conditions[*].type</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5802,11 +4259,7 @@ Status of this condition; is it currently True, False, or Unknown?
 
 Type of this condition. At most one of each condition type may apply to
   a resource at any point in time.
-</details>
-<details>
-<summary>
-  <h4>.status.rdsConnectionSecret</h4>
-</summary>
+<h4>.status.rdsConnectionSecret</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5816,11 +4269,7 @@ Type of this condition. At most one of each condition type may apply to
 
 RdsConnectionSecret is the secret containing the connection details
   for the database
-</details>
-<details>
-<summary>
-  <h4>.status.rdsEndpoint</h4>
-</summary>
+<h4>.status.rdsEndpoint</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5829,11 +4278,7 @@ RdsConnectionSecret is the secret containing the connection details
 
 
 RdsEndpoint is the endpoint of the database
-</details>
-<details>
-<summary>
-  <h4>.status.rdsPort</h4>
-</summary>
+<h4>.status.rdsPort</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5842,11 +4287,7 @@ RdsEndpoint is the endpoint of the database
 
 
 RdsPort is the port of the database
-</details>
-<details>
-<summary>
-  <h4>.status.rdsSubnets</h4>
-</summary>
+<h4>.status.rdsSubnets</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5857,11 +4298,7 @@ RdsPort is the port of the database
 
 
 RdsSubnets is the list of subnets to be used by the database
-</details>
-<details>
-<summary>
-  <h4>.status.rdsSubnets[*]</h4>
-</summary>
+<h4>.status.rdsSubnets[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5869,11 +4306,7 @@ RdsSubnets is the list of subnets to be used by the database
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.status.vpc</h4>
-</summary>
+<h4>.status.vpc</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5882,11 +4315,7 @@ RdsSubnets is the list of subnets to be used by the database
 
 
 Vpc is a VPC configuration to bind the cluster to
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.additionalCidrBlocks</h4>
-</summary>
+<h4>.status.vpc.additionalCidrBlocks</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5897,11 +4326,7 @@ Vpc is a VPC configuration to bind the cluster to
 
 
 A list of additional VPC CIDR blocks defined in this VPC
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.additionalCidrBlocks[*]</h4>
-</summary>
+<h4>.status.vpc.additionalCidrBlocks[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5909,11 +4334,7 @@ A list of additional VPC CIDR blocks defined in this VPC
 |Required |No|
 
 
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.cidrBlock</h4>
-</summary>
+<h4>.status.vpc.cidrBlock</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5922,11 +4343,7 @@ A list of additional VPC CIDR blocks defined in this VPC
 
 
 The Ipv4 cidr block defined for this VPC
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.id</h4>
-</summary>
+<h4>.status.vpc.id</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5935,11 +4352,7 @@ The Ipv4 cidr block defined for this VPC
 
 
 ID The VPC ID
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.internetGateway</h4>
-</summary>
+<h4>.status.vpc.internetGateway</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5948,11 +4361,7 @@ ID The VPC ID
 
 
 The internet gateway defined in this VPC
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.natGateways</h4>
-</summary>
+<h4>.status.vpc.natGateways</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5961,11 +4370,7 @@ The internet gateway defined in this VPC
 
 
 A map of NAT gateways defined in this VPC
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.privateRouteTables</h4>
-</summary>
+<h4>.status.vpc.privateRouteTables</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5976,11 +4381,7 @@ A map of NAT gateways defined in this VPC
 
 
 A map of private route tables defined in this VPC
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.privateRouteTables[*]</h4>
-</summary>
+<h4>.status.vpc.privateRouteTables[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -5989,11 +4390,7 @@ A map of private route tables defined in this VPC
 
 
 StatusRouteTables is a map of route tables and their status
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.privateSubnets</h4>
-</summary>
+<h4>.status.vpc.privateSubnets</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -6004,11 +4401,7 @@ StatusRouteTables is a map of route tables and their status
 
 
 A map of private subnets defined in this VPC
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.privateSubnets[*]</h4>
-</summary>
+<h4>.status.vpc.privateSubnets[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -6017,11 +4410,7 @@ A map of private subnets defined in this VPC
 
 
 StatusSubnets is a map of subnets and their status
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.providerConfig</h4>
-</summary>
+<h4>.status.vpc.providerConfig</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -6030,11 +4419,7 @@ StatusSubnets is a map of subnets and their status
 
 
 The provider config used to look up this VPC
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.publicRouteTables</h4>
-</summary>
+<h4>.status.vpc.publicRouteTables</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -6045,11 +4430,7 @@ The provider config used to look up this VPC
 
 
 A map of public route tables defined in this VPC
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.publicRouteTables[*]</h4>
-</summary>
+<h4>.status.vpc.publicRouteTables[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -6058,11 +4439,7 @@ A map of public route tables defined in this VPC
 
 
 StatusRouteTables is a map of route tables and their status
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.publicSubnets</h4>
-</summary>
+<h4>.status.vpc.publicSubnets</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -6073,11 +4450,7 @@ StatusRouteTables is a map of route tables and their status
 
 
 A list of maps of public subnets defined in this VPC
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.publicSubnets[*]</h4>
-</summary>
+<h4>.status.vpc.publicSubnets[*]</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -6086,11 +4459,7 @@ A list of maps of public subnets defined in this VPC
 
 
 StatusSubnets is a map of subnets and their status
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.region</h4>
-</summary>
+<h4>.status.vpc.region</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -6099,11 +4468,7 @@ StatusSubnets is a map of subnets and their status
 
 
 The region this VPC is located in
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.securityGroups</h4>
-</summary>
+<h4>.status.vpc.securityGroups</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -6112,11 +4477,7 @@ The region this VPC is located in
 
 
 A map of security groups defined in this VPC
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.transitGateways</h4>
-</summary>
+<h4>.status.vpc.transitGateways</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -6125,11 +4486,7 @@ A map of security groups defined in this VPC
 
 
 A map of transit gateways defined in this VPC
-</details>
-<details>
-<summary>
-  <h4>.status.vpc.vpcPeeringConnections</h4>
-</summary>
+<h4>.status.vpc.vpcPeeringConnections</h4>
 
 |Property |Value    |
 |:--------|:--------|
@@ -6138,7 +4495,6 @@ A map of transit gateways defined in this VPC
 
 
 A map of VPC peering connections defined in this VPC
-</details>
 
 
 

@@ -215,7 +215,6 @@ type PeeredSubnetSet struct {
 	// Public subnets are subnets with a route to the internet gateway.
 	//
 	// > [!IMPORTANT]
-	// >
 	// > If this is the default VPC CIDR, the first entry in the list, the
 	// > public subnets will be used for the NAT gateways. Setting this value to
 	// > 0 on the default VPC CIDR may result in the creation of fully private
