@@ -757,6 +757,7 @@ overflow will cause the composition to fail and this will be reflected in
 the status of the XR.
 
 > [!IMPORTANT]
+>
 > There must be at least 1 entry in this set which will be used as the VPC
 > default CIDR range, and you may define a maximum of 4 additional entries.
 </details>
