@@ -248,7 +248,9 @@ type PeeredSubnetBuilder struct {
 	// `kubernetes.io/cluster/$CLUSTER_NAME shared` being added to the subnets
 	// in this set.
 	//
-	// See #lbSetIndex for deciding which subnetset gets these tags.
+	// See [public.lbSetIndex](#specsubnetsetscidrspubliclbsetindex) and
+	// [private.lbSetIndex](#specsubnetsetscidrsprivatelbsetindex) for deciding
+	// which subnetset gets these tags.
 	//
 	// +optional
 	// +listType=atomic
@@ -262,10 +264,17 @@ type PeeredSubnetBuilder struct {
 	// > subnet sets which may fail if there are attached resources.
 	//
 	// +required
+	// +kubebuilder:validation:XValidation:rule="self >= oldSelf",message="count cannot be decreased"
 	Count int `json:"count"`
 
 	// Identifies which subnet set to use for public EKS load balancers. Subnets
-	// in this set will recieve the `kubernetes.io/role/elb: 1` tag
+	// in this set will recieve either the `kubernetes.io/role/elb: 1` or
+	// `kubernetes.io/role/internal-elb: 1` tag depending on if these are public
+	// or private subnets.
+	//
+	// If this is not set, or set to -1 (the default value), no subnets will be
+	// tagged as load balancer subnets otherwise it should be the index of the
+	// subnet set to tag, starting from index 0.
 	//
 	// +optional
 	// +default=-1
@@ -277,7 +286,7 @@ type PeeredSubnetBuilder struct {
 	// To prevent subnets being destroyed and recreated *This field is immutable*
 	//
 	// +required
-	// +immutable
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="mask is immutable"
 	Mask string `json:"mask"`
 
 	// Offset is the number of bits to offset the subnet mask by

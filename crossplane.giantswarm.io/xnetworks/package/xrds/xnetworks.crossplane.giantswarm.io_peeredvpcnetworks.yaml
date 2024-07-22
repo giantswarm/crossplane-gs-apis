@@ -365,7 +365,9 @@ spec:
                                 in this set.
 
 
-                                See #lbSetIndex for deciding which subnetset gets these tags.
+                                See [public.lbSetIndex](#specsubnetsetscidrspubliclbsetindex) and
+                                [private.lbSetIndex](#specsubnetsetscidrsprivatelbsetindex) for deciding
+                                which subnetset gets these tags.
                               items:
                                 type: string
                               type: array
@@ -380,10 +382,20 @@ spec:
                                 > decrease its value once set as this will result in the destruction of
                                 > subnet sets which may fail if there are attached resources.
                               type: integer
+                              x-kubernetes-validations:
+                              - message: count cannot be decreased
+                                rule: self >= oldSelf
                             lbSetIndex:
                               description: |-
                                 Identifies which subnet set to use for public EKS load balancers. Subnets
-                                in this set will recieve the `kubernetes.io/role/elb: 1` tag
+                                in this set will recieve either the `kubernetes.io/role/elb: 1` or
+                                `kubernetes.io/role/internal-elb: 1` tag depending on if these are public
+                                or private subnets.
+
+
+                                If this is not set, or set to -1 (the default value), no subnets will be
+                                tagged as load balancer subnets otherwise it should be the index of the
+                                subnet set to tag, starting from index 0.
                               type: integer
                             mask:
                               description: |-
@@ -393,6 +405,9 @@ spec:
 
                                 To prevent subnets being destroyed and recreated *This field is immutable*
                               type: string
+                              x-kubernetes-validations:
+                              - message: mask is immutable
+                                rule: self == oldSelf
                             offset:
                               description: Offset is the number of bits to offset
                                 the subnet mask by
@@ -423,7 +438,9 @@ spec:
                                 in this set.
 
 
-                                See #lbSetIndex for deciding which subnetset gets these tags.
+                                See [public.lbSetIndex](#specsubnetsetscidrspubliclbsetindex) and
+                                [private.lbSetIndex](#specsubnetsetscidrsprivatelbsetindex) for deciding
+                                which subnetset gets these tags.
                               items:
                                 type: string
                               type: array
@@ -438,10 +455,20 @@ spec:
                                 > decrease its value once set as this will result in the destruction of
                                 > subnet sets which may fail if there are attached resources.
                               type: integer
+                              x-kubernetes-validations:
+                              - message: count cannot be decreased
+                                rule: self >= oldSelf
                             lbSetIndex:
                               description: |-
                                 Identifies which subnet set to use for public EKS load balancers. Subnets
-                                in this set will recieve the `kubernetes.io/role/elb: 1` tag
+                                in this set will recieve either the `kubernetes.io/role/elb: 1` or
+                                `kubernetes.io/role/internal-elb: 1` tag depending on if these are public
+                                or private subnets.
+
+
+                                If this is not set, or set to -1 (the default value), no subnets will be
+                                tagged as load balancer subnets otherwise it should be the index of the
+                                subnet set to tag, starting from index 0.
                               type: integer
                             mask:
                               description: |-
@@ -451,6 +478,9 @@ spec:
 
                                 To prevent subnets being destroyed and recreated *This field is immutable*
                               type: string
+                              x-kubernetes-validations:
+                              - message: mask is immutable
+                                rule: self == oldSelf
                             offset:
                               description: Offset is the number of bits to offset
                                 the subnet mask by
