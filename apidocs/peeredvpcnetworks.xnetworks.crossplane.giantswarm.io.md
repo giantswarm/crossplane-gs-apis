@@ -756,7 +756,7 @@ as there is enough room on the cidr for it to be split at that level. Any
 overflow will cause the composition to fail and this will be reflected in
 the status of the XR.
 
-<div class="markdown-alert markdown-alert-important" dir="auto"><p class="markdown-alert-title" dir="auto">
+<div class="markdown-alert markdown-alert-important" dir="auto">
 > There must be at least 1 entry in this set which will be used as the VPC
 > default CIDR range, and you may define a maximum of 4 additional entries.
 </div>
