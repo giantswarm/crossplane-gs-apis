@@ -74,8 +74,9 @@ metadata:
 spec:
   provider:
     kubernetes:
-      # with this, the store is able to
-      # pull only from `default` namespace
+      # with this, the store is able
+      # to act only on secrets in the
+      # `default` namespace
       remoteNamespace: default
       server:
         caProvider:

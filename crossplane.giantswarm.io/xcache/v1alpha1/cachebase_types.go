@@ -180,10 +180,6 @@ type Cluster struct {
 	// If memcached is selected, the number of nodes will default to 3, one per
 	// availability zone.
 	//
-	// Valid values are:
-	// - single-az: The cluster is created in a single Availability Zone.
-	// - cross-az: The cluster is created across multiple Availability Zones.
-	//
 	// +optional
 	// +default=cross-az
 	// +kubebuilder:validation:Enum=single-az;cross-az
@@ -201,10 +197,6 @@ type Cluster struct {
 
 	// Engine is the name of the cache engine to be used for the clusters in
 	// this group.
-	//
-	// Valid values are:
-	// - memcached
-	// - redis
 	//
 	// +required
 	// +kubebuilder:validation:Enum=memcached;redis
@@ -225,10 +217,6 @@ type Cluster struct {
 	FinalSnapshotIdentifier *string `json:"finalSnapshotIdentifier,omitempty"`
 
 	// IpDiscovery is the method used to discover cluster nodes.
-	//
-	// Valid values are:
-	// - ipv4 (default)
-	// - ipv6
 	//
 	// +optional
 	// +default=ipv4
@@ -251,11 +239,6 @@ type Cluster struct {
 	MaintenanceWindow *string `json:"maintenanceWindow,omitempty"`
 
 	// NetworkType specifies the network configuration for the cluster.
-	//
-	// Valid values are:
-	// - ipv4
-	// - ipv6
-	// - dual_stack
 	//
 	// +optional
 	// +default=ipv4
@@ -284,10 +267,6 @@ type Cluster struct {
 
 	// OutpostMode specifies the outpost mode that will apply to the cache
 	// cluster creation.
-	//
-	// Valid values are:
-	// - single-outpost
-	// - cross-outpost
 	//
 	// Currently only single-outpost is supported.
 	//
@@ -396,19 +375,11 @@ type LogDeliveryConfiguration struct {
 
 	// DestinationType The destination type for the logs.
 	//
-	// Valid values are:
-	// - cloudwatch-logs
-	// - kinesis-firehose
-	//
 	// +required
 	// +kubebuilder:validation:Enum=cloudwatch-logs;kinesis-firehose
 	DestinationType *string `json:"destinationType"`
 
 	// LogFormat The log format to use.
-	//
-	// Valid values are:
-	// - text
-	// - json
 	//
 	// +optional
 	// +default=json
@@ -416,10 +387,6 @@ type LogDeliveryConfiguration struct {
 	LogFormat *string `json:"logFormat,omitempty"`
 
 	// LogType The type of log to deliver.
-	//
-	// Valid values are:
-	// - slow-log
-	// - engine-log
 	//
 	// +required
 	// +kubebuilder:validation:Enum=slow-log;engine-log
@@ -476,11 +443,6 @@ type ReplicationGroup struct {
 	AtRestEncryptionEnabled *bool `json:"atRestEncryptionEnabled,omitempty"`
 
 	// AuthTokenUpdateStrategy specifies how the auth token should be updated.
-	//
-	// Valid values are:
-	// - ROTATE
-	// - SET
-	// - DELETE
 	//
 	// +optional
 	// +default=ROTATE
@@ -543,10 +505,6 @@ type ReplicationGroup struct {
 	// Engine is the name of the cache engine to be used for the clusters in
 	// this group.
 	//
-	// Valid values are:
-	// - memcached
-	// - redis
-	//
 	// +optional
 	// +default=redis
 	// +kubebuilder:validation:Enum=memcached;redis
@@ -581,10 +539,6 @@ type ReplicationGroup struct {
 	GlobalReplicationGroupId *string `json:"globalReplicationGroupId,omitempty"`
 
 	// IpDiscovery is the method used to discover cluster nodes.
-	//
-	// Valid values are:
-	// - ipv4 (default)
-	// - ipv6
 	//
 	// +optional
 	// +default=ipv4
@@ -624,11 +578,6 @@ type ReplicationGroup struct {
 	MultiAzEnabled *bool `json:"multiAzEnabled,omitempty"`
 
 	// NetworkType specifies the network configuration for the cluster.
-	//
-	// Valid values are:
-	// - ipv4
-	// - ipv6
-	// - dual_stack
 	//
 	// +optional
 	// +default=ipv4

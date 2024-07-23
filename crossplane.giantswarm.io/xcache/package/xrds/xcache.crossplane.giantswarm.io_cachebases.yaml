@@ -41,14 +41,8 @@ spec:
                   encrypted at rest.
                 type: boolean
               authTokenUpdateStrategy:
-                description: |-
-                  AuthTokenUpdateStrategy specifies how the auth token should be updated.
-
-
-                  Valid values are:
-                  - ROTATE
-                  - SET
-                  - DELETE
+                description: AuthTokenUpdateStrategy specifies how the auth token
+                  should be updated.
                 enum:
                 - rotate
                 - set
@@ -116,11 +110,6 @@ spec:
                         this is the default value. In this mode, the number of nodes must be > 1
                         If memcached is selected, the number of nodes will default to 3, one per
                         availability zone.
-
-
-                        Valid values are:
-                        - single-az: The cluster is created in a single Availability Zone.
-                        - cross-az: The cluster is created across multiple Availability Zones.
                       enum:
                       - single-az
                       - cross-az
@@ -129,11 +118,6 @@ spec:
                       description: |-
                         Engine is the name of the cache engine to be used for the clusters in
                         this group.
-
-
-                        Valid values are:
-                        - memcached
-                        - redis
                       enum:
                       - memcached
                       - redis
@@ -152,13 +136,8 @@ spec:
                         that is created immediately before the cluster is deleted.
                       type: string
                     ipDiscovery:
-                      description: |-
-                        IpDiscovery is the method used to discover cluster nodes.
-
-
-                        Valid values are:
-                        - ipv4 (default)
-                        - ipv6
+                      description: IpDiscovery is the method used to discover cluster
+                        nodes.
                       enum:
                       - ipv4
                       - ipv6
@@ -177,37 +156,20 @@ spec:
                               or for kinesis firehose resource.
                             type: string
                           destinationType:
-                            description: |-
-                              DestinationType The destination type for the logs.
-
-
-                              Valid values are:
-                              - cloudwatch-logs
-                              - kinesis-firehose
+                            description: DestinationType The destination type for
+                              the logs.
                             enum:
                             - cloudwatch-logs
                             - kinesis-firehose
                             type: string
                           logFormat:
-                            description: |-
-                              LogFormat The log format to use.
-
-
-                              Valid values are:
-                              - text
-                              - json
+                            description: LogFormat The log format to use.
                             enum:
                             - text
                             - json
                             type: string
                           logType:
-                            description: |-
-                              LogType The type of log to deliver.
-
-
-                              Valid values are:
-                              - slow-log
-                              - engine-log
+                            description: LogType The type of log to deliver.
                             enum:
                             - slow-log
                             - engine-log
@@ -224,14 +186,8 @@ spec:
                         maintenance can occur.
                       type: string
                     networkType:
-                      description: |-
-                        NetworkType specifies the network configuration for the cluster.
-
-
-                        Valid values are:
-                        - ipv4
-                        - ipv6
-                        - dual_stack
+                      description: NetworkType specifies the network configuration
+                        for the cluster.
                       enum:
                       - ipv4
                       - ipv6
@@ -261,11 +217,6 @@ spec:
                       description: |-
                         OutpostMode specifies the outpost mode that will apply to the cache
                         cluster creation.
-
-
-                        Valid values are:
-                        - single-outpost
-                        - cross-outpost
 
 
                         Currently only single-outpost is supported.
@@ -420,11 +371,6 @@ spec:
                 description: |-
                   Engine is the name of the cache engine to be used for the clusters in
                   this group.
-
-
-                  Valid values are:
-                  - memcached
-                  - redis
                 enum:
                 - memcached
                 - redis
@@ -499,13 +445,7 @@ spec:
                   be specified.
                 type: string
               ipDiscovery:
-                description: |-
-                  IpDiscovery is the method used to discover cluster nodes.
-
-
-                  Valid values are:
-                  - ipv4 (default)
-                  - ipv6
+                description: IpDiscovery is the method used to discover cluster nodes.
                 enum:
                 - ipv4
                 - ipv6
@@ -532,37 +472,19 @@ spec:
                         for kinesis firehose resource.
                       type: string
                     destinationType:
-                      description: |-
-                        DestinationType The destination type for the logs.
-
-
-                        Valid values are:
-                        - cloudwatch-logs
-                        - kinesis-firehose
+                      description: DestinationType The destination type for the logs.
                       enum:
                       - cloudwatch-logs
                       - kinesis-firehose
                       type: string
                     logFormat:
-                      description: |-
-                        LogFormat The log format to use.
-
-
-                        Valid values are:
-                        - text
-                        - json
+                      description: LogFormat The log format to use.
                       enum:
                       - text
                       - json
                       type: string
                     logType:
-                      description: |-
-                        LogType The type of log to deliver.
-
-
-                        Valid values are:
-                        - slow-log
-                        - engine-log
+                      description: LogType The type of log to deliver.
                       enum:
                       - slow-log
                       - engine-log
@@ -614,14 +536,8 @@ spec:
                   If true, AutomaticFailoverEnabled must also be true.
                 type: boolean
               networkType:
-                description: |-
-                  NetworkType specifies the network configuration for the cluster.
-
-
-                  Valid values are:
-                  - ipv4
-                  - ipv6
-                  - dual_stack
+                description: NetworkType specifies the network configuration for the
+                  cluster.
                 enum:
                 - ipv4
                 - ipv6
