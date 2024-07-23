@@ -111,12 +111,6 @@ Allowed Values:
 - set
 
 AuthTokenUpdateStrategy specifies how the auth token should be updated.
-  
-  
-  Valid values are:
-  - ROTATE
-  - SET
-  - DELETE
 
 #### `.spec.autoMinorVersionUpgrade`
 
@@ -252,11 +246,6 @@ AzMode specifies the Availability Zone mode of the cluster.
   this is the default value. In this mode, the number of nodes must be > 1
   If memcached is selected, the number of nodes will default to 3, one per
   availability zone.
-  
-  
-  Valid values are:
-  - single-az: The cluster is created in a single Availability Zone.
-  - cross-az: The cluster is created across multiple Availability Zones.
 
 #### `.spec.cacheClusters[*].engine`
 
@@ -272,11 +261,6 @@ Allowed Values:
 
 Engine is the name of the cache engine to be used for the clusters in
   this group.
-  
-  
-  Valid values are:
-  - memcached
-  - redis
 
 #### `.spec.cacheClusters[*].engineVersion`
 
@@ -316,11 +300,6 @@ Allowed Values:
 - ipv6
 
 IpDiscovery is the method used to discover cluster nodes.
-  
-  
-  Valid values are:
-  - ipv4 (default)
-  - ipv6
 
 #### `.spec.cacheClusters[*].logDeliveryConfigurations`
 
@@ -370,11 +349,6 @@ Allowed Values:
 - kinesis-firehose
 
 DestinationType The destination type for the logs.
-  
-  
-  Valid values are:
-  - cloudwatch-logs
-  - kinesis-firehose
 
 #### `.spec.cacheClusters[*].logDeliveryConfigurations[*].logFormat`
 
@@ -389,11 +363,6 @@ Allowed Values:
 - json
 
 LogFormat The log format to use.
-  
-  
-  Valid values are:
-  - text
-  - json
 
 #### `.spec.cacheClusters[*].logDeliveryConfigurations[*].logType`
 
@@ -408,11 +377,6 @@ Allowed Values:
 - engine-log
 
 LogType The type of log to deliver.
-  
-  
-  Valid values are:
-  - slow-log
-  - engine-log
 
 #### `.spec.cacheClusters[*].maintenanceWindow`
 
@@ -439,12 +403,6 @@ Allowed Values:
 - dual_stack
 
 NetworkType specifies the network configuration for the cluster.
-  
-  
-  Valid values are:
-  - ipv4
-  - ipv6
-  - dual_stack
 
 #### `.spec.cacheClusters[*].nodeType`
 
@@ -497,11 +455,6 @@ Allowed Values:
 
 OutpostMode specifies the outpost mode that will apply to the cache
   cluster creation.
-  
-  
-  Valid values are:
-  - single-outpost
-  - cross-outpost
   
   
   Currently only single-outpost is supported.
@@ -793,11 +746,6 @@ Allowed Values:
 
 Engine is the name of the cache engine to be used for the clusters in
   this group.
-  
-  
-  Valid values are:
-  - memcached
-  - redis
 
 #### `.spec.engineVersion`
 
@@ -945,11 +893,6 @@ Allowed Values:
 - ipv6
 
 IpDiscovery is the method used to discover cluster nodes.
-  
-  
-  Valid values are:
-  - ipv4 (default)
-  - ipv6
 
 #### `.spec.kmsKeyId`
 
@@ -1013,11 +956,6 @@ Allowed Values:
 - kinesis-firehose
 
 DestinationType The destination type for the logs.
-  
-  
-  Valid values are:
-  - cloudwatch-logs
-  - kinesis-firehose
 
 #### `.spec.logDeliveryConfigurations[*].logFormat`
 
@@ -1032,11 +970,6 @@ Allowed Values:
 - json
 
 LogFormat The log format to use.
-  
-  
-  Valid values are:
-  - text
-  - json
 
 #### `.spec.logDeliveryConfigurations[*].logType`
 
@@ -1051,11 +984,6 @@ Allowed Values:
 - engine-log
 
 LogType The type of log to deliver.
-  
-  
-  Valid values are:
-  - slow-log
-  - engine-log
 
 #### `.spec.maintenanceWindow`
 
@@ -1129,12 +1057,6 @@ Allowed Values:
 - dual_stack
 
 NetworkType specifies the network configuration for the cluster.
-  
-  
-  Valid values are:
-  - ipv4
-  - ipv6
-  - dual_stack
 
 #### `.spec.nodeType`
 
