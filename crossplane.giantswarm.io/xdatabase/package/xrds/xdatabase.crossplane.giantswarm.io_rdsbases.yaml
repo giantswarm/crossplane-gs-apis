@@ -172,29 +172,6 @@ spec:
               databaseName:
                 description: DatabaseName is the name of the database to create.
                 type: string
-              databases:
-                additionalProperties:
-                  items:
-                    properties:
-                      configurationParameters:
-                        additionalProperties:
-                          type: string
-                        description: |-
-                          ConfigurationParameters is the configuration parameters for the user.
-
-
-                          Only applicable for postgresql databases
-                        type: object
-                      name:
-                        description: Name is the name of the user.
-                        type: string
-                    required:
-                    - name
-                    type: object
-                    x-kubernetes-preserve-unknown-fields: true
-                  type: array
-                description: Databases is a map of databases to create.
-                type: object
               dbClusterInstanceClass:
                 description: DbClusterInstanceClass is the instance class to use.
                 type: string
@@ -864,7 +841,61 @@ spec:
                 description: |-
                   ProvisionSql determines whether or not to provision databases inside the
                   RDS cluster.
-                type: boolean
+                properties:
+                  connectionSecretName:
+                    description: |-
+                      The name of the connection secret to use for the RDS instance
+
+
+                      Required if `providerConfigRef` is not provided, ignored otherwise
+                      Must exist in the same namespace as the provisioning claim
+
+
+                      If this value is provided, the composition will attempt to create a
+                      provider config using the engine specific providerconfig spec
+                    type: string
+                  databases:
+                    additionalProperties:
+                      description: A list of SqlUser objects to use for the database
+                      items:
+                        description: |-
+                          Defines a user to create in the database
+
+
+                          See the provider specific documentation for the available configuration
+                          parameters.
+
+
+                          With the exception of `configurationParameters`, all fields should be
+                          created as elements directly on the user object and not as nested objects.
+                        properties:
+                          configurationParameters:
+                            additionalProperties:
+                              type: string
+                            description: |-
+                              ConfigurationParameters is the configuration parameters for the user.
+
+
+                              Only applicable for postgresql databases
+                            type: object
+                          name:
+                            description: Name is the name of the user.
+                            type: string
+                        required:
+                        - name
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    description: Databases is a map of databases to create.
+                    type: object
+                  enabled:
+                    description: Determines if the RDS provisioning should be enabled
+                    type: boolean
+                  engine:
+                    description: The type of database engine being provisioned
+                    type: string
+                type: object
               publiclyAccessible:
                 description: PubliclyAccessible is whether the DB instance is publicly
                   accessible.

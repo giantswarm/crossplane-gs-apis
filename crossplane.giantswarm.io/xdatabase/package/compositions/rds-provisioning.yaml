@@ -1,0 +1,85 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  creationTimestamp: null
+  labels:
+    component: database
+    provider: aws
+    type: provisioning
+  name: rds-provisioning
+spec:
+  compositeTypeRef:
+    apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
+    kind: RdsBase
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+
+          _oxr = option("params").oxr
+          _dxr = option("params").dxr
+          _ocds = option("params").ocds
+          _dcds = option("params").dcds
+
+          get = lambda x: any, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          _createCluster = get(_oxr, "spec.createCluster", False)
+          _connectionSecret = get(_oxr, "spec.connectionSecret", "")
+          _esoEnabled = get(_oxr, "spec.eso.enabled", False)
+          _esoConnectionSecret = get(_oxr, "status.esoConnectionSecret", "")
+          _sqlEnabled = get(_oxr, "spec.provisionSql.enabled", True)
+
+          _mustEnableEso = all_true([
+              _createCluster,
+              _sqlEnabled,
+              not _esoEnabled
+          ])
+
+          assert _mustEnableEso, "ESO must be enabled when creating a cluster with SQL provisioning enabled."
+
+          _useConnectionSecret = _esoConnectionSecret if _esoEnabled else _connectionSecret
+
+          _items = [
+              {
+                  apiVersion: "xdatabases.crossplane.giantswarm.io/v1alpha1"
+                  kind: "RdsProvisioning"
+                  metadata: {
+                      annotations: {
+                          "krm.kcl.dev/composition-resource-name": "${_appName}-rds-provisioning"
+                      }
+                  }
+                  spec: {
+                      deletionPolicy: get(_oxr, "spec.deletionPolicy", "Delete"),
+                      engine: get(_oxr, "spec.engine", "postgres")
+                      connectionSecretName: _useConnectionSecret
+                      databases: get(_oxr, "spec.databases", {})
+                      kubernetesProviderConfig: get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+                  }
+              }
+              for _ in [True]
+              if get(_oxr, "spec.provisionSql.enabled", True)
+          ]
+
+          items = _items
+        target: ""
+    step: function-provision-sql
+  - functionRef:
+      name: function-auto-ready
+    step: function-auto-ready

@@ -638,11 +638,6 @@ type ClusterParameters struct {
 	// +optional
 	DatabaseName *string `json:"databaseName,omitempty"`
 
-	// Databases is a map of databases to create.
-	//
-	// +optional
-	Databases map[string]SqlUsers `json:"databases,omitempty"`
-
 	// DbClusterInstanceClass is the instance class to use.
 	//
 	// +optional
@@ -717,6 +712,7 @@ type ClusterParameters struct {
 	// Engine is the database engine to use.
 	//
 	// +required
+	// +kube:validation:Enum=mariadb:mysql;postgres;aurora-mysql;aurora-postgresql
 	Engine *string `json:"engine,omitempty"`
 
 	// EngineMode is the database engine mode to use.
@@ -827,8 +823,7 @@ type ClusterParameters struct {
 	// RDS cluster.
 	//
 	// +optional
-	// +default=true
-	ProvisionSql *bool `json:"provisionSql,omitempty"`
+	ProvisionSql *RdsProvisioningParameters `json:"provisionSql,omitempty"`
 
 	// PubliclyAccessible is whether the DB instance is publicly accessible.
 	//
@@ -1246,23 +1241,6 @@ type SecretsStore struct {
 	// +default=false
 	IsClusterSecretStore *bool `json:"isClusterSecretStore,omitempty"`
 }
-
-// +kubebuilder:pruning:PreserveUnknownFields
-type SqlUser struct {
-	// Name is the name of the user.
-	//
-	// +required
-	Name *string `json:"name"`
-
-	// ConfigurationParameters is the configuration parameters for the user.
-	//
-	// Only applicable for postgresql databases
-	//
-	// +optional
-	ConfigurationParameters map[string]*string `json:"configurationParameters,omitempty"`
-}
-
-type SqlUsers []*SqlUser
 
 // Repository type metadata.
 var (
