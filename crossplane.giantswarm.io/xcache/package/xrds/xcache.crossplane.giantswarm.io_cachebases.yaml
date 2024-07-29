@@ -383,6 +383,50 @@ spec:
 
                   This value will be ignored once the cluster is created.
                 type: string
+              eso:
+                description: |-
+                  Eso is the ESO configuration.
+
+
+                  This field is used to sync secrets using `external-secrets-operator`.
+                  External Secrets Operator must be installed if this value is set to true
+                properties:
+                  enabled:
+                    description: |-
+                      Enabled Whether or not to enable `external-secrets-operator` object
+                      deployments using `provider-kubernetes.
+                    type: boolean
+                  kubernetesSecretStore:
+                    description: |-
+                      KubernetesSecretStore is the Kubernetes secret store to use.
+
+
+                      The kubernetes secret store is expected to be namespace scoped to prevent
+                      secrets leaking across namespaces.
+                    type: string
+                  stores:
+                    description: Stores is a list of secret stores to use for push
+                      secrets.
+                    items:
+                      description: |-
+                        SecretsStore is a reference to a secrets store to be passed to External
+                        Secrets Operator for creating PushSecrets
+                      properties:
+                        enabled:
+                          description: Enabled is whether the secrets store is enabled.
+                          type: boolean
+                        isClusterSecretStore:
+                          description: IsClusterSecretStore is whether the secret
+                            store is a cluster secret store.
+                          type: boolean
+                        secretStore:
+                          description: SecretStoreName is the name of the secret store.
+                          type: string
+                      required:
+                      - secretStore
+                      type: object
+                    type: array
+                type: object
               finalSnapshotIdentifier:
                 description: |-
                   FinalSnapshotIdentifier is the user-supplied name for the final snapshot
@@ -457,6 +501,53 @@ spec:
 
 
                   Ignored unless AtRestEncryptionEnabled is set to true.
+                type: string
+              kubernetesProviderConfig:
+                description: |-
+                  Provider configuration for the kubernetes provider
+
+
+                  This is required for creating users for redis clusters.
+                  If Redis is the engine type, this must be provided and
+                  external-secrets-operator must be installed.
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                  policy:
+                    description: Policies for referencing.
+                    properties:
+                      resolution:
+                        default: Required
+                        description: |-
+                          Resolution specifies whether resolution of this reference is required.
+                          The default is 'Required', which means the reconcile will fail if the
+                          reference cannot be resolved. 'Optional' means this reference will be
+                          a no-op if it cannot be resolved.
+                        enum:
+                        - Required
+                        - Optional
+                        type: string
+                      resolve:
+                        description: |-
+                          Resolve specifies when this reference should be resolved. The default
+                          is 'IfNotPresent', which will attempt to resolve the reference only when
+                          the corresponding field is not present. Use 'Always' to resolve the
+                          reference on every reconcile.
+                        enum:
+                        - Always
+                        - IfNotPresent
+                        type: string
+                    type: object
+                required:
+                - name
+                type: object
+              kubernetesSecretStore:
+                description: |-
+                  Secret store to be used by external-secrets-operator
+
+
+                  Required if engine is redis and kubernetesProviderConfig is provided.
                 type: string
               logDeliveryConfigurations:
                 description: |-

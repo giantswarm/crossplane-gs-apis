@@ -4,6 +4,8 @@ import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	"github.com/giantswarm/crossplane-gs-apis/pkg/eso"
 )
 
 // +kubebuilder:object:root=true
@@ -46,6 +48,14 @@ type CacheBaseSpec struct {
 	//
 	// +optional
 	CidrBlocks []*string `json:"cidrBlocks,omitempty"`
+
+	// Eso is the ESO configuration.
+	//
+	// This field is used to sync secrets using `external-secrets-operator`.
+	// External Secrets Operator must be installed if this value is set to true
+	//
+	// +optional
+	Eso *eso.Eso `json:"eso,omitempty"`
 
 	// ClusterParameters is the set of parameters that are used to create the
 	// cluster.
@@ -552,6 +562,22 @@ type ReplicationGroup struct {
 	//
 	// +optional
 	KmsKeyId *string `json:"kmsKeyId,omitempty"`
+
+	// Provider configuration for the kubernetes provider
+	//
+	// This is required for creating users for redis clusters.
+	// If Redis is the engine type, this must be provided and
+	// external-secrets-operator must be installed.
+	//
+	// +optional
+	KubernetesProviderConfig *xpv1.Reference `json:"kubernetesProviderConfig,omitempty"`
+
+	// Secret store to be used by external-secrets-operator
+	//
+	// Required if engine is redis and kubernetesProviderConfig is provided.
+	//
+	// +optional
+	KubernetesSecretStore *string `json:"kubernetesSecretStore,omitempty"`
 
 	// LogDeliveryConfiguration is a list of log delivery configurations for
 	// the cluster.

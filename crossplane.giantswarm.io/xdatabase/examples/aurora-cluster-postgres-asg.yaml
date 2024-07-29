@@ -1,5 +1,5 @@
 ---
-apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
+apiVersion: xaws.crossplane.giantswarm.io/v1alpha1
 kind: RdsCacheClusterClaim
 metadata:
   name: cloudtest-rds-aurora-cluster

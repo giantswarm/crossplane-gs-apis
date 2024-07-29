@@ -14,7 +14,7 @@ clusters = [
         "metadata": {
             "annotations": {
                 "krm.kcl.dev/composition-resource-name": "elasticache-cluster-${i}"
-                "krm.kcl.dev/ready": readystr(_ocds, "elasticache-cluster-${i}")
+                "krm.kcl.dev/ready": readystr("elasticache-cluster-${i}")
                 "crossplane.io/external-name": "${appName}-${region}-${i}"
             }
             "labels": labels
@@ -175,7 +175,7 @@ securityGroupRules = [
         "metadata": {
             "annotations": {
                 "krm.kcl.dev/composition-resource-name": "elasticache-security-group-rule-inbound-${i}"
-                "krm.kcl.dev/ready": readystr(_ocds, "elasticache-security-group-rule-inbound-${i}")
+                "krm.kcl.dev/ready": readystr("elasticache-security-group-rule-inbound-${i}")
                 "crossplane.io/external-name": "${appName}-cache-sg-rule-inbound"
             }
         }

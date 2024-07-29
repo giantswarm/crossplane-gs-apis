@@ -14,7 +14,7 @@ useConnectionSecret = esoConnectionSecret if esoEnabled else connectionSecret
 
 _items = [
     {
-        apiVersion: "xdatabases.crossplane.giantswarm.io/v1alpha1"
+        apiVersion: "xdatabase.crossplane.giantswarm.io/v1alpha1"
         kind: "RdsProvisioning"
         metadata: {
             annotations: {

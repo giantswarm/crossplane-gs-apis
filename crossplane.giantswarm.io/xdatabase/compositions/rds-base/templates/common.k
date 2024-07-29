@@ -89,3 +89,8 @@ restoreToPointInTime = {
 
 s3import = get(_oxr, "spec.s3Import", False)
 
+masterInstance = ready("instance-0")
+clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
+clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
+endpoint = ocdsstatus("rds-cluster", "endpoint", "")
+clusterArn = ocdsstatus("rds-cluster", "arn", "")

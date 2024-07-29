@@ -18,8 +18,8 @@ var Builder = builder{}
 
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
-		GroupVersionKind: v1alpha1.RdsBaseGroupVersionKind,
-		Object:           &v1alpha1.RdsBase{},
+		GroupVersionKind: v1alpha1.RdsProvisioningGroupVersionKind,
+		Object:           &v1alpha1.RdsProvisioning{},
 	}
 }
 

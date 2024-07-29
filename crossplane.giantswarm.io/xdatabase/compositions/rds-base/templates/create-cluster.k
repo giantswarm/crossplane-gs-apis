@@ -1,19 +1,8 @@
-clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
-clusterArn = ocdsstatus("rds-cluster", "arn", "")
-clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
-endpoint = ocdsstatus("rds-cluster", "endpoint", "")
-
-subnetGroup = get(_oxr, "status.dbSubnetGroupName", False)
-
 ipgn = get(_oxr, "spec.dbParameterGroup.name", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else ""
-
 provisioned = get(_oxr, "spec.engineMode", "provisioned") == "provisioned"
-
-# should this become "zones"?
 regionedAzs = ["${region}${az}" for az in get(_oxr, "spec.availabilityZones", ["a", "b", "c"])]
-
+subnetGroup = get(_oxr, "status.dbSubnetGroupName", False)
 serverless = get(_oxr, "spec.engineMode", "provisioned") == "serverless"
-
 scalingConfiguration = get(_oxr, "spec.scalingConfiguration", False) if serverless else False
 serverlessv2scaling = get(_oxr, "spec.serverlessv2scalingConfiguration", False) if provisioned else False
 

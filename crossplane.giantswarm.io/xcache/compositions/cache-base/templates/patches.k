@@ -14,12 +14,12 @@ else:
 
 localClusterName = "elasticache-replication-group-local"
 _connectionSecretName = ""
-if ready(_ocds, localClusterName):
+if ready(localClusterName):
     _connectionSecretName = ocdsspec(localClusterName, "writeConnectionSecretToRef.name", "")
 
 globalClusterName = "elasticache-replication-group-global"
 _globalConnectionSecretName = ""
-if ready(_ocds, globalClusterName):
+if ready(globalClusterName):
     _globalConnectionSecretName = ocdsspec(globalClusterName, "writeConnectionSecretToRef.name", "")
 
 

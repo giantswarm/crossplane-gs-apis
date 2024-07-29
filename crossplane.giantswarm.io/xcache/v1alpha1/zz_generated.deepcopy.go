@@ -5,6 +5,8 @@
 package v1alpha1
 
 import (
+	"github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/giantswarm/crossplane-gs-apis/pkg/eso"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -92,6 +94,11 @@ func (in *CacheBaseSpec) DeepCopyInto(out *CacheBaseSpec) {
 				**out = **in
 			}
 		}
+	}
+	if in.Eso != nil {
+		in, out := &in.Eso, &out.Eso
+		*out = new(eso.Eso)
+		(*in).DeepCopyInto(*out)
 	}
 	in.ReplicationGroup.DeepCopyInto(&out.ReplicationGroup)
 	if in.Region != nil {
@@ -641,6 +648,16 @@ func (in *ReplicationGroup) DeepCopyInto(out *ReplicationGroup) {
 	}
 	if in.KmsKeyId != nil {
 		in, out := &in.KmsKeyId, &out.KmsKeyId
+		*out = new(string)
+		**out = **in
+	}
+	if in.KubernetesProviderConfig != nil {
+		in, out := &in.KubernetesProviderConfig, &out.KubernetesProviderConfig
+		*out = new(v1.Reference)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.KubernetesSecretStore != nil {
+		in, out := &in.KubernetesSecretStore, &out.KubernetesSecretStore
 		*out = new(string)
 		**out = **in
 	}

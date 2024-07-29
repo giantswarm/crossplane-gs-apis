@@ -103,7 +103,7 @@ enabledReplicationGroups = [
     "local" if any_true([
         all_true([
             globalEnabled,
-            get(_ocds, "global-elasticache-replication-group.Resource.status.id", False),
+            ready("global-elasticache-replication-group"),
         ]),
         not globalEnabled,
     ]) else "",
@@ -273,105 +273,9 @@ replicationGroups = [
     ])
 ]
 
-userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
-users = [
-    {
-        "apiVersion": "elasticache.aws.upbound.io/v1beta1"
-        "kind": "User"
-        "metadata": {
-            "annotations": {
-                "krm.kcl.dev/composition-resource-name": "elasticache-user-${name}"
-                "krm.kcl.dev/ready": readystr("elasticache-user-${name}")
-                "crossplane.io/external-name": "${appName}-${name}"
-            }
-            "labels": labels
-        }
-        "spec": {
-            "deletionPolicy": dp
-            "forProvider": {
-                if name == "default":
-                    "accessString": "off ~* +@all"
-                    "authenticationMode": [
-                        {
-                            "type": "no-password-required"
-                        }
-                    ]
-                else:
-                    "accessString": "on ~* +@all"
-                    "authenticationMode": [
-                        {
-                            "passwordsSecretRef": [
-                                {
-                                    "key": "password"
-                                    if name == appName:
-                                        "name": "elasticache-user-${name}"
-                                    else:
-                                        "name": "${appName}-elasticache-user-${name}"
-                                    "namespace": get(_oxr, "spec.claimRef.namespace", "default")
-                                }
-                            ]
-                            "type": "password"
-                        }
-                    ]
-                "engine": get(_oxr, "spec.engine", "redis")
-                "region": region
-                "tags" = tags | {
-                    "Name": "${appName}-${region}-${name}"
-                }
-                "userName": name
-            }
-            "providerConfigRef": pcr
-        }
-    }
-    for name in userNames
-] if all_true([
-    get(_oxr, "spec.engine", "redis") == "redis",
-    get(_oxr, "spec.createReplicationGroup", True),
-]) else []
-
-userIds = [
-    i for i in [
-        get(item, "Resource.status.atProvider.id", "")
-        for _, item in _ocds
-        if all_true([
-            get(item, "Resource.kind", "") == "User",
-            get(item, "Resource.apiVersion", "") == "elasticache.aws.upbound.io/v1beta1",
-        ])
-    ] if i
-]
-
-userGroup = [{
-    "apiVersion": "elasticache.aws.upbound.io/v1beta1"
-    "kind": "UserGroup"
-    "metadata": {
-        "annotations": {
-            "krm.kcl.dev/composition-resource-name": "elasticache-user-group"
-            "krm.kcl.dev/ready": readystr("elasticache-user-group")
-            "crossplane.io/external-name": appName
-        }
-        "labels": labels
-    }
-    "spec": {
-        "deletionPolicy": dp
-        "forProvider": {
-            "engine": get(_oxr, "spec.engine", "redis")
-            "region": region
-            "tags": tags | {
-                "Name": "${appName}-${region}"
-            }
-            "userIds": userIds
-        }
-        "providerConfigRef": pcr
-    }
-}] if all_true([
-    userIds,
-    get(_oxr, "spec.engine", "redis") == "redis",
-    get(_oxr, "spec.createReplicationGroup", True),
-]) else []
-
 _items = [
     i for r in [
         replicationGroups, globalReplicationGroup,
-        parameterGroup, users, userGroup
+        parameterGroup
     ] for i in r if i
 ]

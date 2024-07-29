@@ -3,6 +3,7 @@ package v1alpha1
 import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 // +kubebuilder:object:root=true
@@ -12,7 +13,7 @@ import (
 //
 // +kubebuilder:resource:scope=Cluster,categories=crossplane
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:shortName=rdb
+// +kubebuilder:resource:shortName=rdsprv
 // +crossbuilder:generate:xrd:claimNames:kind=RdsProvisioningClaim,plural=rdsprovisioningclaims
 // +crossbuilder:generate:xrd:defaultCompositionRef:name=rds-provisioning
 // +crossbuilder:generate:xrd:enforcedCompositionRef:name=rds-provisioning
@@ -41,7 +42,7 @@ type RdsProvisioningSpec struct {
 	// KubernetesProviderConfig is the provider config for the Kubernetes provider.
 	//
 	// +required
-	KubernetesProviderConfig *ProviderConfig `json:"kubernetesProviderConfig,omitempty"`
+	KubernetesProviderConfig *xpv1.Reference `json:"kubernetesProviderConfig,omitempty"`
 }
 
 // Defines the parameters for the RDS provisioning
@@ -121,3 +122,14 @@ type SqlUser struct {
 //
 // +listType=atomic
 type SqlUsers []*SqlUser
+
+// Repository type metadata.
+var (
+	RdsProvisioningKind      = "RdsProvisioning"
+	RdsProvisioningGroupKind = schema.GroupKind{
+		Group: XRDGroup,
+		Kind:  RdsProvisioningKind,
+	}.String()
+	RdsProvisioningKindAPIVersion   = RdsProvisioningKind + "." + GroupVersion.String()
+	RdsProvisioningGroupVersionKind = GroupVersion.WithKind(RdsProvisioningKind)
+)

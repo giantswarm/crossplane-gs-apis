@@ -7,7 +7,7 @@ dbSubnetGroupName = get(_oxr, "status.dbSubnetGroupName", None)
 partition = get(_oxr, "spec.partition", "aws")
 
 # Has the master instance been built?
-masterInstance = get(_ocds, "instance-0.Resource.status.atProvider", {})
+masterInstanceArn = ocdsstatus("instance-0", "arn", "")
 specInstances = get(_oxr, "spec.instances", [])
 
 if not _specInstances and get(_oxr, "spec.instanceCount", 0) > 0:
@@ -162,8 +162,12 @@ instances = [
 
                     # If this is not the primary (non-cluster) instance, the
                     # replication source
-                    if not _isPrimaryInstance and masterInstance:
-                        "replicateSourceDb": get(masterInstance, "arn", None),
+                    if all_true([
+                        not _isPrimaryInstance,
+                        masterInstance,
+                        masterInstanceArn
+                    ]):
+                        "replicateSourceDb": masterInstanceArn,
                     if _dbp:
                         "parameterGroupName": _dbp
 
@@ -225,7 +229,7 @@ instances = [
     }
     for i, item in buildInstances if all_true([
         any_true([
-            (createCluster and clusterIdentifier != None),
+            (createCluster and clusterId != None),
             not createCluster,
         ]),
         keyId, dbSubnetGroupName
@@ -307,7 +311,7 @@ endpoints = [
             "deletionPolicy": dp
             "forProvider": {
                 "clusterEndpointIdentifier": get(item, "spec.clusterEndpointIdentifier", None),
-                "clusterIdentifier": clusterIdentifier,
+                "clusterIdentifier": clusterId,
                 "customEndpointType": get(item, "spec.type", "ANY"),
                 "excludeMembers": get(item, "spec.excludeMembers", []),
                 "staticMembers": get(item, "spec.staticMembers", []),
@@ -320,7 +324,7 @@ endpoints = [
         }
     }
     for i, item in get(_oxr, "spec.endpoints", []) if all_true([
-        createCluster, clusterIdentifier != None
+        createCluster, clusterId != None
     ])
 ]
 
@@ -351,7 +355,7 @@ iam_roles = [
             "deletionPolicy": dp
             "forProvider": {
                 if createCluster:
-                    "dbClusterIdentifier": clusterIdentifier,
+                    "dbClusterIdentifier": clusterId,
                 else:
                     _v = ocdsstatus("instance-0", "id", False)
                     if _v:
@@ -462,7 +466,7 @@ autoscalingTarget = [
             "forProvider": {
                 "maxCapacity": get(_oxr, "spec.autoscaling.maxCapacity", 2),
                 "minCapacity": get(_oxr, "spec.autoscaling.minCapacity", 2),
-                "resourceId": "cluster:${clusterIdentifier}",
+                "resourceId": "cluster:${clusterId}",
                 "region": region,
                 "scalableDimension": "rds:cluster:ReadReplicaCount",
                 "serviceNamespace": "rds",
@@ -504,7 +508,7 @@ autoscalingPolicy = [
             "deletionPolicy": dp
             "forProvider": {
                 "policyType": "TargetTrackingScaling",
-                "resourceId": "cluster:${clusterIdentifier}",
+                "resourceId": "cluster:${clusterId}",
                 "scalableDimension": "rds:cluster:ReadReplicaCount",
                 "serviceNamespace": "rds",
                 "targetTrackingScalingPolicyConfiguration": [
@@ -669,7 +673,7 @@ cloudwatchLogGroups = [
             "annotations": {
                 "krm.kcl.dev/composition-resource-name" = "log-group-${i}"
                 "krm.kcl.dev/ready" = readystr("log-group-${i}")
-                "crossplane.io/external-name" = "/aws/rds/cluster/${clusterIdentifier}/${item}"
+                "crossplane.io/external-name" = "/aws/rds/cluster/${clusterId}/${item}"
             }
             "labels": labels
         }

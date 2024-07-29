@@ -259,22 +259,17 @@ spec:
 
           s3import = get(_oxr, "spec.s3Import", False)
 
+          masterInstance = ready("instance-0")
           clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
-          clusterArn = ocdsstatus("rds-cluster", "arn", "")
           clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
-
-          subnetGroup = get(_oxr, "status.dbSubnetGroupName", False)
+          clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
           ipgn = get(_oxr, "spec.dbParameterGroup.name", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else ""
-
           provisioned = get(_oxr, "spec.engineMode", "provisioned") == "provisioned"
-
-          # should this become "zones"?
           regionedAzs = ["${region}${az}" for az in get(_oxr, "spec.availabilityZones", ["a", "b", "c"])]
-
+          subnetGroup = get(_oxr, "status.dbSubnetGroupName", False)
           serverless = get(_oxr, "spec.engineMode", "provisioned") == "serverless"
-
           scalingConfiguration = get(_oxr, "spec.scalingConfiguration", False) if serverless else False
           serverlessv2scaling = get(_oxr, "spec.serverlessv2scalingConfiguration", False) if provisioned else False
 
@@ -523,6 +518,12 @@ spec:
 
           s3import = get(_oxr, "spec.s3Import", False)
 
+          masterInstance = ready("instance-0")
+          clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
+          clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
+          endpoint = ocdsstatus("rds-cluster", "endpoint", "")
+          clusterArn = ocdsstatus("rds-cluster", "arn", "")
+
           import json
 
           clusterId = get(_oxr, "status.clusterIdentifier", None)
@@ -532,7 +533,7 @@ spec:
           partition = get(_oxr, "spec.partition", "aws")
 
           # Has the master instance been built?
-          masterInstance = get(_ocds, "instance-0.Resource.status.atProvider", {})
+          masterInstanceArn = ocdsstatus("instance-0", "arn", "")
           specInstances = get(_oxr, "spec.instances", [])
 
           if not _specInstances and get(_oxr, "spec.instanceCount", 0) > 0:
@@ -687,8 +688,12 @@ spec:
 
                               # If this is not the primary (non-cluster) instance, the
                               # replication source
-                              if not _isPrimaryInstance and masterInstance:
-                                  "replicateSourceDb": get(masterInstance, "arn", None),
+                              if all_true([
+                                  not _isPrimaryInstance,
+                                  masterInstance,
+                                  masterInstanceArn
+                              ]):
+                                  "replicateSourceDb": masterInstanceArn,
                               if _dbp:
                                   "parameterGroupName": _dbp
 
@@ -750,7 +755,7 @@ spec:
               }
               for i, item in buildInstances if all_true([
                   any_true([
-                      (createCluster and clusterIdentifier != None),
+                      (createCluster and clusterId != None),
                       not createCluster,
                   ]),
                   keyId, dbSubnetGroupName
@@ -832,7 +837,7 @@ spec:
                       "deletionPolicy": dp
                       "forProvider": {
                           "clusterEndpointIdentifier": get(item, "spec.clusterEndpointIdentifier", None),
-                          "clusterIdentifier": clusterIdentifier,
+                          "clusterIdentifier": clusterId,
                           "customEndpointType": get(item, "spec.type", "ANY"),
                           "excludeMembers": get(item, "spec.excludeMembers", []),
                           "staticMembers": get(item, "spec.staticMembers", []),
@@ -845,7 +850,7 @@ spec:
                   }
               }
               for i, item in get(_oxr, "spec.endpoints", []) if all_true([
-                  createCluster, clusterIdentifier != None
+                  createCluster, clusterId != None
               ])
           ]
 
@@ -876,7 +881,7 @@ spec:
                       "deletionPolicy": dp
                       "forProvider": {
                           if createCluster:
-                              "dbClusterIdentifier": clusterIdentifier,
+                              "dbClusterIdentifier": clusterId,
                           else:
                               _v = ocdsstatus("instance-0", "id", False)
                               if _v:
@@ -987,7 +992,7 @@ spec:
                       "forProvider": {
                           "maxCapacity": get(_oxr, "spec.autoscaling.maxCapacity", 2),
                           "minCapacity": get(_oxr, "spec.autoscaling.minCapacity", 2),
-                          "resourceId": "cluster:${clusterIdentifier}",
+                          "resourceId": "cluster:${clusterId}",
                           "region": region,
                           "scalableDimension": "rds:cluster:ReadReplicaCount",
                           "serviceNamespace": "rds",
@@ -1029,7 +1034,7 @@ spec:
                       "deletionPolicy": dp
                       "forProvider": {
                           "policyType": "TargetTrackingScaling",
-                          "resourceId": "cluster:${clusterIdentifier}",
+                          "resourceId": "cluster:${clusterId}",
                           "scalableDimension": "rds:cluster:ReadReplicaCount",
                           "serviceNamespace": "rds",
                           "targetTrackingScalingPolicyConfiguration": [
@@ -1194,7 +1199,7 @@ spec:
                       "annotations": {
                           "krm.kcl.dev/composition-resource-name" = "log-group-${i}"
                           "krm.kcl.dev/ready" = readystr("log-group-${i}")
-                          "crossplane.io/external-name" = "/aws/rds/cluster/${clusterIdentifier}/${item}"
+                          "crossplane.io/external-name" = "/aws/rds/cluster/${clusterId}/${item}"
                       }
                       "labels": labels
                   }
@@ -1394,6 +1399,12 @@ spec:
 
           s3import = get(_oxr, "spec.s3Import", False)
 
+          masterInstance = ready("instance-0")
+          clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
+          clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
+          endpoint = ocdsstatus("rds-cluster", "endpoint", "")
+          clusterArn = ocdsstatus("rds-cluster", "arn", "")
+
           _secretRef: bool|str = False
           if createCluster:
               if ready("rds-cluster"):
@@ -1406,25 +1417,31 @@ spec:
               **{
                   "status": {
                       if get(_oxr, "spec.eso.enabled", True) and connectionSecret:
-                          "esoConnectionSecret": "${appName}-rds-master"
+                          "esoConnectionSecret" = "${appName}-rds-master"
                       if not createCluster and masterInstance:
-                          "endpoint": get(masterInstance, "address", ""),
-                          "port": get(masterInstance, "port", 0),
+                          "endpoint" = ocdsstatus("instance-0", "address", ""),
+                          "port" = ocdsstatus("instance-0", "port", 0),
                       if _secretRef:
-                          "connectionSecret": _secretRef
+                          "connectionSecret" = _secretRef
                       if createCluster and clusterCreated:
-                          "clusterIdentifier": clusterIdentifier,
-                          "clusterResourceId": clusterResourceId,
-                          "clusterArn": clusterArn,
-                          "endpoint": endpoint,
+                          if clusterIdentifier:
+                              "clusterIdentifier" = clusterIdentifier
+                          if clusterResourceId:
+                              "clusterResourceId" = clusterResourceId,
+                          if clusterArn:
+                              "clusterArn" = clusterArn,
+                          if endpoint:
+                              "endpoint" = endpoint,
 
                           _port = ocdsstatus("rds-cluster", "port", False) if createCluster else ocdsstatus("instance-0", "port", False)
                           if _port:
-                              "port": _port
+                              "port" = _port
 
                   }
               }
           }
+
+          _items = [newdxr]
 
           items = _items
         target: ""
@@ -1528,6 +1545,12 @@ spec:
           }
 
           s3import = get(_oxr, "spec.s3Import", False)
+
+          masterInstance = ready("instance-0")
+          clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
+          clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
+          endpoint = ocdsstatus("rds-cluster", "endpoint", "")
+          clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
           externalSecretStores = [
               {
@@ -1775,6 +1798,12 @@ spec:
 
           s3import = get(_oxr, "spec.s3Import", False)
 
+          masterInstance = ready("instance-0")
+          clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
+          clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
+          endpoint = ocdsstatus("rds-cluster", "endpoint", "")
+          clusterArn = ocdsstatus("rds-cluster", "arn", "")
+
           esoEnabled = get(_oxr, "spec.eso.enabled", False)
           esoConnectionSecret = get(_oxr, "status.esoConnectionSecret", "")
           sqlEnabled = get(_oxr, "spec.provisionSql.enabled", True)
@@ -1791,7 +1820,7 @@ spec:
 
           _items = [
               {
-                  apiVersion: "xdatabases.crossplane.giantswarm.io/v1alpha1"
+                  apiVersion: "xdatabase.crossplane.giantswarm.io/v1alpha1"
                   kind: "RdsProvisioning"
                   metadata: {
                       annotations: {

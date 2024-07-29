@@ -236,6 +236,7 @@ spec:
           createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
           dp = get(_oxr, "spec.deletionPolicy", "Delete")
           keyId = get(_oxr, "status.kmsKeyId", False)
+          namespace = get(_oxr, "spec.claimRef.namespace", "default")
           region = get(_oxr, "spec.region", "eu-central-1")
           pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
           azs = [
@@ -251,6 +252,8 @@ spec:
               createReplicationGroup,
               get(_oxr, "spec.globalReplicationGroup.enabled", False)
           ])
+
+          userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
 
           if get(_oxr, "spec.createReplicationGroup", False):
               assert get(_oxr, "spec.engine", "redis") == "redis", "engine must be redis when createReplicationGroup is true"
@@ -357,7 +360,7 @@ spec:
               "local" if any_true([
                   all_true([
                       globalEnabled,
-                      get(_ocds, "global-elasticache-replication-group.Resource.status.id", False),
+                      ready("global-elasticache-replication-group"),
                   ]),
                   not globalEnabled,
               ]) else "",
@@ -527,106 +530,10 @@ spec:
               ])
           ]
 
-          userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
-          users = [
-              {
-                  "apiVersion": "elasticache.aws.upbound.io/v1beta1"
-                  "kind": "User"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": "elasticache-user-${name}"
-                          "krm.kcl.dev/ready": readystr("elasticache-user-${name}")
-                          "crossplane.io/external-name": "${appName}-${name}"
-                      }
-                      "labels": labels
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "forProvider": {
-                          if name == "default":
-                              "accessString": "off ~* +@all"
-                              "authenticationMode": [
-                                  {
-                                      "type": "no-password-required"
-                                  }
-                              ]
-                          else:
-                              "accessString": "on ~* +@all"
-                              "authenticationMode": [
-                                  {
-                                      "passwordsSecretRef": [
-                                          {
-                                              "key": "password"
-                                              if name == appName:
-                                                  "name": "elasticache-user-${name}"
-                                              else:
-                                                  "name": "${appName}-elasticache-user-${name}"
-                                              "namespace": get(_oxr, "spec.claimRef.namespace", "default")
-                                          }
-                                      ]
-                                      "type": "password"
-                                  }
-                              ]
-                          "engine": get(_oxr, "spec.engine", "redis")
-                          "region": region
-                          "tags" = tags | {
-                              "Name": "${appName}-${region}-${name}"
-                          }
-                          "userName": name
-                      }
-                      "providerConfigRef": pcr
-                  }
-              }
-              for name in userNames
-          ] if all_true([
-              get(_oxr, "spec.engine", "redis") == "redis",
-              get(_oxr, "spec.createReplicationGroup", True),
-          ]) else []
-
-          userIds = [
-              i for i in [
-                  get(item, "Resource.status.atProvider.id", "")
-                  for _, item in _ocds
-                  if all_true([
-                      get(item, "Resource.kind", "") == "User",
-                      get(item, "Resource.apiVersion", "") == "elasticache.aws.upbound.io/v1beta1",
-                  ])
-              ] if i
-          ]
-
-          userGroup = [{
-              "apiVersion": "elasticache.aws.upbound.io/v1beta1"
-              "kind": "UserGroup"
-              "metadata": {
-                  "annotations": {
-                      "krm.kcl.dev/composition-resource-name": "elasticache-user-group"
-                      "krm.kcl.dev/ready": readystr("elasticache-user-group")
-                      "crossplane.io/external-name": appName
-                  }
-                  "labels": labels
-              }
-              "spec": {
-                  "deletionPolicy": dp
-                  "forProvider": {
-                      "engine": get(_oxr, "spec.engine", "redis")
-                      "region": region
-                      "tags": tags | {
-                          "Name": "${appName}-${region}"
-                      }
-                      "userIds": userIds
-                  }
-                  "providerConfigRef": pcr
-              }
-          }] if all_true([
-              userIds,
-              get(_oxr, "spec.engine", "redis") == "redis",
-              get(_oxr, "spec.createReplicationGroup", True),
-          ]) else []
-
           _items = [
               i for r in [
                   replicationGroups, globalReplicationGroup,
-                  parameterGroup, users, userGroup
+                  parameterGroup
               ] for i in r if i
           ]
 
@@ -710,6 +617,7 @@ spec:
           createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
           dp = get(_oxr, "spec.deletionPolicy", "Delete")
           keyId = get(_oxr, "status.kmsKeyId", False)
+          namespace = get(_oxr, "spec.claimRef.namespace", "default")
           region = get(_oxr, "spec.region", "eu-central-1")
           pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
           azs = [
@@ -725,6 +633,8 @@ spec:
               createReplicationGroup,
               get(_oxr, "spec.globalReplicationGroup.enabled", False)
           ])
+
+          userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
 
           # If we are not creating a replication group, check how many cache clusters have
           # been requested and default a list of empty dictionaries as being the cache
@@ -742,7 +652,7 @@ spec:
                   "metadata": {
                       "annotations": {
                           "krm.kcl.dev/composition-resource-name": "elasticache-cluster-${i}"
-                          "krm.kcl.dev/ready": readystr(_ocds, "elasticache-cluster-${i}")
+                          "krm.kcl.dev/ready": readystr("elasticache-cluster-${i}")
                           "crossplane.io/external-name": "${appName}-${region}-${i}"
                       }
                       "labels": labels
@@ -903,7 +813,7 @@ spec:
                   "metadata": {
                       "annotations": {
                           "krm.kcl.dev/composition-resource-name": "elasticache-security-group-rule-inbound-${i}"
-                          "krm.kcl.dev/ready": readystr(_ocds, "elasticache-security-group-rule-inbound-${i}")
+                          "krm.kcl.dev/ready": readystr("elasticache-security-group-rule-inbound-${i}")
                           "crossplane.io/external-name": "${appName}-cache-sg-rule-inbound"
                       }
                   }
@@ -1013,6 +923,7 @@ spec:
           createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
           dp = get(_oxr, "spec.deletionPolicy", "Delete")
           keyId = get(_oxr, "status.kmsKeyId", False)
+          namespace = get(_oxr, "spec.claimRef.namespace", "default")
           region = get(_oxr, "spec.region", "eu-central-1")
           pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
           azs = [
@@ -1028,6 +939,403 @@ spec:
               createReplicationGroup,
               get(_oxr, "spec.globalReplicationGroup.enabled", False)
           ])
+
+          userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
+
+          users = [
+              {
+                  "apiVersion": "elasticache.aws.upbound.io/v1beta1"
+                  "kind": "User"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name": "elasticache-user-${name}"
+                          "krm.kcl.dev/ready": readystr("elasticache-user-${name}")
+                          "crossplane.io/external-name": "${appName}-${name}"
+                      }
+                      "labels": labels
+                  }
+                  "spec": {
+                      "deletionPolicy": dp
+                      "forProvider": {
+                          if name == "default":
+                              "accessString": "off ~* +@all"
+                              "authenticationMode": [
+                                  {
+                                      "type": "no-password-required"
+                                  }
+                              ]
+                          else:
+                              "accessString": "on ~* +@all"
+                              "authenticationMode": [
+                                  {
+                                      "passwordsSecretRef": [
+                                          {
+                                              "key": "password"
+                                              if name == appName:
+                                                  "name": "elasticache-user-${name}"
+                                              else:
+                                                  "name": "${appName}-elasticache-user-${name}"
+                                              "namespace": namespace
+                                          }
+                                      ]
+                                      "type": "password"
+                                  }
+                              ]
+                          "engine": get(_oxr, "spec.engine", "redis")
+                          "region": region
+                          "tags" = tags | {
+                              "Name": "${appName}-${region}-${name}"
+                          }
+                          "userName": name
+                      }
+                      "providerConfigRef": pcr
+                  }
+              }
+              for name in userNames
+          ] if all_true([
+              get(_oxr, "spec.engine", "redis") == "redis",
+              get(_oxr, "spec.createReplicationGroup", True),
+          ]) else []
+
+          userIds = [
+              i for i in [
+                  get(item, "Resource.status.atProvider.id", "")
+                  for _, item in _ocds
+                  if all_true([
+                      get(item, "Resource.kind", "") == "User",
+                      get(item, "Resource.apiVersion", "") == "elasticache.aws.upbound.io/v1beta1",
+                  ])
+              ] if i
+          ]
+
+          userGroup = [{
+              "apiVersion": "elasticache.aws.upbound.io/v1beta1"
+              "kind": "UserGroup"
+              "metadata": {
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name": "elasticache-user-group"
+                      "krm.kcl.dev/ready": readystr("elasticache-user-group")
+                      "crossplane.io/external-name": appName
+                  }
+                  "labels": labels
+              }
+              "spec": {
+                  "deletionPolicy": dp
+                  "forProvider": {
+                      "engine": get(_oxr, "spec.engine", "redis")
+                      "region": region
+                      "tags": tags | {
+                          "Name": "${appName}-${region}"
+                      }
+                      "userIds": userIds
+                  }
+                  "providerConfigRef": pcr
+              }
+          }] if all_true([
+              userIds,
+              get(_oxr, "spec.engine", "redis") == "redis",
+              get(_oxr, "spec.createReplicationGroup", True),
+          ]) else []
+
+          _items = users + userGroup
+
+          items = _items
+        target: ""
+    step: function-kcl-create-users
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+
+          _oxr = option("params").oxr
+          _dxr = option("params").dxr
+          _ocds = option("params").ocds
+          _dcds = option("params").dcds
+
+          get = lambda x: {:}, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+
+              x: The dictionary to search in.
+              y: The path to search for.
+              d: The default value to return if the path is not found.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          getwparent = lambda x: {:}, p: {:}, y: str, d: any -> any {
+              """
+              Get with fallback to parent
+              Tries to get a path from a dictionary, if it fails,
+              tries to get it from the parent dictionary.
+
+              If that fails, falls back to the default value provided.
+              """
+              get(x, y, get(p, "spec.${y}", d))
+          }
+
+          ocdsspec = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the spec of an ocds resource.
+              """
+              get(_ocds, "${x}.Resource.spec.${y}", d)
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          ready = lambda x: str -> bool {
+              """
+              Check if a value is ready.
+              """
+              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              all_true([
+                  get(c, "status", "False") == "True" for c in conditions
+              ])
+          }
+
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          appName = get(_oxr, "spec.claimRef.name", "")
+          createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
+          dp = get(_oxr, "spec.deletionPolicy", "Delete")
+          keyId = get(_oxr, "status.kmsKeyId", False)
+          namespace = get(_oxr, "spec.claimRef.namespace", "default")
+          region = get(_oxr, "spec.region", "eu-central-1")
+          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
+          azs = [
+              "${region}${az}"
+              for az in get(_oxr, "spec.availabilityZones", [])
+          ]
+          labels = get(_oxr, "metadata.labels", {}) | {"region": region}
+
+          tags = labels | get(_oxr, "spec.tags", {})
+
+          globalEnabled = all_true([
+              False,
+              createReplicationGroup,
+              get(_oxr, "spec.globalReplicationGroup.enabled", False)
+          ])
+
+          userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
+
+          if get(_oxr, "spec.engine", "redis") == "redis":
+              assert all_true([
+                  get(_oxr, "spec.kubernetesProviderConfigRef", False),
+                  get(_oxr, "spec.kubernetesSecretStore", False)
+              ]) "Missing required kubernetes ProviderConfig and SecretStore fields for password generation"
+
+          passwordGenerator = {
+              "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+              "kind": "Object"
+              "metadata": {
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name" = "${appName}-pwgen"
+                      "krm.kcl.dev/ready": readystr("${appName}-pwgen")
+                  }
+              }
+              "spec": {
+                  "deletionPolicy": dp,
+                  "forProvider": {
+                      "manifest": {
+                          "apiVersion": "generators.external-secrets.io/v1alpha1"
+                          "kind": "Password"
+                          "metadata": {
+                              "name": "${appName}-pwgen"
+                              "namespace": namespace
+                          }
+                          "spec": {
+                              "length": 42
+                              "digits": 5
+                              "symbols": 5
+                              "symbolCharacters": "-_$@"
+                              "noUpper": False
+                              "allowRepeat": True
+                          }
+                      }
+                  }
+                  "providerConfigRef": get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+              }
+          }
+
+          passwords = [
+              {
+                  "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+                  "kind": "Object"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name": "${appName}-externalsecret-${user}"
+                          "krm.kcl.dev/ready": readystr("${appName}-externalsecret-${user}")
+                      }
+                      "labels": labels
+                  }
+                  "spec": {
+                      "deletionPolicy": dp
+                      "forProvider": {
+                          "manifest": {
+                              "apiVersion": "external-secrets.io/v1alpha1"
+                              "kind": "ExternalSecret"
+                              "metadata": {
+                                  "namespace": namespace
+                              }
+                              "spec": {
+                                  "refreshInterval": "1h"
+                                  "secretStoreRef": {
+                                      "name": get(_oxr, "spec.kubernetesSecretStore", "default")
+                                      "kind": "SecretStore"
+                                  }
+                                  "target": {
+                                      if user == appName:
+                                          "name": "${appName}-externalsecret"
+                                      else:
+                                          "name": "${appName}-externalsecret-${user}"
+                                  }
+                                  "dataFrom": [
+                                      {
+                                          "sourceRef": {
+                                              "generatorRef": {
+                                                  "apiVersion": "generators.external-secrets.io/v1alpha1"
+                                                  "kind": "Password"
+                                                  "name": "${appName}-pwgen"
+                                              }
+                                          }
+                                      }
+                                  ]
+                              }
+                          }
+                      }
+                      "providerConfigRef": get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+                  }
+              }
+              for _, user in userNames
+              if all_true([
+                  get(_oxr, "spec.engine", "redis") == "redis",
+                  get(_oxr, "spec.createReplicationGroup", True),
+                  # don't create a password for the default user
+                  # as this will be disabled
+                  user != "default"
+              ])
+          ]
+
+          _items = passwords + [passwordGenerator]
+
+          items = _items
+        target: ""
+    step: function-kcl-create-password-generator
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+
+          _oxr = option("params").oxr
+          _dxr = option("params").dxr
+          _ocds = option("params").ocds
+          _dcds = option("params").dcds
+
+          get = lambda x: {:}, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+
+              x: The dictionary to search in.
+              y: The path to search for.
+              d: The default value to return if the path is not found.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          getwparent = lambda x: {:}, p: {:}, y: str, d: any -> any {
+              """
+              Get with fallback to parent
+              Tries to get a path from a dictionary, if it fails,
+              tries to get it from the parent dictionary.
+
+              If that fails, falls back to the default value provided.
+              """
+              get(x, y, get(p, "spec.${y}", d))
+          }
+
+          ocdsspec = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the spec of an ocds resource.
+              """
+              get(_ocds, "${x}.Resource.spec.${y}", d)
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          ready = lambda x: str -> bool {
+              """
+              Check if a value is ready.
+              """
+              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              all_true([
+                  get(c, "status", "False") == "True" for c in conditions
+              ])
+          }
+
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          appName = get(_oxr, "spec.claimRef.name", "")
+          createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
+          dp = get(_oxr, "spec.deletionPolicy", "Delete")
+          keyId = get(_oxr, "status.kmsKeyId", False)
+          namespace = get(_oxr, "spec.claimRef.namespace", "default")
+          region = get(_oxr, "spec.region", "eu-central-1")
+          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
+          azs = [
+              "${region}${az}"
+              for az in get(_oxr, "spec.availabilityZones", [])
+          ]
+          labels = get(_oxr, "metadata.labels", {}) | {"region": region}
+
+          tags = labels | get(_oxr, "spec.tags", {})
+
+          globalEnabled = all_true([
+              False,
+              createReplicationGroup,
+              get(_oxr, "spec.globalReplicationGroup.enabled", False)
+          ])
+
+          userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
 
           globalEndpoint = ocdsstatus("elasticache-replication-group-global", "primaryEndpointAddress", "") if globalEnabled else ""
           globalROEndpoint = ocdsstatus("elasticache-replication-group-global", "readerEndpointAddress", "") if globalEnabled else ""
@@ -1045,12 +1353,12 @@ spec:
 
           localClusterName = "elasticache-replication-group-local"
           _connectionSecretName = ""
-          if ready(_ocds, localClusterName):
+          if ready(localClusterName):
               _connectionSecretName = ocdsspec(localClusterName, "writeConnectionSecretToRef.name", "")
 
           globalClusterName = "elasticache-replication-group-global"
           _globalConnectionSecretName = ""
-          if ready(_ocds, globalClusterName):
+          if ready(globalClusterName):
               _globalConnectionSecretName = ocdsspec(globalClusterName, "writeConnectionSecretToRef.name", "")
 
 

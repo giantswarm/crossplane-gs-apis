@@ -5,6 +5,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/giantswarm/crossplane-gs-apis/pkg/eso"
 )
 
 // +kubebuilder:object:root=true
@@ -49,10 +50,18 @@ type RdsBaseSpec struct {
 	// +optional
 	CidrBlocks []*string `json:"cidrBlocks"`
 
+	// Eso is the ESO configuration.
+	//
+	// This field is used to sync secrets using `external-secrets-operator`.
+	// External Secrets Operator must be installed if this value is set to true
+	//
+	// +optional
+	Eso *eso.Eso `json:"eso,omitempty"`
+
 	// KubernetesProviderConfig is the provider config for the Kubernetes provider.
 	//
 	// +required
-	KubernetesProviderConfig *ProviderConfig `json:"kubernetesProviderConfig,omitempty"`
+	KubernetesProviderConfig *xpv1.Reference `json:"kubernetesProviderConfig,omitempty"`
 
 	// Region is the region to use.
 	//
@@ -727,14 +736,6 @@ type ClusterParameters struct {
 	// +required
 	EngineVersion *string `json:"engineVersion,omitempty"`
 
-	// Eso is the ESO configuration.
-	//
-	// This field is used to sync secrets using `external-secrets-operator`.
-	// External Secrets Operator must be installed if this value is set to true
-	//
-	// +optional
-	Eso *Eso `json:"eso,omitempty"`
-
 	// GlobalClusterIdentifier is the global cluster identifier for an Aurora global database.
 	//
 	// +optional
@@ -946,38 +947,6 @@ type EnhancedMonitoring struct {
 	Path *string `json:"path,omitempty"`
 }
 
-// ExternalSecretsOperator (ESO) is the configuration for the external secrets
-// operator.
-//
-// If enabled will duplicate the RDS connection secret to a secret managed by
-// external secrets operator which standardises the fields for use with
-// provider-sql.
-//
-// Additionally, PushSecrets can be automatically created to push the secret to
-// external secrets stores.
-type Eso struct {
-	// Enabled Whether or not to enable `external-secrets-operator` object
-	// deployments using `provider-kubernetes.
-	//
-	// +optional
-	// +default=true
-	Enabled *bool `json:"enabled,omitempty"`
-
-	// KubernetesSecretStore is the Kubernetes secret store to use.
-	//
-	// The kubernetes secret store is expected to be namespace scoped to prevent
-	// secrets leaking across namespaces.
-	//
-	// +optional
-	// +default="default"
-	KubernetesSecretStore *string `json:"kubernetesSecretStore,omitempty"`
-
-	// Stores is a list of secret stores to use for push secrets.
-	//
-	// +optional
-	Stores []*SecretsStore `json:"stores,omitempty"`
-}
-
 type DbParameterGroup struct {
 	// Description is the description of the parameter group.
 	//
@@ -1067,13 +1036,6 @@ type OptionGroup struct {
 //
 // +kubebuilder:validation:Pattern=^[a-zA-Z0-9_]*$
 type Parameter string
-
-// ProviderConfig is a simplified version of the provider configuration.
-// used mainly to provide additional providerconfigs to the composition
-type ProviderConfig struct {
-	// +required
-	Name string `json:"name"`
-}
 
 // RestoreToPointInTime contains details of a point in time restoration
 type RestoreToPointInTime struct {
@@ -1219,27 +1181,6 @@ type ServerlessV2ScalingConfiguration struct {
 	//
 	// +optional
 	MinCapacity *int64 `json:"minCapacity,omitempty"`
-}
-
-// SecretsStore is a reference to a secrets store to be passed to External
-// Secrets Operator for creating PushSecrets
-type SecretsStore struct {
-	// Enabled is whether the secrets store is enabled.
-	//
-	// +optional
-	// +default=true
-	Enabled *bool `json:"enabled,omitempty"`
-
-	// SecretStoreName is the name of the secret store.
-	//
-	// +required
-	SecretStoreName *string `json:"secretStore"`
-
-	// IsClusterSecretStore is whether the secret store is a cluster secret store.
-	//
-	// +optional
-	// +default=false
-	IsClusterSecretStore *bool `json:"isClusterSecretStore,omitempty"`
 }
 
 // Repository type metadata.

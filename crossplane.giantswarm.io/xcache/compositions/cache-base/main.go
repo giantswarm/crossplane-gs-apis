@@ -38,6 +38,8 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 	var (
 		resources                []xpt.ComposedTemplate = createResources()
 		kclCommon                string
+		kclUsers                 string
+		kclPassword              string
 		kclFooter                string = "items = _items"
 		replicationGroupTemplate string
 		clusterTemplate          string
@@ -56,6 +58,16 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 	}
 
 	replicationGroupTemplate, err = build.LoadTemplate("compositions/cache-base/templates/replicationgroup.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclUsers, err = build.LoadTemplate("compositions/cache-base/templates/users.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclPassword, err = build.LoadTemplate("compositions/cache-base/templates/password-gen.k")
 	if err != nil {
 		panic(err)
 	}
@@ -111,6 +123,38 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 				Spec: xkcl.RunSpec{
 					Source: strings.Join([]string{kclCommon, clusterTemplate, kclFooter}, "\n\n"),
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-kcl-create-users").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclCommon, kclUsers, kclFooter}, "\n\n"),
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-kcl-create-password-generator").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclCommon, kclPassword, kclFooter}, "\n\n"),
 				},
 			},
 		})

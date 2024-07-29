@@ -66,6 +66,7 @@ appName = get(_oxr, "spec.claimRef.name", "")
 createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
 dp = get(_oxr, "spec.deletionPolicy", "Delete")
 keyId = get(_oxr, "status.kmsKeyId", False)
+namespace = get(_oxr, "spec.claimRef.namespace", "default")
 region = get(_oxr, "spec.region", "eu-central-1")
 pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
 azs = [
@@ -81,3 +82,5 @@ globalEnabled = all_true([
     createReplicationGroup,
     get(_oxr, "spec.globalReplicationGroup.enabled", False)
 ])
+
+userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]

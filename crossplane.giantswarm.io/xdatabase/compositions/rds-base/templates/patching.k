@@ -10,22 +10,28 @@ newdxr = {
     **{
         "status": {
             if get(_oxr, "spec.eso.enabled", True) and connectionSecret:
-                "esoConnectionSecret": "${appName}-rds-master"
+                "esoConnectionSecret" = "${appName}-rds-master"
             if not createCluster and masterInstance:
-                "endpoint": get(masterInstance, "address", ""),
-                "port": get(masterInstance, "port", 0),
+                "endpoint" = ocdsstatus("instance-0", "address", ""),
+                "port" = ocdsstatus("instance-0", "port", 0),
             if _secretRef:
-                "connectionSecret": _secretRef
+                "connectionSecret" = _secretRef
             if createCluster and clusterCreated:
-                "clusterIdentifier": clusterIdentifier,
-                "clusterResourceId": clusterResourceId,
-                "clusterArn": clusterArn,
-                "endpoint": endpoint,
+                if clusterIdentifier:
+                    "clusterIdentifier" = clusterIdentifier
+                if clusterResourceId:
+                    "clusterResourceId" = clusterResourceId,
+                if clusterArn:
+                    "clusterArn" = clusterArn,
+                if endpoint:
+                    "endpoint" = endpoint,
 
                 _port = ocdsstatus("rds-cluster", "port", False) if createCluster else ocdsstatus("instance-0", "port", False)
                 if _port:
-                    "port": _port
+                    "port" = _port
 
         }
     }
 }
+
+_items = [newdxr]

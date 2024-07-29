@@ -19,10 +19,10 @@ get = lambda x: {:}, y: str, d: any -> any {
 _subnets = get(_oxr, "status.vpc.privateSubnets", [])
 
 _dbsnindex = get(_oxr, "spec.subnetGroupIndexes.database", False)
-_dbSnIds = [k for _, k in _subnets[_dbsnindex]] if _dbsnindex != False and _subnets else []
+_dbSnIds = [k.id for _, k in _subnets[_dbsnindex]] if _dbsnindex != False and _subnets else []
 
 _cachesnindex = get(_oxr, "spec.subnetGroupIndexes.cache", False)
-_cacheSnIds = [k for _, k in _subnets[_cachesnindex]] if _cachesnindex != False and _subnets else []
+_cacheSnIds = [k.id for _, k in _subnets[_cachesnindex]] if _cachesnindex != False and _subnets else []
 
 _dbPatch = {
     **get(_dcds, "rds-base.Resource", {}),

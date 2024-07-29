@@ -10,7 +10,7 @@ metadata:
 spec:
   compositeTypeRef:
     apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
-    kind: RdsBase
+    kind: RdsProvisioning
   mode: Pipeline
   pipeline:
   - functionRef:
@@ -113,6 +113,12 @@ spec:
 
           s3import = get(_oxr, "spec.s3Import", False)
 
+          masterInstance = ready("instance-0")
+          clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
+          clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
+          endpoint = ocdsstatus("rds-cluster", "endpoint", "")
+          clusterArn = ocdsstatus("rds-cluster", "arn", "")
+
           esoEnabled = get(_oxr, "spec.eso.enabled", False)
           esoConnectionSecret = get(_oxr, "status.esoConnectionSecret", "")
           sqlEnabled = get(_oxr, "spec.provisionSql.enabled", True)
@@ -129,7 +135,7 @@ spec:
 
           _items = [
               {
-                  apiVersion: "xdatabases.crossplane.giantswarm.io/v1alpha1"
+                  apiVersion: "xdatabase.crossplane.giantswarm.io/v1alpha1"
                   kind: "RdsProvisioning"
                   metadata: {
                       annotations: {

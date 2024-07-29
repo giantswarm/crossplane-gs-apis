@@ -117,7 +117,7 @@ func createResources() []xpt.ComposedTemplate {
 				Object: &xcache.CacheBase{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: "xcache.crossplane.giantswarm.io/v1alpha1",
-						Kind:       "Elasticache",
+						Kind:       "CacheBase",
 					},
 				},
 			},
@@ -126,6 +126,7 @@ func createResources() []xpt.ComposedTemplate {
 				cb.FromPatch("spec.availabilityZones", "spec.availabilityZones"),
 				cb.FromPatch("spec.claimRef", "spec.claimRef"),
 				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
+				cb.FromPatch("spec.kubernetesProviderConfig", "spec.kubernetesProviderConfig"),
 				cb.FromPatch(("spec.providerConfigRef"), "spec.providerConfigRef"),
 				cb.FromPatch("spec.region", "spec.region"),
 				{
@@ -155,7 +156,7 @@ func createResources() []xpt.ComposedTemplate {
 				Object: &xdb.RdsBase{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: "xdatabase.crossplane.giantswarm.io/v1alpha1",
-						Kind:       "RdsBaseDbCluster",
+						Kind:       "RdsBase",
 					},
 				},
 			},
@@ -164,6 +165,7 @@ func createResources() []xpt.ComposedTemplate {
 				cb.FromPatch("spec.availabilityZones", "spec.availabilityZones"),
 				cb.FromPatch("spec.claimRef", "spec.claimRef"),
 				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
+				cb.FromPatch("spec.eso", "spec.eso"),
 				cb.FromPatch("spec.kubernetesProviderConfig", "spec.kubernetesProviderConfig"),
 				cb.FromPatch("spec.providerConfigRef", "spec.providerConfigRef"),
 				cb.FromPatch("spec.region", "spec.region"),

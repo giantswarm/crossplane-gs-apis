@@ -98,7 +98,7 @@ spec:
           type: ToCompositeFieldPath
       - base:
           apiVersion: xcache.crossplane.giantswarm.io/v1alpha1
-          kind: Elasticache
+          kind: CacheBase
           metadata:
             creationTimestamp: null
           spec:
@@ -122,6 +122,9 @@ spec:
           type: FromCompositeFieldPath
         - fromFieldPath: spec.deletionPolicy
           toFieldPath: spec.deletionPolicy
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.kubernetesProviderConfig
+          toFieldPath: spec.kubernetesProviderConfig
           type: FromCompositeFieldPath
         - fromFieldPath: spec.providerConfigRef
           toFieldPath: spec.providerConfigRef
@@ -160,7 +163,7 @@ spec:
           type: ToCompositeFieldPath
       - base:
           apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
-          kind: RdsBaseDbCluster
+          kind: RdsBase
           metadata:
             creationTimestamp: null
           spec:
@@ -238,10 +241,10 @@ spec:
           _subnets = get(_oxr, "status.vpc.privateSubnets", [])
 
           _dbsnindex = get(_oxr, "spec.subnetGroupIndexes.database", False)
-          _dbSnIds = [k for _, k in _subnets[_dbsnindex]] if _dbsnindex != False and _subnets else []
+          _dbSnIds = [k.id for _, k in _subnets[_dbsnindex]] if _dbsnindex != False and _subnets else []
 
           _cachesnindex = get(_oxr, "spec.subnetGroupIndexes.cache", False)
-          _cacheSnIds = [k for _, k in _subnets[_cachesnindex]] if _cachesnindex != False and _subnets else []
+          _cacheSnIds = [k.id for _, k in _subnets[_cachesnindex]] if _cachesnindex != False and _subnets else []
 
           _dbPatch = {
               **get(_dcds, "rds-base.Resource", {}),
