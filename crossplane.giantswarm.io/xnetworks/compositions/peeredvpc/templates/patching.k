@@ -165,9 +165,5 @@ newdxr = {
 }
 
 _items = [
-    newdxr
-    for _ in [True] if any_true([
-        publicRouteTables, publicSubnets,
-        privateRouteTables, privateSubnets
-    ])
+    newdxr,
 ]

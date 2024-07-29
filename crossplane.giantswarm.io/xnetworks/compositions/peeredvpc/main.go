@@ -160,6 +160,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 			},
 		})
+
 	c.NewPipelineStep("function-kcl-patch-xr").
 		WithFunctionRef(xapiextv1.FunctionReference{
 			Name: "function-kcl",
