@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
+	//"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
+	"crossbuilder/v1alpha1"
 
 	xgt "github.com/crossplane-contrib/function-go-templating/input/v1beta1"
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
@@ -41,9 +42,11 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 	var (
 		err                  error
 		kclCommon            string
-		kclSubnetsTemplate   string
 		kclResourcesTemplate string
+		kclPeeringTemplate   string
+		kclTransitTemplate   string
 		kclPatchTemplate     string
+		kclFooter            string                 = "items = _items"
 		resources            []xpt.ComposedTemplate = createResources()
 	)
 
@@ -52,12 +55,17 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		panic(err)
 	}
 
-	kclSubnetsTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/subnets.k")
+	kclResourcesTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/resources.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclResourcesTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/resources.k")
+	kclPeeringTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/peering.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclTransitTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/transitgw.k")
 	if err != nil {
 		panic(err)
 	}
@@ -78,29 +86,13 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "Input",
 				},
 				Spec: &xnd.Spec{
-					EnabledRef:        "spec.peering.enabled",
-					GroupByRef:        "spec.peering.groupBy",
+					EnabledRef:        "status.vpcLookup.enabled",
+					GroupByRef:        "status.vpcLookup.groupBy",
 					ProviderType:      "aws",
 					ProviderConfigRef: "spec.providerConfigRef.name",
 					RegionRef:         "spec.region",
-					VpcNameRef:        "spec.peering.remoteVpcs",
+					VpcNameRef:        "status.vpcLookup.remoteVpcs",
 					PatchTo:           "status.vpcs",
-				},
-			},
-		})
-
-	c.NewPipelineStep("function-kcl-subnet-bits").
-		WithFunctionRef(xapiextv1.FunctionReference{
-			Name: "function-kcl",
-		}).
-		WithInput(build.ObjectKindReference{
-			Object: &xkcl.KCLInput{
-				TypeMeta: metav1.TypeMeta{
-					APIVersion: "krm.kcl.dev/v1alpha1",
-					Kind:       "KCLInput",
-				},
-				Spec: xkcl.RunSpec{
-					Source: strings.Join([]string{kclCommon, kclSubnetsTemplate}, "\n\n"),
 				},
 			},
 		})
@@ -132,11 +124,42 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: strings.Join([]string{kclCommon, kclResourcesTemplate}, "\n\n"),
+					Source: strings.Join([]string{kclCommon, kclResourcesTemplate, kclFooter}, "\n\n"),
 				},
 			},
 		})
 
+	c.NewPipelineStep("function-kcl-create-peering").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclCommon, kclPeeringTemplate, kclFooter}, "\n\n"),
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-kcl-create-transit-gateway").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclCommon, kclTransitTemplate, kclFooter}, "\n\n"),
+				},
+			},
+		})
 	c.NewPipelineStep("function-kcl-patch-xr").
 		WithFunctionRef(xapiextv1.FunctionReference{
 			Name: "function-kcl",
@@ -148,7 +171,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: strings.Join([]string{kclCommon, kclPatchTemplate}, "\n\n"),
+					Source: strings.Join([]string{kclCommon, kclPatchTemplate, kclFooter}, "\n\n"),
 				},
 			},
 		})

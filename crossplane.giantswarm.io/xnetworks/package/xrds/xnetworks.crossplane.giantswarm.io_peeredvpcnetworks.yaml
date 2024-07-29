@@ -117,14 +117,13 @@ spec:
                   allowPublic:
                     description: |-
                       AllowPublic specifies if the VPC peering connections should be allowed to
+
+
                       be linked to the public subnets
                       Defaults to false
                     type: boolean
                   enabled:
-                    description: |-
-                      Enabled specifies if the VPC peering connections should be enabled for
-                      this VPC.
-                      Defaults to false
+                    description: Enabled specifies if VPC peering is enabled.
                     type: boolean
                   groupBy:
                     description: GroupBy specifies the key to group the remote subnets
@@ -133,53 +132,12 @@ spec:
                   remoteVpcs:
                     description: RemoteVpcs is a list of VPCs to peer with.
                     items:
-                      description: VpcPeer defines the parameters for peering with
-                        a VPC.
                       properties:
                         allowPublic:
                           description: |-
-                            Disabled specifies if the peering connection should be disabled.
-                            Defaults to true
+                            AllowPublic specifies if the VPC peering connections should be allowed to
+                            be linked to the public subnets
                           type: boolean
-                        excludeFromLocalPeering:
-                          description: |-
-                            ExcludeFromLocalPeering specifies the indexes of subnetsets for this VPC to
-                            exclude from routing to the peering connection
-                          properties:
-                            private:
-                              description: private subnets to exclude from peering
-                              items:
-                                type: integer
-                              type: array
-                              x-kubernetes-list-type: atomic
-                            public:
-                              description: public subnets to exclude from peering
-                              items:
-                                type: integer
-                              type: array
-                              x-kubernetes-list-type: atomic
-                          type: object
-                        excludeFromRemotePeering:
-                          description: |-
-                            ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
-                            VPC to exclude from routing to the peering connection. If emmpty, all
-                            subnetsets will be included by default
-                          items:
-                            properties:
-                              private:
-                                description: private subnets to exclude from peering
-                                items:
-                                  type: integer
-                                type: array
-                                x-kubernetes-list-type: atomic
-                              public:
-                                description: public subnets to exclude from peering
-                                items:
-                                  type: integer
-                                type: array
-                                x-kubernetes-list-type: atomic
-                            type: object
-                          type: array
                         name:
                           description: Name specifies the name of the VPC to peer
                             with.
@@ -353,6 +311,9 @@ spec:
                             will be assigned as an additional CIDR to the VPC.
                           pattern: ^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$
                           type: string
+                          x-kubernetes-validations:
+                          - message: mask is immutable
+                            rule: self == oldSelf
                         private:
                           description: Private is the number of private subnets to
                             create in this set
@@ -425,7 +386,7 @@ spec:
 
 
                             > [!IMPORTANT]
-                            > If this is the default VPC CIDR, the first entry in the list, the
+                            > If this is the default VPC CIDR, i.e. the first entry in the list, the
                             > public subnets will be used for the NAT gateways. Setting this value to
                             > 0 on the default VPC CIDR may result in the creation of fully private
                             > networks with no route to the outside world.
@@ -497,13 +458,19 @@ spec:
                     maxItems: 5
                     minItems: 1
                     type: array
-                    x-kubernetes-list-type: atomic
+                    x-kubernetes-list-map-keys:
+                    - prefix
+                    x-kubernetes-list-type: map
                   function:
                     default: multiprefixloop
                     description: |-
-                      Function defines the function to use to calculate the CIDR blocks for the
-                      subnets. The default is "multiprefixloop" which will split multiple CIDRs
+                      Defines the function to use to calculate the CIDR blocks for thesubnets.
+
+
+                      The default value is "multiprefixloop" which will split multiple CIDRs
                       into equal parts based on the number of bits provided.
+
+
                       `multiprefixloop` is the only function being made available as part of
                       this XRD and as it's defaulted it can be hidden from the user. The
                       function input expects a path though so this has to exist but isn't
@@ -538,6 +505,367 @@ spec:
                     x-kubernetes-map-type: granular
                 type: object
                 x-kubernetes-map-type: granular
+              transitGateway:
+                description: TransitGateway is the transit gateway to attach to the
+                  VPC.
+                properties:
+                  additionalRoutes:
+                    description: Additional routes to apply to the attachment
+                    items:
+                      properties:
+                        blackhole:
+                          description: Is this a blackhole route
+                          type: boolean
+                        cidrBlock:
+                          description: The CIDR block for the route
+                          type: string
+                      required:
+                      - cidrBlock
+                      type: object
+                    type: array
+                  allowPublic:
+                    description: |-
+                      AllowPublic specifies if the VPC peering connections should be allowed to
+                      be linked to the public subnets
+                    type: boolean
+                  amazonSideAsn:
+                    description: |-
+                      Amazon side ASN. Private autonomous system number (ASN) for
+                      the Amazon side of a BGP session.
+                    format: int64
+                    type: integer
+                  applianceModeSupport:
+                    description: Appliance mode support. Indicates whether appliance
+                      mode support is enabled.
+                    type: string
+                  autoAcceptSharedAttachments:
+                    description: |-
+                      Auto accept shared attachments. Indicates whether there is automatic
+                      acceptance of attachment requests.
+                    type: string
+                  cidrBlocks:
+                    description: Cidr blocks for the VPC
+                    items:
+                      description: Cidr is a string type that represents a CIDR block.
+                      pattern: ^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$
+                      type: string
+                    type: array
+                  createPolicyTable:
+                    description: Create the policy table.
+                    type: boolean
+                  defaultRouteTableAssociation:
+                    description: |-
+                      Default route table association. Indicates whether resource attachments
+                      are automatically associated with the default association route table.
+                    type: boolean
+                  defaultRouteTablePropagation:
+                    description: |-
+                      Default route table propagation. Indicates whether resource attachments
+                      automatically propagate routes to the default propagation route table.
+                    type: boolean
+                  dnsSupport:
+                    description: Dns support. Indicates whether DNS support is enabled.
+                    type: string
+                  enabled:
+                    description: Determines if the TransitGateway should be enabled
+                    type: boolean
+                  ipv6Support:
+                    description: If IPv6 support is enabled for the transit gateway.
+                    type: string
+                  multicastSupport:
+                    description: |-
+                      Multicast support. Indicates whether multicast is enabled on the transit gateway.
+
+
+                      Currently unused in this composition
+                    type: string
+                  prefixList:
+                    description: Prefix lists for the VPC
+                    items:
+                      properties:
+                        blackhole:
+                          description: If this is a blackhole route
+                          type: boolean
+                        id:
+                          description: The ID of the prefix list.
+                          type: string
+                      required:
+                      - id
+                      type: object
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  prefixListSupport:
+                    description: If the prefix lists are supported.
+                    type: boolean
+                  prefixLists:
+                    description: Prefix lists for the VPC
+                    items:
+                      properties:
+                        blackhole:
+                          description: If this is a blackhole route
+                          type: boolean
+                        id:
+                          description: The ID of the prefix list.
+                          type: string
+                      required:
+                      - id
+                      type: object
+                    type: array
+                  ram:
+                    description: Resource Access Management (RAM)
+                    properties:
+                      allowExternalPrincipals:
+                        description: Do we allow external principles with this ram
+                        type: boolean
+                      enabled:
+                        description: Is RAM enabled
+                        type: boolean
+                      principals:
+                        description: Principals that are allowed to access the resource
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  region:
+                    description: Region this VPC is located in
+                    type: string
+                  remoteVpcs:
+                    description: RemoteVpcs is a list of VPCs build a transit gateway
+                      between
+                    items:
+                      description: |-
+                        TgwWrappedVpcWithProviderConfig defines the parameters for creating a VPC with
+                        the option of peered subnets.
+                      properties:
+                        additionalRoutes:
+                          description: Additional routes to apply to the attachment
+                          items:
+                            properties:
+                              blackhole:
+                                description: Is this a blackhole route
+                                type: boolean
+                              cidrBlock:
+                                description: The CIDR block for the route
+                                type: string
+                            required:
+                            - cidrBlock
+                            type: object
+                          type: array
+                        allowPublic:
+                          description: |-
+                            AllowPublic specifies if the VPC peering connections should be allowed to
+                            be linked to the public subnets
+                          type: boolean
+                        cidrBlocks:
+                          description: Cidr blocks for the VPC
+                          items:
+                            description: Cidr is a string type that represents a CIDR
+                              block.
+                            pattern: ^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$
+                            type: string
+                          type: array
+                        name:
+                          description: The name of the VPC
+                          type: string
+                        prefixLists:
+                          description: Prefix lists for the VPC
+                          items:
+                            properties:
+                              blackhole:
+                                description: If this is a blackhole route
+                                type: boolean
+                              id:
+                                description: The ID of the prefix list.
+                                type: string
+                            required:
+                            - id
+                            type: object
+                          type: array
+                        providerConfigRef:
+                          description: |-
+                            ProviderConfigRef references a ProviderConfig used to create this
+                            resource
+
+
+                            If not provided, will fall back to the top-level ProviderConfigRef
+
+
+                            Required for cross account VPCs
+                            Should not be set for same account VPCs unless restricted by
+                            IAM
+                          properties:
+                            name:
+                              description: Name of the referenced object.
+                              type: string
+                            policy:
+                              description: Policies for referencing.
+                              properties:
+                                resolution:
+                                  default: Required
+                                  description: |-
+                                    Resolution specifies whether resolution of this reference is required.
+                                    The default is 'Required', which means the reconcile will fail if the
+                                    reference cannot be resolved. 'Optional' means this reference will be
+                                    a no-op if it cannot be resolved.
+                                  enum:
+                                  - Required
+                                  - Optional
+                                  type: string
+                                resolve:
+                                  description: |-
+                                    Resolve specifies when this reference should be resolved. The default
+                                    is 'IfNotPresent', which will attempt to resolve the reference only when
+                                    the corresponding field is not present. Use 'Always' to resolve the
+                                    reference on every reconcile.
+                                  enum:
+                                  - Always
+                                  - IfNotPresent
+                                  type: string
+                              type: object
+                          required:
+                          - name
+                          type: object
+                        region:
+                          description: Region this VPC is located in
+                          type: string
+                        routeTableIds:
+                          description: Route table ids in the VPC
+                          items:
+                            description: |-
+                              RouteTableId is a string type that represents the unique identifier for a
+                              route table.
+                            pattern: ^rtb-[a-z0-9]{8,17}$
+                            type: string
+                          type: array
+                        subnetIds:
+                          description: SubnetIds in the VPC
+                          items:
+                            description: SubnetId is a string type that represents
+                              the unique identifier for a subnet.
+                            pattern: ^subnet-[a-z0-9]{8,17}$
+                            type: string
+                          type: array
+                        vpcId:
+                          description: The ID of the VPC
+                          pattern: ^vpc-[a-z0-9]{8,17}$
+                          type: string
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  routeTableIds:
+                    description: Route table ids in the VPC
+                    items:
+                      description: |-
+                        RouteTableId is a string type that represents the unique identifier for a
+                        route table.
+                      pattern: ^rtb-[a-z0-9]{8,17}$
+                      type: string
+                    type: array
+                  subnetIds:
+                    description: SubnetIds in the VPC
+                    items:
+                      description: SubnetId is a string type that represents the unique
+                        identifier for a subnet.
+                      pattern: ^subnet-[a-z0-9]{8,17}$
+                      type: string
+                    type: array
+                  tags:
+                    additionalProperties:
+                      type: string
+                    description: The tags for the transit gateway.
+                    maxProperties: 50
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  transitG1atewayCidrBlocks:
+                    description: Transit gateway CIDR blocks. A list of CIDR blocks
+                      for the VPCs.
+                    items:
+                      type: string
+                    type: array
+                  transitGatewayDefaultRouteTableAssociation:
+                    description: |-
+                      TransitGatewayDefaultRouteTableAssociation. Indicates whether resource
+                      attachments are automatically associated with the default association route table.
+                    type: string
+                  transitGatewayDefaultRouteTablePropagation:
+                    description: |-
+                      TransitGatewayDefaultRouteTablePropagation. Indicates whether resource
+                      attachments automatically propagate routes to the default propagation route table.
+                    type: string
+                  transitGatewayPeers:
+                    description: |-
+                      TransitGatewayPeers defines other transit gateways that this transit gateway
+                      should peer with
+                    items:
+                      properties:
+                        accountId:
+                          description: The Account ID this VPC is associated with
+                          type: string
+                        id:
+                          description: The ID of the gateway to peer with
+                          type: string
+                        providerConfigRef:
+                          description: |-
+                            ProviderConfigRef references a ProviderConfig used to create this
+                            resource
+
+
+                            If not provided, will fall back to the top-level ProviderConfigRef
+
+
+                            Required for cross account transit gateway peering
+                          properties:
+                            name:
+                              description: Name of the referenced object.
+                              type: string
+                            policy:
+                              description: Policies for referencing.
+                              properties:
+                                resolution:
+                                  default: Required
+                                  description: |-
+                                    Resolution specifies whether resolution of this reference is required.
+                                    The default is 'Required', which means the reconcile will fail if the
+                                    reference cannot be resolved. 'Optional' means this reference will be
+                                    a no-op if it cannot be resolved.
+                                  enum:
+                                  - Required
+                                  - Optional
+                                  type: string
+                                resolve:
+                                  description: |-
+                                    Resolve specifies when this reference should be resolved. The default
+                                    is 'IfNotPresent', which will attempt to resolve the reference only when
+                                    the corresponding field is not present. Use 'Always' to resolve the
+                                    reference on every reconcile.
+                                  enum:
+                                  - Always
+                                  - IfNotPresent
+                                  type: string
+                              type: object
+                          required:
+                          - name
+                          type: object
+                        region:
+                          description: Region the remote transit gateway is located
+                            in
+                          type: string
+                      required:
+                      - id
+                      type: object
+                    type: array
+                  vpcId:
+                    description: The ID of the VPC
+                    pattern: ^vpc-[a-z0-9]{8,17}$
+                    type: string
+                  vpnEcmpSupport:
+                    description: Vpn ecmp support. Indicates whether Equal Cost Multipath
+                      Protocol support is enabled.
+                    type: string
+                required:
+                - remoteVpcs
+                type: object
               writeConnectionSecretToRef:
                 description: |-
                   WriteConnectionSecretToReference specifies the namespace and name of a
@@ -646,6 +974,43 @@ spec:
                   type: object
                 type: array
                 x-kubernetes-list-type: atomic
+              vpcLookup:
+                description: Details of VPCs to lookup in network discovery
+                properties:
+                  enabled:
+                    description: If network discovery is enabled
+                    type: boolean
+                  groupBy:
+                    description: GroupBy is the key to group the remote VPCs by
+                    type: string
+                  remoteVpcs:
+                    description: RemoteVpcs is a list of VPCs to lookup
+                    items:
+                      description: VpcPeer defines the parameters for peering with
+                        a VPC.
+                      properties:
+                        name:
+                          description: Name specifies the name of the VPC to peer
+                            with.
+                          type: string
+                        providerConfigRef:
+                          description: |-
+                            ProviderConfigRef specifies the provider config to use for the peering
+                            connection.
+                          type: string
+                        region:
+                          description: |-
+                            Region specifies the region the VPC is found in.
+
+
+                            If not defined, the region of the VPC will be assumed to be the same as
+                            the region of the peered VPC.
+                          type: string
+                      required:
+                      - name
+                      type: object
+                    type: array
+                type: object
               vpcs:
                 additionalProperties:
                   description: Vpc holds VPC information
@@ -676,7 +1041,13 @@ spec:
                       description: A map of private route tables defined in this VPC
                       items:
                         additionalProperties:
-                          type: string
+                          properties:
+                            id:
+                              description: The ID of the route table
+                              type: string
+                          required:
+                          - id
+                          type: object
                         description: StatusRouteTables is a map of route tables and
                           their status
                         type: object
@@ -687,7 +1058,13 @@ spec:
                       description: A map of private subnets defined in this VPC
                       items:
                         additionalProperties:
-                          type: string
+                          properties:
+                            id:
+                              description: The ID of the subnet
+                              type: string
+                          required:
+                          - id
+                          type: object
                         description: StatusSubnets is a map of subnets and their status
                         type: object
                         x-kubernetes-map-type: atomic
@@ -700,7 +1077,13 @@ spec:
                       description: A map of public route tables defined in this VPC
                       items:
                         additionalProperties:
-                          type: string
+                          properties:
+                            id:
+                              description: The ID of the route table
+                              type: string
+                          required:
+                          - id
+                          type: object
                         description: StatusRouteTables is a map of route tables and
                           their status
                         type: object
@@ -712,7 +1095,13 @@ spec:
                         VPC
                       items:
                         additionalProperties:
-                          type: string
+                          properties:
+                            id:
+                              description: The ID of the subnet
+                              type: string
+                          required:
+                          - id
+                          type: object
                         description: StatusSubnets is a map of subnets and their status
                         type: object
                         x-kubernetes-map-type: atomic
@@ -729,7 +1118,41 @@ spec:
                       x-kubernetes-map-type: atomic
                     transitGateways:
                       additionalProperties:
-                        type: string
+                        properties:
+                          attachments:
+                            additionalProperties:
+                              properties:
+                                id:
+                                  description: The ID of the transit gateway attachment
+                                  type: string
+                                type:
+                                  description: The type of the transit gateway attachment
+                                  type: string
+                              type: object
+                            description: |-
+                              TransitGatewayAttachments The IDs of the transit gateway attachment(s)
+                              associated with this transit gateway
+                            type: object
+                          id:
+                            description: The ID of the transit gateway
+                            type: string
+                          routeTables:
+                            additionalProperties:
+                              properties:
+                                default:
+                                  description: Is this the default route table for
+                                    the transit gateway
+                                  type: boolean
+                                id:
+                                  description: The ID of the transit gateway route
+                                    table
+                                  type: string
+                              type: object
+                            description: |-
+                              TransitGatewayRouteTables The IDs of the transit gateway route table(s)
+                              associated with this transit gateway
+                            type: object
+                        type: object
                       description: A map of transit gateways defined in this VPC
                       nullable: true
                       type: object

@@ -1,18 +1,16 @@
-_createCluster = get(_oxr, "spec.createCluster", False)
-_connectionSecret = get(_oxr, "spec.connectionSecret", "")
-_esoEnabled = get(_oxr, "spec.eso.enabled", False)
-_esoConnectionSecret = get(_oxr, "status.esoConnectionSecret", "")
-_sqlEnabled = get(_oxr, "spec.provisionSql.enabled", True)
+esoEnabled = get(_oxr, "spec.eso.enabled", False)
+esoConnectionSecret = get(_oxr, "status.esoConnectionSecret", "")
+sqlEnabled = get(_oxr, "spec.provisionSql.enabled", True)
 
-_mustEnableEso = all_true([
-    _createCluster,
-    _sqlEnabled,
-    not _esoEnabled
+mustEnableEso = all_true([
+    createCluster,
+    sqlEnabled,
+    not esoEnabled
 ])
 
-assert _mustEnableEso, "ESO must be enabled when creating a cluster with SQL provisioning enabled."
+assert mustEnableEso, "ESO must be enabled when creating a cluster with SQL provisioning enabled."
 
-_useConnectionSecret = _esoConnectionSecret if _esoEnabled else _connectionSecret
+useConnectionSecret = esoConnectionSecret if esoEnabled else connectionSecret
 
 _items = [
     {
@@ -20,15 +18,16 @@ _items = [
         kind: "RdsProvisioning"
         metadata: {
             annotations: {
-                "krm.kcl.dev/composition-resource-name": "${_appName}-rds-provisioning"
+                "krm.kcl.dev/composition-resource-name": "${appName}-rds-provisioning"
+                "krm.kcl.dev/ready": readystr("${appName}-rds-provisioning")
             }
         }
         spec: {
-            deletionPolicy: get(_oxr, "spec.deletionPolicy", "Delete"),
-            engine: get(_oxr, "spec.engine", "postgres")
-            connectionSecretName: _useConnectionSecret
-            databases: get(_oxr, "spec.databases", {})
-            kubernetesProviderConfig: get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+            "deletionPolicy": dp,
+            "engine": get(_oxr, "spec.engine", "postgres")
+            "connectionSecretName": useConnectionSecret
+            "databases": get(_oxr, "spec.databases", {})
+            "kubernetesProviderConfig": get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
         }
     }
     for _ in [True]

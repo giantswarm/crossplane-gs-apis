@@ -29,7 +29,7 @@ spec:
           _ocds = option("params").ocds
           _dcds = option("params").dcds
 
-          get = lambda x: any, y: str, d: any -> any {
+          get = lambda x: {:}, y: str, d: any -> any {
               """
               Get an item from a dictionary using a dot separated path.
               If the item is not found, return a default value.
@@ -40,21 +40,92 @@ spec:
               x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
           }
 
-          _createCluster = get(_oxr, "spec.createCluster", False)
-          _connectionSecret = get(_oxr, "spec.connectionSecret", "")
-          _esoEnabled = get(_oxr, "spec.eso.enabled", False)
-          _esoConnectionSecret = get(_oxr, "status.esoConnectionSecret", "")
-          _sqlEnabled = get(_oxr, "spec.provisionSql.enabled", True)
+          getwparent = lambda x: {:}, p: {:}, y: str, d: any -> any {
+              """
+              Get with fallback to parent
+              Tries to get a path from a dictionary, if it fails,
+              tries to get it from the parent dictionary.
 
-          _mustEnableEso = all_true([
-              _createCluster,
-              _sqlEnabled,
-              not _esoEnabled
+              If that fails, falls back to the default value provided.
+              """
+              get(x, y, get(p, "spec.${y}", d))
+          }
+
+          ocdsspec = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the spec of an ocds resource.
+              """
+              get(_ocds, "${x}.Resource.spec.${y}", d)
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          ready = lambda x: str -> bool {
+              """
+              Check if a value is ready.
+              """
+              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              all_true([
+                  get(c, "status", "False") == "True" for c in conditions
+              ])
+          }
+
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          appName = get(_oxr, "spec.claimRef.name", "")
+          createCluster = get(_oxr, "spec.createCluster", True)
+          connectionSecret = get(_oxr, "spec.connectionSecret", "")
+          engine = get(_oxr, "spec.engine", "")
+          dp = get(_oxr, "spec.deletionPolicy", "Delete")
+          keyId = get(_oxr, "status.kmsKeyId", False)
+          namespace = get(_oxr, "spec.claimRef.namespace", "default")
+          region = get(_oxr, "spec.region", "eu-central-1")
+          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
+          labels = get(_oxr, "metadata.labels", {}) | {"region": region}
+          tags = labels | get(_oxr, "spec.tags", {})
+
+          port = get(_oxr, "status.port", False)
+          restoreToPointInTime = {
+              if createCluster:
+                  "sourceDbClusterIdentifier": get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
+                  "restoreType": get(_oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
+              else:
+                  "sourceDbInstanceIdentifier" = get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None)
+                  "sourceDbInstanceAutomatedBackupsArn" = get(_oxr, "spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn", None)
+                  "sourceDbiResourceId" = get(_oxr, "spec.restoreToPointInTime.sourceDbiResourceId", None)
+
+              _v = get(_oxr, "spec.restoreToPointInTime.restoreToTime", False)
+              if _v:
+                  "restoreToTime": get(_oxr, "spec.restoreToPointInTime.restoreToTime", None)
+              else:
+                  "useLatestRestorableTime": get(_oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True)
+          }
+
+          s3import = get(_oxr, "spec.s3Import", False)
+
+          esoEnabled = get(_oxr, "spec.eso.enabled", False)
+          esoConnectionSecret = get(_oxr, "status.esoConnectionSecret", "")
+          sqlEnabled = get(_oxr, "spec.provisionSql.enabled", True)
+
+          mustEnableEso = all_true([
+              createCluster,
+              sqlEnabled,
+              not esoEnabled
           ])
 
-          assert _mustEnableEso, "ESO must be enabled when creating a cluster with SQL provisioning enabled."
+          assert mustEnableEso, "ESO must be enabled when creating a cluster with SQL provisioning enabled."
 
-          _useConnectionSecret = _esoConnectionSecret if _esoEnabled else _connectionSecret
+          useConnectionSecret = esoConnectionSecret if esoEnabled else connectionSecret
 
           _items = [
               {
@@ -62,15 +133,16 @@ spec:
                   kind: "RdsProvisioning"
                   metadata: {
                       annotations: {
-                          "krm.kcl.dev/composition-resource-name": "${_appName}-rds-provisioning"
+                          "krm.kcl.dev/composition-resource-name": "${appName}-rds-provisioning"
+                          "krm.kcl.dev/ready": readystr("${appName}-rds-provisioning")
                       }
                   }
                   spec: {
-                      deletionPolicy: get(_oxr, "spec.deletionPolicy", "Delete"),
-                      engine: get(_oxr, "spec.engine", "postgres")
-                      connectionSecretName: _useConnectionSecret
-                      databases: get(_oxr, "spec.databases", {})
-                      kubernetesProviderConfig: get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+                      "deletionPolicy": dp,
+                      "engine": get(_oxr, "spec.engine", "postgres")
+                      "connectionSecretName": useConnectionSecret
+                      "databases": get(_oxr, "spec.databases", {})
+                      "kubernetesProviderConfig": get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
                   }
               }
               for _ in [True]

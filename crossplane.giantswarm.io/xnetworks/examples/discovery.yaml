@@ -1,0 +1,22 @@
+apiVersion: xnetworks.crossplane.giantswarm.io/v1alpha1
+kind: DiscoveryClaim
+metadata:
+  labels:
+    owner: honeybadger
+    provider: aws
+    app.kubernetes.io/name: discovery
+    app.kubernetes.io/instance: discovery
+    app.kubernetes.io/part-of: xnetworks
+    app.kubernetes.io/managed-by: crossplane
+  name: discovery
+  namespace: default
+spec:
+  deletionPolicy: Delete
+  enabled: true
+  groupBy: "giantswarm.io/subnetset"
+  region: eu-west-2
+  providerConfigRef:
+    name: aws-import
+  providerType: aws
+  remoteVpcs:
+  - name: golem-vpc

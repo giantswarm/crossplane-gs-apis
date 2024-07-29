@@ -5,7 +5,7 @@ _dxr = option("params").dxr
 _ocds = option("params").ocds
 _dcds = option("params").dcds
 
-get = lambda x: any, y: str, d: any -> any {
+get = lambda x: {:}, y: str, d: any -> any {
     """
     Get an item from a dictionary using a dot separated path.
     If the item is not found, return a default value.
@@ -14,6 +14,16 @@ get = lambda x: any, y: str, d: any -> any {
     c = p[0]
     y = ".".join(p[1:])
     x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+}
+
+ready = lambda x: any, y: str -> str {
+    """
+    Check if a value is ready.
+    """
+    conditions = get(x, "${y}.Resource.status.conditions", [])
+    "True" if all_true([
+        get(c, "status", "False") == "True" for c in conditions
+    ]) else "False"
 }
 
 _clusterLookup = get(_ocds, "cluster-lookup.Resource", False)
@@ -36,18 +46,17 @@ _kubernetesObject = {
     metadata: {
         annotations: {
             "krm.kcl.dev/composition-resource-name" = "aws-cluster"
+            "krm.kcl.dev/ready": ready(_ocds, "aws-cluster")
         }
     }
     spec: {
         managementPolicies: ["Observe"],
         deletionPolicy: get(_oxr, "spec.clusterDiscovery.deletionPolicy", "Delete"),
-        providerConfigRef: {
-            name: get(_oxr, "spec.clusterDiscovery.providerConfigRef.name", "")
         }
         forProvider: {
             manifest: _awsClusterObject,
         }
-    }
+        providerConfigRef: get(_oxr, "spec.clusterDiscovery.providerConfigRef", {"name": "default"}),
 } if _awsClusterObject else {}
 
 _region = get(_ocds, "aws-cluster.Resource.spec.region", False)

@@ -1,91 +1,88 @@
-_createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
-_globalEnabled = all_true([
-    False,
-    _createReplicationGroup,
-    get(_oxr, "spec.globalReplicationGroup.enabled", False)
-])
+globalEndpoint = ocdsstatus("elasticache-replication-group-global", "primaryEndpointAddress", "") if globalEnabled else ""
+globalROEndpoint = ocdsstatus("elasticache-replication-group-global", "readerEndpointAddress", "") if globalEnabled else ""
 
-_globalEndpoint = get(_ocds, "elasticache-replication-group-global.Resource.status.atProvider.primaryEndpointAddress", "") if _globalEnabled else ""
-_globalROEndpoint = get(_ocds, "elasticache-replication-group-global.Resource.status.atProvider.readerEndpointAddress", "") if _globalEnabled else ""
+endpoint = ocdsstatus("elasticache-replication-group-local", "primaryEndpointAddress", "") if createReplicationGroup else ""
+readerep = ocdsstatus("elasticache-replication-group-local", "readerEndpointAddress", "") if createReplicationGroup else ""
 
-_endpoint = get(_ocds, "elasticache-replication-group-local.Resource.status.atProvider.primaryEndpointAddress", "") if _createReplicationGroup else ""
-_readerep = get(_ocds, "elasticache-replication-group-local.Resource.status.atProvider.readerEndpointAddress", "") if _createReplicationGroup else ""
 _port = 0
-if _globalEnabled:
-    _port = get(_ocds, "elasticache-replication-group-global.Resource.status.atProvider.port", "")
-elif _createReplicationGroup:
-    _port = get(_ocds, "elasticache-replication-group-local.Resource.status.atProvider.port", "")
+if globalEnabled:
+    _port = ocdsstatus("elasticache-replication-group-global", "port", False)
+elif createReplicationGroup:
+    _port = ocdsstatus("elasticache-replication-group-local", "port", False)
 else:
-    _port = get(_ocds, "elasticache-cluster-0.Resource.status.atProvider.port", "")
+    _port = ocdsstatus("elasticache-cluster-0", "port", False)
 
-
-_requiredClusters = len(get(_oxr, "spec.cacheClusters", [])) if get(_oxr, "spec.cacheClusters", False) else get(_oxr, "spec.numCacheClusters", 1)
-
+localClusterName = "elasticache-replication-group-local"
 _connectionSecretName = ""
-_localReplicationGroup = get(_ocds, "elasticache-replication-group-local.Resource", False)
+if ready(_ocds, localClusterName):
+    _connectionSecretName = ocdsspec(localClusterName, "writeConnectionSecretToRef.name", "")
 
-if _localReplicationGroup and all_true([c.status == "True" for c in get(_localReplicationGroup, "status.conditions", [])]):
-    _connectionSecretName = get(_localReplicationGroup, "spec.writeConnectionSecretToRef.name", "")
-
+globalClusterName = "elasticache-replication-group-global"
 _globalConnectionSecretName = ""
-_globalReplicationGroup = get(_ocds, "elasticache-replication-group-global.Resource", False)
-if _globalReplicationGroup and all_true([c.status == "True" for c in get(_globalReplicationGroup, "status.conditions", [])]):
-    _globalConnectionSecretName = get(_globalReplicationGroup, "spec.writeConnectionSecretToRef.name", "")
+if ready(_ocds, globalClusterName):
+    _globalConnectionSecretName = ocdsspec(globalClusterName, "writeConnectionSecretToRef.name", "")
 
-_clusterEndpoints = [
-    get(_ocds, "elasticache-cluster-${i}.Resource.status.atProvider.clusterAddress", "")
-    for i in range(_requiredClusters)
+
+cc = get(_oxr, "spec.cacheClusters", [])
+rclen = len(cc) if cc else get(_oxr, "spec.numCacheClusters", 1)
+clusterEndpoints = [
+    e for e in [
+        ocdsstatus("elasticache-cluster-${i}", "clusterAddress", "")
+        for i in range(rclen)
+    ]
+    if e
 ]
-_eps = [e for e in _clusterEndpoints if e]
 
-_globalReplicationId = get(_ocds, "elasticache-replication-group-global.Resource.status.atProvider.id", "")
-_localReplicationId = get(_ocds, "elasticache-replication-group-local.Resource.status.atProvider.id", "")
+_globalReplicationId = ocdsstatus("elasticache-replication-group-global", "id", "")
+_localReplicationId = ocdsstatus("elasticache-replication-group-local", "id", "")
 
 _ipgn = get(_oxr, "spec.parameterGroupName", "")
 if get(_oxr, "spec.parameterGroupConfiguration", False):
     _ipgn = get(_oxr, "spec.parameterGroupConfiguration.name", "")
 
-_ugId = get(_ocds, "elasticache-user-group.Resource.status.atProvider.id", "")
+_ugId = ocdsstatus("elasticache-user-group", "id", "")
 
-_items = [{
+dxr = {
     **_oxr,
     **{
         "status": {
             if _connectionSecretName:
-                connectionSecret: _connectionSecretName,
+                "connectionSecret": _connectionSecretName,
 
-            if _eps:
-                clusterEndpoints = _eps,
+            if clusterEndpoints:
+                "clusterEndpoints" = clusterEndpoints,
 
-            if _endpoint:
-                endpoint: _endpoint,
+            if endpoint:
+                "endpoint": endpoint,
 
             if _globalConnectionSecretName:
-                globalConnectionSecret: _globalConnectionSecretName,
+                "globalConnectionSecret": _globalConnectionSecretName,
 
-            if _globalEndpoint:
-                globalEndpoint: _globalEndpoint,
+            if globalEndpoint:
+                "globalEndpoint": globalEndpoint,
 
-            if _globalROEndpoint:
-                globalReaderEndpoint: _globalROEndpoint,
+            if globalROEndpoint:
+                "globalReaderEndpoint": globalROEndpoint,
 
             if _globalReplicationId:
-                globalReplicationGroupId: _globalReplicationId,
+                "globalReplicationGroupId": _globalReplicationId,
 
             if _localReplicationId:
-                replicationGroupId: _localReplicationId,
+                "replicationGroupId": _localReplicationId,
 
             if _ipgn:
-                parameterGroupName: _ipgn,
+                "parameterGroupName": _ipgn,
 
             if _port:
-                port: _port,
+                "port": _port,
 
-            if _readerep:
-                readerEndpoint: _readerep,
+            if readerep:
+                "readerEndpoint": readerep,
 
             if _ugId:
-                userGroupId: _ugId,
+                "userGroupId": _ugId,
         },
     }
-}]
+}
+
+_items = [dxr]

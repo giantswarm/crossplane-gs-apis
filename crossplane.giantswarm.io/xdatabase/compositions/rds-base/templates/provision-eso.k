@@ -1,16 +1,11 @@
-_appName = get(_oxr, "spec.claimRef.name", "")
-_createCluster = get(_oxr, "spec.createCluster", True)
-_connectionSecret = get(_oxr, "status.connectionSecret", "")
-_engine = get(_oxr, "spec.engine", "")
-
-_externalSecretStores = [
+externalSecretStores = [
     {
         "name": get(_oxr, "spec.eso.kubernetesSecretStore", "default"),
         "clusterScoped": False,
     }
 ]
 
-_pushSecretStores = [
+pushSecretStores = [
     {
         "name": store.secretStore,
         "clusterScoped": True,
@@ -18,10 +13,10 @@ _pushSecretStores = [
     for _, store in get(_oxr, "spec.eso.stores", [])
     if get(_oxr, "spec.eso.enabled", True) and store.enabled
 ]
-_usernameField = "username" if not _createCluster else "master_username"
-_passwordField = "password" if not _createCluster else "attribute.master_password"
+usernameField = "username" if not createCluster else "master_username"
+passwordField = "password" if not createCluster else "attribute.master_password"
 
-_pushSecretData = [
+pushSecretData = [
     {
         conversionStrategy: "None"
         match: {
@@ -38,97 +33,99 @@ _pushSecretData = [
     ]
 ]
 
-_deletionPolicy = "Delete" if get(_oxr, "spec.deletionPolicy", "Delete") == "Delete" else "Retain"
-_esoSqlSecret = [
+deletionPolicy = "Delete" if dp == "Delete" else "Retain"
+esoSqlSecret = [
     {
         "apiVersion": "kubernetes.crossplane.io/v1alpha2"
         "kind": "Object"
         "metadata": {
             annotations: {
-                "krm.kcl.dev/composition-resource-name" = "${_appName}-externalsecret"
+                "krm.kcl.dev/composition-resource-name" = "${appName}-externalsecret"
+                "krm.kcl.dev/ready": readystr("${appName}-externalsecret")
             }
         }
         "spec": {
-            deletionPolicy: get(_oxr, "spec.deletionPolicy", "Delete"),
-            providerConfigRef: {
-                name: get(_oxr, "spec.kubernetesProviderConfig.name", "")
-            }
+            deletionPolicy: dp,
             forProvider: {
                 manifest: {
-                    apiVersion: "external-secrets.io/v1alpha1"
-                    kind: "ExternalSecret"
-                    metadata: {
-                        namespace: get(_oxr, "spec.claimRef.namespace", "default")
+                    "apiVersion": "external-secrets.io/v1alpha1"
+                    "kind": "ExternalSecret"
+                    "metadata": {
+                        "namespace": namespace
                     }
-                    spec: {
-                        refreshInterval: "1h"
-                        secretStoreRef: {
-                            name: value.name
-                            kind: "ClusterSecretStore" if value.clusterScoped else "SecretStore"
+                    "spec": {
+                        "refreshInterval": "1h"
+                        "secretStoreRef": {
+                            "name": value.name
+                            "kind": "ClusterSecretStore" if value.clusterScoped else "SecretStore"
                         }
-                        data: [
+                        "data": [
                             {
-                                secretKey: k.r,
-                                remoteRef: {
-                                    key: _connectionSecret,
-                                    property: k.p
+                                "secretKey": k.r,
+                                "remoteRef": {
+                                    "key": connectionSecret,
+                                    "property": k.p
                                 }
                             }
                             for _, k in [
                                 {r: "endpoint", p:"endpoint"},
                                 {r: "port", p: "port"},
-                                {r: "password", p: _passwordField},
-                                {r: "username", p: _usernameField},
+                                {r: "password", p: passwordField},
+                                {r: "username", p: usernameField},
                             ]
                         ]
-                        target: {
-                            name: "${_appName}-rds-master"
-                            deletionPolicy: _deletionPolicy
+                        "target": {
+                            "name": "${appName}-rds-master"
+                            "deletionPolicy": deletionPolicy
                         }
                     }
                 }
             }
+            "providerConfigRef": {
+                "name": get(_oxr, "spec.kubernetesProviderConfig.name", "")
+            }
         }
     }
-    for _, value in _externalSecretStores
-    if _connectionSecret and get(_oxr, "spec.eso.enabled", True)
+    for _, value in externalSecretStores
+    if connectionSecret and get(_oxr, "spec.eso.enabled", True)
 ]
 
-_pushSecret = [
+pushSecret = [
     {
         "apiVersion": "kubernetes.crossplane.io/v1alpha2"
         "kind": "Object"
         "metadata": {
-            annotations: {
-                "krm.kcl.dev/composition-resource-name" = "${_appName}-pushsecret"
+            "annotations": {
+                "krm.kcl.dev/composition-resource-name" = "${appName}-pushsecret"
+                "krm.kcl.dev/ready": readystr("${appName}-pushsecret")
             }
         }
         "spec": {
-            deletionPolicy: get(_oxr, "spec.deletionPolicy", "Delete"),
-            providerConfigRef: {
+            "deletionPolicy": dp
+            "providerConfigRef": {
                 name: get(_oxr, "spec.kubernetesProviderConfig.name", "")
             }
-            forProvider: {
-                manifest: {
-                    apiVersion: "external-secrets.io/v1alpha1"
-                    kind: "PushSecret"
-                    metadata: {
-                        namespace: get(_oxr, "spec.claimRef.namespace", "default")
+            "forProvider": {
+                "manifest": {
+                    "apiVersion": "external-secrets.io/v1alpha1"
+                    "kind": "PushSecret"
+                    "metadata": {
+                        "namespace": get(_oxr, "spec.claimRef.namespace", "default")
                     }
-                    spec: {
-                        refreshInterval: "10s"
-                        secretStoreRefs: [
+                    "spec": {
+                        "refreshInterval": "10s"
+                        "secretStoreRefs": [
                             {
-                                name: value.name
-                                kind: "ClusterSecretStore" if value.clusterScoped else "SecretStore"
+                                "name": value.name
+                                "kind": "ClusterSecretStore" if value.clusterScoped else "SecretStore"
                             }
-                            for _, value in _pushSecretStores
+                            for _, value in pushSecretStores
                         ]
-                        data: _pushSecretData
-                        deletionPolicy: _deletionPolicy
-                        selector: {
-                            secret: {
-                                name: "${_appName}-rds-master"
+                        "data": pushSecretData
+                        "deletionPolicy": deletionPolicy
+                        "selector": {
+                            "secret": {
+                                "name": "${appName}-rds-master"
                             }
                         }
                         updatePolicy: "Replace"
@@ -136,19 +133,10 @@ _pushSecret = [
                 }
             }
         }
-    } for _ in [True] if _pushSecretStores and get(_oxr, "spec.eso.enabled", True)
+    } for _ in [True] if pushSecretStores and get(_oxr, "spec.eso.enabled", True)
 ]
 
-_newdxr = {
-    **_oxr,
-    **{
-        "status": {
-            "esoConnectionSecret": "${_appName}-rds-master"
-        }
-    }
-} if get(_oxr, "spec.eso.enabled", True) and _connectionSecret else {}
-
 _items = [
-    i for r in [_esoSqlSecret, _pushSecret, [_newdxr]]
+    i for r in [esoSqlSecret, pushSecret]
     for i in r if i
 ]

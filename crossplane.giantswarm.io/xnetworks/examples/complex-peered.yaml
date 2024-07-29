@@ -24,14 +24,16 @@ spec:
   providerConfigRef:
     name: default
   peering:
-    remoteVpcs:
-    - name: basic-no-peering
-      allowPublic: true
-    - name: basic-peered
-      allowPublic: true
-    groupBy: "giantswarm.io/subnetset"
-    enabled: true
     allowPublic: true
+    enabled: true
+    groupBy: "giantswarm.io/subnetset"
+    remoteVpcs:
+    - allowPublic: true
+      name: basic-no-peering
+      providerConfigRef: default
+      region: eu-central-1
+    - allowPublic: true
+      name: basic-peered
   subnetsets:
     cidrs:
     - prefix: '10.20.0.0/19'

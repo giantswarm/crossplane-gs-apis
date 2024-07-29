@@ -1,0 +1,31 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  creationTimestamp: null
+  labels:
+    component: networking
+    provider: aws
+    type: discovery
+  name: network-discovery
+spec:
+  compositeTypeRef:
+    apiVersion: xnetworks.crossplane.giantswarm.io/v1alpha1
+    kind: Discovery
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-network-discovery
+    input:
+      apiVersion: xnetworks.crossplane.giantswarm.io/v1beta1
+      kind: Input
+      metadata:
+        creationTimestamp: null
+      spec:
+        enabledRef: spec.enabled
+        groupByRef: spec.groupBy
+        patchTo: status.vpcs
+        providerConfigRef: spec.providerConfigRef.name
+        providerType: aws
+        regionRef: spec.region
+        vpcRef: spec.remoteVpcs
+    step: network-discovery

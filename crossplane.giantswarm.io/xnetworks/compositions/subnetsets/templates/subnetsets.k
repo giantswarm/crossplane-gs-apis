@@ -3,7 +3,7 @@ _oxr = option("params").oxr
 _dxr = option("params").dxr
 _ocds = option("params").ocds
 
-get = lambda x: any, y: str, d: any -> any {
+get = lambda x: {:}, y: str, d: any -> any {
     """
     Get an item from a dictionary using a dot separated path.
     If the item is not found, return a default value.
@@ -14,166 +14,167 @@ get = lambda x: any, y: str, d: any -> any {
     x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
 }
 
-ready = lambda x: any, y: str -> str {
+ready = lambda y: str -> bool {
     """
     Check if a value is ready.
     """
-    conditions = get(x, "${y}.Resource, status.conditions", [])
-    "True" if all_true([
+    conditions = get(_ocds, "${y}.Resource.status.conditions", [])
+    all_true([
         get(c, "status", "False") == "True" for c in conditions
-    ]) else "False"
+    ])
 }
 
-xrReady = lambda x: any -> str {
+readystr = lambda y: str -> str {
     """
-    Check if a resource is ready.
+    Check if a value is ready.
     """
-    "True" if all_true([
-        all_true([
-            get(c, "status", "False") for c in get(y, "Resource.status.conditions", [])
-        ]) for y in x
-    ]) else "False"
+    "True" if ready(y) else "False"
 }
 
-_appIndex = get(_oxr, "spec.appIndex", "")
-_appName = get(_oxr, "spec.claimRef.name", "") + "-" + _appIndex
-_labels = get(_oxr, "metadata.labels", {})
-_region = get(_oxr, "spec.region", "")
-_subnets = get(_oxr, "spec.subnets", {})
 
-_tags = get(_oxr, "spec.tags.all", {})
-_type = get(_oxr, "spec.type", "")
-_vpcId = get(_oxr, "spec.vpcId", "")
+appIndex = get(_oxr, "spec.appIndex", "")
+appName = get(_oxr, "spec.claimRef.name", "") + "-" + appIndex
+dp = get(_oxr, "spec.deletionPolicy", "Delete")
+labels = get(_oxr, "metadata.labels", {})
+pcr = get(_oxr, "spec.providerConfigRef", {})
+region = get(_oxr, "spec.region", "")
+subnets = get(_oxr, "spec.subnets", {})
+tags = get(_oxr, "spec.tags.all", {})
+tpe = get(_oxr, "spec.type", "")
+vpcId = get(_oxr, "spec.vpcId", "")
 
-_subnetsets = [
+subnetsets = [
     {
-        _az = "${_region}${zone}"
+        _az = "${region}${zone}"
         _resourceName = "subnet-${_az}"
 
-        apiVersion: "ec2.aws.upbound.io/v1beta1",
-        kind: "Subnet",
-        metadata: {
-            annotations: {
+        "apiVersion": "ec2.aws.upbound.io/v1beta1",
+        "kind": "Subnet",
+        "metadata": {
+            "annotations": {
                 "krm.kcl.dev/composition-resource-name" = _resourceName
-                "krm.kcl.dev/ready": ready(_ocds, _resourceName)
+                "krm.kcl.dev/ready": readystr(_resourceName)
             }
-            labels = _labels | {
-                access: _type
-                availabilityZone: _az
+            "labels" = labels | {
+                "access": tpe
+                "availabilityZone": _az
             }
         }
-        spec: {
-            forProvider: {
+        "spec": {
+            "deletionPolicy": dp
+            "forProvider": {
                 "availabilityZone": _az
                 "cidrBlock": cidrBlock
-                "mapPublicIpOnLaunch": _type == "public"
-                "region": _region
-                "tags": _tags | {
-                    Name: "${_appName}-${_type}-${_az}"
-                } | {
-                    "${k}": "${v}"
-                    for k, v in get(_tags, "subnet", {})
-                }
-                "vpcId": _vpcId
+                "mapPublicIpOnLaunch": tpe == "public"
+                "region": region
+                "tags": tags | {
+                    Name: "${appName}-${tpe}-${_az}"
+                } | get(tags, "subnet", {})
+
+                "vpcId": vpcId
             }
+            "providerConfigRef": pcr
         }
     }
-    for zone, cidrBlock in _subnets if zone and cidrBlock
+    for zone, cidrBlock in subnets if zone and cidrBlock
 ]
 
-_routeTables = [
+routeTables = [
     {
-        _az = "${_region}${zone}"
-        apiVersion: "ec2.aws.upbound.io/v1beta1",
-        kind: "RouteTable",
-        metadata: {
-            annotations: {
-                "krm.kcl.dev/composition-resource-name" = "route-table-${_az}"
+        _az = "${region}${zone}"
+        _resourceName = "route-table-${_az}"
+        "apiVersion": "ec2.aws.upbound.io/v1beta1",
+        "kind": "RouteTable",
+        "metadata": {
+            "annotations": {
+                "krm.kcl.dev/composition-resource-name": _resourceName
+                "krm.kcl.dev/ready": readystr(_resourceName)
             }
-            labels = _labels | {
-                access: _type
-                availabilityZone: _az
+            "labels": labels | {
+                "access": tpe
+                "availabilityZone": _az
             }
         }
-        spec: {
-            forProvider: {
-                region: _region
-                tags: _tags | {
-                    Name: "${_appName}-${_type}-${_az}"
+        "spec": {
+            "deletionPolicy": dp
+            "forProvider": {
+                "region": region
+                "tags": tags | {
+                    Name: "${appName}-${tpe}-${_az}"
                 }
-                vpcId: _vpcId
+                "vpcId": vpcId
             }
+            "providerConfigRef": pcr
         }
     }
-    for zone, _ in _subnets if zone
+    for zone, _ in subnets if zone
 ]
 
-_associations = [
+associations = [
     {
-        _az = "${_region}${zone}"
-        apiVersion: "ec2.aws.upbound.io/v1beta1",
-        kind: "RouteTableAssociation",
-        metadata: {
-            annotations: {
-                "krm.kcl.dev/composition-resource-name" = "association-${_az}"
+        _az = "${region}${zone}"
+        _resourceName = "association-${_az}"
+        "apiVersion": "ec2.aws.upbound.io/v1beta1",
+        "kind": "RouteTableAssociation",
+        "metadata": {
+            "annotations": {
+                "krm.kcl.dev/composition-resource-name": _resourceName
+                "krm.kcl.dev/ready": readystr(_resourceName)
             }
         }
-        spec: {
-            forProvider: {
-                region: _region
-                routeTableIdSelector: {
-                    matchControllerRef: True
-                    matchLabels: {
-                        availabilityZone: _az
+        "spec": {
+            "deletionPolicy": dp
+            "forProvider": {
+                "region": region
+                "routeTableIdSelector": {
+                    "matchControllerRef": True
+                    "matchLabels": {
+                        "availabilityZone": _az
                     }
                 }
-                subnetIdSelector: {
-                    matchControllerRef: True
-                    matchLabels: {
-                        availabilityZone: _az
+                "subnetIdSelector": {
+                    "matchControllerRef": True
+                    "matchLabels": {
+                        "availabilityZone": _az
                     }
                 }
             }
+            "providerConfigRef": pcr
         }
     }
-    for zone, _ in _subnets if zone
+    for zone, _ in subnets if zone
 ]
 
-_subnetIds = {
+subnetIds = {
     get(item, "Resource.metadata.labels.availabilityZone", "") = get(item, "Resource.status.atProvider.id", "")
     for _, item in _ocds
     if get(item, "Resource.kind", "") == "Subnet"
 }
 
-_routeTableIds = {
+routeTableIds = {
     get(item, "Resource.metadata.labels.availabilityZone", "") = get(item, "Resource.status.atProvider.id", "")
     for _, item in _ocds
     if get(item, "Resource.kind", "") == "RouteTable"
 }
 
-_newdxr = {
+newdxr = {
     **_oxr,
     **{
-        "metadata": {
-            "annotations": {
-                "krm.kcl.dev/ready": xrReady(_ocds)
-            }
-        }
         "status": {
             "subnets": {
                 "${k}": "${v}"
-                for k, v in _subnetIds if k and v
+                for k, v in subnetIds if k and v
             }
             "routeTables": {
                 "${k}": "${v}"
-                for k, v in _routeTableIds if k and v
+                for k, v in routeTableIds if k and v
             }
-            "vpcId": _vpcId
-        } if _routeTableIds and _subnetIds else {}
+            "vpcId": vpcId
+        } if routeTableIds and subnetIds else {}
     }
 }
 
 items = [
-    i for r in [_subnetsets, _routeTables, _associations, [_newdxr]]
+    i for r in [subnetsets, routeTables, associations, [newdxr]]
     for i in r if i
 ]

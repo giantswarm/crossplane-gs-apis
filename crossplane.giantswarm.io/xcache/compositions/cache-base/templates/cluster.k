@@ -1,190 +1,206 @@
 # If we are not creating a replication group, check how many cache clusters have
 # been requested and default a list of empty dictionaries as being the cache
 # cluster template.
-_requiredClusters = get(_oxr, "spec.cacheClusters", []) if get(_oxr, "spec.cacheClusters", False) else [
+requiredClusters = get(_oxr, "spec.cacheClusters", []) if get(_oxr, "spec.cacheClusters", False) else [
     {}
     for i in range(get(_oxr, "spec.numCacheClusters", 1))
     if not get(_oxr, "spec.createReplicationGroup", False)
 ]
 
-_region = get(_oxr, "spec.region", "eu-central-1")
-_appName = get(_oxr, "spec.claimRef.name", "")
-
-_azs = [
-    "${_region}${az}"
-    for az in get(_oxr, "spec.availabilityZones", [])
-]
-
-_clusters = [
+clusters = [
     {
-        apiVersion: "elasticache.aws.upbound.io/v1beta1"
-        kind: "Cluster"
+        "apiVersion": "elasticache.aws.upbound.io/v1beta1"
+        "kind": "Cluster"
         "metadata": {
-            annotations: {
+            "annotations": {
                 "krm.kcl.dev/composition-resource-name": "elasticache-cluster-${i}"
+                "krm.kcl.dev/ready": readystr(_ocds, "elasticache-cluster-${i}")
+                "crossplane.io/external-name": "${appName}-${region}-${i}"
             }
+            "labels": labels
         }
         "spec": {
-            deletionPolicy: _oxr.spec.deletionPolicy
-            initProvider: {
+            "deletionPolicy": get(_oxr, "spec.deletionPolicy", "Delete"),
+            "initProvider": {
                 if get(_oxr, "spec.autoMinorVersionUpgrade", False):
                     if get(_oxr, "spec.engineVersion", False):
-                        engineVersion: _oxr.spec.engineVersion
+                        "engineVersion": get(_oxr, "spec.engineVersion", "7.x")
             }
 
-            forProvider: {
-                if get(cluster, "applyImmediately", get(_oxr, "spec.applyImmediately", False)):
-                    applyImmediately: get(cluster, "applyImmediately", get(_oxr, "spec.applyImmediately", True))
-                if get(cluster, "autoMinorVersionUpgrade", get(_oxr, "spec.autoMinorVersionUpgrade", False)):
-                    autoMinorVersionUpgrade: get(cluster, "autoMinorVersionUpgrade", get(_oxr, "spec.autoMinorVersionUpgrade", True)),
+            "forProvider": {
+                _v = getwparent(cluster, _oxr, "applyImmediately",False)
+                if _v:
+                    "applyImmediately": _v
 
-                _az = get(cluster, "availabilityZone", _azs[i % len(_azs)])
+                _v = getwparent(cluster, _oxr, "autoMinorVersionUpgrade", False)
+                if _v:
+                    "autoMinorVersionUpgrade": _v
+
+                _az = get(cluster, "availabilityZone", azs[i % len(azs)])
                 if get(cluster, "availabilityZone", False):
-                    availabilityZone: _az,
+                    "availabilityZone": _az
 
                 if all_true([
-                    get(cluster, "azMode", get(_oxr, "spec.azMode", False)),
-                    get(cluster, "engine", get(_oxr, "spec.engine", False)) == "memcached",
+                    getwparent(cluster, _oxr, "azMode", False),
+                    getwparent(cluster, _oxr "engine", False) == "memcached",
                 ]):
-                    azMode: get(cluster, "azMode", get(_oxr, "spec.azMode", "cross-az")),
-                    numCacheNodes = get(cluster, "numCacheNodes", get(_oxr, "spec.numCacheNodes", len(_azs))),
+                    "azMode": getwparent(cluster, _oxr, "azMode", "cross-az"),
+                    "numCacheNodes" = getwparent(cluster, _oxr, "numCacheNodes", len(azs)),
 
-                if get(cluster, "engine", get(_oxr, "spec.engine", False)):
-                    engine = get(cluster, "engine", get(_oxr, "spec.engine", "redis")),
+                _v = getwparent(cluster, _oxr, "engine", False)
+                if _v:
+                    "engine" = _v
 
                 if not get(_oxr, "spec.autoMinorVersionUpgrade", False):
-                    if get(cluster, "engineVersion", get(_oxr, "spec.engineVersion", False)):
-                        engineVersion = get(cluster, "engineVersion", get(_oxr, "spec.engineVersion", "6.x")),
-                if get(cluster, "finalSnapshotIdentifier", get(_oxr, "spec.finalSnapshotIdentifier", False)):
-                    finalSnapshotIdentifier = get(cluster, "finalSnapshotIdentifier", get(_oxr, "spec.finalSnapshotIdentifier", "")),
+                    _v = getwparent(cluster, _oxr, "engineVersion", False)
+                    if _v:
+                        "engineVersion" = _v
 
-                if get(cluster, "ipDiscovery", get(_oxr, "spec.ipDiscovery", False)):
-                    ipDiscovery = get(cluster, "ipDiscovery", get(_oxr, "spec.ipDiscovery", "dns")),
+                _v = getwparent(cluster, _oxr, "finalSnapshotIdentifier", False)
+                if _v:
+                    "finalSnapshotIdentifier" = _v
+
+                _v = getwparent(cluster, _oxr, "ipDiscovery", False)
+                if _v:
+                    "ipDiscovery" = _v
 
                 if all_true([
-                    get(cluster, "spec.engine", get(_oxr, "spec.engine", "redis")) == "redis",
-                    get(cluster, "logDeliveryConfiguration", get(_oxr, "spec.logDeliveryConfiguration", False)),
+                    getwparent(cluster, _oxr, "engine", "redis") == "redis",
+                    getwparent(cluster, _oxr, "logDeliveryConfiguration", False),
                 ]):
-                    _config = get(cluster, "logDeliveryConfiguration", get(_oxr, "spec.logDeliveryConfiguration", []))
-                    logDeliveryConfiguration = [{
+                    _config = getwparent(cluster, _oxr, "logDeliveryConfiguration", [])
+                    "logDeliveryConfiguration" = [{
                         if get(c, "destination", False):
-                            destination: get(c, "destination", ""),
+                            "destination": get(c, "destination", ""),
                         if get(c, "destinationType", False):
-                            destinationType = c.destinationType,
+                            "destinationType" = c.destinationType,
                         if get(c, "logFormat", False):
-                            logFormat = c.logFormat,
+                            "logFormat" = c.logFormat,
                         if get(c, "logType", False):
-                            logType = c.logType,
+                            "logType" = c.logType,
                     } for c in _config],
 
-                if get(cluster, "maintenanceWindow", get(_oxr, "spec.maintenanceWindow", False)):
-                    maintenanceWindow = get(cluster, "maintenanceWindow", get(_oxr, "spec.maintenanceWindow", "Sun:05:00-Mon:09:00")),
+                _v = getwparent(cluster, _oxr, "maintenanceWindow", False)
+                if _v:
+                    "maintenanceWindow" = _v
 
-                if get(cluster, "networkType", get(_oxr, "spec.networkType", False)):
-                    networkType = get(cluster, "networkType", get(_oxr, "spec.networkType", "ipv4")),
+                _v = getwparent(cluster, _oxr, "networkType", False)
+                if _v:
+                    "networkType" = _v
 
-                if get(cluster, "nodeType", get(_oxr, "spec.nodeType", False)):
-                    nodeType = get(cluster, "nodeType", get(_oxr, "spec.nodeType", "cache.t3.micro")),
+                _v = getwparent(cluster, _oxr, "nodeType", False)
+                if _v:
+                    "nodeType" = _v
 
-                if get(cluster, "notificationTopicArn", get(_oxr, "spec.notificationTopicArn", False)):
-                    notificationTopicArn = get(cluster, "notificationTopicArn", get(_oxr, "spec.notificationTopicArn", "")),
+                _v = getwparent(cluster, _oxr, "notificationTopicArn", False)
+                if _v:
+                    "notificationTopicArn" = _v
 
-                if all_true([
-                    get(cluster, "outpostMode", get(_oxr, "spec.outpostMode", False)),
-                    get(cluster, "preferredOutpostArn", get(_oxr, "spec.preferredOutpostArn", False)),
-                ]):
-                    outpostMode = get(cluster, "outpostMode", get(_oxr, "spec.outpostMode", "none")),
-                    preferredOutpostArn = get(cluster, "preferredOutpostArn", get(_oxr, "spec.preferredOutpostArn", "")),
+                _om = getwparent(cluster, _oxr, "outpostMode", False)
+                _poa = getwparent(cluster, _oxr, "preferredOutpostArn", False)
+                if all_true([_om, _poa]):
+                    "outpostMode" = _om,
+                    "preferredOutpostArn" = _poa
 
-                if get(_oxr, "status.parameterGroupName", False):
-                    parameterGroupName = get(_oxr, "status.parameterGroupName", ""),
+                _v = get(_oxr, "status.parameterGroupName", False)
+                if _v:
+                    "parameterGroupName" = _v
 
-                if get(cluster, "port", get(_oxr, "spec.port", False)):
-                    port = get(cluster, "port", get(_oxr, "spec.port", 6379))
+                _v = getwparent(cluster, _oxr, "port", False)
+                    "port" = _v
 
                 if not get(cluster, "availabilityZone", False):
-                    preferredAvailabilityZones = _azs
+                    "preferredAvailabilityZones" = azs
 
-                region = _region,
+                "region" = region
 
                 if all_true([
                     get(_oxr, "spec.createReplicationGroup", False),
                     get(_oxr, "status.localReplicationGroupId", False),
                 ]):
-                    replicationGroupId = get(_oxr, "status.localReplicationGroupId", ""),
+                    "replicationGroupId" = get(_oxr, "status.localReplicationGroupId", "")
 
                 if get(_oxr, "status.securityGroupId", False):
-                    securityGroupIds = [
+                    "securityGroupIds" = [
                         get(_oxr, "status.securityGroupId", None),
-                    ] + get(cluster, "securityGroupIds", get(_oxr, "spec.securityGroupIds", [])),
+                    ] + getwparent(cluster, _oxr, "securityGroupIds", [])
 
-                if get(cluster, "snapshotArns", get(_oxr, "spec.snapshotArns", False)):
-                    snapshotArns = get(cluster, "snapshotArns", get(_oxr, "spec.snapshotArns", [])),
+                _v = getwparent(cluster, _oxr, "snapshotArns", False)
+                if _v:
+                    "snapshotArns" = _v
 
-                if get(cluster, "snapshotName", get(_oxr, "spec.snapshotName", False)):
-                    snapshotName = get(cluster, "snapshotName", get(_oxr, "spec.snapshotName", "")),
-                if get(cluster, "snapshotRetentionLimit", get(_oxr, "spec.snapshotRetentionLimit", False)):
-                    snapshotRetentionLimit = get(cluster, "snapshotRetentionLimit", get(_oxr, "spec.snapshotRetentionLimit", 1)),
-                if get(cluster, "snapshotWindow", get(_oxr, "spec.snapshotWindow", False)):
-                    snapshotWindow = get(cluster, "snapshotWindow", get(_oxr, "spec.snapshotWindow", "00:00-01:00")),
+                _v = getwparent(cluster, _oxr, "snapshotName", False)
+                if _v:
+                    "snapshotName" = _v
+
+                _v = getwparent(cluster, _oxr, "snapshotRetentionLimit", False)
+                if _v:
+                    "snapshotRetentionLimit" = _v
+
+                _v = getwparent(cluster, _oxr, "snapshotWindow", False)
+                if _v:
+                    "snapshotWindow" = _v
 
                 # Only assign subnetGroup if we are not creating a replication group
                 if all_true([
                     get(_oxr, "status.subnetGroupName", False),
-                    not get(cluster, "createReplicationGroup", get(_oxr, "spec.createReplicationGroup", False)),
+                    not getwparent(cluster, _oxr, "createReplicationGroup", False),
                 ]):
-                    subnetGroupName = get(cluster, "subnetGroupName", get(_oxr, "status.subnetGroupName", "")),
+                    _sgn = getwparent(cluster, _oxr, "subnetGroupName", "")
+                    "subnetGroupName" = get(_oxr, "status.subnetGroupName", _sgn)
 
-                tags = get(cluster, "tags", get(_oxr, "spec.tags", {})) | {
-                    "Name": "${_appName}-${_region}-${_az}"
+                "tags" = tags | get(cluster, "tags", {}) | {
+                    "Name": "${appName}-${region}-${_az}"
                 },
 
-                if get(cluster, "transitEncryptionEnabled", get(_oxr, "spec.transitEncryptionEnabled", False)):
-                    transitEncryptionEnabled = get(cluster, "transitEncryptionEnabled", get(_oxr, "spec.transitEncryptionEnabled", False)),
+                _v = getwparent(cluster, _oxr, "transitEncryptionEnabled", False)
+                if _v:
+                    "transitEncryptionEnabled" = _v
             }
-            providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
+            "providerConfigRef": pcr
         }
     }
-    for i, cluster in _requiredClusters
+    for i, cluster in requiredClusters
     if all_true([
         get(_oxr, "status.subnetGroupName", False)
         get(_oxr, "status.securityGroupId", False)
     ])
 ]
 
-_port = get(_oxr, "status.port", False)
-_securityGroupRules = [
+port = get(_oxr, "status.port", False)
+securityGroupRules = [
     {
-        apiVersion: "ec2.aws.upbound.io/v1beta1"
-        kind: "SecurityGroupRule"
+        "apiVersion": "ec2.aws.upbound.io/v1beta1"
+        "kind": "SecurityGroupRule"
         "metadata": {
-            annotations: {
+            "annotations": {
                 "krm.kcl.dev/composition-resource-name": "elasticache-security-group-rule-inbound-${i}"
+                "krm.kcl.dev/ready": readystr(_ocds, "elasticache-security-group-rule-inbound-${i}")
+                "crossplane.io/external-name": "${appName}-cache-sg-rule-inbound"
             }
         }
         "spec": {
-            deletionPolicy: _oxr.spec.deletionPolicy
-            forProvider: {
-                cidrBlocks: [cidr],
-                fromPort: _port,
-                protocol: "tcp",
-                region: _region,
-                securityGroupId: get(_oxr, "status.securityGroupId", ""),
-                toPort: _port,
-                type: "ingress",
+            "deletionPolicy": _oxr.spec.deletionPolicy
+            "forProvider": {
+                "cidrBlocks": [cidr],
+                "fromPort": port,
+                "protocol": "tcp",
+                "region": region,
+                "securityGroupId": get(_oxr, "status.securityGroupId", ""),
+                "toPort": port,
+                "type": "ingress",
             }
-            providerConfigRef: get(_oxr, "spec.providerConfigRef", {"name": "default"})
+            "providerConfigRef": get(_oxr, "spec.providerConfigRef", {"name": "default"})
         }
     }
     for i, cidr in get(_oxr, "spec.cidrBlocks", [])
     if all_true([
         get(_oxr, "status.securityGroupId", False),
-        _port,
-        cidr,
+        port, cidr,
     ])
 ]
 
 _items = [
-    i for r in [_clusters, _securityGroupRules]
+    i for r in [clusters, securityGroupRules]
     for i in r if i
 ]

@@ -1,5 +1,9 @@
 package v1alpha1
 
+import (
+	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+)
+
 // AvailabilityZone is a string type that represents the availability zone
 // for a subnet.
 //
@@ -38,3 +42,39 @@ type RouteTableId string
 // +kubebuilder:validation:Type=string
 // +kubebuilder:validation:Pattern="^vpc-[a-z0-9]{8,17}$"
 type VpcId string
+
+// VpcDetails contains the details of a VPC.
+type VpcDetails struct {
+	// Name of the VPC.
+	//
+	// +required
+	Name string `json:"name"`
+
+	// The ID of the VPC.
+	//
+	// +required
+	VpcId VpcId `json:"vpcId"`
+
+	// The CIDR blocks for the VPC.
+	//
+	// +required
+	CidrBlock []Cidr `json:"cidrBlocks"`
+
+	// ProviderConfigRef is a reference to a provider configuration
+	// for managing connections to this vpc
+	//
+	// +optional
+	ProviderConfigRef *xpv1.Reference `json:"providerConfigRef,omitempty"`
+
+	// Region is the region in which the VPC is located.
+	//
+	// Required if local vpc
+	//
+	// +optional
+	Region string `json:"region"`
+
+	// The route table ids in the VPC.
+	//
+	// +required
+	RouteTableIds []RouteTableId `json:"routeTableIds"`
+}

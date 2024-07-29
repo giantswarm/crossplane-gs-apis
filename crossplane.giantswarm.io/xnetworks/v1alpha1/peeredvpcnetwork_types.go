@@ -108,6 +108,50 @@ type PeeredVpcNetworkParameters struct {
 	//
 	// +required
 	Peering VpcPeering `json:"peering"`
+
+	// TransitGateway is the transit gateway to attach to the VPC.
+	//
+	// +optional
+	TransitGateway TransitGatewayWrapper `json:"transitGateway"`
+}
+
+type TransitGatewayWrapper struct {
+	TransitGatewayParameters `json:",inline"`
+
+	TgwVpcDetailsWrapper `json:",inline"`
+
+	// Prefix lists for the VPC
+	//
+	// +optional
+	// +listType=atomic
+	PrefixList []PrefixList `json:"prefixList"`
+
+	// RemoteVpcs is a list of VPCs build a transit gateway between
+	RemoteVpcs []TgwWrappedVpcWithProviderConfig `json:"remoteVpcs"`
+}
+
+type TgwVpcDetailsWrapper struct {
+	TransitGatewayVpc `json:",inline"`
+
+	// AllowPublic specifies if the VPC peering connections should be allowed to
+	// be linked to the public subnets
+	//
+	// +optional
+	// +default=true
+	AllowPublic bool `json:"allowPublic"`
+}
+
+// TgwWrappedVpcWithProviderConfig defines the parameters for creating a VPC with
+// the option of peered subnets.
+type TgwWrappedVpcWithProviderConfig struct {
+	TransitGatewayVpcWithProviderConfig `json:",inline"`
+
+	// AllowPublic specifies if the VPC peering connections should be allowed to
+	// be linked to the public subnets
+	//
+	// +optional
+	// +default=true
+	AllowPublic bool `json:"allowPublic"`
 }
 
 // VpcPeering defines the parameters for VPC peering.
@@ -116,15 +160,15 @@ type PeeredVpcNetworkParameters struct {
 // `remoteVpcs` field.
 type VpcPeering struct {
 	// AllowPublic specifies if the VPC peering connections should be allowed to
+	//
 	// be linked to the public subnets
 	// Defaults to false
 	//
 	// +optional
 	// +default=false
 	AllowPublic bool `json:"allowPublic"`
-	// Enabled specifies if the VPC peering connections should be enabled for
-	// this VPC.
-	// Defaults to false
+
+	// Enabled specifies if VPC peering is enabled.
 	//
 	// +optional
 	// +default=false
@@ -140,38 +184,22 @@ type VpcPeering struct {
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=125
 	// +optional
-	RemoteVpcs []VpcPeer `json:"remoteVpcs"`
+	RemoteVpcs []WrappedVpcPeer `json:"remoteVpcs"`
 }
 
-type SetExclusion struct {
-	// public subnets to exclude from peering
-	//
-	// +optional
-	// +listType=atomic
-	Public []int `json:"public"`
+type WrappedVpcPeer struct {
+	VpcPeer `json:",inline"`
 
-	// private subnets to exclude from peering
-	//
-	// +optional
-	// +listType=atomic
-	Private []int `json:"private"`
-}
-
-// VpcPeer defines the parameters for peering with a VPC.
-type VpcPeer struct {
-	// Disabled specifies if the peering connection should be disabled.
-	// Defaults to true
+	// AllowPublic specifies if the VPC peering connections should be allowed to
+	// be linked to the public subnets
 	//
 	// +optional
 	// +default=true
 	AllowPublic bool `json:"allowPublic"`
+}
 
-	// ExcludeFromLocalPeering specifies the indexes of subnetsets for this VPC to
-	// exclude from routing to the peering connection
-	//
-	// +optional
-	ExcludeFromLocalPeering SetExclusion `json:"excludeFromLocalPeering,omitempty"`
-
+// VpcPeer defines the parameters for peering with a VPC.
+type VpcPeer struct {
 	// Name specifies the name of the VPC to peer with.
 	//
 	// +required
@@ -190,13 +218,6 @@ type VpcPeer struct {
 	//
 	// +optional
 	Region string `json:"region"`
-
-	// ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
-	// VPC to exclude from routing to the peering connection. If emmpty, all
-	// subnetsets will be included by default
-	//
-	// +optional
-	ExcludeFromRemotePeering []SetExclusion `json:"excludeFromRemotePeering,omitempty"`
 }
 
 // PeeredSubnetSet defines the parameters for creating a set of subnets with the
@@ -215,7 +236,7 @@ type PeeredSubnetSet struct {
 	// Public subnets are subnets with a route to the internet gateway.
 	//
 	// > [!IMPORTANT]
-	// > If this is the default VPC CIDR, the first entry in the list, the
+	// > If this is the default VPC CIDR, i.e. the first entry in the list, the
 	// > public subnets will be used for the NAT gateways. Setting this value to
 	// > 0 on the default VPC CIDR may result in the creation of fully private
 	// > networks with no route to the outside world.
@@ -313,7 +334,8 @@ type PeeredSubnets struct {
 	// +required
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=5
-	// +listType=atomic
+	// +listType=map
+	// +listMapKey=prefix
 	Cidrs []PeeredSubnetSet `json:"cidrs"`
 
 	// Defines the function to use to calculate the CIDR blocks for thesubnets.
@@ -333,6 +355,24 @@ type PeeredSubnets struct {
 	Function string `json:"function"`
 }
 
+type PeeredVpcLookup struct {
+	// If network discovery is enabled
+	//
+	// +optional
+	// +default=true
+	Enabled bool `json:"enabled"`
+
+	// GroupBy is the key to group the remote VPCs by
+	//
+	// +optional
+	GroupBy string `json:"groupBy"`
+
+	// RemoteVpcs is a list of VPCs to lookup
+	//
+	// +optional
+	RemoteVpcs []VpcPeer `json:"remoteVpcs"`
+}
+
 type PeeredVpcNetworkStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
 
@@ -347,6 +387,11 @@ type PeeredVpcNetworkStatus struct {
 	// +listType=atomic
 	// +optional
 	SubnetBits []fncdr.MultiPrefix `json:"subnetBits"`
+
+	// Details of VPCs to lookup in network discovery
+	//
+	// +optional
+	VpcLookup PeeredVpcLookup `json:"vpcLookup"`
 
 	// Vpcs contains details of both the peered VPCs and the current local VPC
 	// The current VPC can be found at the `self` key

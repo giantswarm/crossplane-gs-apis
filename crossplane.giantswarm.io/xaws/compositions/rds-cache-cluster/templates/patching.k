@@ -5,7 +5,7 @@ _dxr = option("params").dxr
 _ocds = option("params").ocds
 _dcds = option("params").dcds
 
-get = lambda x: any, y: str, d: any -> any {
+get = lambda x: {:}, y: str, d: any -> any {
     """
     Get an item from a dictionary using a dot separated path.
     If the item is not found, return a default value.

@@ -16,7 +16,7 @@ require (
 	github.com/crossplane-contrib/provider-kubernetes v0.14.0
 	github.com/crossplane/crossplane v1.16.0
 	github.com/crossplane/crossplane-runtime v1.17.0-rc.0.0.20240509182037-b31be7747c60
-	github.com/giantswarm/crossplane-fn-network-discovery v0.2.4
+	github.com/giantswarm/crossplane-fn-network-discovery v0.3.0-alpha1
 	github.com/mproffitt/crossbuilder v0.0.0-20240603170948-9d1c1d735d19
 	github.com/mproffitt/function-cidr v0.0.0-20240528204613-a5ff3a0e6daa
 	github.com/upbound/provider-aws v1.4.0
@@ -79,7 +79,6 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/onsi/gomega v1.33.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.19.0 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect

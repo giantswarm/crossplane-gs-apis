@@ -25,5 +25,8 @@ var (
 func init() {
 	SchemeBuilder.Register(&VpcNetwork{}, &VpcNetworkList{})
 	SchemeBuilder.Register(&SubnetSet{}, &SubnetSetList{})
+	SchemeBuilder.Register(&Peering{}, &PeeringList{})
 	SchemeBuilder.Register(&PeeredVpcNetwork{}, &PeeredVpcNetworkList{})
+	SchemeBuilder.Register(&TransitGateway{}, &TransitGatewayList{})
+	SchemeBuilder.Register(&Discovery{}, &DiscoveryList{})
 }

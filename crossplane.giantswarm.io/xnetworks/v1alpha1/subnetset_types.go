@@ -10,13 +10,15 @@ import (
 // TagSet is a set of tags to apply to resources in the subnetset.
 type TagSet struct {
 
-	// All is a map of tags to apply to all resources in the subnetset.
+	// A map of tags to apply to all resources in the subnetset.
+	//
 	// +optional
 	// +mapType=atomic
 	// +kubebuilder:validation:MaxProperties=50
 	All map[string]string `json:"all,omitempty"`
 
 	// Subnet is a map of tags to apply only to the subnet resources
+	//
 	// +optional
 	// +mapType=atomic
 	// +kubebuilder:validation:MaxProperties=50
@@ -24,7 +26,7 @@ type TagSet struct {
 }
 
 type SubnetSetParameters struct {
-	// AppIndex is the index of the application that the subnet is being created for.
+	// The index of the application that the subnet is being created for.
 	//
 	// This is used for complex applications that require multiple subnet groups
 	// Normally leave this on the default.

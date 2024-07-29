@@ -65,7 +65,6 @@ source_repository_ref: {{ .SourceRepositoryRef }}
 ---
 
 # {{ .Title }}
-
 {{- with .Metadata.Deprecation }}
 <p class="well disclaimer">
 <i class="fa fa-warning"></i> <b>Deprecation:</b>
@@ -77,10 +76,9 @@ This CRD is being replaced by <a href="../{{ .FullName }}/">{{ .ShortName }}</a>
 {{- end }}
 </p>
 {{- end }}
-
 {{ with .Description }}
 {{ . }}
-{{ end -}}
+{{- end }}
 
 <dl class="crd-meta">
 <dt class="fullname">Full name:</dt>
@@ -97,14 +95,12 @@ This CRD is being replaced by <a href="../{{ .FullName }}/">{{ .ShortName }}</a>
 <dd class="groupname">{{ .Group }}</dd>
 <dt class="singularname">Singular name:</dt>
 <dd class="singularname">{{ .NameSingular }}</dd>
+{{- if not (eq (len .ShortNames) 0)}}
 <dt class="shortnames">Short Names</dt>
-<dd class="shortnames">
-  <ul>
-  {{ range .ShortNames }}
-  <li>{{.}}</li>
-  {{end}}
-</dd>
-
+{{- range .ShortNames }}
+<dd class="shortnames">{{.}}</dd>
+{{- end }}
+{{- end }}
 <dt class="pluralname">Plural name:</dt>
 <dd class="pluralname">{{ .NamePlural }}</dd>
 <dt class="scope">Scope:</dt>
@@ -117,17 +113,16 @@ This CRD is being replaced by <a href="../{{ .FullName }}/">{{ .ShortName }}</a>
 </dd>
 </dl>
 
-{{ if .VersionSchemas }}
-{{ range $versionName, $versionSchema := .VersionSchemas }}
+{{ if .VersionSchemas -}}
+{{- range $versionName, $versionSchema := .VersionSchemas -}}
 ## Version `{{$versionName}}`
-
-{{with .ExampleCR}}
+{{ with .ExampleCR -}}
 ### Example CR
 
 ```yaml
 {{ .|raw -}}
 ```
-{{end}}
+{{ end }}
 
 {{- range $versionSchema.Properties }}
 {{- if eq .Path ".spec" }}
@@ -148,7 +143,7 @@ This CRD is being replaced by <a href="../{{ .FullName }}/">{{ .ShortName }}</a>
 |Max Items|{{ if eq .MaxLength -1 }}Unlimited{{else}}{{.MaxLength}}{{end}}|
 {{- end}}
 {{- if not (eq (len .Pattern) 0)}}
-|Validation|`{{ .Pattern }}`|
+|Validation|`{{ .Pattern | raw }}`|
 {{- end}}
 {{- if not (eq (len .Default) 0)}}
 |Default Value|{{.Default}}|
@@ -156,22 +151,20 @@ This CRD is being replaced by <a href="../{{ .FullName }}/">{{ .ShortName }}</a>
 {{- if not (eq .Immutability "None")}}
 |Immutability|{{.Immutability}}|
 {{- end}}
-
 {{ if not (eq (len .Enum) 0) }}
 Allowed Values:
-{{- range .Enum }}
+{{ range .Enum }}
 - {{ . }}
 {{- end }}
-{{ end }}
+{{ end -}}
 
-{{- with .Description}}
-{{.|rawindent}}
-{{- end }}
-
+{{ with .Description }}
+{{ . | raw }}
 {{- end }}
 {{- end }}
+{{- end }}
+{{- if .Annotations }}
 
-{{ if .Annotations }}
 ### Annotations
 
 {{ range $versionSchema.Annotations }}
@@ -181,14 +174,14 @@ Allowed Values:
 </div>
 {{with .Documentation}}
 {{.|markdown}}
-{{end}}
 {{ end }}
 {{ end }}
-{{end}}
+{{ end }}
+{{- end -}}
 
-{{ else }}
+{{- else }}
 <div class="crd-noversions">
 <p>We currently cannot show any schema information on this <abbr title="custom resource definition">CRD</abbr>. Sorry for the inconvenience!</p>
 <p>Please refer to the <a href="https://pkg.go.dev/github.com/giantswarm/apiextensions/pkg/apis/">Godoc</a> or <a href="https://github.com/giantswarm/apiextensions/tree/master/pkg/apis">source</a> for details.</p>
 </div>
-{{ end }}
+{{- end }}

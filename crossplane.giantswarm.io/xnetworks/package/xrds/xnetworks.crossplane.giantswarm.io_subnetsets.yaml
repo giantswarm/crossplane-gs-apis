@@ -32,7 +32,7 @@ spec:
             properties:
               appIndex:
                 description: |-
-                  AppIndex is the index of the application that the subnet is being created for.
+                  The index of the application that the subnet is being created for.
 
 
                   This is used for complex applications that require multiple subnet groups
@@ -214,8 +214,7 @@ spec:
                   all:
                     additionalProperties:
                       type: string
-                    description: All is a map of tags to apply to all resources in
-                      the subnetset.
+                    description: A map of tags to apply to all resources in the subnetset.
                     maxProperties: 50
                     type: object
                     x-kubernetes-map-type: atomic
@@ -240,6 +239,9 @@ spec:
                 description: VpcId is the unique identifier for the VPC.
                 pattern: ^vpc-[a-z0-9]{8,17}$
                 type: string
+                x-kubernetes-validations:
+                - message: vpcId is immutable
+                  rule: self == oldSelf
               writeConnectionSecretToRef:
                 description: |-
                   WriteConnectionSecretToReference specifies the namespace and name of a

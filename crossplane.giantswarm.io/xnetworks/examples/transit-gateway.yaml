@@ -1,0 +1,47 @@
+apiVersion: xnetworks.crossplane.giantswarm.io/v1alpha1
+kind: PeeredVpcNetworkClaim
+metadata:
+  labels:
+    owner: honeybadger
+    provider: aws
+    app.kubernetes.io/name: transit-gateway-network
+    app.kubernetes.io/instance: transit-gateway-network
+    app.kubernetes.io/part-of: my-peered-vpc
+    app.kubernetes.io/managed-by: crossplane
+  name: transit-gateway-network
+  namespace: default
+spec:
+  compositionSelector:
+    matchLabels:
+      provider: aws
+      component: network
+  deletionPolicy: Delete
+  region: eu-west-2
+  peering:
+    enabled: false
+  transitGateway:
+    enabled: true
+    remoteVpcs:
+    - name: golem-vpc
+  providerConfigRef:
+    name: aws-golem
+  subnetsets:
+    cidrs:
+    - prefix: '10.21.0.0/24'
+      public:
+        mask: /28
+        count: 2
+        lbSetIndex: 0
+      private:
+        mask: /28
+        count: 2
+        lbSetIndex: 1
+  availabilityZones:
+  - a
+  - b
+  - c
+  tags:
+    common:
+      giantswarm.io/owner: honeybadger
+      giantswarm.io/managed-by: crossplane
+      giantswarm.io/part-of: transit-gateway-network
