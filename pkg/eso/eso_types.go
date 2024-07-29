@@ -9,6 +9,10 @@ package eso
 //
 // Additionally, PushSecrets can be automatically created to push the secret to
 // external secrets stores.
+//
+// +kubebuilder:object:root=true
+// +genclient
+// +genclient:nonNamespaced
 type Eso struct {
 	// Enabled Whether or not to enable `external-secrets-operator` object
 	// deployments using `provider-kubernetes.
