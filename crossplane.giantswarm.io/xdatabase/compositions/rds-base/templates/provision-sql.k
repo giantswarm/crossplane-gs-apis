@@ -2,13 +2,8 @@ esoEnabled = get(_oxr, "spec.eso.enabled", False)
 esoConnectionSecret = get(_oxr, "status.esoConnectionSecret", "")
 sqlEnabled = get(_oxr, "spec.provisionSql.enabled", True)
 
-mustEnableEso = all_true([
-    createCluster,
-    sqlEnabled,
-    not esoEnabled
-])
-
-assert mustEnableEso, "ESO must be enabled when creating a cluster with SQL provisioning enabled."
+if createCluster and sqlEnabled:
+    assert esoEnabled != False, "ESO must be enabled when creating a cluster with SQL provisioning enabled."
 
 useConnectionSecret = esoConnectionSecret if esoEnabled else connectionSecret
 

@@ -38,12 +38,12 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		err            error
 	)
 
-	kclCommon, err = build.LoadTemplate("compositions/rds-base/templates/common.k")
+	kclCommon, err = build.LoadTemplate("compositions/rds-provisioning/templates/common.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclSqlTemplate, err = build.LoadTemplate("compositions/rds-base/templates/provision-sql.k")
+	kclSqlTemplate, err = build.LoadTemplate("compositions/rds-provisioning/templates/provision-sql.k")
 	if err != nil {
 		panic(err)
 	}

@@ -542,13 +542,6 @@ spec:
                 required:
                 - name
                 type: object
-              kubernetesSecretStore:
-                description: |-
-                  Secret store to be used by external-secrets-operator
-
-
-                  Required if engine is redis and kubernetesProviderConfig is provided.
-                type: string
               logDeliveryConfigurations:
                 description: |-
                   LogDeliveryConfiguration is a list of log delivery configurations for

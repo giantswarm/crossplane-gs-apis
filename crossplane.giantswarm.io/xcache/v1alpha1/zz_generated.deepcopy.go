@@ -656,11 +656,6 @@ func (in *ReplicationGroup) DeepCopyInto(out *ReplicationGroup) {
 		*out = new(v1.Reference)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.KubernetesSecretStore != nil {
-		in, out := &in.KubernetesSecretStore, &out.KubernetesSecretStore
-		*out = new(string)
-		**out = **in
-	}
 	if in.LogDeliveryConfiguration != nil {
 		in, out := &in.LogDeliveryConfiguration, &out.LogDeliveryConfiguration
 		*out = make([]*LogDeliveryConfiguration, len(*in))

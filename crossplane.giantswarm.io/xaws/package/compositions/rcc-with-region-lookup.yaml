@@ -91,6 +91,22 @@ spec:
                 cidrs: null
                 function: ""
               tags: {}
+              transitGateway:
+                additionalRoutes: null
+                allowPublic: false
+                cidrBlocks: null
+                enabled: false
+                prefixList: null
+                prefixLists: null
+                ram:
+                  allowExternalPrincipals: false
+                  enabled: false
+                  principals: null
+                region: ""
+                remoteVpcs: null
+                routeTableIds: null
+                subnetIds: null
+                vpcId: ""
           status:
             vpc:
               additionalCidrBlocks: null

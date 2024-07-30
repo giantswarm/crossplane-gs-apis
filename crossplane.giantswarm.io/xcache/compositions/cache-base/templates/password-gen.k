@@ -1,8 +1,13 @@
-if get(_oxr, "spec.engine", "redis") == "redis":
-    assert all_true([
-        get(_oxr, "spec.kubernetesProviderConfigRef", False),
-        get(_oxr, "spec.kubernetesSecretStore", False)
-    ]) "Missing required kubernetes ProviderConfig and SecretStore fields for password generation"
+esoEnabled = get(_oxr, "spec.eso.enabled", False)
+engine = get(_oxr, "spec.engine", "redis")
+kubernetesPcr = get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+
+has = all_true([
+    engine == "redis",
+    esoEnabled,
+    kubernetesPcr,
+])
+assert has != False, "Missing required kubernetes ProviderConfig and SecretStore fields for password generation"
 
 passwordGenerator = {
     "apiVersion": "kubernetes.crossplane.io/v1alpha2"
@@ -52,22 +57,18 @@ passwords = [
             "deletionPolicy": dp
             "forProvider": {
                 "manifest": {
-                    "apiVersion": "external-secrets.io/v1alpha1"
+                    "apiVersion": "external-secrets.io/v1beta1"
                     "kind": "ExternalSecret"
                     "metadata": {
                         "namespace": namespace
                     }
                     "spec": {
                         "refreshInterval": "1h"
-                        "secretStoreRef": {
-                            "name": get(_oxr, "spec.kubernetesSecretStore", "default")
-                            "kind": "SecretStore"
-                        }
                         "target": {
                             if user == appName:
-                                "name": "${appName}-externalsecret"
+                                "name": "elasticache-user-${user}"
                             else:
-                                "name": "${appName}-externalsecret-${user}"
+                                "name": "${appName}-elasticache-user-${user}"
                         }
                         "dataFrom": [
                             {

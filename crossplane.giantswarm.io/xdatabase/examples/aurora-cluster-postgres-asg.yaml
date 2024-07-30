@@ -14,6 +14,13 @@ metadata:
 spec:
   availabilityZones: ["a", "b", "c"]
 
+  kubernetesProviderConfig:
+    name: default
+
+  eso:
+    enabled: true
+    kubernetesSecretStore: default
+
   cache:
     createReplicationGroup: true
     engine: redis

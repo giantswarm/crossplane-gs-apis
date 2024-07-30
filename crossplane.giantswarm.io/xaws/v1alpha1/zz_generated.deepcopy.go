@@ -5,7 +5,8 @@
 package v1alpha1
 
 import (
-	xdatabasev1alpha1 "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xdatabase/v1alpha1"
+	"github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/giantswarm/crossplane-gs-apis/pkg/eso"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -198,10 +199,15 @@ func (in *RdsCacheClusterSpec) DeepCopyInto(out *RdsCacheClusterSpec) {
 	in.ResourceSpec.DeepCopyInto(&out.ResourceSpec)
 	in.Cache.DeepCopyInto(&out.Cache)
 	in.Database.DeepCopyInto(&out.Database)
+	if in.Eso != nil {
+		in, out := &in.Eso, &out.Eso
+		*out = new(eso.Eso)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.KubernetesProviderConfig != nil {
 		in, out := &in.KubernetesProviderConfig, &out.KubernetesProviderConfig
-		*out = new(xdatabasev1alpha1.ProviderConfig)
-		**out = **in
+		*out = new(v1.Reference)
+		(*in).DeepCopyInto(*out)
 	}
 	out.SubnetGroupIndexes = in.SubnetGroupIndexes
 	if in.AvailabilityZones != nil {

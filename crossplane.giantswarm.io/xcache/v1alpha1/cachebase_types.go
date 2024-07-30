@@ -572,13 +572,6 @@ type ReplicationGroup struct {
 	// +optional
 	KubernetesProviderConfig *xpv1.Reference `json:"kubernetesProviderConfig,omitempty"`
 
-	// Secret store to be used by external-secrets-operator
-	//
-	// Required if engine is redis and kubernetesProviderConfig is provided.
-	//
-	// +optional
-	KubernetesSecretStore *string `json:"kubernetesSecretStore,omitempty"`
-
 	// LogDeliveryConfiguration is a list of log delivery configurations for
 	// the cluster.
 	//

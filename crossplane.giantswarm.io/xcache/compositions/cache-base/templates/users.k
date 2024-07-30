@@ -6,7 +6,6 @@ users = [
             "annotations": {
                 "krm.kcl.dev/composition-resource-name": "elasticache-user-${name}"
                 "krm.kcl.dev/ready": readystr("elasticache-user-${name}")
-                "crossplane.io/external-name": "${appName}-${name}"
             }
             "labels": labels
         }

@@ -9,6 +9,7 @@ import (
 	xcache "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xcache/v1alpha1"
 	xdb "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xdatabase/v1alpha1"
 	xnet "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
+	"github.com/giantswarm/crossplane-gs-apis/pkg/eso"
 )
 
 // +kubebuilder:object:root=true
@@ -64,10 +65,15 @@ type RdsCacheClusterSpec struct {
 	// +required
 	Database xdb.ClusterParameters `json:"database"`
 
+	// Eso is the configuration for the external secrets operator
+	//
+	// +optional
+	Eso *eso.Eso `json:"eso,omitempty"`
+
 	// KubernetesProviderConfig
 	//
 	// +required
-	KubernetesProviderConfig *xdb.ProviderConfig `json:"kubernetesProviderConfig"`
+	KubernetesProviderConfig *xpv1.Reference `json:"kubernetesProviderConfig"`
 
 	// SubnetGroupIndexes is a map of service name to subnet set indexes
 	//
