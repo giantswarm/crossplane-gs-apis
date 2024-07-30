@@ -1,21 +1,21 @@
 ---
-title: SubnetSet CRD schema reference (group xnetworks.crossplane.giantswarm.io)
-linkTitle: SubnetSet
+title: Discovery CRD schema reference (group xnetworks.crossplane.giantswarm.io)
+linkTitle: Discovery
 description: |
-  Custom resource definition (CRD) schema reference page for the SubnetSet resource (subnetsets.xnetworks.crossplane.giantswarm.io), as part of the Giant Swarm Management API documentation.
+  Custom resource definition (CRD) schema reference page for the Discovery resource (discoveries.xnetworks.crossplane.giantswarm.io), as part of the Giant Swarm Management API documentation.
 weight: 100
 crd:
-  claim_name: SubnetSetClaim
-  claim_name_plural: subnetsetclaims
-  default_composition_ref: subnetset
-  enforced_composition_ref: subnetset
-  name_camelcase: SubnetSet
-  name_plural: subnetsets
-  name_singular: subnetset
+  claim_name: DiscoveryClaim
+  claim_name_plural: networkdiscoveryclaims
+  default_composition_ref: network-discovery
+  enforced_composition_ref: network-discovery
+  name_camelcase: Discovery
+  name_plural: discoveries
+  name_singular: discovery
   short_names:
-    - sn
+    - dscvr
   group: xnetworks.crossplane.giantswarm.io
-  technical_name: subnetsets.xnetworks.crossplane.giantswarm.io
+  technical_name: discoveries.xnetworks.crossplane.giantswarm.io
   scope: 
   source_repository: https://github.com/giantswarm/crossplane-gs-apis
   source_repository_ref: main
@@ -25,38 +25,40 @@ crd:
     - aws
     - crossplane
     - networks
+    - vpc
+    - discovery
 layout: crd
 owner:
   - https://github.com/orgs/giantswarm/teams/team-honeybadger
 aliases:
-  - /reference/cp-k8s-api/subnetsets.xnetworks.crossplane.giantswarm.io/
-technical_name: subnetsets.xnetworks.crossplane.giantswarm.io
+  - /reference/cp-k8s-api/discoveries.xnetworks.crossplane.giantswarm.io/
+technical_name: discoveries.xnetworks.crossplane.giantswarm.io
 source_repository: https://github.com/giantswarm/crossplane-gs-apis
 source_repository_ref: main
 ---
 
-# SubnetSet
+# Discovery
 
 
 <dl class="crd-meta">
 <dt class="fullname">Full name:</dt>
-<dd class="fullname">subnetsets.xnetworks.crossplane.giantswarm.io</dd>
+<dd class="fullname">discoveries.xnetworks.crossplane.giantswarm.io</dd>
 <dt class="claimname">Claim name:</dt>
-<dd class="claimname">SubnetSetClaim</dd>
+<dd class="claimname">DiscoveryClaim</dd>
 <dt class="claimnamesplural">Claim plural names:</dt>
-<dd class="claimnamesplural">subnetsetclaims</dd>
+<dd class="claimnamesplural">networkdiscoveryclaims</dd>
 <dt class="defaultcompositionref">Default composition ref:</dt>
-<dd class="defaultcompositionref">subnetset</dd>
+<dd class="defaultcompositionref">network-discovery</dd>
 <dt class="enforcedcompositionref">Enforced composition ref:</dt>
-<dd class="enforcedcompositionref">subnetset</dd>
+<dd class="enforcedcompositionref">network-discovery</dd>
 <dt class="groupname">Group:</dt>
 <dd class="groupname">xnetworks.crossplane.giantswarm.io</dd>
 <dt class="singularname">Singular name:</dt>
-<dd class="singularname">subnetset</dd>
+<dd class="singularname">discovery</dd>
 <dt class="shortnames">Short Names</dt>
-<dd class="shortnames">sn</dd>
+<dd class="shortnames">dscvr</dd>
 <dt class="pluralname">Plural name:</dt>
-<dd class="pluralname">subnetsets</dd>
+<dd class="pluralname">discoveries</dd>
 <dt class="scope">Scope:</dt>
 <dd class="scope"></dd>
 <dt class="versions">Versions:</dt>
@@ -66,18 +68,6 @@ source_repository_ref: main
 ## Version `v1alpha1`
 
 ### Spec Properties
-
-#### `.spec.appIndex`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-The index of the application that the subnet is being created for.
-
-This is used for complex applications that require multiple subnet groups
-Normally leave this on the default.
 
 #### `.spec.deletionPolicy`
 
@@ -99,6 +89,22 @@ This field is planned to be deprecated in favor of the ManagementPolicies
 field in a future release. Currently, both could be set independently and
 non-default values would be honored if the feature flag is enabled.
 See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+
+#### `.spec.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |**Yes**|
+
+
+#### `.spec.groupBy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
 
 #### `.spec.managementPolicies`
 
@@ -195,6 +201,14 @@ Resolve specifies when this reference should be resolved. The default
 is 'IfNotPresent', which will attempt to resolve the reference only when
 the corresponding field is not present. Use 'Always' to resolve the
 reference on every reconcile.
+
+#### `.spec.providerType`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
 
 #### `.spec.publishConnectionDetailsTo`
 
@@ -329,71 +343,57 @@ Name is the name of the connection secret.
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-|Validation|`^[a-z]{2}-[a-z]+-[0-9]$`|
 
-Region is the region you'd like the VPC to be created in.
 
-#### `.spec.subnets`
+#### `.spec.remoteVpcs`
 
 |Property |Value    |
 |:--------|:--------|
-|Type     |object|
+|Type     |array|
 |Required |**Yes**|
+|Min Items|0|
+|Max Items|Unlimited|
 
-Subnets is a map of availability zones and subnet cidr blocks.
 
-#### `.spec.tags`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-Tags is a set of tags to apply to resources in the subnetset
-
-#### `.spec.tags.all`
+#### `.spec.remoteVpcs[*]`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |object|
 |Required |No|
 
-A map of tags to apply to all resources in the subnetset.
+VpcPeer defines the parameters for peering with a VPC.
 
-#### `.spec.tags.subnet`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-Subnet is a map of tags to apply only to the subnet resources
-
-#### `.spec.type`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-|Default Value|public|
-
-Allowed Values:
-
-- public
-- private
-
-Type is the type of VPC Subnet to create.
-
-#### `.spec.vpcId`
+#### `.spec.remoteVpcs[*].name`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-|Validation|`^vpc-[a-z0-9]{8,17}$`|
-|Immutability|immutable|
 
-VpcId is the unique identifier for the VPC.
+Name specifies the name of the VPC to peer with.
+
+#### `.spec.remoteVpcs[*].providerConfigRef`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+ProviderConfigRef specifies the provider config to use for the peering
+connection.
+
+#### `.spec.remoteVpcs[*].region`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Region specifies the region the VPC is found in.
+
+If not defined, the region of the VPC will be assumed to be the same as
+the region of the peered VPC.
 
 #### `.spec.writeConnectionSecretToRef`
 
@@ -499,30 +499,10 @@ Status of this condition; is it currently True, False, or Unknown?
 Type of this condition. At most one of each condition type may apply to
 a resource at any point in time.
 
-#### `.status.routeTables`
+#### `.status.vpcs`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |object|
-|Required |No|
+|Required |**Yes**|
 
-RouteTables is a map of route tables discovered by the composite.
-
-#### `.status.subnets`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-Subnets is a map of subnets discovered by the composite.
-
-#### `.status.vpcId`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-|Validation|`^vpc-[a-z0-9]{8,17}$`|
-
-VpcID is the unique identifier for the VPC.

@@ -26,6 +26,21 @@ If an API is marked `(definition only)`, check the [crossplane-examples] repo
     Create Sets of subnets which logically belong together across *n* subnets
   - VpcNetwork (definition only) [***deprecated***] Use PeeredVpcNetwork instead
 
+# Building API documentation
+
+This project uses crd-docs-generator to build the API spec
+
+> [!NOTE]
+> Currently requires a future version of crd-docs-generator
+
+```bash
+docker run \
+    -v $(pwd)/apidocs:/opt/crd-docs-generator/output \
+    -v $(pwd):/opt/crd-docs-generator/config \
+    gsoci.azurecr.io/giantswarm/crd-docs-generator:0.12.0 \
+      --config /opt/crd-docs-generator/config/doc-gen.yaml
+```
+
 ## Building
 
 To build the `go` code into consumable YAML, the fork of `crossbuilder` found

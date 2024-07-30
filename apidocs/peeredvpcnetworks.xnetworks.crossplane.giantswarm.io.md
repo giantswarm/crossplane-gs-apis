@@ -56,7 +56,6 @@ source_repository_ref: main
 
 # PeeredVpcNetwork
 
-
 PeeredVpcNetwork defines the desired state of a VPC.
 
 
@@ -76,6 +75,7 @@ Up to 5 CIDR ranges can be specified and these are done via the
 `spec.subnetsets.cidrs` field, where the first entry in the list is the
 default VPC CIDR and all subsequent entries are attached as additional
 VPC CIDRs.
+
 <dl class="crd-meta">
 <dt class="fullname">Full name:</dt>
 <dd class="fullname">peeredvpcnetworks.xnetworks.crossplane.giantswarm.io</dd>
@@ -92,13 +92,7 @@ VPC CIDRs.
 <dt class="singularname">Singular name:</dt>
 <dd class="singularname">peeredvpcnetwork</dd>
 <dt class="shortnames">Short Names</dt>
-<dd class="shortnames">
-  <ul>
-  
-  <li>pvpc</li>
-  
-</dd>
-
+<dd class="shortnames">pvpc</dd>
 <dt class="pluralname">Plural name:</dt>
 <dd class="pluralname">peeredvpcnetworks</dd>
 <dt class="scope">Scope:</dt>
@@ -107,10 +101,7 @@ VPC CIDRs.
 <dd class="versions"><a class="version" href="#version-v1alpha1" title="Show schema for version v1alpha1">v1alpha1</a></dd>
 </dl>
 
-
-
 ## Version `v1alpha1`
-
 
 ### Spec Properties
 
@@ -123,9 +114,8 @@ VPC CIDRs.
 |Min Items|3|
 |Max Items|3|
 
-
 AvailabilityZones is a list of availability zones in the region to be
-  used for this VPC. This should be a list of single character strings
+used for this VPC. This should be a list of single character strings
 
 #### `.spec.availabilityZones[*]`
 
@@ -135,9 +125,8 @@ AvailabilityZones is a list of availability zones in the region to be
 |Required |No|
 |Validation|`^[a-z]$`|
 
-
 A single character representation of the short name of an availability zone.
-  For example, "a" for "eu-west-1a".
+For example, "a" for "eu-west-1a".
 
 #### `.spec.deletionPolicy`
 
@@ -147,18 +136,18 @@ A single character representation of the short name of an availability zone.
 |Required |No|
 |Default Value|Delete|
 
-
 Allowed Values:
+
 - Orphan
 - Delete
 
 DeletionPolicy specifies what will happen to the underlying external
-  when this managed resource is deleted - either "Delete" or "Orphan" the
-  external resource.
-  This field is planned to be deprecated in favor of the ManagementPolicies
-  field in a future release. Currently, both could be set independently and
-  non-default values would be honored if the feature flag is enabled.
-  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+when this managed resource is deleted - either "Delete" or "Orphan" the
+external resource.
+This field is planned to be deprecated in favor of the ManagementPolicies
+field in a future release. Currently, both could be set independently and
+non-default values would be honored if the feature flag is enabled.
+See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
 
 #### `.spec.managementPolicies`
 
@@ -170,17 +159,16 @@ DeletionPolicy specifies what will happen to the underlying external
 |Max Items|Unlimited|
 |Default Value|[*]|
 
-
 THIS IS A BETA FIELD. It is on by default but can be opted out
-  through a Crossplane feature flag.
-  ManagementPolicies specify the array of actions Crossplane is allowed to
-  take on the managed and external resources.
-  This field is planned to replace the DeletionPolicy field in a future
-  release. Currently, both could be set independently and non-default
-  values would be honored if the feature flag is enabled. If both are
-  custom, the DeletionPolicy field will be ignored.
-  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
-  and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
+through a Crossplane feature flag.
+ManagementPolicies specify the array of actions Crossplane is allowed to
+take on the managed and external resources.
+This field is planned to replace the DeletionPolicy field in a future
+release. Currently, both could be set independently and non-default
+values would be honored if the feature flag is enabled. If both are
+custom, the DeletionPolicy field will be ignored.
+See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
 
 #### `.spec.managementPolicies[*]`
 
@@ -189,9 +177,8 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
 |Type     |string|
 |Required |No|
 
-
 A ManagementAction represents an action that the Crossplane controllers
-  can take on an external resource.
+can take on an external resource.
 
 #### `.spec.peering`
 
@@ -199,7 +186,6 @@ A ManagementAction represents an action that the Crossplane controllers
 |:--------|:--------|
 |Type     |object|
 |Required |**Yes**|
-
 
 Peering is the VPC to peer with.
 
@@ -210,10 +196,10 @@ Peering is the VPC to peer with.
 |Type     |boolean|
 |Required |No|
 
-
 AllowPublic specifies if the VPC peering connections should be allowed to
-  be linked to the public subnets
-  Defaults to false
+
+be linked to the public subnets
+Defaults to false
 
 #### `.spec.peering.enabled`
 
@@ -222,10 +208,7 @@ AllowPublic specifies if the VPC peering connections should be allowed to
 |Type     |boolean|
 |Required |No|
 
-
-Enabled specifies if the VPC peering connections should be enabled for
-  this VPC.
-  Defaults to false
+Enabled specifies if VPC peering is enabled.
 
 #### `.spec.peering.groupBy`
 
@@ -233,7 +216,6 @@ Enabled specifies if the VPC peering connections should be enabled for
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 GroupBy specifies the key to group the remote subnets by
 
@@ -246,7 +228,6 @@ GroupBy specifies the key to group the remote subnets by
 |Min Items|0|
 |Max Items|125|
 
-
 RemoteVpcs is a list of VPCs to peer with.
 
 #### `.spec.peering.remoteVpcs[*]`
@@ -257,8 +238,6 @@ RemoteVpcs is a list of VPCs to peer with.
 |Required |No|
 
 
-VpcPeer defines the parameters for peering with a VPC.
-
 #### `.spec.peering.remoteVpcs[*].allowPublic`
 
 |Property |Value    |
@@ -266,127 +245,8 @@ VpcPeer defines the parameters for peering with a VPC.
 |Type     |boolean|
 |Required |No|
 
-
-Disabled specifies if the peering connection should be disabled.
-  Defaults to true
-
-#### `.spec.peering.remoteVpcs[*].excludeFromLocalPeering`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-
-ExcludeFromLocalPeering specifies the indexes of subnetsets for this VPC to
-  exclude from routing to the peering connection
-
-#### `.spec.peering.remoteVpcs[*].excludeFromLocalPeering.private`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-
-private subnets to exclude from peering
-
-#### `.spec.peering.remoteVpcs[*].excludeFromLocalPeering.private[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |integer|
-|Required |No|
-
-
-
-#### `.spec.peering.remoteVpcs[*].excludeFromLocalPeering.public`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-
-public subnets to exclude from peering
-
-#### `.spec.peering.remoteVpcs[*].excludeFromLocalPeering.public[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |integer|
-|Required |No|
-
-
-
-#### `.spec.peering.remoteVpcs[*].excludeFromRemotePeering`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-
-ExcludeFromRemotePeering specifies the indexes of subnetsets for the remote
-  VPC to exclude from routing to the peering connection. If emmpty, all
-  subnetsets will be included by default
-
-#### `.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-
-
-#### `.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*].private`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-
-private subnets to exclude from peering
-
-#### `.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*].private[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |integer|
-|Required |No|
-
-
-
-#### `.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*].public`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-
-public subnets to exclude from peering
-
-#### `.spec.peering.remoteVpcs[*].excludeFromRemotePeering[*].public[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |integer|
-|Required |No|
-
-
+AllowPublic specifies if the VPC peering connections should be allowed to
+be linked to the public subnets
 
 #### `.spec.peering.remoteVpcs[*].name`
 
@@ -394,7 +254,6 @@ public subnets to exclude from peering
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 Name specifies the name of the VPC to peer with.
 
@@ -405,9 +264,8 @@ Name specifies the name of the VPC to peer with.
 |Type     |string|
 |Required |No|
 
-
 ProviderConfigRef specifies the provider config to use for the peering
-  connection.
+connection.
 
 #### `.spec.peering.remoteVpcs[*].region`
 
@@ -416,12 +274,10 @@ ProviderConfigRef specifies the provider config to use for the peering
 |Type     |string|
 |Required |No|
 
-
 Region specifies the region the VPC is found in.
-  
-  
-  If not defined, the region of the VPC will be assumed to be the same as
-  the region of the peered VPC.
+
+If not defined, the region of the VPC will be assumed to be the same as
+the region of the peered VPC.
 
 #### `.spec.providerConfigRef`
 
@@ -431,10 +287,9 @@ Region specifies the region the VPC is found in.
 |Required |No|
 |Default Value|{name:default}|
 
-
 ProviderConfigReference specifies how the provider that will be used to
-  create, observe, update, and delete this managed resource should be
-  configured.
+create, observe, update, and delete this managed resource should be
+configured.
 
 #### `.spec.providerConfigRef.name`
 
@@ -442,7 +297,6 @@ ProviderConfigReference specifies how the provider that will be used to
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 Name of the referenced object.
 
@@ -452,7 +306,6 @@ Name of the referenced object.
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 Policies for referencing.
 
@@ -464,15 +317,15 @@ Policies for referencing.
 |Required |No|
 |Default Value|Required|
 
-
 Allowed Values:
+
 - Required
 - Optional
 
 Resolution specifies whether resolution of this reference is required.
-  The default is 'Required', which means the reconcile will fail if the
-  reference cannot be resolved. 'Optional' means this reference will be
-  a no-op if it cannot be resolved.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
 
 #### `.spec.providerConfigRef.policy.resolve`
 
@@ -481,15 +334,15 @@ Resolution specifies whether resolution of this reference is required.
 |Type     |string|
 |Required |No|
 
-
 Allowed Values:
+
 - Always
 - IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
-  is 'IfNotPresent', which will attempt to resolve the reference only when
-  the corresponding field is not present. Use 'Always' to resolve the
-  reference on every reconcile.
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
 
 #### `.spec.publishConnectionDetailsTo`
 
@@ -498,12 +351,11 @@ Resolve specifies when this reference should be resolved. The default
 |Type     |object|
 |Required |No|
 
-
 PublishConnectionDetailsTo specifies the connection secret config which
-  contains a name, metadata and a reference to secret store config to
-  which any connection details for this managed resource should be written.
-  Connection details frequently include the endpoint, username,
-  and password required to connect to the managed resource.
+contains a name, metadata and a reference to secret store config to
+which any connection details for this managed resource should be written.
+Connection details frequently include the endpoint, username,
+and password required to connect to the managed resource.
 
 #### `.spec.publishConnectionDetailsTo.configRef`
 
@@ -513,9 +365,8 @@ PublishConnectionDetailsTo specifies the connection secret config which
 |Required |No|
 |Default Value|{name:default}|
 
-
 SecretStoreConfigRef specifies which secret store config should be used
-  for this ConnectionSecret.
+for this ConnectionSecret.
 
 #### `.spec.publishConnectionDetailsTo.configRef.name`
 
@@ -523,7 +374,6 @@ SecretStoreConfigRef specifies which secret store config should be used
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 Name of the referenced object.
 
@@ -533,7 +383,6 @@ Name of the referenced object.
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 Policies for referencing.
 
@@ -545,15 +394,15 @@ Policies for referencing.
 |Required |No|
 |Default Value|Required|
 
-
 Allowed Values:
+
 - Required
 - Optional
 
 Resolution specifies whether resolution of this reference is required.
-  The default is 'Required', which means the reconcile will fail if the
-  reference cannot be resolved. 'Optional' means this reference will be
-  a no-op if it cannot be resolved.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
 
 #### `.spec.publishConnectionDetailsTo.configRef.policy.resolve`
 
@@ -562,15 +411,15 @@ Resolution specifies whether resolution of this reference is required.
 |Type     |string|
 |Required |No|
 
-
 Allowed Values:
+
 - Always
 - IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
-  is 'IfNotPresent', which will attempt to resolve the reference only when
-  the corresponding field is not present. Use 'Always' to resolve the
-  reference on every reconcile.
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
 
 #### `.spec.publishConnectionDetailsTo.metadata`
 
@@ -578,7 +427,6 @@ Resolve specifies when this reference should be resolved. The default
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 Metadata is the metadata for connection secret.
 
@@ -589,10 +437,9 @@ Metadata is the metadata for connection secret.
 |Type     |object|
 |Required |No|
 
-
 Annotations are the annotations to be added to connection secret.
-  - For Kubernetes secrets, this will be used as "metadata.annotations".
-  - It is up to Secret Store implementation for others store types.
+- For Kubernetes secrets, this will be used as "metadata.annotations".
+- It is up to Secret Store implementation for others store types.
 
 #### `.spec.publishConnectionDetailsTo.metadata.labels`
 
@@ -601,10 +448,9 @@ Annotations are the annotations to be added to connection secret.
 |Type     |object|
 |Required |No|
 
-
 Labels are the labels/tags to be added to connection secret.
-  - For Kubernetes secrets, this will be used as "metadata.labels".
-  - It is up to Secret Store implementation for others store types.
+- For Kubernetes secrets, this will be used as "metadata.labels".
+- It is up to Secret Store implementation for others store types.
 
 #### `.spec.publishConnectionDetailsTo.metadata.type`
 
@@ -613,9 +459,8 @@ Labels are the labels/tags to be added to connection secret.
 |Type     |string|
 |Required |No|
 
-
 Type is the SecretType for the connection secret.
-  - Only valid for Kubernetes Secret Stores.
+- Only valid for Kubernetes Secret Stores.
 
 #### `.spec.publishConnectionDetailsTo.name`
 
@@ -623,7 +468,6 @@ Type is the SecretType for the connection secret.
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 Name is the name of the connection secret.
 
@@ -634,7 +478,6 @@ Name is the name of the connection secret.
 |Type     |string|
 |Required |**Yes**|
 
-
 Region is the region in which the VPC will be created.
 
 #### `.spec.subnetsets`
@@ -643,7 +486,6 @@ Region is the region in which the VPC will be created.
 |:--------|:--------|
 |Type     |object|
 |Required |**Yes**|
-
 
 PeeredSubnets defines how many public and private subnet sets to create.
 
@@ -656,19 +498,16 @@ PeeredSubnets defines how many public and private subnet sets to create.
 |Min Items|1|
 |Max Items|5|
 
-
 A list of PeeredSubnetSets to create in the VPC
-  
-  
-  Each VPC Cidr may be split into *n* public and *n* private subnets as long
-  as there is enough room on the cidr for it to be split at that level. Any
-  overflow will cause the composition to fail and this will be reflected in
-  the status of the XR.
-  
-  
-  > [!IMPORTANT]
-  > There must be at least 1 entry in this set which will be used as the VPC
-  > default CIDR range, and you may define a maximum of 4 additional entries.
+
+Each VPC Cidr may be split into *n* public and *n* private subnets as long
+as there is enough room on the cidr for it to be split at that level. Any
+overflow will cause the composition to fail and this will be reflected in
+the status of the XR.
+
+> [!IMPORTANT]
+> There must be at least 1 entry in this set which will be used as the VPC
+> default CIDR range, and you may define a maximum of 4 additional entries.
 
 #### `.spec.subnetsets.cidrs[*]`
 
@@ -677,9 +516,8 @@ A list of PeeredSubnetSets to create in the VPC
 |Type     |object|
 |Required |No|
 
-
 PeeredSubnetSet defines the parameters for creating a set of subnets with the
-  same mask.
+same mask.
 
 #### `.spec.subnetsets.cidrs[*].prefix`
 
@@ -688,11 +526,11 @@ PeeredSubnetSet defines the parameters for creating a set of subnets with the
 |Type     |string|
 |Required |**Yes**|
 |Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
-
+|Immutability|immutable|
 
 A VPC CIDR or Additional CIDR to use for the VPC. If this is the first
-  entry in the list, it will be used as the default VPC CIDR, otherwise it
-  will be assigned as an additional CIDR to the VPC.
+entry in the list, it will be used as the default VPC CIDR, otherwise it
+will be assigned as an additional CIDR to the VPC.
 
 #### `.spec.subnetsets.cidrs[*].private`
 
@@ -700,7 +538,6 @@ A VPC CIDR or Additional CIDR to use for the VPC. If this is the first
 |:--------|:--------|
 |Type     |object|
 |Required |**Yes**|
-
 
 Private is the number of private subnets to create in this set
 
@@ -713,16 +550,14 @@ Private is the number of private subnets to create in this set
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 A list of cluster names that may add load balancers in the tagged subnet
-  set. Each entry will result in the tag
-  `kubernetes.io/cluster/$CLUSTER_NAME shared` being added to the subnets
-  in this set.
-  
-  
-  See [public.lbSetIndex](#specsubnetsetscidrspubliclbsetindex) and
-  [private.lbSetIndex](#specsubnetsetscidrsprivatelbsetindex) for deciding
-  which subnetset gets these tags.
+set. Each entry will result in the tag
+`kubernetes.io/cluster/$CLUSTER_NAME shared` being added to the subnets
+in this set.
+
+See [public.lbSetIndex](#specsubnetsetscidrspubliclbsetindex) and
+[private.lbSetIndex](#specsubnetsetscidrsprivatelbsetindex) for deciding
+which subnetset gets these tags.
 
 #### `.spec.subnetsets.cidrs[*].private.clusterNames[*]`
 
@@ -730,7 +565,6 @@ A list of cluster names that may add load balancers in the tagged subnet
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 
 #### `.spec.subnetsets.cidrs[*].private.count`
@@ -741,14 +575,12 @@ A list of cluster names that may add load balancers in the tagged subnet
 |Required |**Yes**|
 |Immutability|increment only|
 
-
 Count is the number of subnet sets to create with this mask.
-  
-  
-  > [!WARNING]
-  > Whilst this field is not `immutable`, care should be taken to never
-  > decrease its value once set as this will result in the destruction of
-  > subnet sets which may fail if there are attached resources.
+
+> [!WARNING]
+> Whilst this field is not `immutable`, care should be taken to never
+> decrease its value once set as this will result in the destruction of
+> subnet sets which may fail if there are attached resources.
 
 #### `.spec.subnetsets.cidrs[*].private.lbSetIndex`
 
@@ -757,16 +589,14 @@ Count is the number of subnet sets to create with this mask.
 |Type     |integer|
 |Required |No|
 
-
 Identifies which subnet set to use for public EKS load balancers. Subnets
-  in this set will recieve either the `kubernetes.io/role/elb: 1` or
-  `kubernetes.io/role/internal-elb: 1` tag depending on if these are public
-  or private subnets.
-  
-  
-  If this is not set, or set to -1 (the default value), no subnets will be
-  tagged as load balancer subnets otherwise it should be the index of the
-  subnet set to tag, starting from index 0.
+in this set will recieve either the `kubernetes.io/role/elb: 1` or
+`kubernetes.io/role/internal-elb: 1` tag depending on if these are public
+or private subnets.
+
+If this is not set, or set to -1 (the default value), no subnets will be
+tagged as load balancer subnets otherwise it should be the index of the
+subnet set to tag, starting from index 0.
 
 #### `.spec.subnetsets.cidrs[*].private.mask`
 
@@ -776,12 +606,10 @@ Identifies which subnet set to use for public EKS load balancers. Subnets
 |Required |**Yes**|
 |Immutability|immutable|
 
-
 This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
-  use as a mask for the subnet.
-  
-  
-  To prevent subnets being destroyed and recreated *This field is immutable*
+use as a mask for the subnet.
+
+To prevent subnets being destroyed and recreated *This field is immutable*
 
 #### `.spec.subnetsets.cidrs[*].private.offset`
 
@@ -789,7 +617,6 @@ This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
 |:--------|:--------|
 |Type     |integer|
 |Required |No|
-
 
 Offset is the number of bits to offset the subnet mask by
 
@@ -800,18 +627,15 @@ Offset is the number of bits to offset the subnet mask by
 |Type     |object|
 |Required |**Yes**|
 
-
 Details on how to build the public subnets.
-  
-  
-  Public subnets are subnets with a route to the internet gateway.
-  
-  
-  > [!IMPORTANT]
-  > If this is the default VPC CIDR, the first entry in the list, the
-  > public subnets will be used for the NAT gateways. Setting this value to
-  > 0 on the default VPC CIDR may result in the creation of fully private
-  > networks with no route to the outside world.
+
+Public subnets are subnets with a route to the internet gateway.
+
+> [!IMPORTANT]
+> If this is the default VPC CIDR, i.e. the first entry in the list, the
+> public subnets will be used for the NAT gateways. Setting this value to
+> 0 on the default VPC CIDR may result in the creation of fully private
+> networks with no route to the outside world.
 
 #### `.spec.subnetsets.cidrs[*].public.clusterNames`
 
@@ -822,16 +646,14 @@ Details on how to build the public subnets.
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 A list of cluster names that may add load balancers in the tagged subnet
-  set. Each entry will result in the tag
-  `kubernetes.io/cluster/$CLUSTER_NAME shared` being added to the subnets
-  in this set.
-  
-  
-  See [public.lbSetIndex](#specsubnetsetscidrspubliclbsetindex) and
-  [private.lbSetIndex](#specsubnetsetscidrsprivatelbsetindex) for deciding
-  which subnetset gets these tags.
+set. Each entry will result in the tag
+`kubernetes.io/cluster/$CLUSTER_NAME shared` being added to the subnets
+in this set.
+
+See [public.lbSetIndex](#specsubnetsetscidrspubliclbsetindex) and
+[private.lbSetIndex](#specsubnetsetscidrsprivatelbsetindex) for deciding
+which subnetset gets these tags.
 
 #### `.spec.subnetsets.cidrs[*].public.clusterNames[*]`
 
@@ -839,7 +661,6 @@ A list of cluster names that may add load balancers in the tagged subnet
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 
 #### `.spec.subnetsets.cidrs[*].public.count`
@@ -850,14 +671,12 @@ A list of cluster names that may add load balancers in the tagged subnet
 |Required |**Yes**|
 |Immutability|increment only|
 
-
 Count is the number of subnet sets to create with this mask.
-  
-  
-  > [!WARNING]
-  > Whilst this field is not `immutable`, care should be taken to never
-  > decrease its value once set as this will result in the destruction of
-  > subnet sets which may fail if there are attached resources.
+
+> [!WARNING]
+> Whilst this field is not `immutable`, care should be taken to never
+> decrease its value once set as this will result in the destruction of
+> subnet sets which may fail if there are attached resources.
 
 #### `.spec.subnetsets.cidrs[*].public.lbSetIndex`
 
@@ -866,16 +685,14 @@ Count is the number of subnet sets to create with this mask.
 |Type     |integer|
 |Required |No|
 
-
 Identifies which subnet set to use for public EKS load balancers. Subnets
-  in this set will recieve either the `kubernetes.io/role/elb: 1` or
-  `kubernetes.io/role/internal-elb: 1` tag depending on if these are public
-  or private subnets.
-  
-  
-  If this is not set, or set to -1 (the default value), no subnets will be
-  tagged as load balancer subnets otherwise it should be the index of the
-  subnet set to tag, starting from index 0.
+in this set will recieve either the `kubernetes.io/role/elb: 1` or
+`kubernetes.io/role/internal-elb: 1` tag depending on if these are public
+or private subnets.
+
+If this is not set, or set to -1 (the default value), no subnets will be
+tagged as load balancer subnets otherwise it should be the index of the
+subnet set to tag, starting from index 0.
 
 #### `.spec.subnetsets.cidrs[*].public.mask`
 
@@ -885,12 +702,10 @@ Identifies which subnet set to use for public EKS load balancers. Subnets
 |Required |**Yes**|
 |Immutability|immutable|
 
-
 This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
-  use as a mask for the subnet.
-  
-  
-  To prevent subnets being destroyed and recreated *This field is immutable*
+use as a mask for the subnet.
+
+To prevent subnets being destroyed and recreated *This field is immutable*
 
 #### `.spec.subnetsets.cidrs[*].public.offset`
 
@@ -898,7 +713,6 @@ This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
 |:--------|:--------|
 |Type     |integer|
 |Required |No|
-
 
 Offset is the number of bits to offset the subnet mask by
 
@@ -910,17 +724,19 @@ Offset is the number of bits to offset the subnet mask by
 |Required |No|
 |Default Value|multiprefixloop|
 
-
 Allowed Values:
+
 - multiprefixloop
 
-Function defines the function to use to calculate the CIDR blocks for the
-  subnets. The default is "multiprefixloop" which will split multiple CIDRs
-  into equal parts based on the number of bits provided.
-  `multiprefixloop` is the only function being made available as part of
-  this XRD and as it's defaulted it can be hidden from the user. The
-  function input expects a path though so this has to exist but isn't
-  expected to be defined on the claim.
+Defines the function to use to calculate the CIDR blocks for thesubnets.
+
+The default value is "multiprefixloop" which will split multiple CIDRs
+into equal parts based on the number of bits provided.
+
+`multiprefixloop` is the only function being made available as part of
+this XRD and as it's defaulted it can be hidden from the user. The
+function input expects a path though so this has to exist but isn't
+expected to be defined on the claim.
 
 #### `.spec.tags`
 
@@ -928,7 +744,6 @@ Function defines the function to use to calculate the CIDR blocks for the
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 Tags is a map of additional tags to assign to the VPC.
 
@@ -939,7 +754,6 @@ Tags is a map of additional tags to assign to the VPC.
 |Type     |object|
 |Required |No|
 
-
 Cluster tags to apply subnets for autodiscovery of load balancers
 
 #### `.spec.tags.common`
@@ -948,7 +762,6 @@ Cluster tags to apply subnets for autodiscovery of load balancers
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 common tags apoplied to all resources
 
@@ -959,8 +772,808 @@ common tags apoplied to all resources
 |Type     |object|
 |Required |No|
 
-
 Subnet tags to apply to all subnetsets
+
+#### `.spec.transitGateway`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+TransitGateway is the transit gateway to attach to the VPC.
+
+#### `.spec.transitGateway.additionalRoutes`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Additional routes to apply to the attachment
+
+#### `.spec.transitGateway.additionalRoutes[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.transitGateway.additionalRoutes[*].blackhole`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Is this a blackhole route
+
+#### `.spec.transitGateway.additionalRoutes[*].cidrBlock`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The CIDR block for the route
+
+#### `.spec.transitGateway.allowPublic`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+AllowPublic specifies if the VPC peering connections should be allowed to
+be linked to the public subnets
+
+#### `.spec.transitGateway.amazonSideAsn`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |integer|
+|Required |No|
+
+Amazon side ASN. Private autonomous system number (ASN) for
+the Amazon side of a BGP session.
+
+#### `.spec.transitGateway.applianceModeSupport`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Appliance mode support. Indicates whether appliance mode support is enabled.
+
+#### `.spec.transitGateway.autoAcceptSharedAttachments`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Auto accept shared attachments. Indicates whether there is automatic
+acceptance of attachment requests.
+
+#### `.spec.transitGateway.cidrBlocks`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Cidr blocks for the VPC
+
+#### `.spec.transitGateway.cidrBlocks[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
+
+Cidr is a string type that represents a CIDR block.
+
+#### `.spec.transitGateway.createPolicyTable`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Create the policy table.
+
+#### `.spec.transitGateway.defaultRouteTableAssociation`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Default route table association. Indicates whether resource attachments
+are automatically associated with the default association route table.
+
+#### `.spec.transitGateway.defaultRouteTablePropagation`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Default route table propagation. Indicates whether resource attachments
+automatically propagate routes to the default propagation route table.
+
+#### `.spec.transitGateway.dnsSupport`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Dns support. Indicates whether DNS support is enabled.
+
+#### `.spec.transitGateway.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Determines if the TransitGateway should be enabled
+
+#### `.spec.transitGateway.ipv6Support`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+If IPv6 support is enabled for the transit gateway.
+
+#### `.spec.transitGateway.multicastSupport`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Multicast support. Indicates whether multicast is enabled on the transit gateway.
+
+Currently unused in this composition
+
+#### `.spec.transitGateway.prefixList`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Prefix lists for the VPC
+
+#### `.spec.transitGateway.prefixListSupport`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If the prefix lists are supported.
+
+#### `.spec.transitGateway.prefixList[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.transitGateway.prefixList[*].blackhole`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If this is a blackhole route
+
+#### `.spec.transitGateway.prefixList[*].id`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The ID of the prefix list.
+
+#### `.spec.transitGateway.prefixLists`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Prefix lists for the VPC
+
+#### `.spec.transitGateway.prefixLists[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.transitGateway.prefixLists[*].blackhole`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If this is a blackhole route
+
+#### `.spec.transitGateway.prefixLists[*].id`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The ID of the prefix list.
+
+#### `.spec.transitGateway.ram`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Resource Access Management (RAM)
+
+#### `.spec.transitGateway.ram.allowExternalPrincipals`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Do we allow external principles with this ram
+
+#### `.spec.transitGateway.ram.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Is RAM enabled
+
+#### `.spec.transitGateway.ram.principals`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Principals that are allowed to access the resource
+
+#### `.spec.transitGateway.ram.principals[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+
+#### `.spec.transitGateway.region`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Region this VPC is located in
+
+#### `.spec.transitGateway.remoteVpcs`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |**Yes**|
+|Min Items|0|
+|Max Items|Unlimited|
+
+RemoteVpcs is a list of VPCs build a transit gateway between
+
+#### `.spec.transitGateway.remoteVpcs[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+TgwWrappedVpcWithProviderConfig defines the parameters for creating a VPC with
+the option of peered subnets.
+
+#### `.spec.transitGateway.remoteVpcs[*].additionalRoutes`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Additional routes to apply to the attachment
+
+#### `.spec.transitGateway.remoteVpcs[*].additionalRoutes[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.transitGateway.remoteVpcs[*].additionalRoutes[*].blackhole`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Is this a blackhole route
+
+#### `.spec.transitGateway.remoteVpcs[*].additionalRoutes[*].cidrBlock`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The CIDR block for the route
+
+#### `.spec.transitGateway.remoteVpcs[*].allowPublic`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+AllowPublic specifies if the VPC peering connections should be allowed to
+be linked to the public subnets
+
+#### `.spec.transitGateway.remoteVpcs[*].cidrBlocks`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Cidr blocks for the VPC
+
+#### `.spec.transitGateway.remoteVpcs[*].cidrBlocks[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
+
+Cidr is a string type that represents a CIDR block.
+
+#### `.spec.transitGateway.remoteVpcs[*].name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The name of the VPC
+
+#### `.spec.transitGateway.remoteVpcs[*].prefixLists`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Prefix lists for the VPC
+
+#### `.spec.transitGateway.remoteVpcs[*].prefixLists[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.transitGateway.remoteVpcs[*].prefixLists[*].blackhole`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If this is a blackhole route
+
+#### `.spec.transitGateway.remoteVpcs[*].prefixLists[*].id`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The ID of the prefix list.
+
+#### `.spec.transitGateway.remoteVpcs[*].providerConfigRef`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+ProviderConfigRef references a ProviderConfig used to create this
+resource
+
+If not provided, will fall back to the top-level ProviderConfigRef
+
+Required for cross account VPCs
+Should not be set for same account VPCs unless restricted by
+IAM
+
+#### `.spec.transitGateway.remoteVpcs[*].providerConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.spec.transitGateway.remoteVpcs[*].providerConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.transitGateway.remoteVpcs[*].providerConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.transitGateway.remoteVpcs[*].providerConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
+
+#### `.spec.transitGateway.remoteVpcs[*].region`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Region this VPC is located in
+
+#### `.spec.transitGateway.remoteVpcs[*].routeTableIds`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Route table ids in the VPC
+
+#### `.spec.transitGateway.remoteVpcs[*].routeTableIds[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^rtb-[a-z0-9]{8,17}$`|
+
+RouteTableId is a string type that represents the unique identifier for a
+route table.
+
+#### `.spec.transitGateway.remoteVpcs[*].subnetIds`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+SubnetIds in the VPC
+
+#### `.spec.transitGateway.remoteVpcs[*].subnetIds[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^subnet-[a-z0-9]{8,17}$`|
+
+SubnetId is a string type that represents the unique identifier for a subnet.
+
+#### `.spec.transitGateway.remoteVpcs[*].vpcId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^vpc-[a-z0-9]{8,17}$`|
+
+The ID of the VPC
+
+#### `.spec.transitGateway.routeTableIds`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Route table ids in the VPC
+
+#### `.spec.transitGateway.routeTableIds[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^rtb-[a-z0-9]{8,17}$`|
+
+RouteTableId is a string type that represents the unique identifier for a
+route table.
+
+#### `.spec.transitGateway.subnetIds`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+SubnetIds in the VPC
+
+#### `.spec.transitGateway.subnetIds[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^subnet-[a-z0-9]{8,17}$`|
+
+SubnetId is a string type that represents the unique identifier for a subnet.
+
+#### `.spec.transitGateway.tags`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+The tags for the transit gateway.
+
+#### `.spec.transitGateway.transitG1atewayCidrBlocks`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Transit gateway CIDR blocks. A list of CIDR blocks for the VPCs.
+
+#### `.spec.transitGateway.transitG1atewayCidrBlocks[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+
+#### `.spec.transitGateway.transitGatewayDefaultRouteTableAssociation`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+TransitGatewayDefaultRouteTableAssociation. Indicates whether resource
+attachments are automatically associated with the default association route table.
+
+#### `.spec.transitGateway.transitGatewayDefaultRouteTablePropagation`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+TransitGatewayDefaultRouteTablePropagation. Indicates whether resource
+attachments automatically propagate routes to the default propagation route table.
+
+#### `.spec.transitGateway.transitGatewayPeers`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+TransitGatewayPeers defines other transit gateways that this transit gateway
+should peer with
+
+#### `.spec.transitGateway.transitGatewayPeers[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.transitGateway.transitGatewayPeers[*].accountId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The Account ID this VPC is associated with
+
+#### `.spec.transitGateway.transitGatewayPeers[*].id`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The ID of the gateway to peer with
+
+#### `.spec.transitGateway.transitGatewayPeers[*].providerConfigRef`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+ProviderConfigRef references a ProviderConfig used to create this
+resource
+
+If not provided, will fall back to the top-level ProviderConfigRef
+
+Required for cross account transit gateway peering
+
+#### `.spec.transitGateway.transitGatewayPeers[*].providerConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.spec.transitGateway.transitGatewayPeers[*].providerConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.transitGateway.transitGatewayPeers[*].providerConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.transitGateway.transitGatewayPeers[*].providerConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
+
+#### `.spec.transitGateway.transitGatewayPeers[*].region`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Region the remote transit gateway is located in
+
+#### `.spec.transitGateway.vpcId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^vpc-[a-z0-9]{8,17}$`|
+
+The ID of the VPC
+
+#### `.spec.transitGateway.vpnEcmpSupport`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Vpn ecmp support. Indicates whether Equal Cost Multipath Protocol support is enabled.
 
 #### `.spec.writeConnectionSecretToRef`
 
@@ -969,15 +1582,14 @@ Subnet tags to apply to all subnetsets
 |Type     |object|
 |Required |No|
 
-
 WriteConnectionSecretToReference specifies the namespace and name of a
-  Secret to which any connection details for this managed resource should
-  be written. Connection details frequently include the endpoint, username,
-  and password required to connect to the managed resource.
-  This field is planned to be replaced in a future release in favor of
-  PublishConnectionDetailsTo. Currently, both could be set independently
-  and connection details would be published to both without affecting
-  each other.
+Secret to which any connection details for this managed resource should
+be written. Connection details frequently include the endpoint, username,
+and password required to connect to the managed resource.
+This field is planned to be replaced in a future release in favor of
+PublishConnectionDetailsTo. Currently, both could be set independently
+and connection details would be published to both without affecting
+each other.
 
 #### `.spec.writeConnectionSecretToRef.name`
 
@@ -985,7 +1597,6 @@ WriteConnectionSecretToReference specifies the namespace and name of a
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 Name of the secret.
 
@@ -995,7 +1606,6 @@ Name of the secret.
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 Namespace of the secret.
 
@@ -1008,7 +1618,6 @@ Namespace of the secret.
 |Type     |object|
 |Required |No|
 
-
 Contains the CIDR blocks output by function-cidr
 
 #### `.status.conditions`
@@ -1020,7 +1629,6 @@ Contains the CIDR blocks output by function-cidr
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 Conditions of the resource.
 
 #### `.status.conditions[*]`
@@ -1029,7 +1637,6 @@ Conditions of the resource.
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 A Condition that may apply to a resource.
 
@@ -1040,9 +1647,8 @@ A Condition that may apply to a resource.
 |Type     |string|
 |Required |**Yes**|
 
-
 LastTransitionTime is the last time this condition transitioned from one
-  status to another.
+status to another.
 
 #### `.status.conditions[*].message`
 
@@ -1051,9 +1657,8 @@ LastTransitionTime is the last time this condition transitioned from one
 |Type     |string|
 |Required |No|
 
-
 A Message containing details about this condition's last transition from
-  one status to another, if any.
+one status to another, if any.
 
 #### `.status.conditions[*].reason`
 
@@ -1061,7 +1666,6 @@ A Message containing details about this condition's last transition from
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 A Reason for this condition's last transition from one status to another.
 
@@ -1072,7 +1676,6 @@ A Reason for this condition's last transition from one status to another.
 |Type     |string|
 |Required |**Yes**|
 
-
 Status of this condition; is it currently True, False, or Unknown?
 
 #### `.status.conditions[*].type`
@@ -1082,9 +1685,8 @@ Status of this condition; is it currently True, False, or Unknown?
 |Type     |string|
 |Required |**Yes**|
 
-
 Type of this condition. At most one of each condition type may apply to
-  a resource at any point in time.
+a resource at any point in time.
 
 #### `.status.subnetBits`
 
@@ -1095,7 +1697,6 @@ Type of this condition. At most one of each condition type may apply to
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 Contains the subnet bits output by function-kcl-subnet-bits
 
 #### `.status.subnetBits[*]`
@@ -1104,7 +1705,6 @@ Contains the subnet bits output by function-kcl-subnet-bits
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 MultiPrefix defines an item in a list of CIDR blocks to NewBits mappings
 
@@ -1117,7 +1717,6 @@ MultiPrefix defines an item in a list of CIDR blocks to NewBits mappings
 |Min Items|1|
 |Max Items|Unlimited|
 
-
 NewBits is a list of bits to allocate to the subnet
 
 #### `.status.subnetBits[*].newBits[*]`
@@ -1128,7 +1727,6 @@ NewBits is a list of bits to allocate to the subnet
 |Required |No|
 
 
-
 #### `.status.subnetBits[*].offset`
 
 |Property |Value    |
@@ -1137,9 +1735,8 @@ NewBits is a list of bits to allocate to the subnet
 |Required |No|
 |Default Value|0|
 
-
 Offset is the number of bits to offset the subnet mask by when generating
-  subnets.
+subnets.
 
 #### `.status.subnetBits[*].prefix`
 
@@ -1149,8 +1746,85 @@ Offset is the number of bits to offset the subnet mask by when generating
 |Required |**Yes**|
 |Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
 
-
 Prefix is a CIDR block that is used as input for CIDR calculations
+
+#### `.status.vpcLookup`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Details of VPCs to lookup in network discovery
+
+#### `.status.vpcLookup.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If network discovery is enabled
+
+#### `.status.vpcLookup.groupBy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+GroupBy is the key to group the remote VPCs by
+
+#### `.status.vpcLookup.remoteVpcs`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+RemoteVpcs is a list of VPCs to lookup
+
+#### `.status.vpcLookup.remoteVpcs[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+VpcPeer defines the parameters for peering with a VPC.
+
+#### `.status.vpcLookup.remoteVpcs[*].name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name specifies the name of the VPC to peer with.
+
+#### `.status.vpcLookup.remoteVpcs[*].providerConfigRef`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+ProviderConfigRef specifies the provider config to use for the peering
+connection.
+
+#### `.status.vpcLookup.remoteVpcs[*].region`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Region specifies the region the VPC is found in.
+
+If not defined, the region of the VPC will be assumed to be the same as
+the region of the peered VPC.
 
 #### `.status.vpcs`
 
@@ -1159,11 +1833,5 @@ Prefix is a CIDR block that is used as input for CIDR calculations
 |Type     |object|
 |Required |No|
 
-
 Vpcs contains details of both the peered VPCs and the current local VPC
-  The current VPC can be found at the `self` key
-
-
-
-
-
+The current VPC can be found at the `self` key

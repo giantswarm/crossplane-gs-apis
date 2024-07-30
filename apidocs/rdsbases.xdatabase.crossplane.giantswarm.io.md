@@ -38,6 +38,7 @@ source_repository_ref: main
 
 # RdsBase
 
+
 <dl class="crd-meta">
 <dt class="fullname">Full name:</dt>
 <dd class="fullname">rdsbases.xdatabase.crossplane.giantswarm.io</dd>
@@ -54,13 +55,7 @@ source_repository_ref: main
 <dt class="singularname">Singular name:</dt>
 <dd class="singularname">rdsbase</dd>
 <dt class="shortnames">Short Names</dt>
-<dd class="shortnames">
-  <ul>
-  
-  <li>rdb</li>
-  
-</dd>
-
+<dd class="shortnames">rdb</dd>
 <dt class="pluralname">Plural name:</dt>
 <dd class="pluralname">rdsbases</dd>
 <dt class="scope">Scope:</dt>
@@ -69,10 +64,7 @@ source_repository_ref: main
 <dd class="versions"><a class="version" href="#version-v1alpha1" title="Show schema for version v1alpha1">v1alpha1</a></dd>
 </dl>
 
-
-
 ## Version `v1alpha1`
-
 
 ### Spec Properties
 
@@ -83,7 +75,6 @@ source_repository_ref: main
 |Type     |object|
 |Required |No|
 
-
 ActivityStream is the activity stream configuration.
 
 #### `.spec.activityStream.enabled`
@@ -92,7 +83,6 @@ ActivityStream is the activity stream configuration.
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 Enabled is whether activity stream is enabled.
 
@@ -103,9 +93,8 @@ Enabled is whether activity stream is enabled.
 |Type     |boolean|
 |Required |No|
 
-
 EngineNativeAuditFieldsIncluded is whether engine native audit fields are
-  included. This option only applies to Oracle databases.
+included. This option only applies to Oracle databases.
 
 #### `.spec.activityStream.mode`
 
@@ -114,8 +103,8 @@ EngineNativeAuditFieldsIncluded is whether engine native audit fields are
 |Type     |string|
 |Required |No|
 
-
 Allowed Values:
+
 - sync
 - async
 
@@ -128,7 +117,6 @@ Mode is the mode of the activity stream. Valid values are `sync` and `async`.
 |Type     |integer|
 |Required |No|
 
-
 AllocatedStorage is the size of the database.
 
 #### `.spec.allowMajorVersionUpgrade`
@@ -137,7 +125,6 @@ AllocatedStorage is the size of the database.
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 AllowMajorVersionUpgrade is whether major version upgrades are allowed.
 
@@ -148,7 +135,6 @@ AllowMajorVersionUpgrade is whether major version upgrades are allowed.
 |Type     |boolean|
 |Required |No|
 
-
 ApplyImmediately is whether changes should be applied immediately.
 
 #### `.spec.autoMinorVersionUpgrade`
@@ -158,9 +144,8 @@ ApplyImmediately is whether changes should be applied immediately.
 |Type     |boolean|
 |Required |No|
 
-
 AutoMinorVersionUpgrade is whether minor version upgrades are applied
-  automatically. This value can be overridden on a per instance basis.
+automatically. This value can be overridden on a per instance basis.
 
 #### `.spec.autoscaling`
 
@@ -168,7 +153,6 @@ AutoMinorVersionUpgrade is whether minor version upgrades are applied
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 Autoscaling is the autoscaling configuration.
 
@@ -179,7 +163,6 @@ Autoscaling is the autoscaling configuration.
 |Type     |boolean|
 |Required |No|
 
-
 Autoscaling is whether autoscaling is enabled.
 
 #### `.spec.autoscaling.maxCapacity`
@@ -188,7 +171,6 @@ Autoscaling is whether autoscaling is enabled.
 |:--------|:--------|
 |Type     |integer|
 |Required |No|
-
 
 MaxCapacity is the maximum capacity for autoscaling.
 
@@ -199,8 +181,8 @@ MaxCapacity is the maximum capacity for autoscaling.
 |Type     |string|
 |Required |No|
 
-
 Allowed Values:
+
 - RDSReaderAverageCPUUtilization
 - RDSReaderAverageDatabaseConnections
 
@@ -213,7 +195,6 @@ MetricType is the type of metric to use for autoscaling.
 |Type     |integer|
 |Required |No|
 
-
 MinCapacity is the minimum capacity for autoscaling.
 
 #### `.spec.autoscaling.policyName`
@@ -222,7 +203,6 @@ MinCapacity is the minimum capacity for autoscaling.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 PolicyName is the name of the autoscaling policy.
 
@@ -233,9 +213,8 @@ PolicyName is the name of the autoscaling policy.
 |Type     |integer|
 |Required |No|
 
-
 ScaleInCooldown is the amount of time, in seconds, after a scaling in
-  activity completes before another scaling activity can start.
+activity completes before another scaling activity can start.
 
 #### `.spec.autoscaling.scaleOutCooldown`
 
@@ -244,9 +223,8 @@ ScaleInCooldown is the amount of time, in seconds, after a scaling in
 |Type     |integer|
 |Required |No|
 
-
 ScaleOutCooldown is the amount of time, in seconds, after a scaling out
-  activity completes before another scaling activity can start.
+activity completes before another scaling activity can start.
 
 #### `.spec.autoscaling.targetCPU`
 
@@ -254,7 +232,6 @@ ScaleOutCooldown is the amount of time, in seconds, after a scaling out
 |:--------|:--------|
 |Type     |integer|
 |Required |No|
-
 
 TargetCPU is CPU threshold which will initiate autoscaling.
 
@@ -265,10 +242,9 @@ TargetCPU is CPU threshold which will initiate autoscaling.
 |Type     |integer|
 |Required |No|
 
-
 TargetConnections is the average number of connections threshold which
-  will initiate autoscaling. Default value is 70% of db.r4/r5/r6g.large's
-  default max_connections
+will initiate autoscaling. Default value is 70% of db.r4/r5/r6g.large's
+default max_connections
 
 #### `.spec.availabilityZones`
 
@@ -278,7 +254,6 @@ TargetConnections is the average number of connections threshold which
 |Required |No|
 |Min Items|0|
 |Max Items|Unlimited|
-
 
 AvailabilityZones is a list of availability zone to use.
 
@@ -290,7 +265,6 @@ AvailabilityZones is a list of availability zone to use.
 |Required |No|
 
 
-
 #### `.spec.backtrackWindow`
 
 |Property |Value    |
@@ -298,9 +272,8 @@ AvailabilityZones is a list of availability zone to use.
 |Type     |integer|
 |Required |No|
 
-
 BacktrackWindow is the target backtrack window, in seconds.
-  Only available for Aurora engine. To disable backtracking, set this value to 0.
+Only available for Aurora engine. To disable backtracking, set this value to 0.
 
 #### `.spec.backupRetentionPeriod`
 
@@ -308,7 +281,6 @@ BacktrackWindow is the target backtrack window, in seconds.
 |:--------|:--------|
 |Type     |integer|
 |Required |No|
-
 
 BackupRetentionPeriod is the number of days to retain backups for.
 
@@ -321,7 +293,6 @@ BackupRetentionPeriod is the number of days to retain backups for.
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 CidrBlocks is a list of CIDRs that are allowed to connect to the DB.
 
 #### `.spec.cidrBlocks[*]`
@@ -332,14 +303,12 @@ CidrBlocks is a list of CIDRs that are allowed to connect to the DB.
 |Required |No|
 
 
-
 #### `.spec.cloudwatchLogGroupParameters`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 CloudwatchLogGroup defines the parameters for the log groups
 
@@ -350,7 +319,6 @@ CloudwatchLogGroup defines the parameters for the log groups
 |Type     |string|
 |Required |No|
 
-
 Class is the class of the log group.
 
 #### `.spec.cloudwatchLogGroupParameters.create`
@@ -359,7 +327,6 @@ Class is the class of the log group.
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 Create is whether the log group is to be created.
 
@@ -370,7 +337,6 @@ Create is whether the log group is to be created.
 |Type     |integer|
 |Required |No|
 
-
 RetentionInDays is the number of days to retain logs for.
 
 #### `.spec.cloudwatchLogGroupParameters.skipDestroy`
@@ -379,7 +345,6 @@ RetentionInDays is the number of days to retain logs for.
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 SkipDestroy is whether the log group should be skipped during destroy.
 
@@ -390,7 +355,6 @@ SkipDestroy is whether the log group should be skipped during destroy.
 |Type     |boolean|
 |Required |No|
 
-
 CopyTagsToSnapshot is whether tags should be copied to snapshots.
 
 #### `.spec.createCluster`
@@ -400,11 +364,10 @@ CopyTagsToSnapshot is whether tags should be copied to snapshots.
 |Type     |boolean|
 |Required |No|
 
-
 CreateCluster is whether the cluster should be created.
-  By default this is true but for non-aurora clusters, the DB Cluster
-  resource is optional and can be omitted. In this case, the DB instances
-  will be created as `instance.rds` types.
+By default this is true but for non-aurora clusters, the DB Cluster
+resource is optional and can be omitted. In this case, the DB instances
+will be created as `instance.rds` types.
 
 #### `.spec.databaseName`
 
@@ -413,18 +376,7 @@ CreateCluster is whether the cluster should be created.
 |Type     |string|
 |Required |No|
 
-
 DatabaseName is the name of the database to create.
-
-#### `.spec.databases`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-
-Databases is a map of databases to create.
 
 #### `.spec.dbClusterInstanceClass`
 
@@ -432,7 +384,6 @@ Databases is a map of databases to create.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 DbClusterInstanceClass is the instance class to use.
 
@@ -443,7 +394,6 @@ DbClusterInstanceClass is the instance class to use.
 |Type     |object|
 |Required |No|
 
-
 DbClusterParameterGroup defines the parameters for the DB cluster.
 
 #### `.spec.dbClusterParameterGroup.applyMethod`
@@ -453,14 +403,14 @@ DbClusterParameterGroup defines the parameters for the DB cluster.
 |Type     |string|
 |Required |No|
 
-
 Allowed Values:
+
 - immediate
 - pending-reboot
 
 ApplyMethod is the apply method for the parameter group. Some engines
-  cannot apply changes immediately, and require a reboot in which case you
-  must set this value to `pending-reboot`.
+cannot apply changes immediately, and require a reboot in which case you
+must set this value to `pending-reboot`.
 
 #### `.spec.dbClusterParameterGroup.create`
 
@@ -468,7 +418,6 @@ ApplyMethod is the apply method for the parameter group. Some engines
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 Create is whether the parameter group is to be created.
 
@@ -479,7 +428,6 @@ Create is whether the parameter group is to be created.
 |Type     |string|
 |Required |No|
 
-
 Description is the description of the parameter group.
 
 #### `.spec.dbClusterParameterGroup.family`
@@ -489,7 +437,6 @@ Description is the description of the parameter group.
 |Type     |string|
 |Required |No|
 
-
 Family is the family of the parameter group.
 
 #### `.spec.dbClusterParameterGroup.name`
@@ -498,7 +445,6 @@ Family is the family of the parameter group.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 Name is the name of the parameter group.
 
@@ -511,9 +457,8 @@ Name is the name of the parameter group.
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 Parameters is a list of parameters to associate with the parameter group.
-  Note that parameters may differ between families
+Note that parameters may differ between families
 
 #### `.spec.dbClusterParameterGroup.parameters[*]`
 
@@ -522,7 +467,6 @@ Parameters is a list of parameters to associate with the parameter group.
 |Type     |string|
 |Required |No|
 |Validation|`^[a-zA-Z0-9_]*$`|
-
 
 Parameter is a parameter to associate with a parameter group.
 
@@ -533,7 +477,6 @@ Parameter is a parameter to associate with a parameter group.
 |Type     |object|
 |Required |No|
 
-
 Tags is a set of tags to associate with the parameter group.
 
 #### `.spec.dbParameterGroup`
@@ -542,7 +485,6 @@ Tags is a set of tags to associate with the parameter group.
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 DbParameterGroup defines the parameters for the DB instance.
 
@@ -553,7 +495,6 @@ DbParameterGroup defines the parameters for the DB instance.
 |Type     |boolean|
 |Required |No|
 
-
 Create is whether the parameter group is created.
 
 #### `.spec.dbParameterGroup.description`
@@ -562,7 +503,6 @@ Create is whether the parameter group is created.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 Description is the description of the parameter group.
 
@@ -573,7 +513,6 @@ Description is the description of the parameter group.
 |Type     |string|
 |Required |No|
 
-
 Family is the family of the parameter group.
 
 #### `.spec.dbParameterGroup.name`
@@ -582,7 +521,6 @@ Family is the family of the parameter group.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 Name is the name of the parameter group.
 
@@ -595,9 +533,8 @@ Name is the name of the parameter group.
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 Parameters is a list of parameters to associate with the parameter group.
-  Note that parameters may differ between families
+Note that parameters may differ between families
 
 #### `.spec.dbParameterGroup.parameters[*]`
 
@@ -606,7 +543,6 @@ Parameters is a list of parameters to associate with the parameter group.
 |Type     |string|
 |Required |No|
 |Validation|`^[a-zA-Z0-9_]*$`|
-
 
 Parameter is a parameter to associate with a parameter group.
 
@@ -617,7 +553,6 @@ Parameter is a parameter to associate with a parameter group.
 |Type     |object|
 |Required |No|
 
-
 Tags is a set of tags to associate with the parameter group.
 
 #### `.spec.deleteAutomatedBackups`
@@ -626,7 +561,6 @@ Tags is a set of tags to associate with the parameter group.
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 DeleteAutomatedBackups is whether automated backups should be deleted.
 
@@ -638,18 +572,18 @@ DeleteAutomatedBackups is whether automated backups should be deleted.
 |Required |No|
 |Default Value|Delete|
 
-
 Allowed Values:
+
 - Orphan
 - Delete
 
 DeletionPolicy specifies what will happen to the underlying external
-  when this managed resource is deleted - either "Delete" or "Orphan" the
-  external resource.
-  This field is planned to be deprecated in favor of the ManagementPolicies
-  field in a future release. Currently, both could be set independently and
-  non-default values would be honored if the feature flag is enabled.
-  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+when this managed resource is deleted - either "Delete" or "Orphan" the
+external resource.
+This field is planned to be deprecated in favor of the ManagementPolicies
+field in a future release. Currently, both could be set independently and
+non-default values would be honored if the feature flag is enabled.
+See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
 
 #### `.spec.deletionProtection`
 
@@ -657,7 +591,6 @@ DeletionPolicy specifies what will happen to the underlying external
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 DeletionProtection is whether deletion protection is enabled.
 
@@ -668,7 +601,6 @@ DeletionProtection is whether deletion protection is enabled.
 |Type     |string|
 |Required |No|
 
-
 Domain is the domain to use.
 
 #### `.spec.domainIAMRoleName`
@@ -677,7 +609,6 @@ Domain is the domain to use.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 DomainIAMRoleName is the name of the IAM role to use.
 
@@ -688,7 +619,6 @@ DomainIAMRoleName is the name of the IAM role to use.
 |Type     |boolean|
 |Required |No|
 
-
 EnableGlobalWriteForwarding is whether global write forwarding is enabled.
 
 #### `.spec.enableHttpEndpoint`
@@ -698,7 +628,6 @@ EnableGlobalWriteForwarding is whether global write forwarding is enabled.
 |Type     |boolean|
 |Required |No|
 
-
 EnableHttpEndpoint is whether the HTTP endpoint is enabled.
 
 #### `.spec.enableLocalWriteForwarding`
@@ -707,7 +636,6 @@ EnableHttpEndpoint is whether the HTTP endpoint is enabled.
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 EnableLocalWriteForwarding is whether local write forwarding is enabled.
 
@@ -720,7 +648,6 @@ EnableLocalWriteForwarding is whether local write forwarding is enabled.
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Logs.
 
 #### `.spec.enabledCloudwatchLogsExports[*]`
@@ -729,7 +656,6 @@ EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Lo
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 LogGroup is the name of a log group.
 
@@ -742,7 +668,6 @@ LogGroup is the name of a log group.
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 Endpoints is a list of custom endpoints to create.
 
 #### `.spec.endpoints[*]`
@@ -753,7 +678,6 @@ Endpoints is a list of custom endpoints to create.
 |Required |No|
 
 
-
 #### `.spec.endpoints[*].customEndpointType`
 
 |Property |Value    |
@@ -761,8 +685,8 @@ Endpoints is a list of custom endpoints to create.
 |Type     |string|
 |Required |No|
 
-
 Allowed Values:
+
 - READER
 - ANY
 
@@ -777,9 +701,8 @@ CustomEndpointType is the type of the custom endpoint.
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 ExcludedMembers is a list of DB instances that aren't part of the custom
-  endpoint group.
+endpoint group.
 
 #### `.spec.endpoints[*].excludedMembers[*]`
 
@@ -787,7 +710,6 @@ ExcludedMembers is a list of DB instances that aren't part of the custom
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 
 #### `.spec.endpoints[*].staticMembers`
@@ -799,9 +721,8 @@ ExcludedMembers is a list of DB instances that aren't part of the custom
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 StaticMembers is a list of DB instances that are part of the custom
-  endpoint group.
+endpoint group.
 
 #### `.spec.endpoints[*].staticMembers[*]`
 
@@ -811,14 +732,12 @@ StaticMembers is a list of DB instances that are part of the custom
 |Required |No|
 
 
-
 #### `.spec.endpoints[*].tags`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 Tags is a set of tags to associate with the custom endpoint.
 
@@ -829,7 +748,6 @@ Tags is a set of tags to associate with the custom endpoint.
 |Type     |string|
 |Required |No|
 
-
 Engine is the database engine to use.
 
 #### `.spec.engineMode`
@@ -839,8 +757,8 @@ Engine is the database engine to use.
 |Type     |string|
 |Required |No|
 
-
 Allowed Values:
+
 - parallelquery
 - provisioned
 - serverless
@@ -854,7 +772,6 @@ EngineMode is the database engine mode to use.
 |Type     |string|
 |Required |No|
 
-
 EngineVersion is the version of the database engine to use.
 
 #### `.spec.enhancedMonitoring`
@@ -863,7 +780,6 @@ EngineVersion is the version of the database engine to use.
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 EnhancedMonitoring is the enhanced monitoring configuration.
 
@@ -874,7 +790,6 @@ EnhancedMonitoring is the enhanced monitoring configuration.
 |Type     |string|
 |Required |No|
 
-
 Description is the description of the monitoring role.
 
 #### `.spec.enhancedMonitoring.enabled`
@@ -884,7 +799,6 @@ Description is the description of the monitoring role.
 |Type     |boolean|
 |Required |No|
 
-
 Enabled is whether enhanced monitoring is enabled.
 
 #### `.spec.enhancedMonitoring.forceDetachPolicies`
@@ -893,7 +807,6 @@ Enabled is whether enhanced monitoring is enabled.
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 ForceDetachPolicies Whether to force detaching any policies the monitoring role has before destroying it
 
@@ -906,7 +819,6 @@ ForceDetachPolicies Whether to force detaching any policies the monitoring role 
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 ManagedPolicyArns is a list of ARNs for managed policies to attach to the monitoring role.
 
 #### `.spec.enhancedMonitoring.managedPolicyArns[*]`
@@ -917,14 +829,12 @@ ManagedPolicyArns is a list of ARNs for managed policies to attach to the monito
 |Required |No|
 
 
-
 #### `.spec.enhancedMonitoring.maxSessionDuration`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |integer|
 |Required |No|
-
 
 MaxSessionDuration is the maximum session duration (in seconds) that you want to set for the monitoring role.
 
@@ -935,7 +845,6 @@ MaxSessionDuration is the maximum session duration (in seconds) that you want to
 |Type     |integer|
 |Required |No|
 
-
 MonitoringInterval is the interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance.
 
 #### `.spec.enhancedMonitoring.path`
@@ -944,7 +853,6 @@ MonitoringInterval is the interval, in seconds, between points when Enhanced Mon
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 Path is the path of the monitoring role.
 
@@ -955,7 +863,6 @@ Path is the path of the monitoring role.
 |Type     |string|
 |Required |No|
 
-
 PermissionsBoundary is the ARN of the policy that is used to set the permissions boundary for the monitoring role.
 
 #### `.spec.eso`
@@ -965,12 +872,10 @@ PermissionsBoundary is the ARN of the policy that is used to set the permissions
 |Type     |object|
 |Required |No|
 
-
 Eso is the ESO configuration.
-  
-  
-  This field is used to sync secrets using `external-secrets-operator`.
-  External Secrets Operator must be installed if this value is set to true
+
+This field is used to sync secrets using `external-secrets-operator`.
+External Secrets Operator must be installed if this value is set to true
 
 #### `.spec.eso.enabled`
 
@@ -979,9 +884,8 @@ Eso is the ESO configuration.
 |Type     |boolean|
 |Required |No|
 
-
 Enabled Whether or not to enable `external-secrets-operator` object
-  deployments using `provider-kubernetes.
+deployments using `provider-kubernetes.
 
 #### `.spec.eso.kubernetesSecretStore`
 
@@ -990,12 +894,10 @@ Enabled Whether or not to enable `external-secrets-operator` object
 |Type     |string|
 |Required |No|
 
-
 KubernetesSecretStore is the Kubernetes secret store to use.
-  
-  
-  The kubernetes secret store is expected to be namespace scoped to prevent
-  secrets leaking across namespaces.
+
+The kubernetes secret store is expected to be namespace scoped to prevent
+secrets leaking across namespaces.
 
 #### `.spec.eso.stores`
 
@@ -1006,7 +908,6 @@ KubernetesSecretStore is the Kubernetes secret store to use.
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 Stores is a list of secret stores to use for push secrets.
 
 #### `.spec.eso.stores[*]`
@@ -1016,9 +917,8 @@ Stores is a list of secret stores to use for push secrets.
 |Type     |object|
 |Required |No|
 
-
 SecretsStore is a reference to a secrets store to be passed to External
-  Secrets Operator for creating PushSecrets
+Secrets Operator for creating PushSecrets
 
 #### `.spec.eso.stores[*].enabled`
 
@@ -1026,7 +926,6 @@ SecretsStore is a reference to a secrets store to be passed to External
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 Enabled is whether the secrets store is enabled.
 
@@ -1037,7 +936,6 @@ Enabled is whether the secrets store is enabled.
 |Type     |boolean|
 |Required |No|
 
-
 IsClusterSecretStore is whether the secret store is a cluster secret store.
 
 #### `.spec.eso.stores[*].secretStore`
@@ -1046,7 +944,6 @@ IsClusterSecretStore is whether the secret store is a cluster secret store.
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 SecretStoreName is the name of the secret store.
 
@@ -1057,7 +954,6 @@ SecretStoreName is the name of the secret store.
 |Type     |string|
 |Required |No|
 
-
 GlobalClusterIdentifier is the global cluster identifier for an Aurora global database.
 
 #### `.spec.iamDatabaseAuthenticationEnabled`
@@ -1066,7 +962,6 @@ GlobalClusterIdentifier is the global cluster identifier for an Aurora global da
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 IAMDatabaseAuthenticationEnabled is whether IAM database authentication is enabled.
 
@@ -1079,7 +974,6 @@ IAMDatabaseAuthenticationEnabled is whether IAM database authentication is enabl
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 IamRoles is a list of IAM roles to associate with the DB cluster.
 
 #### `.spec.iamRoles[*]`
@@ -1090,14 +984,12 @@ IamRoles is a list of IAM roles to associate with the DB cluster.
 |Required |No|
 
 
-
 #### `.spec.iamRoles[*].featureName`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 FeatureName is the name of the feature.
 
@@ -1108,7 +1000,6 @@ FeatureName is the name of the feature.
 |Type     |string|
 |Required |No|
 
-
 RoleArn is the ARN of the role.
 
 #### `.spec.instanceCount`
@@ -1118,13 +1009,11 @@ RoleArn is the ARN of the role.
 |Type     |integer|
 |Required |No|
 
-
 InstanceCount is the number of instances to create.
-  
-  
-  If set, this value will create the requested number of instances using
-  defaults from the cluster configuration. If `instances` are specified,
-  this value is ignored.
+
+If set, this value will create the requested number of instances using
+defaults from the cluster configuration. If `instances` are specified,
+this value is ignored.
 
 #### `.spec.instances`
 
@@ -1134,7 +1023,6 @@ InstanceCount is the number of instances to create.
 |Required |No|
 |Min Items|0|
 |Max Items|Unlimited|
-
 
 Instances is a list of instances to create.
 
@@ -1146,7 +1034,6 @@ Instances is a list of instances to create.
 |Required |No|
 
 
-
 #### `.spec.instances[*].allocatedStorage`
 
 |Property |Value    |
@@ -1154,15 +1041,12 @@ Instances is a list of instances to create.
 |Type     |integer|
 |Required |No|
 
-
 AllocatedStorage is the size of the database.
-  
-  
-  Only applicable if not running in cluster mode. In cluster mode this value
-  is ignored.
-  
-  
-  Overrides `ClusterParameters.AllocatedStorage`
+
+Only applicable if not running in cluster mode. In cluster mode this value
+is ignored.
+
+Overrides `ClusterParameters.AllocatedStorage`
 
 #### `.spec.instances[*].allowMajorVersionUpgrade`
 
@@ -1171,15 +1055,12 @@ AllocatedStorage is the size of the database.
 |Type     |boolean|
 |Required |No|
 
-
 AllowMajorVersionUpgrade is whether major version upgrades are allowed.
-  
-  
-  Only applicable if not running in cluster mode. In cluster mode this value
-  is ignored.
-  
-  
-  Overrides `ClusterParameters.AllowMajorVersionUpgrade`
+
+Only applicable if not running in cluster mode. In cluster mode this value
+is ignored.
+
+Overrides `ClusterParameters.AllowMajorVersionUpgrade`
 
 #### `.spec.instances[*].applyImmediately`
 
@@ -1188,11 +1069,9 @@ AllowMajorVersionUpgrade is whether major version upgrades are allowed.
 |Type     |boolean|
 |Required |No|
 
-
 ApplyImmediately is whether changes should be applied immediately.
-  
-  
-  Overrides `ClusterParameters.ApplyImmediately`
+
+Overrides `ClusterParameters.ApplyImmediately`
 
 #### `.spec.instances[*].autoMinorVersionUpgrade`
 
@@ -1201,12 +1080,10 @@ ApplyImmediately is whether changes should be applied immediately.
 |Type     |boolean|
 |Required |No|
 
-
 AutoMinorVersionUpgrade is whether minor version upgrades are applied
-  automatically.
-  
-  
-  Overrides `ClusterParameters.AutoMinorVersionUpgrade`
+automatically.
+
+Overrides `ClusterParameters.AutoMinorVersionUpgrade`
 
 #### `.spec.instances[*].availabilityZone`
 
@@ -1215,9 +1092,8 @@ AutoMinorVersionUpgrade is whether minor version upgrades are applied
 |Type     |string|
 |Required |No|
 
-
 AvailabilityZone is the availability zone for this instance.
-  Ignored if `multiAz` is true
+Ignored if `multiAz` is true
 
 #### `.spec.instances[*].backupRetentionPeriod`
 
@@ -1226,11 +1102,9 @@ AvailabilityZone is the availability zone for this instance.
 |Type     |integer|
 |Required |No|
 
-
 BackupRetentionPeriod is the number of days to retain backups for.
-  
-  
-  Only applicable if not running in cluster mode
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].copyTagsToSnapshot`
 
@@ -1238,7 +1112,6 @@ BackupRetentionPeriod is the number of days to retain backups for.
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 CopyTagsToSnapshot is whether tags should be copied to snapshots.
 
@@ -1249,7 +1122,6 @@ CopyTagsToSnapshot is whether tags should be copied to snapshots.
 |Type     |string|
 |Required |No|
 
-
 DatabaseName is the name of the database to create.
 
 #### `.spec.instances[*].deleteAutomatedBackups`
@@ -1259,11 +1131,9 @@ DatabaseName is the name of the database to create.
 |Type     |boolean|
 |Required |No|
 
-
 DeleteAutomatedBackups is whether automated backups should be deleted.
-  
-  
-  Only applicable if not running in cluster mode
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].deletionProtection`
 
@@ -1272,11 +1142,9 @@ DeleteAutomatedBackups is whether automated backups should be deleted.
 |Type     |boolean|
 |Required |No|
 
-
 DeletionProtection is whether deletion protection is enabled.
-  
-  
-  Only applicable if not running in cluster mode
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].domainIamRoleName`
 
@@ -1285,11 +1153,9 @@ DeletionProtection is whether deletion protection is enabled.
 |Type     |string|
 |Required |No|
 
-
 DomainIamRoleName is the name of the IAM role to use.
-  
-  
-  Only applicable if not running in cluster mode
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].enabledCloudwatchLogsExports`
 
@@ -1300,11 +1166,9 @@ DomainIamRoleName is the name of the IAM role to use.
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Logs.
-  
-  
-  Only applicable if not running in cluster mode
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].enabledCloudwatchLogsExports[*]`
 
@@ -1312,7 +1176,6 @@ EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Lo
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 LogGroup is the name of a log group.
 
@@ -1323,11 +1186,9 @@ LogGroup is the name of a log group.
 |Type     |string|
 |Required |No|
 
-
 FinalSnapshotIdentifier is the identifier of the final snapshot.
-  
-  
-  Only applicable if not running in cluster mode
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].iamDatabaseAuthenticationEnabled`
 
@@ -1336,11 +1197,9 @@ FinalSnapshotIdentifier is the identifier of the final snapshot.
 |Type     |boolean|
 |Required |No|
 
-
 IamDatabaseAuthenticationEnabled is whether IAM database authentication is enabled.
-  
-  
-  Only applicable if not running in cluster mode
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].instanceClass`
 
@@ -1348,7 +1207,6 @@ IamDatabaseAuthenticationEnabled is whether IAM database authentication is enabl
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 InstanceClass is the instance class to use.
 
@@ -1359,11 +1217,9 @@ InstanceClass is the instance class to use.
 |Type     |integer|
 |Required |No|
 
-
 Iops is the amount of provisioned IOPS.
-  
-  
-  Only applicable if not running in cluster mode
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].licenseModel`
 
@@ -1372,11 +1228,9 @@ Iops is the amount of provisioned IOPS.
 |Type     |string|
 |Required |No|
 
-
 LicenseModel is the license model to use.
-  
-  
-  Only applicable if not running in cluster mode.
+
+Only applicable if not running in cluster mode.
 
 #### `.spec.instances[*].monitoringInterval`
 
@@ -1385,9 +1239,8 @@ LicenseModel is the license model to use.
 |Type     |integer|
 |Required |No|
 
-
 MonitoringInterval is the interval, in seconds, between points when
-  Enhanced Monitoring metrics are collected for the DB instance.
+Enhanced Monitoring metrics are collected for the DB instance.
 
 #### `.spec.instances[*].multiAz`
 
@@ -1396,11 +1249,9 @@ MonitoringInterval is the interval, in seconds, between points when
 |Type     |boolean|
 |Required |No|
 
-
 MultiAZ is whether the DB instance is a Multi-AZ deployment.
-  
-  
-  Only applicable if not running in cluster mode
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].networkType`
 
@@ -1409,11 +1260,9 @@ MultiAZ is whether the DB instance is a Multi-AZ deployment.
 |Type     |string|
 |Required |No|
 
-
 NetworkType is the network type to use.
-  
-  
-  Only applicable if not running in cluster mode
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].optionGroupName`
 
@@ -1422,12 +1271,10 @@ NetworkType is the network type to use.
 |Type     |string|
 |Required |No|
 
-
 OptionGroupName is the name of the option group to associate with this DB
-  instance.
-  
-  
-  Only applicable if not running in cluster mode
+instance.
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].parameterGroupName`
 
@@ -1436,10 +1283,9 @@ OptionGroupName is the name of the option group to associate with this DB
 |Type     |string|
 |Required |No|
 
-
 ParameterGroupName is the name of the DB parameter group to associate
-  with this DB instance. Must pre-exist in the account. Mutually exclusive
-  with `RdsBaseDbCluster.dbParameterGroup`
+with this DB instance. Must pre-exist in the account. Mutually exclusive
+with `RdsBaseDbCluster.dbParameterGroup`
 
 #### `.spec.instances[*].performanceInsightsEnabled`
 
@@ -1447,7 +1293,6 @@ ParameterGroupName is the name of the DB parameter group to associate
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 PerformanceInsightsEnabled is whether Performance Insights is enabled.
 
@@ -1458,9 +1303,8 @@ PerformanceInsightsEnabled is whether Performance Insights is enabled.
 |Type     |string|
 |Required |No|
 
-
 PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption
-  of Performance Insights data.
+of Performance Insights data.
 
 #### `.spec.instances[*].performanceInsightsRetentionPeriod`
 
@@ -1469,9 +1313,8 @@ PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption
 |Type     |integer|
 |Required |No|
 
-
 PerformanceInsightsRetentionPeriod is the amount of time, in days, to
-  retain Performance Insights data.
+retain Performance Insights data.
 
 #### `.spec.instances[*].preferredMaintenanceWindow`
 
@@ -1479,7 +1322,6 @@ PerformanceInsightsRetentionPeriod is the amount of time, in days, to
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 PreferredMaintenanceWindow is the preferred maintenance window.
 
@@ -1490,9 +1332,8 @@ PreferredMaintenanceWindow is the preferred maintenance window.
 |Type     |integer|
 |Required |No|
 
-
 PromotionTier is the order in which to promote an Aurora replica to the
-  primary instance.
+primary instance.
 
 #### `.spec.instances[*].publiclyAccessible`
 
@@ -1500,7 +1341,6 @@ PromotionTier is the order in which to promote an Aurora replica to the
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 PubliclyAccessible is whether the DB instance is publicly accessible.
 
@@ -1511,11 +1351,9 @@ PubliclyAccessible is whether the DB instance is publicly accessible.
 |Type     |boolean|
 |Required |No|
 
-
 SkipFinalSnapshot is whether to skip the final snapshot.
-  
-  
-  Only applicable if not running in cluster mode
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].storageEncrypted`
 
@@ -1524,11 +1362,9 @@ SkipFinalSnapshot is whether to skip the final snapshot.
 |Type     |boolean|
 |Required |No|
 
-
 StorageEncrypted is whether storage is encrypted.
-  
-  
-  Only applicable if not running in cluster mode
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].storageThroughput`
 
@@ -1537,12 +1373,10 @@ StorageEncrypted is whether storage is encrypted.
 |Type     |integer|
 |Required |No|
 
-
 StorageThroughput is the amount of storage throughput. Only applicable if
-  `storageType` is `gp3`
-  
-  
-  Only applicable if not running in cluster mode
+`storageType` is `gp3`
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].storageType`
 
@@ -1551,11 +1385,9 @@ StorageThroughput is the amount of storage throughput. Only applicable if
 |Type     |string|
 |Required |No|
 
-
 StorageType is the storage type to use.
-  
-  
-  Only applicable if not running in cluster mode
+
+Only applicable if not running in cluster mode
 
 #### `.spec.instances[*].tags`
 
@@ -1563,7 +1395,6 @@ StorageType is the storage type to use.
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 Tags is a set of tags to associate with the DB instance.
 
@@ -1574,7 +1405,6 @@ Tags is a set of tags to associate with the DB instance.
 |Type     |integer|
 |Required |No|
 
-
 Iops is the amount of provisioned IOPS.
 
 #### `.spec.kubernetesProviderConfig`
@@ -1583,7 +1413,6 @@ Iops is the amount of provisioned IOPS.
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 KubernetesProviderConfig is the provider config for the Kubernetes provider.
 
@@ -1594,7 +1423,51 @@ KubernetesProviderConfig is the provider config for the Kubernetes provider.
 |Type     |string|
 |Required |**Yes**|
 
+Name of the referenced object.
 
+#### `.spec.kubernetesProviderConfig.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.kubernetesProviderConfig.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.kubernetesProviderConfig.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
 
 #### `.spec.managementPolicies`
 
@@ -1606,17 +1479,16 @@ KubernetesProviderConfig is the provider config for the Kubernetes provider.
 |Max Items|Unlimited|
 |Default Value|[*]|
 
-
 THIS IS A BETA FIELD. It is on by default but can be opted out
-  through a Crossplane feature flag.
-  ManagementPolicies specify the array of actions Crossplane is allowed to
-  take on the managed and external resources.
-  This field is planned to replace the DeletionPolicy field in a future
-  release. Currently, both could be set independently and non-default
-  values would be honored if the feature flag is enabled. If both are
-  custom, the DeletionPolicy field will be ignored.
-  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
-  and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
+through a Crossplane feature flag.
+ManagementPolicies specify the array of actions Crossplane is allowed to
+take on the managed and external resources.
+This field is planned to replace the DeletionPolicy field in a future
+release. Currently, both could be set independently and non-default
+values would be honored if the feature flag is enabled. If both are
+custom, the DeletionPolicy field will be ignored.
+See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
 
 #### `.spec.managementPolicies[*]`
 
@@ -1625,9 +1497,8 @@ THIS IS A BETA FIELD. It is on by default but can be opted out
 |Type     |string|
 |Required |No|
 
-
 A ManagementAction represents an action that the Crossplane controllers
-  can take on an external resource.
+can take on an external resource.
 
 #### `.spec.masterUsername`
 
@@ -1635,7 +1506,6 @@ A ManagementAction represents an action that the Crossplane controllers
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 MasterUsername is the master username to use.
 
@@ -1646,7 +1516,6 @@ MasterUsername is the master username to use.
 |Type     |boolean|
 |Required |No|
 
-
 MultiAZ is whether the DB instance is a Multi-AZ deployment.
 
 #### `.spec.partition`
@@ -1656,8 +1525,8 @@ MultiAZ is whether the DB instance is a Multi-AZ deployment.
 |Type     |string|
 |Required |No|
 
-
 Allowed Values:
+
 - aws
 - aws-cn
 - aws-us-gov
@@ -1671,7 +1540,6 @@ Partition is the AWS partition to use.
 |Type     |boolean|
 |Required |No|
 
-
 PerformanceInsightsEnabled is whether Performance Insights is enabled.
 
 #### `.spec.performanceInsightsKmsKeyID`
@@ -1680,7 +1548,6 @@ PerformanceInsightsEnabled is whether Performance Insights is enabled.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption of Performance Insights data.
 
@@ -1691,7 +1558,6 @@ PerformanceInsightsKmsKeyID is the AWS KMS key identifier for encryption of Perf
 |Type     |integer|
 |Required |No|
 
-
 PerformanceInsightsRetentionPeriod is the amount of time, in days, to retain Performance Insights data.
 
 #### `.spec.preferredBackupWindow`
@@ -1701,7 +1567,6 @@ PerformanceInsightsRetentionPeriod is the amount of time, in days, to retain Per
 |Type     |string|
 |Required |No|
 
-
 PreferredBackupWindow is the preferred backup window.
 
 #### `.spec.preferredMaintenanceWindow`
@@ -1710,7 +1575,6 @@ PreferredBackupWindow is the preferred backup window.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 PreferredMaintenanceWindow is the preferred maintenance window.
 
@@ -1722,10 +1586,9 @@ PreferredMaintenanceWindow is the preferred maintenance window.
 |Required |No|
 |Default Value|{name:default}|
 
-
 ProviderConfigReference specifies how the provider that will be used to
-  create, observe, update, and delete this managed resource should be
-  configured.
+create, observe, update, and delete this managed resource should be
+configured.
 
 #### `.spec.providerConfigRef.name`
 
@@ -1733,7 +1596,6 @@ ProviderConfigReference specifies how the provider that will be used to
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 Name of the referenced object.
 
@@ -1743,7 +1605,6 @@ Name of the referenced object.
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 Policies for referencing.
 
@@ -1755,15 +1616,15 @@ Policies for referencing.
 |Required |No|
 |Default Value|Required|
 
-
 Allowed Values:
+
 - Required
 - Optional
 
 Resolution specifies whether resolution of this reference is required.
-  The default is 'Required', which means the reconcile will fail if the
-  reference cannot be resolved. 'Optional' means this reference will be
-  a no-op if it cannot be resolved.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
 
 #### `.spec.providerConfigRef.policy.resolve`
 
@@ -1772,26 +1633,67 @@ Resolution specifies whether resolution of this reference is required.
 |Type     |string|
 |Required |No|
 
-
 Allowed Values:
+
 - Always
 - IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
-  is 'IfNotPresent', which will attempt to resolve the reference only when
-  the corresponding field is not present. Use 'Always' to resolve the
-  reference on every reconcile.
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
 
 #### `.spec.provisionSql`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+ProvisionSql determines whether or not to provision databases inside the
+RDS cluster.
+
+#### `.spec.provisionSql.connectionSecretName`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The name of the connection secret to use for the RDS instance
+
+Required if `providerConfigRef` is not provided, ignored otherwise
+Must exist in the same namespace as the provisioning claim
+
+If this value is provided, the composition will attempt to create a
+provider config using the engine specific providerconfig spec
+
+#### `.spec.provisionSql.databases`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Databases is a map of databases to create.
+
+#### `.spec.provisionSql.enabled`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
 
+Determines if the RDS provisioning should be enabled
 
-ProvisionSql determines whether or not to provision databases inside the
-  RDS cluster.
+#### `.spec.provisionSql.engine`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The type of database engine being provisioned
 
 #### `.spec.publiclyAccessible`
 
@@ -1799,7 +1701,6 @@ ProvisionSql determines whether or not to provision databases inside the
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 PubliclyAccessible is whether the DB instance is publicly accessible.
 
@@ -1810,12 +1711,11 @@ PubliclyAccessible is whether the DB instance is publicly accessible.
 |Type     |object|
 |Required |No|
 
-
 PublishConnectionDetailsTo specifies the connection secret config which
-  contains a name, metadata and a reference to secret store config to
-  which any connection details for this managed resource should be written.
-  Connection details frequently include the endpoint, username,
-  and password required to connect to the managed resource.
+contains a name, metadata and a reference to secret store config to
+which any connection details for this managed resource should be written.
+Connection details frequently include the endpoint, username,
+and password required to connect to the managed resource.
 
 #### `.spec.publishConnectionDetailsTo.configRef`
 
@@ -1825,9 +1725,8 @@ PublishConnectionDetailsTo specifies the connection secret config which
 |Required |No|
 |Default Value|{name:default}|
 
-
 SecretStoreConfigRef specifies which secret store config should be used
-  for this ConnectionSecret.
+for this ConnectionSecret.
 
 #### `.spec.publishConnectionDetailsTo.configRef.name`
 
@@ -1835,7 +1734,6 @@ SecretStoreConfigRef specifies which secret store config should be used
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 Name of the referenced object.
 
@@ -1845,7 +1743,6 @@ Name of the referenced object.
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 Policies for referencing.
 
@@ -1857,15 +1754,15 @@ Policies for referencing.
 |Required |No|
 |Default Value|Required|
 
-
 Allowed Values:
+
 - Required
 - Optional
 
 Resolution specifies whether resolution of this reference is required.
-  The default is 'Required', which means the reconcile will fail if the
-  reference cannot be resolved. 'Optional' means this reference will be
-  a no-op if it cannot be resolved.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
 
 #### `.spec.publishConnectionDetailsTo.configRef.policy.resolve`
 
@@ -1874,15 +1771,15 @@ Resolution specifies whether resolution of this reference is required.
 |Type     |string|
 |Required |No|
 
-
 Allowed Values:
+
 - Always
 - IfNotPresent
 
 Resolve specifies when this reference should be resolved. The default
-  is 'IfNotPresent', which will attempt to resolve the reference only when
-  the corresponding field is not present. Use 'Always' to resolve the
-  reference on every reconcile.
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
 
 #### `.spec.publishConnectionDetailsTo.metadata`
 
@@ -1890,7 +1787,6 @@ Resolve specifies when this reference should be resolved. The default
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 Metadata is the metadata for connection secret.
 
@@ -1901,10 +1797,9 @@ Metadata is the metadata for connection secret.
 |Type     |object|
 |Required |No|
 
-
 Annotations are the annotations to be added to connection secret.
-  - For Kubernetes secrets, this will be used as "metadata.annotations".
-  - It is up to Secret Store implementation for others store types.
+- For Kubernetes secrets, this will be used as "metadata.annotations".
+- It is up to Secret Store implementation for others store types.
 
 #### `.spec.publishConnectionDetailsTo.metadata.labels`
 
@@ -1913,10 +1808,9 @@ Annotations are the annotations to be added to connection secret.
 |Type     |object|
 |Required |No|
 
-
 Labels are the labels/tags to be added to connection secret.
-  - For Kubernetes secrets, this will be used as "metadata.labels".
-  - It is up to Secret Store implementation for others store types.
+- For Kubernetes secrets, this will be used as "metadata.labels".
+- It is up to Secret Store implementation for others store types.
 
 #### `.spec.publishConnectionDetailsTo.metadata.type`
 
@@ -1925,9 +1819,8 @@ Labels are the labels/tags to be added to connection secret.
 |Type     |string|
 |Required |No|
 
-
 Type is the SecretType for the connection secret.
-  - Only valid for Kubernetes Secret Stores.
+- Only valid for Kubernetes Secret Stores.
 
 #### `.spec.publishConnectionDetailsTo.name`
 
@@ -1935,7 +1828,6 @@ Type is the SecretType for the connection secret.
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 Name is the name of the connection secret.
 
@@ -1946,7 +1838,6 @@ Name is the name of the connection secret.
 |Type     |string|
 |Required |**Yes**|
 
-
 Region is the region to use.
 
 #### `.spec.replicationSourceIdentifier`
@@ -1956,9 +1847,8 @@ Region is the region to use.
 |Type     |string|
 |Required |No|
 
-
 ReplicationSourceIdentifier ARN of a source DB cluster or DB instance if
-  this DB cluster is to be created as a Read Replica
+this DB cluster is to be created as a Read Replica
 
 #### `.spec.restoreToPointInTime`
 
@@ -1966,7 +1856,6 @@ ReplicationSourceIdentifier ARN of a source DB cluster or DB instance if
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 RestoreToPointInTime is the point in time to restore to.
 
@@ -1977,10 +1866,9 @@ RestoreToPointInTime is the point in time to restore to.
 |Type     |string|
 |Required |No|
 
-
 Identifier is the identifier of the source DB cluster snapshot or DB
-  instance snapshot to restore from. Only valid if not running in cluster
-  mode.
+instance snapshot to restore from. Only valid if not running in cluster
+mode.
 
 #### `.spec.restoreToPointInTime.restoreToTime`
 
@@ -1988,7 +1876,6 @@ Identifier is the identifier of the source DB cluster snapshot or DB
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 RestoreToTime is the time to restore to.
 
@@ -1999,13 +1886,13 @@ RestoreToTime is the time to restore to.
 |Type     |string|
 |Required |No|
 
-
 Allowed Values:
+
 - full-copy
 - copy-on-write
 
 RestoreType is the type of restore to perform. This option is ignored if
-  not running in cluster mode.
+not running in cluster mode.
 
 #### `.spec.restoreToPointInTime.sourceDbClusterIdentifier`
 
@@ -2014,9 +1901,8 @@ RestoreType is the type of restore to perform. This option is ignored if
 |Type     |string|
 |Required |No|
 
-
 SourceDbClusterIdentifier is the identifier of the source DB cluster.
-  This option is ignored if not running in cluster mode.
+This option is ignored if not running in cluster mode.
 
 #### `.spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn`
 
@@ -2025,9 +1911,8 @@ SourceDbClusterIdentifier is the identifier of the source DB cluster.
 |Type     |string|
 |Required |No|
 
-
 sourceDbInstanceAutomatedBackupsArn is the ARN of the source DB instance
-  automated backup to restore from. Only valid if not running in cluster mode.
+automated backup to restore from. Only valid if not running in cluster mode.
 
 #### `.spec.restoreToPointInTime.sourceDbInstanceIdentifier`
 
@@ -2036,10 +1921,9 @@ sourceDbInstanceAutomatedBackupsArn is the ARN of the source DB instance
 |Type     |string|
 |Required |No|
 
-
 SourceDbInstanceIdentifier is the identifier of the source DB instance.
-  Only valid if not running in cluster mode. If running in cluster mode, use
-  `SourceDbClusterIdentifier` instead.
+Only valid if not running in cluster mode. If running in cluster mode, use
+`SourceDbClusterIdentifier` instead.
 
 #### `.spec.restoreToPointInTime.sourceDbiResourceId`
 
@@ -2048,9 +1932,8 @@ SourceDbInstanceIdentifier is the identifier of the source DB instance.
 |Type     |string|
 |Required |No|
 
-
 SourceDbiResourceId is the resource ID of the source DB instance. Only
-  valid if not running in cluster mode.
+valid if not running in cluster mode.
 
 #### `.spec.restoreToPointInTime.useLatestRestorableTime`
 
@@ -2058,7 +1941,6 @@ SourceDbiResourceId is the resource ID of the source DB instance. Only
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 UseLatestRestorableTime is whether to use the latest restorable time.
 
@@ -2069,7 +1951,6 @@ UseLatestRestorableTime is whether to use the latest restorable time.
 |Type     |object|
 |Required |No|
 
-
 S3Import is the S3 import configuration.
 
 #### `.spec.s3Import.bucketName`
@@ -2078,7 +1959,6 @@ S3Import is the S3 import configuration.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 BucketName is the name of the S3 bucket.
 
@@ -2089,9 +1969,8 @@ BucketName is the name of the S3 bucket.
 |Type     |string|
 |Required |No|
 
-
 BucketPrefix is the prefix of the S3 bucket. Can be blank but is the path
-  within the bucket where the data is located.
+within the bucket where the data is located.
 
 #### `.spec.s3Import.ingestionRole`
 
@@ -2099,7 +1978,6 @@ BucketPrefix is the prefix of the S3 bucket. Can be blank but is the path
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 IngestionRole is the role to use for ingestion.
 
@@ -2110,7 +1988,6 @@ IngestionRole is the role to use for ingestion.
 |Type     |string|
 |Required |No|
 
-
 SourceEngine is the source engine to use.
 
 #### `.spec.s3Import.sourceEngineVersion`
@@ -2119,7 +1996,6 @@ SourceEngine is the source engine to use.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 SourceEngineVersion is the source engine version to use.
 
@@ -2130,7 +2006,6 @@ SourceEngineVersion is the source engine version to use.
 |Type     |object|
 |Required |No|
 
-
 ScalingConfiguration is the scaling configuration.
 
 #### `.spec.scalingConfiguration.autoPause`
@@ -2139,7 +2014,6 @@ ScalingConfiguration is the scaling configuration.
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 AutoPause is whether the database should automatically pause.
 
@@ -2150,7 +2024,6 @@ AutoPause is whether the database should automatically pause.
 |Type     |integer|
 |Required |No|
 
-
 MaxCapacity is the maximum capacity for the database.
 
 #### `.spec.scalingConfiguration.minCapacity`
@@ -2159,7 +2032,6 @@ MaxCapacity is the maximum capacity for the database.
 |:--------|:--------|
 |Type     |integer|
 |Required |No|
-
 
 MinCapacity is the minimum capacity for the database.
 
@@ -2170,9 +2042,8 @@ MinCapacity is the minimum capacity for the database.
 |Type     |integer|
 |Required |No|
 
-
 SecondsUntilAutoPause is the number of seconds until the database
-  automatically pauses.
+automatically pauses.
 
 #### `.spec.secretRotation`
 
@@ -2180,7 +2051,6 @@ SecondsUntilAutoPause is the number of seconds until the database
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 SecretRotation is the secret rotation configuration.
 
@@ -2191,9 +2061,8 @@ SecretRotation is the secret rotation configuration.
 |Type     |integer|
 |Required |No|
 
-
 AutomaticallyAfterDays is the number of days after which the secret is
-  rotated automatically.
+rotated automatically.
 
 #### `.spec.secretRotation.enabled`
 
@@ -2201,7 +2070,6 @@ AutomaticallyAfterDays is the number of days after which the secret is
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
-
 
 Enabled is whether secret rotation is enabled.
 
@@ -2212,7 +2080,6 @@ Enabled is whether secret rotation is enabled.
 |Type     |boolean|
 |Required |No|
 
-
 RotateImmediately is whether the secret should be rotated immediately.
 
 #### `.spec.secretRotation.scheduleExpression`
@@ -2221,7 +2088,6 @@ RotateImmediately is whether the secret should be rotated immediately.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 ScheduleExpression is the schedule expression for secret rotation.
 
@@ -2232,7 +2098,6 @@ ScheduleExpression is the schedule expression for secret rotation.
 |Type     |object|
 |Required |No|
 
-
 ServerlessV2ScalingConfiguration is the serverless v2 scaling configuration.
 
 #### `.spec.serverlessV2ScalingConfiguration.maxCapacity`
@@ -2241,7 +2106,6 @@ ServerlessV2ScalingConfiguration is the serverless v2 scaling configuration.
 |:--------|:--------|
 |Type     |integer|
 |Required |No|
-
 
 MaxCapacity is the maximum capacity for the database.
 
@@ -2252,7 +2116,6 @@ MaxCapacity is the maximum capacity for the database.
 |Type     |integer|
 |Required |No|
 
-
 MinCapacity is the minimum capacity for the database.
 
 #### `.spec.storageType`
@@ -2261,7 +2124,6 @@ MinCapacity is the minimum capacity for the database.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 StorageType specifies the storage type to be associated with the cluster
 
@@ -2274,7 +2136,6 @@ StorageType specifies the storage type to be associated with the cluster
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 SubnetIds is a list of subnet IDs to use for the subnet group.
 
 #### `.spec.subnetIds[*]`
@@ -2285,14 +2146,12 @@ SubnetIds is a list of subnet IDs to use for the subnet group.
 |Required |No|
 
 
-
 #### `.spec.tags`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 Tags is a set of tags to associate with the DB cluster.
 
@@ -2303,7 +2162,6 @@ Tags is a set of tags to associate with the DB cluster.
 |Type     |string|
 |Required |**Yes**|
 
-
 VpcId is the VPC ID to use.
 
 #### `.spec.writeConnectionSecretToRef`
@@ -2313,15 +2171,14 @@ VpcId is the VPC ID to use.
 |Type     |object|
 |Required |No|
 
-
 WriteConnectionSecretToReference specifies the namespace and name of a
-  Secret to which any connection details for this managed resource should
-  be written. Connection details frequently include the endpoint, username,
-  and password required to connect to the managed resource.
-  This field is planned to be replaced in a future release in favor of
-  PublishConnectionDetailsTo. Currently, both could be set independently
-  and connection details would be published to both without affecting
-  each other.
+Secret to which any connection details for this managed resource should
+be written. Connection details frequently include the endpoint, username,
+and password required to connect to the managed resource.
+This field is planned to be replaced in a future release in favor of
+PublishConnectionDetailsTo. Currently, both could be set independently
+and connection details would be published to both without affecting
+each other.
 
 #### `.spec.writeConnectionSecretToRef.name`
 
@@ -2329,7 +2186,6 @@ WriteConnectionSecretToReference specifies the namespace and name of a
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 Name of the secret.
 
@@ -2339,7 +2195,6 @@ Name of the secret.
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 Namespace of the secret.
 
@@ -2352,7 +2207,6 @@ Namespace of the secret.
 |Type     |string|
 |Required |No|
 
-
 AccountId is the account ID of the DB cluster.
 
 #### `.status.clusterArn`
@@ -2361,7 +2215,6 @@ AccountId is the account ID of the DB cluster.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 ClusterArn is the ARN of the DB cluster.
 
@@ -2372,7 +2225,6 @@ ClusterArn is the ARN of the DB cluster.
 |Type     |string|
 |Required |No|
 
-
 ClusterIdentifier is the identifier of the DB cluster.
 
 #### `.status.clusterResourceId`
@@ -2381,7 +2233,6 @@ ClusterIdentifier is the identifier of the DB cluster.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 ClusterResourceId is the resource ID of the DB cluster.
 
@@ -2394,7 +2245,6 @@ ClusterResourceId is the resource ID of the DB cluster.
 |Min Items|0|
 |Max Items|Unlimited|
 
-
 Conditions of the resource.
 
 #### `.status.conditions[*]`
@@ -2403,7 +2253,6 @@ Conditions of the resource.
 |:--------|:--------|
 |Type     |object|
 |Required |No|
-
 
 A Condition that may apply to a resource.
 
@@ -2414,9 +2263,8 @@ A Condition that may apply to a resource.
 |Type     |string|
 |Required |**Yes**|
 
-
 LastTransitionTime is the last time this condition transitioned from one
-  status to another.
+status to another.
 
 #### `.status.conditions[*].message`
 
@@ -2425,9 +2273,8 @@ LastTransitionTime is the last time this condition transitioned from one
 |Type     |string|
 |Required |No|
 
-
 A Message containing details about this condition's last transition from
-  one status to another, if any.
+one status to another, if any.
 
 #### `.status.conditions[*].reason`
 
@@ -2435,7 +2282,6 @@ A Message containing details about this condition's last transition from
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
-
 
 A Reason for this condition's last transition from one status to another.
 
@@ -2446,7 +2292,6 @@ A Reason for this condition's last transition from one status to another.
 |Type     |string|
 |Required |**Yes**|
 
-
 Status of this condition; is it currently True, False, or Unknown?
 
 #### `.status.conditions[*].type`
@@ -2456,9 +2301,8 @@ Status of this condition; is it currently True, False, or Unknown?
 |Type     |string|
 |Required |**Yes**|
 
-
 Type of this condition. At most one of each condition type may apply to
-  a resource at any point in time.
+a resource at any point in time.
 
 #### `.status.connectionSecret`
 
@@ -2466,7 +2310,6 @@ Type of this condition. At most one of each condition type may apply to
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 ConnectionSecret is the name of the connection secret used for the DB.
 
@@ -2477,9 +2320,8 @@ ConnectionSecret is the name of the connection secret used for the DB.
 |Type     |string|
 |Required |No|
 
-
 DbParameterGroupName is the name of the DB parameter group to associate
-  with this DB instance.
+with this DB instance.
 
 #### `.status.dbSubnetGroupName`
 
@@ -2488,9 +2330,8 @@ DbParameterGroupName is the name of the DB parameter group to associate
 |Type     |string|
 |Required |No|
 
-
 DbSubnetGroupName is the name of the DB subnet group to associate with
-  this DB instance.
+this DB instance.
 
 #### `.status.endpoint`
 
@@ -2498,7 +2339,6 @@ DbSubnetGroupName is the name of the DB subnet group to associate with
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 Endpoint is the endpoint of the DB cluster.
 
@@ -2509,9 +2349,8 @@ Endpoint is the endpoint of the DB cluster.
 |Type     |string|
 |Required |No|
 
-
 EsoConnectionSecret is the name of the connection secret created by ESO
-  for use with provider-sql.
+for use with provider-sql.
 
 #### `.status.kmsKeyId`
 
@@ -2519,7 +2358,6 @@ EsoConnectionSecret is the name of the connection secret created by ESO
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-
 
 KmsKeyId is the ID of the KMS key.
 
@@ -2530,7 +2368,6 @@ KmsKeyId is the ID of the KMS key.
 |Type     |string|
 |Required |No|
 
-
 MonitoringRoleArn is the ARN of the monitoring role.
 
 #### `.status.port`
@@ -2539,7 +2376,6 @@ MonitoringRoleArn is the ARN of the monitoring role.
 |:--------|:--------|
 |Type     |integer|
 |Required |No|
-
 
 port is the port of the database.
 
@@ -2550,10 +2386,4 @@ port is the port of the database.
 |Type     |string|
 |Required |No|
 
-
 SecurityGroupId The security group ID of the DB cluster.
-
-
-
-
-

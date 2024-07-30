@@ -1,21 +1,21 @@
 ---
-title: SubnetSet CRD schema reference (group xnetworks.crossplane.giantswarm.io)
-linkTitle: SubnetSet
+title: Peering CRD schema reference (group xnetworks.crossplane.giantswarm.io)
+linkTitle: Peering
 description: |
-  Custom resource definition (CRD) schema reference page for the SubnetSet resource (subnetsets.xnetworks.crossplane.giantswarm.io), as part of the Giant Swarm Management API documentation.
+  Custom resource definition (CRD) schema reference page for the Peering resource (peerings.xnetworks.crossplane.giantswarm.io), as part of the Giant Swarm Management API documentation.
 weight: 100
 crd:
-  claim_name: SubnetSetClaim
-  claim_name_plural: subnetsetclaims
-  default_composition_ref: subnetset
-  enforced_composition_ref: subnetset
-  name_camelcase: SubnetSet
-  name_plural: subnetsets
-  name_singular: subnetset
+  claim_name: VpcPeeringClaim
+  claim_name_plural: vpcpeeringclaims
+  default_composition_ref: vpcpeering
+  enforced_composition_ref: vpcpeering
+  name_camelcase: Peering
+  name_plural: peerings
+  name_singular: peering
   short_names:
-    - sn
+    - pcx
   group: xnetworks.crossplane.giantswarm.io
-  technical_name: subnetsets.xnetworks.crossplane.giantswarm.io
+  technical_name: peerings.xnetworks.crossplane.giantswarm.io
   scope: 
   source_repository: https://github.com/giantswarm/crossplane-gs-apis
   source_repository_ref: main
@@ -25,38 +25,39 @@ crd:
     - aws
     - crossplane
     - networks
+    - vpc
 layout: crd
 owner:
   - https://github.com/orgs/giantswarm/teams/team-honeybadger
 aliases:
-  - /reference/cp-k8s-api/subnetsets.xnetworks.crossplane.giantswarm.io/
-technical_name: subnetsets.xnetworks.crossplane.giantswarm.io
+  - /reference/cp-k8s-api/peerings.xnetworks.crossplane.giantswarm.io/
+technical_name: peerings.xnetworks.crossplane.giantswarm.io
 source_repository: https://github.com/giantswarm/crossplane-gs-apis
 source_repository_ref: main
 ---
 
-# SubnetSet
+# Peering
 
 
 <dl class="crd-meta">
 <dt class="fullname">Full name:</dt>
-<dd class="fullname">subnetsets.xnetworks.crossplane.giantswarm.io</dd>
+<dd class="fullname">peerings.xnetworks.crossplane.giantswarm.io</dd>
 <dt class="claimname">Claim name:</dt>
-<dd class="claimname">SubnetSetClaim</dd>
+<dd class="claimname">VpcPeeringClaim</dd>
 <dt class="claimnamesplural">Claim plural names:</dt>
-<dd class="claimnamesplural">subnetsetclaims</dd>
+<dd class="claimnamesplural">vpcpeeringclaims</dd>
 <dt class="defaultcompositionref">Default composition ref:</dt>
-<dd class="defaultcompositionref">subnetset</dd>
+<dd class="defaultcompositionref">vpcpeering</dd>
 <dt class="enforcedcompositionref">Enforced composition ref:</dt>
-<dd class="enforcedcompositionref">subnetset</dd>
+<dd class="enforcedcompositionref">vpcpeering</dd>
 <dt class="groupname">Group:</dt>
 <dd class="groupname">xnetworks.crossplane.giantswarm.io</dd>
 <dt class="singularname">Singular name:</dt>
-<dd class="singularname">subnetset</dd>
+<dd class="singularname">peering</dd>
 <dt class="shortnames">Short Names</dt>
-<dd class="shortnames">sn</dd>
+<dd class="shortnames">pcx</dd>
 <dt class="pluralname">Plural name:</dt>
-<dd class="pluralname">subnetsets</dd>
+<dd class="pluralname">peerings</dd>
 <dt class="scope">Scope:</dt>
 <dd class="scope"></dd>
 <dt class="versions">Versions:</dt>
@@ -66,18 +67,6 @@ source_repository_ref: main
 ## Version `v1alpha1`
 
 ### Spec Properties
-
-#### `.spec.appIndex`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-The index of the application that the subnet is being created for.
-
-This is used for complex applications that require multiple subnet groups
-Normally leave this on the default.
 
 #### `.spec.deletionPolicy`
 
@@ -99,6 +88,160 @@ This field is planned to be deprecated in favor of the ManagementPolicies
 field in a future release. Currently, both could be set independently and
 non-default values would be honored if the feature flag is enabled.
 See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+
+#### `.spec.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Determines if the VPC peering should be enabled
+
+#### `.spec.localVpcDetails`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |**Yes**|
+
+Details of the local VPC
+
+#### `.spec.localVpcDetails.cidrBlocks`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |**Yes**|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The CIDR blocks for the VPC.
+
+#### `.spec.localVpcDetails.cidrBlocks[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
+
+Cidr is a string type that represents a CIDR block.
+
+#### `.spec.localVpcDetails.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the VPC.
+
+#### `.spec.localVpcDetails.providerConfigRef`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+ProviderConfigRef is a reference to a provider configuration
+for managing connections to this vpc
+
+#### `.spec.localVpcDetails.providerConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.spec.localVpcDetails.providerConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.localVpcDetails.providerConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.localVpcDetails.providerConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
+
+#### `.spec.localVpcDetails.region`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Region is the region in which the VPC is located.
+
+Required if local vpc
+
+#### `.spec.localVpcDetails.routeTableIds`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |**Yes**|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The route table ids in the VPC.
+
+#### `.spec.localVpcDetails.routeTableIds[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^rtb-[a-z0-9]{8,17}$`|
+
+RouteTableId is a string type that represents the unique identifier for a
+route table.
+
+#### `.spec.localVpcDetails.vpcId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+|Validation|`^vpc-[a-z0-9]{8,17}$`|
+
+The ID of the VPC.
 
 #### `.spec.managementPolicies`
 
@@ -130,6 +273,151 @@ and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93
 
 A ManagementAction represents an action that the Crossplane controllers
 can take on an external resource.
+
+#### `.spec.peerVpcDetails`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |**Yes**|
+
+Details of the peer VPC
+
+#### `.spec.peerVpcDetails.cidrBlocks`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |**Yes**|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The CIDR blocks for the VPC.
+
+#### `.spec.peerVpcDetails.cidrBlocks[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
+
+Cidr is a string type that represents a CIDR block.
+
+#### `.spec.peerVpcDetails.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the VPC.
+
+#### `.spec.peerVpcDetails.providerConfigRef`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+ProviderConfigRef is a reference to a provider configuration
+for managing connections to this vpc
+
+#### `.spec.peerVpcDetails.providerConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.spec.peerVpcDetails.providerConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.peerVpcDetails.providerConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.peerVpcDetails.providerConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
+
+#### `.spec.peerVpcDetails.region`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Region is the region in which the VPC is located.
+
+Required if local vpc
+
+#### `.spec.peerVpcDetails.routeTableIds`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |**Yes**|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The route table ids in the VPC.
+
+#### `.spec.peerVpcDetails.routeTableIds[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^rtb-[a-z0-9]{8,17}$`|
+
+RouteTableId is a string type that represents the unique identifier for a
+route table.
+
+#### `.spec.peerVpcDetails.vpcId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+|Validation|`^vpc-[a-z0-9]{8,17}$`|
+
+The ID of the VPC.
 
 #### `.spec.providerConfigRef`
 
@@ -323,25 +611,6 @@ Type is the SecretType for the connection secret.
 
 Name is the name of the connection secret.
 
-#### `.spec.region`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |**Yes**|
-|Validation|`^[a-z]{2}-[a-z]+-[0-9]$`|
-
-Region is the region you'd like the VPC to be created in.
-
-#### `.spec.subnets`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |**Yes**|
-
-Subnets is a map of availability zones and subnet cidr blocks.
-
 #### `.spec.tags`
 
 |Property |Value    |
@@ -349,51 +618,7 @@ Subnets is a map of availability zones and subnet cidr blocks.
 |Type     |object|
 |Required |No|
 
-Tags is a set of tags to apply to resources in the subnetset
-
-#### `.spec.tags.all`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-A map of tags to apply to all resources in the subnetset.
-
-#### `.spec.tags.subnet`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-Subnet is a map of tags to apply only to the subnet resources
-
-#### `.spec.type`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-|Default Value|public|
-
-Allowed Values:
-
-- public
-- private
-
-Type is the type of VPC Subnet to create.
-
-#### `.spec.vpcId`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |**Yes**|
-|Validation|`^vpc-[a-z0-9]{8,17}$`|
-|Immutability|immutable|
-
-VpcId is the unique identifier for the VPC.
+Tags to apply to the VPC peering connection
 
 #### `.spec.writeConnectionSecretToRef`
 
@@ -499,30 +724,11 @@ Status of this condition; is it currently True, False, or Unknown?
 Type of this condition. At most one of each condition type may apply to
 a resource at any point in time.
 
-#### `.status.routeTables`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-RouteTables is a map of route tables discovered by the composite.
-
-#### `.status.subnets`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-Subnets is a map of subnets discovered by the composite.
-
-#### `.status.vpcId`
+#### `.status.peeringConnectionId`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-|Validation|`^vpc-[a-z0-9]{8,17}$`|
 
-VpcID is the unique identifier for the VPC.
+The ID of the VPC peering connection.
