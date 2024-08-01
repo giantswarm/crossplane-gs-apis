@@ -29,3 +29,51 @@ spec:
         regionRef: spec.region
         vpcRef: spec.remoteVpcs
     step: network-discovery
+
+  - step: patch-and-transform
+    functionRef:
+      name: function-patch-and-transform
+    input:
+      apiVersion: pt.fn.crossplane.io/v1beta1
+      kind: Resources
+      resources:
+      - name: deployment
+        base:
+          apiVersion: kubernetes.crossplane.io/v1alpha2
+          kind: Object
+          metadata:
+            name: network-discovery
+          spec:
+            forProvider:
+              manifest:
+                apiVersion: v1
+                kind: ConfigMap
+                metadata:
+                  name: ""
+                  namespace: ""
+                spec:
+                  data: {}
+            providerConfigRef:
+              name: default
+        patches:
+        - fromFieldPath: spec.claimRef.name
+          toFieldPath: metadata.name
+        - fromFieldPath: spec.claimRef.namespace
+          toFieldPath: spec.forProvider.manifest.metadata.namespace
+        - fromFieldPath: spec.claimRef.name
+          toFieldPath: spec.forProvider.manifest.metadata.name
+          transforms:
+          - type: string
+            string:
+              type: Format
+              fmt: "%s-network-discovery"
+        - fromFieldPath: status.vpcs
+          toFieldPath: spec.forProvider.manifest.data.vpcs
+          transforms:
+          - type: string
+            string:
+              type: Convert
+              convert: ToJson
+  - functionRef:
+      name: function-auto-ready
+    step: function-auto-ready

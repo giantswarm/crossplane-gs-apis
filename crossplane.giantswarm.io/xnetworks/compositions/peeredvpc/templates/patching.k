@@ -137,8 +137,14 @@ newdxr = {
                     if privateSubnets:
                         "privateSubnets" = privateSubnets
 
-                    "natGateways": {
-                        name: get(item, "Resource.status.atProvider.id", "")
+                    if get(pcr, "name", False):
+                        "providerConfig" = pcr.name
+
+                    if region:
+                        "region" = region
+
+                    "natGateways" = {
+                        name = get(item, "Resource.status.atProvider.id", "")
                         for name, item in _ocs
                         if all_true([
                             _ocs,
@@ -146,8 +152,8 @@ newdxr = {
                             get(item, "Resource.status.atProvider.id", False)
                         ])
                     }
-                    "transitGateways": {
-                        "name": {
+                    "transitGateways" = {
+                        name = {
                             "id": get(item, "Resource.status.atProvider.id", ""),
                         }
                         for name, item in _ocs
@@ -156,6 +162,21 @@ newdxr = {
                             get(item, "Resource.kind", "") == "TransitGateway"
                             get(item, "Resource.apiVersion", "") == "xnetworks.crossplane.giantswarm.io/v1alpha1"
                             get(item, "Resource.status.tgwId", False)
+                        ])
+                    }
+
+                    "vpcPeeringConnections" = {
+                        name = {
+                            "id": get(item, "Resource.status.peeringConnectionId", ""),
+                            "arn": get(item, "Resource.status.peeringConnectionArn", ""),
+                        }
+                        for name, item in _ocs
+                        if all_true([
+                            _ocs,
+                            get(item, "Resource.kind", "") == "Peering"
+                            get(item, "Resource.apiVersion", "") == "xnetworks.crossplane.giantswarm.io/v1alpha1"
+                            get(item, "Resourece.status.peeringConnectionId", False)
+                            get(item, "Resource.status.peeringConnectionArn", False)
                         ])
                     }
                 }

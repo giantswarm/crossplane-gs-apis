@@ -52,6 +52,42 @@ peering = [
     for _ in [True] if pcr
 ]
 
+peeringId = ocdsstatus("peering-${remoteVpcName}", "id", "")
+peeringCreated = ready("peering-${remoteVpcName}")
+
+options = [
+    {
+        "apiVersion": "ec2.aws.upbound.io/v1beta1"
+        "kind": "VPCPeeringConnectionOptions"
+        "metadata": {
+            "annotations": {
+                "krm.kcl.dev/composition-resource-name": "${appName}-peering-options"
+                "krm.kcl.dev/ready": readystr("${appName}-peering-options")
+            }
+        }
+        "spec": {
+            "deletionPolicy": dp,
+            "forProvider": {
+                "accepter": [
+                    {
+                        "allowRemoteVpcDnsResolution": True
+                    }
+                ]
+                "region": region,
+                "requester": [
+                    {
+                        "allowRemoteVpcDnsResolution": True
+                    }
+                ]
+                "vpcPeeringConnectionId": ocdsstatus("peering-${remoteVpcName}", "id", "")
+            }
+            "providerConfigRef": pcr,
+        }
+    }
+    for _ in [True]
+    if ready("peering-${remoteVpcName}")
+]
+
 accepters = [
     {
         _resourceName = "accepter-${remoteVpcName}"
@@ -76,7 +112,7 @@ accepters = [
                     }
                 ]
                 "region": remoteRegion
-                "vpcPeeringConnectionId": ocdsstatus("peering-${remoteVpcName}", "id", "")
+                "vpcPeeringConnectionId": peeringId
                 "tags": tags | {
                     Name: "${appName}-${region}-${remoteVpcName}"
                 }
@@ -87,19 +123,9 @@ accepters = [
     for _, x in get(_oxr, "spec.peering.remoteVpcs", [])
     if all_true([
         remoteRegion != region
-        ready("peering-${remoteVpcName}")
+        peeringCreated
     ])
 ]
-
-peeringIds = [
-    ocdsstatus("peering-${remoteVpcName}", "id", "")
-    for _ in [True]
-    if ready("peering-${remoteVpcName}")
-]
-peeringCreated = all_true([
-    id != False
-    for id in peeringIds
-])
 
 # Routes in the Remote VPC
 rmtRoutes = [
@@ -124,14 +150,13 @@ rmtRoutes = [
                 "destinationCidrBlock": cidr
                 "routeTableId": routeTableId
                 "region": remoteRegion
-                "vpcPeeringConnectionId": id
+                "vpcPeeringConnectionId": peeringId
             }
             "providerConfigRef": pcr
         }
     }
     for cidr in get(_oxr, "spec.localVpcDetails.cidrBlocks", [])
     for routeTableId in get(_oxr, "spec.peerVpcDetails.routeTableIds", [])
-    for id in peeringIds
     if all_true([
         peeringCreated,
         get(_oxr, "spec.localVpcDetails.cidrBlocks", False),
@@ -161,14 +186,13 @@ localRoutes  = [
                 "destinationCidrBlock": cidr
                 "routeTableId": routeTableId
                 "region": remoteRegion
-                "vpcPeeringConnectionId": id
+                "vpcPeeringConnectionId": peeringId
             }
             "providerConfigRef": pcr
         }
     }
     for cidr in get(_oxr, "spec.peerVpcDetails.cidrBlocks", [])
     for routeTableId in get(_oxr, "spec.localVpcDetails.routeTableIds", [])
-    for id in peeringIds
     if all_true([
         peeringCreated,
         get(_oxr, "spec.peerVpcDetails.cidrBlocks", False),
@@ -176,8 +200,22 @@ localRoutes  = [
     ])
 ]
 
+owner = ocdsstatus("peering-${remoteVpcName}", "peerOwnerId", "")
+arn = "arn:aws:ec2:${region}:${owner}:vpc-peering-connection/${peeringId}"
+
+newdxr = {
+    **_oxr,
+    **{
+        "status": {
+            if peeringCreated:
+                "peeringConnectionId": peeringId
+                "peeringConnectionArn": arn
+        }
+    }
+}
+
 _items = [
-    i for r in [peering, accepters, rmtRoutes, localRoutes]
+    i for r in [peering, accepters, rmtRoutes, localRoutes, [newdxr]]
     for i in r
     if i
 ]

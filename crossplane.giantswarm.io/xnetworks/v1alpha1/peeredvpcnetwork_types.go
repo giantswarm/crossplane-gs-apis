@@ -120,6 +120,11 @@ type TransitGatewayWrapper struct {
 
 	TgwVpcDetailsWrapper `json:",inline"`
 
+	// Peers is a list of transit gateway peers to connect to
+	//
+	// +optional
+	Peers []TgwPeerWrapper `json:"peers"`
+
 	// Prefix lists for the VPC
 	//
 	// +optional
@@ -128,6 +133,15 @@ type TransitGatewayWrapper struct {
 
 	// RemoteVpcs is a list of VPCs build a transit gateway between
 	RemoteVpcs []TgwWrappedVpcWithProviderConfig `json:"remoteVpcs"`
+}
+
+type TgwPeerWrapper struct {
+	TransitGatewayPeer `json:",inline"`
+
+	// Name of the transit gateway to peer with
+	//
+	// +required
+	Name string `json:"name"`
 }
 
 type TgwVpcDetailsWrapper struct {

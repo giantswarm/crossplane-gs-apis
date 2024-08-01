@@ -106,6 +106,46 @@ remoteVpcs = [
     if get(_oxr, "status.vpcs.${vpc.name}.id", False)
 ]
 
+# Transit Gateway Peers
+#
+# For peer to peer TGWs, at the remote TGW must be attached to one of the remote
+# VPCs.
+#
+# A possible future extention is to move `status.vpcs` down one level, maybe to
+# `status.region.vpcs` to allow for multiple regions to be managed by the
+# `network lookup` composition function. This would allow for discovery of
+# additional components that fit outside of the current framework however it
+# would be a huge breaking change on the API.
+#
+# Another option would be to
+transitGatewayPeers = [
+    {
+        _aid = getwparentfb(peer, _oxr, "accountId", "status.vpcs.self.owner", ""),
+        "accountId": _aid,
+        "id": peer.id,
+        "providerConfigRef": get(peer, "providerConfigRef", pcr),
+        "region": get(peer, "region", region),
+    }
+    for _, peer in get(_oxr, "spec.transitGateway.peers", [])
+    if get(peer, "id", False)
+] + [
+    {
+        "accountId": peer.accountId,
+        "id": tgw.id,
+        "providerConfigRef": get(peer, "providerConfigRef", pcr),
+        "region": peer.region,
+    }
+    for _, peer in get(_oxr, "spec.transitGateway.peers", [])
+    for _, vpc in get(_oxr, "status.vpcs", [])
+    for name, tgw in get(vpc, "transitGateways", [])
+    if all_true([
+        get(peer, "name", False),
+        name == get(peer, "name", False) and not get(peer, "id", False),
+        get(peer, "accountId", False) == get(vpc, "owner", ""),
+        get(peer, "region", False) == get(vpc, "region", ""),
+    ])
+]
+
 tgw = {
     "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1",
     "kind": "TransitGateway",
@@ -156,7 +196,7 @@ tgw = {
         if get(_oxr, "spec.transitGatewayRouteTablePropagation", False):
             "transitGatewayRouteTablePropagation": get(_oxr, "spec.transitGatewayRouteTablePropagation", "disable"),
 
-        # TRANSIT GATEWAY PEERS HERE
+        "transitGatewayPeers": transitGatewayPeers,
 
         "tags": get(_oxr, "spec.tags.common", []),
 

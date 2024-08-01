@@ -24,6 +24,17 @@ ready = lambda x: any, y: str -> str {
     ]) else "False"
 }
 
+getwparentfb = lambda x: {:}, p: {:}, y: str, z: str, d: any -> any {
+    """
+    Get with fallback to parent status
+    Tries to get a path from a dictionary, if it fails,
+    tries to get it from the parent dictionary.
+
+    If that fails, falls back to the default value provided.
+    """
+    get(x, y, get(p, "${z}", d))
+}
+
 appName = get(_oxr, "spec.claimRef.name", "")
 claimRef = get(_oxr, "spec.claimRef", {})
 dp = get(_oxr, "spec.deletionPolicy", "Delete")

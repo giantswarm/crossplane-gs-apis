@@ -42,6 +42,11 @@ type PeeringSpec struct {
 type PeeringStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
 
+	// The ARN of the VPC peering connection.
+	//
+	// +optional
+	PeeringConnectionArn string `json:"peeringConnectionArn,omitempty"`
+
 	// The ID of the VPC peering connection.
 	//
 	// +optional

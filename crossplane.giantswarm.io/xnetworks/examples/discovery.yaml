@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/instance: discovery
     app.kubernetes.io/part-of: xnetworks
     app.kubernetes.io/managed-by: crossplane
-  name: discovery
+  name: gazelle
   namespace: default
 spec:
   deletionPolicy: Delete
@@ -16,7 +16,7 @@ spec:
   groupBy: "giantswarm.io/subnetset"
   region: eu-west-2
   providerConfigRef:
-    name: aws-import
+    name: crossplane-network-discovery
   providerType: aws
   remoteVpcs:
-  - name: golem-vpc
+  - name: gazelle-vpc

@@ -411,6 +411,9 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              peeringConnectionArn:
+                description: The ARN of the VPC peering connection.
+                type: string
               peeringConnectionId:
                 description: The ID of the VPC peering connection.
                 type: string
