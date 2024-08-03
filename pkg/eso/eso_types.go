@@ -20,6 +20,17 @@ type Eso struct {
 	// +default=true
 	Enabled *bool `json:"enabled,omitempty"`
 
+	// FluxSSASecretName is the name of the secret that contains SSA details
+	// for each project built with infrastructure components.
+	//
+	// This secret will be updated with the name of the current project with
+	// all hyphens, underscores and dots replaced with an empty string.
+	//
+	// This secret must exist in the same namespace as the current project.
+	//
+	// +optional
+	FluxSSASecretName *string `json:"fluxSSASecretName,omitempty"`
+
 	// KubernetesSecretStore is the Kubernetes secret store to use.
 	//
 	// The kubernetes secret store is expected to be namespace scoped to prevent

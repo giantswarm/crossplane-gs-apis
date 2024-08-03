@@ -14,6 +14,11 @@ func (in *Eso) DeepCopyInto(out *Eso) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.FluxSSASecretName != nil {
+		in, out := &in.FluxSSASecretName, &out.FluxSSASecretName
+		*out = new(string)
+		**out = **in
+	}
 	if in.KubernetesSecretStore != nil {
 		in, out := &in.KubernetesSecretStore, &out.KubernetesSecretStore
 		*out = new(string)
