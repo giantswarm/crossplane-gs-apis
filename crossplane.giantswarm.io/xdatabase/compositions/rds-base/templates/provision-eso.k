@@ -1,6 +1,6 @@
 externalSecretStores = [
     {
-        "name": get(_oxr, "spec.eso.kubernetesSecretStore", "default"),
+        "name": get(oxr, "spec.eso.kubernetesSecretStore", "default"),
         "clusterScoped": False,
     }
 ]
@@ -10,8 +10,8 @@ pushSecretStores = [
         "name": store.secretStore,
         "clusterScoped": True,
     }
-    for _, store in get(_oxr, "spec.eso.stores", [])
-    if get(_oxr, "spec.eso.enabled", True) and store.enabled
+    for _, store in get(oxr, "spec.eso.stores", [])
+    if get(oxr, "spec.eso.enabled", True) and store.enabled
 ]
 usernameField = "username" if not createCluster else "master_username"
 passwordField = "password" if not createCluster else "attribute.master_password"
@@ -39,16 +39,16 @@ esoSqlSecret = [
         "apiVersion": "kubernetes.crossplane.io/v1alpha2"
         "kind": "Object"
         "metadata": {
-            annotations: {
+            "annotations": {
                 "krm.kcl.dev/composition-resource-name" = "${appName}-externalsecret"
                 "krm.kcl.dev/ready": readystr("${appName}-externalsecret")
             }
         }
         "spec": {
-            deletionPolicy: dp,
-            forProvider: {
+            "deletionPolicy": dp,
+            "forProvider": {
                 manifest: {
-                    "apiVersion": "external-secrets.io/v1alpha1"
+                    "apiVersion": "external-secrets.io/v1beta1"
                     "kind": "ExternalSecret"
                     "metadata": {
                         "namespace": namespace
@@ -63,7 +63,7 @@ esoSqlSecret = [
                             {
                                 "secretKey": k.r,
                                 "remoteRef": {
-                                    "key": connectionSecret,
+                                    "key": _connectionSecret,
                                     "property": k.p
                                 }
                             }
@@ -81,13 +81,14 @@ esoSqlSecret = [
                     }
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": {
-                "name": get(_oxr, "spec.kubernetesProviderConfig.name", "")
+                "name": get(oxr, "spec.kubernetesProviderConfig.name", "")
             }
         }
     }
     for _, value in externalSecretStores
-    if connectionSecret and get(_oxr, "spec.eso.enabled", True)
+    if _connectionSecret and get(oxr, "spec.eso.enabled", True)
 ]
 
 pushSecret = [
@@ -102,15 +103,12 @@ pushSecret = [
         }
         "spec": {
             "deletionPolicy": dp
-            "providerConfigRef": {
-                name: get(_oxr, "spec.kubernetesProviderConfig.name", "")
-            }
             "forProvider": {
                 "manifest": {
                     "apiVersion": "external-secrets.io/v1alpha1"
                     "kind": "PushSecret"
                     "metadata": {
-                        "namespace": get(_oxr, "spec.claimRef.namespace", "default")
+                        "namespace": get(oxr, "spec.claimRef.namespace", "default")
                     }
                     "spec": {
                         "refreshInterval": "10s"
@@ -132,8 +130,12 @@ pushSecret = [
                     }
                 }
             }
+            "managementPolicies": mgmtPolicy,
+            "providerConfigRef": {
+                name: get(oxr, "spec.kubernetesProviderConfig.name", "")
+            }
         }
-    } for _ in [True] if pushSecretStores and get(_oxr, "spec.eso.enabled", True)
+    } for _ in [True] if pushSecretStores and get(oxr, "spec.eso.enabled", True)
 ]
 
 _items = [

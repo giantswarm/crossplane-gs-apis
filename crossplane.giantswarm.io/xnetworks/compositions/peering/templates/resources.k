@@ -1,16 +1,16 @@
-appName = get(_oxr, "spec.claimRef.name", "")
-dp = get(_oxr, "spec.deletionPolicy", "Delete")
-labels = get(_oxr, "metadata.labels", {})
-pcr = get(_oxr, "spec.localVpcDetails.providerConfigRef", get(_oxr, "spec.providerConfigRef", {}))
+appName = get(oxr, "spec.claimRef.name", "")
+dp = get(oxr, "spec.deletionPolicy", "Delete")
+labels = get(oxr, "metadata.labels", {})
+pcr = get(oxr, "spec.localVpcDetails.providerConfigRef", get(oxr, "spec.providerConfigRef", {}))
 
-if not get(_oxr, "spec.localVpcDetails.region", False):
+if not get(oxr, "spec.localVpcDetails.region", False):
     assert False, "localVpcDetails.region is required"
 
-localVpcName = get(_oxr, "spec.localVpcDetails.name", "")
-region = get(_oxr, "spec.localVpcDetails.region", "eu-central-1")
-remoteRegion = get(_oxr, "spec.peerVpcDetails.region", region)
-remoteVpcName = get(_oxr, "spec.peerVpcDetails.name", "")
-tags = labels | get(_oxr, "spec.tags.common", {}) | {
+localVpcName = get(oxr, "spec.localVpcDetails.name", "")
+region = get(oxr, "spec.localVpcDetails.region", "eu-central-1")
+remoteRegion = get(oxr, "spec.peerVpcDetails.region", region)
+remoteVpcName = get(oxr, "spec.peerVpcDetails.name", "")
+tags = labels | get(oxr, "spec.tags.common", {}) | {
     region: region,
 }
 
@@ -39,21 +39,28 @@ peering = [
                 else:
                     "autoAccept": False
                     "peerRegion": remoteRegion
-                "peerVpcId": get(_oxr, "spec.peerVpcDetails.vpcId", "")
+                "peerVpcId": get(oxr, "spec.peerVpcDetails.vpcId", "")
                 "region": region
                 "tags": tags | {
                     Name: "${appName}-${region}-${remoteVpcName}"
                 }
-                "vpcId": get(_oxr, "spec.localVpcDetails.vpcId", "")
+                "vpcId": get(oxr, "spec.localVpcDetails.vpcId", "")
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
-    for _ in [True] if pcr
+    for _ in [True] if all_true([
+        get(oxr, "spec.localVpcDetails.vpcId", False),
+        get(oxr, "spec.peerVpcDetails.vpcId", False),
+        region,
+        remoteRegion,
+        pcr,
+    ])
 ]
 
-peeringId = ocdsstatus("peering-${remoteVpcName}", "id", "")
-peeringCreated = ready("peering-${remoteVpcName}")
+peeringId = ocdsstatus("peering-${remoteVpcName}", "id", False)
+peeringCreated = peeringId and ready("peering-${remoteVpcName}")
 
 options = [
     {
@@ -81,11 +88,12 @@ options = [
                 ]
                 "vpcPeeringConnectionId": ocdsstatus("peering-${remoteVpcName}", "id", "")
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr,
         }
     }
     for _ in [True]
-    if ready("peering-${remoteVpcName}")
+    if peeringCreated
 ]
 
 accepters = [
@@ -117,10 +125,11 @@ accepters = [
                     Name: "${appName}-${region}-${remoteVpcName}"
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
-    for _, x in get(_oxr, "spec.peering.remoteVpcs", [])
+    for _, x in get(oxr, "spec.peering.remoteVpcs", [])
     if all_true([
         remoteRegion != region
         peeringCreated
@@ -152,15 +161,16 @@ rmtRoutes = [
                 "region": remoteRegion
                 "vpcPeeringConnectionId": peeringId
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
-    for cidr in get(_oxr, "spec.localVpcDetails.cidrBlocks", [])
-    for routeTableId in get(_oxr, "spec.peerVpcDetails.routeTableIds", [])
+    for cidr in get(oxr, "spec.localVpcDetails.cidrBlocks", [])
+    for routeTableId in get(oxr, "spec.peerVpcDetails.routeTableIds", [])
     if all_true([
         peeringCreated,
-        get(_oxr, "spec.localVpcDetails.cidrBlocks", False),
-        get(_oxr, "spec.peerVpcDetails.routeTableIds", False),
+        get(oxr, "spec.localVpcDetails.cidrBlocks", False),
+        get(oxr, "spec.peerVpcDetails.routeTableIds", False),
     ])
 ]
 
@@ -185,18 +195,19 @@ localRoutes  = [
             "forProvider": {
                 "destinationCidrBlock": cidr
                 "routeTableId": routeTableId
-                "region": remoteRegion
+                "region": region
                 "vpcPeeringConnectionId": peeringId
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
-    for cidr in get(_oxr, "spec.peerVpcDetails.cidrBlocks", [])
-    for routeTableId in get(_oxr, "spec.localVpcDetails.routeTableIds", [])
+    for cidr in get(oxr, "spec.peerVpcDetails.cidrBlocks", [])
+    for routeTableId in get(oxr, "spec.localVpcDetails.routeTableIds", [])
     if all_true([
         peeringCreated,
-        get(_oxr, "spec.peerVpcDetails.cidrBlocks", False),
-        get(_oxr, "spec.localVpcDetails.routeTableIds", False),
+        get(oxr, "spec.peerVpcDetails.cidrBlocks", False),
+        get(oxr, "spec.localVpcDetails.routeTableIds", False),
     ])
 ]
 
@@ -204,12 +215,12 @@ owner = ocdsstatus("peering-${remoteVpcName}", "peerOwnerId", "")
 arn = "arn:aws:ec2:${region}:${owner}:vpc-peering-connection/${peeringId}"
 
 newdxr = {
-    **_oxr,
+    **oxr,
     **{
         "status": {
             if peeringCreated:
-                "peeringConnectionId": peeringId
-                "peeringConnectionArn": arn
+                "peeringConnectionId" = peeringId
+                "peeringConnectionArn" = arn
         }
     }
 }

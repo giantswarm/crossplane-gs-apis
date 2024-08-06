@@ -1,9 +1,7 @@
 import regex
 
-_oxr = option("params").oxr
-_dxr = option("params").dxr
-_ocds = option("params").ocds
-_dcds = option("params").dcds
+oxr = option("params").oxr
+ocds = option("params").ocds
 
 get = lambda x: {:}, y: str, d: any -> any {
     """
@@ -16,13 +14,23 @@ get = lambda x: {:}, y: str, d: any -> any {
     x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
 }
 
+exists = lambda x: any -> bool {
+    """
+    Check if a value exists.
+    """
+    x in list(ocds)
+}
+
 ready = lambda x: str -> bool {
     """
     Check if a value is ready.
     """
-    conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-    all_true([
-        get(c, "status", "False") == "True" for c in conditions
+    conditions = get(ocds, "${x}.Resource.status.conditions", [])
+    any_true([
+        exists(x),
+        all_true([
+            get(c, "status", "False") == "True" for c in conditions
+        ])
     ])
 }
 
@@ -33,5 +41,5 @@ readystr = lambda x: str -> str {
     "True" if ready(x) else "False"
 }
 
-dp = get(_oxr, "spec.deletionPolicy", "Delete")
-pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
+dp = get(oxr, "spec.deletionPolicy", "Delete")
+pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})

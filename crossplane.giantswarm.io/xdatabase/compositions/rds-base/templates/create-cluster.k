@@ -1,10 +1,10 @@
-ipgn = get(_oxr, "spec.dbParameterGroup.name", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else ""
-provisioned = get(_oxr, "spec.engineMode", "provisioned") == "provisioned"
-regionedAzs = ["${region}${az}" for az in get(_oxr, "spec.availabilityZones", ["a", "b", "c"])]
-subnetGroup = get(_oxr, "status.dbSubnetGroupName", False)
-serverless = get(_oxr, "spec.engineMode", "provisioned") == "serverless"
-scalingConfiguration = get(_oxr, "spec.scalingConfiguration", False) if serverless else False
-serverlessv2scaling = get(_oxr, "spec.serverlessv2scalingConfiguration", False) if provisioned else False
+ipgn = get(oxr, "spec.dbParameterGroup.name", "") if get(oxr, "spec.allowMajorVersionUpgrade", False) else ""
+provisioned = get(oxr, "spec.engineMode", "provisioned") == "provisioned"
+regionedAzs = ["${region}${az}" for az in get(oxr, "spec.availabilityZones", ["a", "b", "c"])]
+subnetGroup = get(oxr, "status.dbSubnetGroupName", False)
+serverless = get(oxr, "spec.engineMode", "provisioned") == "serverless"
+scalingConfiguration = get(oxr, "spec.scalingConfiguration", False) if serverless else False
+serverlessv2scaling = get(oxr, "spec.serverlessv2scalingConfiguration", False) if provisioned else False
 
 cluster = {
     "apiVersion": "rds.aws.upbound.io/v1beta1"
@@ -20,23 +20,23 @@ cluster = {
     "spec": {
         "deletionPolicy": dp
         "initProvider": {
-            if get(_oxr, "spec.allowMajorVersionUpgrade", True):
-                if get(_oxr, "spec.engineVersion", False):
-                    "engineVersion": _oxr.spec.engineVersion
-            if get(_oxr, "spec.globalClusterIdentifier", False):
-                "globalClusterIdentifier": _oxr.spec.globalClusterIdentifier
-            if get(_oxr, "spec.replicationSourceIdentifier", False):
-                "replicationSourceIdentifier": _oxr.spec.replicationSourceIdentifier
+            if get(oxr, "spec.allowMajorVersionUpgrade", True):
+                if get(oxr, "spec.engineVersion", False):
+                    "engineVersion": oxr.spec.engineVersion
+            if get(oxr, "spec.globalClusterIdentifier", False):
+                "globalClusterIdentifier": oxr.spec.globalClusterIdentifier
+            if get(oxr, "spec.replicationSourceIdentifier", False):
+                "replicationSourceIdentifier": oxr.spec.replicationSourceIdentifier
         }
 
         "forProvider": {
             _managedMasterUserPassword = False
-            _autoGeneratePassword = get(_oxr, "spec.autoGeneratePassword", True),
+            _autoGeneratePassword = get(oxr, "spec.autoGeneratePassword", True),
             if _autoGeneratePassword and not _managedMasterUserPassword:
                 "autoGeneratePassword": _autoGeneratePassword,
                 "masterPasswordSecretRef": {
                     "key": "password",
-                    "namespace": get(_oxr, "spec.claimRef.namespace", "default"),
+                    "namespace": get(oxr, "spec.claimRef.namespace", "default"),
                     "name": "${appName}-${region}-rds-autogen-pass",
                 }
 
@@ -51,73 +51,73 @@ cluster = {
                 Name: "${appName}-${region}"
             }
 
-            if get(_oxr, "spec.allocatedStorage", False):
-                "allocatedStorage": _oxr.spec.allocatedStorage
-            if get(_oxr, "spec.allowMajorVersionUpgrade", None) != None:
-                "allowMajorVersionUpgrade": _oxr.spec.allowMajorVersionUpgrade
-            if get(_oxr, "spec.applyImmediately", None) != None:
-                "applyImmediately": _oxr.spec.applyImmediately
-            if get(_oxr, "spec.availabilityZones", False):
+            if get(oxr, "spec.allocatedStorage", False):
+                "allocatedStorage": oxr.spec.allocatedStorage
+            if get(oxr, "spec.allowMajorVersionUpgrade", None) != None:
+                "allowMajorVersionUpgrade": oxr.spec.allowMajorVersionUpgrade
+            if get(oxr, "spec.applyImmediately", None) != None:
+                "applyImmediately": oxr.spec.applyImmediately
+            if get(oxr, "spec.availabilityZones", False):
                 "availabilityZones": regionedAzs
-            if get(_oxr, "spec.backupRetentionPeriod", False):
-                "backupRetentionPeriod": _oxr.spec.backupRetentionPeriod
-            if get(_oxr, "spec.backtrackWindow", False):
-                "backtrackWindow": _oxr.spec.backtrackWindow
-            if get(_oxr, "spec.clusterMembers", False):
-                "clusterMembers": _oxr.spec.clusterMembers
-            if get(_oxr, "spec.databaseName", False):
-                "databaseName": _oxr.spec.databaseName
-            if get(_oxr, "spec.dbClusterInstanceClass", False):
-                "dbClusterInstanceClass": _oxr.spec.dbClusterInstanceClass
-            if get(_oxr, "spec.dbClusterParameterGroup.name", False):
-                "dbClusterParameterGroupName": _oxr.spec.dbClusterParameterGroup.name
-            if get(_oxr, "spec.dbInstanceParameterGroup.name", False):
-                "dbInstanceParameterGroupName": _oxr.spec.dbInstanceParameterGroup.name
-            if get(_oxr, "spec.deletionProtection", None) != None:
-                "deletionProtection": _oxr.spec.deletionProtection
-            if get(_oxr, "spec.deleteAutomatedBackups", None) != None:
-                "deleteAutomatedBackups": _oxr.spec.deleteAutomatedBackups
-            if get(_oxr, "spec.domain", False):
-                "domain": _oxr.spec.domain
-            if get(_oxr, "spec.domainIAMRoleName", False):
-                "domainIAMRoleName": _oxr.spec.domainIAMRoleName
-            if get(_oxr, "spec.enableHttpEndpoint", False):
-                "enableHttpEndpoint": _oxr.spec.enableHttpEndpoint
-            if get(_oxr, "spec.enableGlobalWriteForwarding", None) != None:
-                "enableGlobalWriteForwarding": _oxr.spec.enableGlobalWriteForwarding
-            if get(_oxr, "spec.enableLocalWriteForwarding", None) != None:
-                "enableLocalWriteForwarding": _oxr.spec.enableLocalWriteForwarding
-            if get(_oxr, "spec.enabledCloudwatchLogsExports", False):
-                "enabledCloudwatchLogsExports": _oxr.spec.enabledCloudwatchLogsExports
-            if get(_oxr, "spec.engine", False):
-                "engine": _oxr.spec.engine
-            if get(_oxr, "spec.engineMode", False):
-                "engineMode": _oxr.spec.engineMode
+            if get(oxr, "spec.backupRetentionPeriod", False):
+                "backupRetentionPeriod": oxr.spec.backupRetentionPeriod
+            if get(oxr, "spec.backtrackWindow", False):
+                "backtrackWindow": oxr.spec.backtrackWindow
+            if get(oxr, "spec.clusterMembers", False):
+                "clusterMembers": oxr.spec.clusterMembers
+            if get(oxr, "spec.databaseName", False):
+                "databaseName": oxr.spec.databaseName
+            if get(oxr, "spec.dbClusterInstanceClass", False):
+                "dbClusterInstanceClass": oxr.spec.dbClusterInstanceClass
+            if get(oxr, "spec.dbClusterParameterGroup.name", False):
+                "dbClusterParameterGroupName": oxr.spec.dbClusterParameterGroup.name
+            if get(oxr, "spec.dbInstanceParameterGroup.name", False):
+                "dbInstanceParameterGroupName": oxr.spec.dbInstanceParameterGroup.name
+            if get(oxr, "spec.deletionProtection", None) != None:
+                "deletionProtection": oxr.spec.deletionProtection
+            if get(oxr, "spec.deleteAutomatedBackups", None) != None:
+                "deleteAutomatedBackups": oxr.spec.deleteAutomatedBackups
+            if get(oxr, "spec.domain", False):
+                "domain": oxr.spec.domain
+            if get(oxr, "spec.domainIAMRoleName", False):
+                "domainIAMRoleName": oxr.spec.domainIAMRoleName
+            if get(oxr, "spec.enableHttpEndpoint", False):
+                "enableHttpEndpoint": oxr.spec.enableHttpEndpoint
+            if get(oxr, "spec.enableGlobalWriteForwarding", None) != None:
+                "enableGlobalWriteForwarding": oxr.spec.enableGlobalWriteForwarding
+            if get(oxr, "spec.enableLocalWriteForwarding", None) != None:
+                "enableLocalWriteForwarding": oxr.spec.enableLocalWriteForwarding
+            if get(oxr, "spec.enabledCloudwatchLogsExports", False):
+                "enabledCloudwatchLogsExports": oxr.spec.enabledCloudwatchLogsExports
+            if get(oxr, "spec.engine", False):
+                "engine": oxr.spec.engine
+            if get(oxr, "spec.engineMode", False):
+                "engineMode": oxr.spec.engineMode
 
-            if not get(_oxr, "spec.allowMajorVersionUpgrade", True):
-                if get(_oxr, "spec.engineVersion", False):
-                    "engineVersion": get(_oxr, "spec.engineVersion", "")
+            if not get(oxr, "spec.allowMajorVersionUpgrade", True):
+                if get(oxr, "spec.engineVersion", False):
+                    "engineVersion": get(oxr, "spec.engineVersion", "")
 
-            if get(_oxr, "spec.claimRef.name", False):
-                "finalSnapshotIdentifier": _oxr.spec.claimRef.name
-            if get(_oxr, "spec.iamDatabaseAuthenticationEnabled", None) != None:
-                "iamDatabaseAuthenticationEnabled": _oxr.spec.iamDatabaseAuthenticationEnabled
-            if get(_oxr, "spec.iops", False):
-                "iops": _oxr.spec.iops
-            if get(_oxr, "spec.masterUsername", False):
-                "masterUsername": _oxr.spec.masterUsername
-            if get(_oxr, "spec.preferredBackupWindow", False):
-                "preferredBackupWindow": _oxr.spec.preferredBackupWindow
-            if get(_oxr, "spec.preferredMaintenanceWindow", False):
-                "preferredMaintenanceWindow": _oxr.spec.preferredMaintenanceWindow
-            if get(_oxr, "spec.restoreToPointInTime", False):
+            if get(oxr, "spec.claimRef.name", False):
+                "finalSnapshotIdentifier": oxr.spec.claimRef.name
+            if get(oxr, "spec.iamDatabaseAuthenticationEnabled", None) != None:
+                "iamDatabaseAuthenticationEnabled": oxr.spec.iamDatabaseAuthenticationEnabled
+            if get(oxr, "spec.iops", False):
+                "iops": oxr.spec.iops
+            if get(oxr, "spec.masterUsername", False):
+                "masterUsername": oxr.spec.masterUsername
+            if get(oxr, "spec.preferredBackupWindow", False):
+                "preferredBackupWindow": oxr.spec.preferredBackupWindow
+            if get(oxr, "spec.preferredMaintenanceWindow", False):
+                "preferredMaintenanceWindow": oxr.spec.preferredMaintenanceWindow
+            if get(oxr, "spec.restoreToPointInTime", False):
                 "restoreToPointInTime": [restoreToPointInTime]
-            if get(_oxr, "status.securityGroupId", False):
-                "vpcSecurityGroupIds": [_oxr.status.securityGroupId]
-            if get(_oxr, "spec.storageType", False):
-                "storageType": _oxr.spec.storageType
-            if get(_oxr, "spec.sourceRegion", False):
-                "sourceRegion": _oxr.spec.sourceRegion
+            if get(oxr, "status.securityGroupId", False):
+                "vpcSecurityGroupIds": [oxr.status.securityGroupId]
+            if get(oxr, "spec.storageType", False):
+                "storageType": oxr.spec.storageType
+            if get(oxr, "spec.sourceRegion", False):
+                "sourceRegion": oxr.spec.sourceRegion
 
             if s3import:
                 "s3Import": [
@@ -135,10 +135,11 @@ cluster = {
             if ipgn:
                 "dbInstanceParameterGroupName": ipgn
         }
-        "providerConfigRef": pcr
+        "managementPolicies": mgmtPolicy,
+        "providerConfigRef": pcr,
         "writeConnectionSecretToRef": {
             "name": "${appName}-${region}-rds"
-            "namespace": get(_oxr, "spec.claimRef.namespace", "default")
+            "namespace": get(oxr, "spec.claimRef.namespace", "default")
         }
     }
 } if keyId and subnetGroup else {}

@@ -12,12 +12,10 @@ import (
 // +genclient
 // +genclient:nonNamespaced
 //
-// +kubebuilder:resource:scope=Cluster,categories=crossplane
+// +kubebuilder:resource:scope=Cluster,categories=crossplane;network
 // +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="Region",type=string,JSONPath=`.spec.region`
-// +kubebuilder:printcolumn:name="VpcID",type=string,JSONPath=`.status.vpcID`
 // +kubebuilder:resource:shortName=dscvr
-// +crossbuilder:generate:xrd:claimNames:kind=DiscoveryClaim,plural=networkdiscoveryclaims
+// +crossbuilder:generate:xrd:claimNames:kind=DiscoveryClaim,plural=discoveryclaims
 // +crossbuilder:generate:xrd:defaultCompositionRef:name=network-discovery
 // +crossbuilder:generate:xrd:enforcedCompositionRef:name=network-discovery
 type Discovery struct {
@@ -38,19 +36,40 @@ type DiscoveryList struct {
 type DiscoverySpec struct {
 	xpv1.ResourceSpec `json:",inline"`
 
+	// Whether this discovery is enabled.
+	//
+	// +optional
+	// +default=true
 	Enabled bool `json:"enabled"`
 
+	// A tag that can be referenced to group subnets and route tables
+	// into subnetsets.
+	//
+	// The tag must have an integer value
+	//
+	// +optional
+	// +default="giantswarm.io/subnetset"
 	GroupBy string `json:"groupBy"`
 
+	// The name of the provider config to use for creating kubernetes resources.
+	//
+	// +required
+	KubernetesProviderConfigRef xpv1.Reference `json:"kubernetesProviderConfigRef"`
+
+	// The name of the provider config to use for looking up remote VPCs.
+	//
+	// +required
 	ProviderType string `json:"providerType"`
 
+	// The default region to look in.
 	Region string `json:"region"`
 
+	// Details about the remove VPCs to look up.
 	RemoteVpcs []VpcPeer `json:"remoteVpcs"`
 }
 
 type DiscoveryStatus struct {
-	xpv1.ResourceStatus `json:",inline"`
+	xpv1.ConditionedStatus `json:",inline"`
 
 	Vpcs map[string]nd.AwsVpc `json:"vpcs"`
 }

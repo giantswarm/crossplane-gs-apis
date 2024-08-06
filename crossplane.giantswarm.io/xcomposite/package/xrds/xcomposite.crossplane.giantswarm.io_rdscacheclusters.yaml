@@ -5,7 +5,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: (devel)
   creationTimestamp: null
-  name: rdscacheclusters.xaws.crossplane.giantswarm.io
+  name: rdscacheclusters.xcomposite.crossplane.giantswarm.io
 spec:
   claimNames:
     kind: RdsCacheClusterClaim
@@ -14,7 +14,7 @@ spec:
     name: rds-cache-cluster
   enforcedCompositionRef:
     name: rds-cache-cluster
-  group: xaws.crossplane.giantswarm.io
+  group: xcomposite.crossplane.giantswarm.io
   names:
     kind: RdsCacheCluster
     listKind: RdsCacheClusterList
@@ -2655,6 +2655,9 @@ spec:
                     description: A map of NAT gateways defined in this VPC
                     type: object
                     x-kubernetes-map-type: atomic
+                  owner:
+                    description: The owner of the current VPC
+                    type: string
                   privateRouteTables:
                     description: A map of private route tables defined in this VPC
                     items:
@@ -2677,6 +2680,9 @@ spec:
                     items:
                       additionalProperties:
                         properties:
+                          arn:
+                            description: The ARN of the subnet
+                            type: string
                           id:
                             description: The ID of the subnet
                             type: string
@@ -2714,6 +2720,9 @@ spec:
                     items:
                       additionalProperties:
                         properties:
+                          arn:
+                            description: The ARN of the subnet
+                            type: string
                           id:
                             description: The ID of the subnet
                             type: string
@@ -2737,11 +2746,21 @@ spec:
                   transitGateways:
                     additionalProperties:
                       properties:
+                        arn:
+                          description: The ARN of the transit gateway
+                          type: string
                         attachments:
                           additionalProperties:
                             properties:
                               id:
                                 description: The ID of the transit gateway attachment
+                                type: string
+                              resourceId:
+                                description: The ID of the resource that the transit
+                                  gateway is attached to
+                                type: string
+                              routeTableId:
+                                description: The associated route table ID
                                 type: string
                               type:
                                 description: The type of the transit gateway attachment
@@ -2757,9 +2776,13 @@ spec:
                         routeTables:
                           additionalProperties:
                             properties:
-                              default:
+                              defaultAssociation:
                                 description: Is this the default route table for the
                                   transit gateway
+                                type: boolean
+                              defaultPropagation:
+                                description: Is this the default propagation route
+                                  table for the transit gateway
                                 type: boolean
                               id:
                                 description: The ID of the transit gateway route table
@@ -2771,20 +2794,24 @@ spec:
                           type: object
                       type: object
                     description: A map of transit gateways defined in this VPC
-                    nullable: true
                     type: object
                     x-kubernetes-map-type: atomic
                   vpcPeeringConnections:
                     additionalProperties:
-                      type: string
+                      properties:
+                        arn:
+                          description: The ARN of the VPC peering connection
+                          type: string
+                        id:
+                          description: The ID of the VPC peering connection
+                          type: string
+                      type: object
                     description: A map of VPC peering connections defined in this
                       VPC
-                    nullable: true
                     type: object
                     x-kubernetes-map-type: atomic
-                required:
-                - id
                 type: object
+                x-kubernetes-map-type: granular
             type: object
         required:
         - spec

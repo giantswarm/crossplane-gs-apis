@@ -51,9 +51,6 @@ spec:
 
   deletionPolicy: Delete
 
-  kubernetesProviderConfig:
-    name: default
-
   providerConfigRef:
     name: aws-golem
 

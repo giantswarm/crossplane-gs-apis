@@ -9,7 +9,7 @@ chunksplit = lambda size: int subnets: [] -> [] {
 allowsPublic = lambda vpc: str -> bool {
     a = [
         get(x, "allowPublic", False)
-        for x in get(_oxr, "spec.peering.remoteVpcs", [])
+        for x in get(oxr, "spec.peering.remoteVpcs", [])
         if x.name == vpc
     ]
 
@@ -20,10 +20,10 @@ allowsPublic = lambda vpc: str -> bool {
 # in a VPC - this total must be below that
 requestedSets = [
     c.public.count + c.private.count
-    for c in get(_oxr, "spec.subnetsets.cidrs", [])
+    for c in get(oxr, "spec.subnetsets.cidrs", [])
 ]
 
-zones = sorted(get(_oxr, "spec.availabilityZones", [ "a", "b", "c" ]))
+zones = sorted(get(oxr, "spec.availabilityZones", [ "a", "b", "c" ]))
 
 assert sum(requestedSets)*len(zones) < 200, """
     The number of subnet sets you are requesting will exceed the maximum number
@@ -38,18 +38,18 @@ assert sum(requestedSets)*len(zones) < 200, """
 # allowing up to 4 additional CIDR ranges.
 additionalCidrs = [
     s.prefix
-    for s in _oxr.spec.subnetsets.cidrs[1:]
+    for s in oxr.spec.subnetsets.cidrs[1:]
 ]
 
-calculatedCidrs = get(_oxr, "status.calculatedCidrs", {})
-clusterTags = get(_oxr, "spec.tags.cluster", {})
+calculatedCidrs = get(oxr, "status.calculatedCidrs", {})
+clusterTags = get(oxr, "spec.tags.cluster", {})
 
 # Created checks
-vpcs = get(_oxr, "status.vpcs", {})
+vpcs = get(oxr, "status.vpcs", {})
 self = get(vpcs, "self", {})
 
 _ngw = [
-    ngw.Resource for _, ngw in _ocs if _ocs and get(ngw, "Resource.kind", "") == "NATGateway"
+    ngw.Resource for _, ngw in ocds if ocds and get(ngw, "Resource.kind", "") == "NATGateway"
 ]
 natgatewaysCreated = len([ngw for ngw in _ngw if ngw]) == len(zones)
 
@@ -94,12 +94,13 @@ _subnetsets = [
             "kubernetes.io/role/internal-elb": "1"
         } if _index == s.private.lbSetIndex and _visibility == "private" else {}
 
+        _resourceName = "subnetset-${_visibility}-cidr${c}-${_index}"
         "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
         "kind": "SubnetSet"
         "metadata": {
             "annotations": {
-                "krm.kcl.dev/composition-resource-name" = "subnetset-${_visibility}-cidr${c}-${_index}"
-                "krm.kcl.dev/ready" = ready(_ocs, "subnetset-${_visibility}-cidr${c}-${_index}")
+                "krm.kcl.dev/composition-resource-name" = _resourceName
+                "krm.kcl.dev/ready" = readystr(_resourceName)
             }
             "labels": labels | {access: _visibility, index: _index}
         }
@@ -107,6 +108,7 @@ _subnetsets = [
             "appIndex": _suffix
             "claimRef": claimRef
             "deletionPolicy": dp
+            "managementPolicies": mgmtPolicy,
             "region": region
             "providerConfigRef": pcr
             "subnets": {
@@ -115,18 +117,18 @@ _subnetsets = [
             }
             "type": _visibility
             "tags": {
-                "all": tags | get(_oxr, "spec.tags.subnet", {})
+                "all": tags | get(oxr, "spec.tags.subnet", {})
                 "subnet": _snlbtag
             }
             "vpcId": self.id
         }
     }
-    for c, s in get(_oxr, "spec.subnetsets.cidrs", [])
+    for c, s in get(oxr, "spec.subnetsets.cidrs", [])
     for i in range(get(s, "public.count", 0) + get(s, "private.count", 0))
     if all_true([
         calculatedCidrs, self,
         self.id,
-        get(_oxr, "spec.subnetsets.cidrs", False)
+        get(oxr, "spec.subnetsets.cidrs", False)
     ])
 ]
 
@@ -181,13 +183,14 @@ subnetsets = _fpubss + _fpriss
 # Each VPC may have up to 4 additional CIDRs attached
 acs = [
     {
+        _resourceName = "cidrassoc-${i}"
         "apiVersion": "ec2.aws.upbound.io/v1beta1"
         "kind": "VPCIPv4CidrBlockAssociation"
         "metadata": {
             "labels": labels
             "annotations": {
-                "krm.kcl.dev/composition-resource-name" = "cidrassoc-${i}"
-                "krm.kcl.dev/ready" = ready(_ocs, "cidrassoc-${i}")
+                "krm.kcl.dev/composition-resource-name" = _resourceName
+                "krm.kcl.dev/ready" = readystr(_resourceName)
             }
         }
         spec: {
@@ -199,6 +202,7 @@ acs = [
                     "matchControllerRef": True
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
@@ -210,12 +214,13 @@ acs = [
 # Each NAT Gateway must be associated with an EIP
 eips = [
     {
+        _resourceName = "eip-${i}"
         "apiVersion": "ec2.aws.upbound.io/v1beta1"
         "kind": "EIP"
         "metadata": {
             "annotations": {
-                "krm.kcl.dev/composition-resource-name" = "eip-${i}"
-                "krm.kcl.dev/ready" = ready(_ocs, "eip-${i}")
+                "krm.kcl.dev/composition-resource-name" = _resourceName
+                "krm.kcl.dev/ready" = readystr(_resourceName)
             }
             "labels": labels | {
                 "availabilityZone": az
@@ -227,12 +232,44 @@ eips = [
             "forProvider": {
                 "domain": "vpc"
                 "region": region
-                "tags": tags | {"Name": "${appName}-${region}${az}-${i}"}
+                "tags": tags | {
+                    "Name": "${appName}-${region}${az}-${i}",
+                    "utilization": "nat",
+                    "availabilityZone": az,
+                }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
     for i, az in zones if pubsn
+]
+
+igw = [
+    {
+        _resourceName = "internet-gateway"
+        "apiVersion": "ec2.aws.upbound.io/v1beta1"
+        "kind": "InternetGateway"
+        "metadata": {
+            "annotations": {
+                "krm.kcl.dev/composition-resource-name" = _resourceName
+                "krm.kcl.dev/ready" = readystr(_resourceName)
+            }
+            "labels": labels
+        }
+        "spec": {
+            "deletionPolicy": dp
+            "forProvider": {
+                "region": region
+                "tags": tags | {
+                    "Name": "${appName}-${region}"
+                }
+                "vpcId": self.id,
+            }
+            "managementPolicies": mgmtPolicy,
+            "providerConfigRef": pcr
+        }
+    } for _ in [True] if self and pubsn
 ]
 
 # NAT Gateways
@@ -242,12 +279,13 @@ eips = [
 keys = [k for k in pubsn[0]] if pubsn and len(pubsn) > 0 and len(pubsn[0]) == len(zones) else []
 natgateways = [
     {
+        _resourceName = "ngw-${i}"
         "apiVersion": "ec2.aws.upbound.io/v1beta1"
         "kind": "NATGateway"
         "metadata": {
             "annotations": {
-                "krm.kcl.dev/composition-resource-name" = "ngw-${i}"
-                "krm.kcl.dev/ready" = ready(_ocs, "ngw-${i}")
+                "krm.kcl.dev/composition-resource-name" = _resourceName
+                "krm.kcl.dev/ready" = readystr(_resourceName)
             }
             "labels": {
                 "availabilityZone": az
@@ -263,9 +301,11 @@ natgateways = [
                 "region": region
                 "subnetId": pubsn[0][keys[i]].id
                 "tags": labels | {
-                    "Name": "${appName}-${region}${az}"
+                    "Name": "${appName}-${region}${az}",
+                    "availabilityZone": az,
                 } | tags
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
@@ -295,12 +335,13 @@ _pubrtbls = [
 # One route per private route table
 ngwRoutes = [
     {
+        _resourceName = "ngw-rt-${rtbl[1].id}"
         "apiVersion": "ec2.aws.upbound.io/v1beta1"
         "kind": "Route"
         "metadata": {
             "annotations": {
-                "krm.kcl.dev/composition-resource-name" = "ngw-rt-${rtbl[1].id}"
-                "krm.kcl.dev/ready" = ready(_ocs, "ngw-rt-${rtbl[1].id}")
+                "krm.kcl.dev/composition-resource-name" = _resourceName
+                "krm.kcl.dev/ready" = readystr(_resourceName)
             }
             "labels": {
                 "availabilityZone": rtbl[0]
@@ -318,6 +359,7 @@ ngwRoutes = [
                 "region": region
                 "routeTableId": rtbl[1].id
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
@@ -331,12 +373,13 @@ ngwRoutes = [
 # One IGW route per public route table
 igwRoutes = [
     {
+        _resourceName = "igw-rt-${rtbl[1].id}"
         "apiVersion": "ec2.aws.upbound.io/v1beta1"
         "kind": "Route"
         "metadata": {
             "annotations": {
-                "krm.kcl.dev/composition-resource-name" = "igw-rt-${rtbl[1].id}"
-                "krm.kcl.dev/ready" = ready(_ocs, "igw-rt-${rtbl[1].id}")
+                "krm.kcl.dev/composition-resource-name" = _resourceName
+                "krm.kcl.dev/ready" = readystr(_resourceName)
             }
             "labels": {
                 "availabilityZone": rtbl[0]
@@ -353,18 +396,20 @@ igwRoutes = [
                 "region": region
                 "routeTableId": rtbl[1].id
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
     for i, x in _pubrtbls
     for _, rtbl in zip(zones, [r for _, r in x])
+    if igw and pubsn
 ]
 
 # Create the list of items to return
 _items = [
     i for x in [
-        subnetsets, acs, eips, natgateways,
-        ngwRoutes, igwRoutes
+        subnetsets, acs, eips, igw,
+        igwRoutes, natgateways, ngwRoutes
     ]
     for i in x if i
 ]

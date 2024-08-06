@@ -6,7 +6,6 @@ import (
 	//"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 	"crossbuilder/v1alpha1"
 
-	xgt "github.com/crossplane-contrib/function-go-templating/input/v1beta1"
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 
 	xapiextv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
@@ -21,7 +20,7 @@ var Builder = builder{}
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
 		GroupVersionKind: v1alpha1.TransitGatewayGroupVersionKind,
-		Object:           &xgt.GoTemplate{},
+		Object:           &v1alpha1.TransitGateway{},
 	}
 }
 
@@ -36,10 +35,16 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 
 	// Load the template
 	var (
-		err                error
-		kclCommon          string
-		kclPeeringTemplate string
-		kclFooter          string = "items = _items"
+		err                  error
+		kclCommon            string
+		kclFooter            string = "items = _items"
+		kclLocalTemplate     string
+		kclMplTemplate       string
+		kclPeeringTemplate   string
+		kclPatchingTemplate  string
+		kclRamTemplate       string
+		kclRemoteTemplate    string
+		kclResourcesTemplate string
 	)
 
 	kclCommon, err = build.LoadTemplate("compositions/transitgateway/templates/common.k")
@@ -47,12 +52,85 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		panic(err)
 	}
 
-	kclPeeringTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/resources.k")
+	kclLocalTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/local.k")
 	if err != nil {
 		panic(err)
 	}
 
-	c.NewPipelineStep("function-kcl-create-peering").
+	kclMplTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/mpl.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclPeeringTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/peering.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclPatchingTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/patching.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclRamTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/ram.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclResourcesTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/resources.k")
+	if err != nil {
+		panic(err)
+	}
+
+	c.NewPipelineStep("function-kcl-local").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclCommon, kclLocalTemplate, kclFooter}, "\n\n"),
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-kcl-mpl").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclCommon, kclMplTemplate, kclFooter}, "\n\n"),
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-kcl-patching").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclCommon, kclPatchingTemplate, kclFooter}, "\n\n"),
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-kcl-peering").
 		WithFunctionRef(xapiextv1.FunctionReference{
 			Name: "function-kcl",
 		}).
@@ -64,6 +142,54 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 				Spec: xkcl.RunSpec{
 					Source: strings.Join([]string{kclCommon, kclPeeringTemplate, kclFooter}, "\n\n"),
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-kcl-ram").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclCommon, kclRamTemplate, kclFooter}, "\n\n"),
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-kcl-create-resources").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclCommon, kclResourcesTemplate, kclFooter}, "\n\n"),
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-kcl-remote").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclCommon, kclRemoteTemplate, kclFooter}, "\n\n"),
 				},
 			},
 		})

@@ -7,7 +7,6 @@ import (
 	//"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 	"crossbuilder/v1alpha1"
 
-	xgt "github.com/crossplane-contrib/function-go-templating/input/v1beta1"
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 	xpt "github.com/crossplane-contrib/function-patch-and-transform/input/v1beta1"
 
@@ -25,7 +24,7 @@ var Builder = builder{}
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
 		GroupVersionKind: v1alpha1.PeeredVpcNetworkGroupVersionKind,
-		Object:           &xgt.GoTemplate{},
+		Object:           &v1alpha1.PeeredVpcNetwork{},
 	}
 }
 
@@ -242,7 +241,7 @@ func createResources() []xpt.ComposedTemplate {
 	var resources []xpt.ComposedTemplate = []xpt.ComposedTemplate{
 		createVpcResource(),
 		createDefaultSgControl(),
-		createInternetGateway(),
+		// createInternetGateway(),
 	}
 
 	return resources

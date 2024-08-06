@@ -50,9 +50,8 @@ spec:
       spec:
         source: |-
           import regex
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocs = option("params").ocds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -65,26 +64,64 @@ spec:
               x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
           }
 
-          ready = lambda x: any, y: str -> str {
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
+
+          ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(x, "${y}.Resource.status.conditions", [])
-              "True" if all_true([
-                  get(c, "status", "False") == "True" for c in conditions
-              ]) else "False"
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
+              ])
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          claimRef = get(_oxr, "spec.claimRef", {})
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          labels = get(_oxr, "metadata.labels", {})
-          peeringEnabled = get(_oxr, "spec.peering.enabled", False)
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
-          region = get(_oxr, "spec.region", "eu-central-1")
-          tags = labels | get(_oxr, "spec.tags.common", {}) | {
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          getwparentfb = lambda x: {:}, p: {:}, y: str, z: str, d: any -> any {
+              """
+              Get with fallback to parent status
+              Tries to get a path from a dictionary, if it fails,
+              tries to get it from the parent dictionary.
+
+              If that fails, falls back to the default value provided.
+              """
+              get(x, y, get(p, "${z}", d))
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          appName = get(oxr, "spec.claimRef.name", "")
+          claimRef = get(oxr, "spec.claimRef", {})
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          labels = get(oxr, "metadata.labels", {})
+          peeringEnabled = get(oxr, "spec.peering.enabled", False)
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          region = get(oxr, "spec.region", "eu-central-1")
+          tags = labels | get(oxr, "spec.tags.common", {}) | {
               "region": region,
           }
+
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 
           chunksplit = lambda size: int subnets: [] -> [] {
               # split the subnets array into chunks of size `size`
@@ -97,7 +134,7 @@ spec:
           allowsPublic = lambda vpc: str -> bool {
               a = [
                   get(x, "allowPublic", False)
-                  for x in get(_oxr, "spec.peering.remoteVpcs", [])
+                  for x in get(oxr, "spec.peering.remoteVpcs", [])
                   if x.name == vpc
               ]
 
@@ -108,10 +145,10 @@ spec:
           # in a VPC - this total must be below that
           requestedSets = [
               c.public.count + c.private.count
-              for c in get(_oxr, "spec.subnetsets.cidrs", [])
+              for c in get(oxr, "spec.subnetsets.cidrs", [])
           ]
 
-          zones = sorted(get(_oxr, "spec.availabilityZones", [ "a", "b", "c" ]))
+          zones = sorted(get(oxr, "spec.availabilityZones", [ "a", "b", "c" ]))
 
           assert sum(requestedSets)*len(zones) < 200, """
               The number of subnet sets you are requesting will exceed the maximum number
@@ -126,18 +163,18 @@ spec:
           # allowing up to 4 additional CIDR ranges.
           additionalCidrs = [
               s.prefix
-              for s in _oxr.spec.subnetsets.cidrs[1:]
+              for s in oxr.spec.subnetsets.cidrs[1:]
           ]
 
-          calculatedCidrs = get(_oxr, "status.calculatedCidrs", {})
-          clusterTags = get(_oxr, "spec.tags.cluster", {})
+          calculatedCidrs = get(oxr, "status.calculatedCidrs", {})
+          clusterTags = get(oxr, "spec.tags.cluster", {})
 
           # Created checks
-          vpcs = get(_oxr, "status.vpcs", {})
+          vpcs = get(oxr, "status.vpcs", {})
           self = get(vpcs, "self", {})
 
           _ngw = [
-              ngw.Resource for _, ngw in _ocs if _ocs and get(ngw, "Resource.kind", "") == "NATGateway"
+              ngw.Resource for _, ngw in ocds if ocds and get(ngw, "Resource.kind", "") == "NATGateway"
           ]
           natgatewaysCreated = len([ngw for ngw in _ngw if ngw]) == len(zones)
 
@@ -182,12 +219,13 @@ spec:
                       "kubernetes.io/role/internal-elb": "1"
                   } if _index == s.private.lbSetIndex and _visibility == "private" else {}
 
+                  _resourceName = "subnetset-${_visibility}-cidr${c}-${_index}"
                   "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
                   "kind": "SubnetSet"
                   "metadata": {
                       "annotations": {
-                          "krm.kcl.dev/composition-resource-name" = "subnetset-${_visibility}-cidr${c}-${_index}"
-                          "krm.kcl.dev/ready" = ready(_ocs, "subnetset-${_visibility}-cidr${c}-${_index}")
+                          "krm.kcl.dev/composition-resource-name" = _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
                       }
                       "labels": labels | {access: _visibility, index: _index}
                   }
@@ -195,6 +233,7 @@ spec:
                       "appIndex": _suffix
                       "claimRef": claimRef
                       "deletionPolicy": dp
+                      "managementPolicies": mgmtPolicy,
                       "region": region
                       "providerConfigRef": pcr
                       "subnets": {
@@ -203,18 +242,18 @@ spec:
                       }
                       "type": _visibility
                       "tags": {
-                          "all": tags | get(_oxr, "spec.tags.subnet", {})
+                          "all": tags | get(oxr, "spec.tags.subnet", {})
                           "subnet": _snlbtag
                       }
                       "vpcId": self.id
                   }
               }
-              for c, s in get(_oxr, "spec.subnetsets.cidrs", [])
+              for c, s in get(oxr, "spec.subnetsets.cidrs", [])
               for i in range(get(s, "public.count", 0) + get(s, "private.count", 0))
               if all_true([
                   calculatedCidrs, self,
                   self.id,
-                  get(_oxr, "spec.subnetsets.cidrs", False)
+                  get(oxr, "spec.subnetsets.cidrs", False)
               ])
           ]
 
@@ -269,13 +308,14 @@ spec:
           # Each VPC may have up to 4 additional CIDRs attached
           acs = [
               {
+                  _resourceName = "cidrassoc-${i}"
                   "apiVersion": "ec2.aws.upbound.io/v1beta1"
                   "kind": "VPCIPv4CidrBlockAssociation"
                   "metadata": {
                       "labels": labels
                       "annotations": {
-                          "krm.kcl.dev/composition-resource-name" = "cidrassoc-${i}"
-                          "krm.kcl.dev/ready" = ready(_ocs, "cidrassoc-${i}")
+                          "krm.kcl.dev/composition-resource-name" = _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
                       }
                   }
                   spec: {
@@ -287,6 +327,7 @@ spec:
                               "matchControllerRef": True
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
@@ -298,12 +339,13 @@ spec:
           # Each NAT Gateway must be associated with an EIP
           eips = [
               {
+                  _resourceName = "eip-${i}"
                   "apiVersion": "ec2.aws.upbound.io/v1beta1"
                   "kind": "EIP"
                   "metadata": {
                       "annotations": {
-                          "krm.kcl.dev/composition-resource-name" = "eip-${i}"
-                          "krm.kcl.dev/ready" = ready(_ocs, "eip-${i}")
+                          "krm.kcl.dev/composition-resource-name" = _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
                       }
                       "labels": labels | {
                           "availabilityZone": az
@@ -315,12 +357,44 @@ spec:
                       "forProvider": {
                           "domain": "vpc"
                           "region": region
-                          "tags": tags | {"Name": "${appName}-${region}${az}-${i}"}
+                          "tags": tags | {
+                              "Name": "${appName}-${region}${az}-${i}",
+                              "utilization": "nat",
+                              "availabilityZone": az,
+                          }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
               for i, az in zones if pubsn
+          ]
+
+          igw = [
+              {
+                  _resourceName = "internet-gateway"
+                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
+                  "kind": "InternetGateway"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name" = _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                      "labels": labels
+                  }
+                  "spec": {
+                      "deletionPolicy": dp
+                      "forProvider": {
+                          "region": region
+                          "tags": tags | {
+                              "Name": "${appName}-${region}"
+                          }
+                          "vpcId": self.id,
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": pcr
+                  }
+              } for _ in [True] if self and pubsn
           ]
 
           # NAT Gateways
@@ -330,12 +404,13 @@ spec:
           keys = [k for k in pubsn[0]] if pubsn and len(pubsn) > 0 and len(pubsn[0]) == len(zones) else []
           natgateways = [
               {
+                  _resourceName = "ngw-${i}"
                   "apiVersion": "ec2.aws.upbound.io/v1beta1"
                   "kind": "NATGateway"
                   "metadata": {
                       "annotations": {
-                          "krm.kcl.dev/composition-resource-name" = "ngw-${i}"
-                          "krm.kcl.dev/ready" = ready(_ocs, "ngw-${i}")
+                          "krm.kcl.dev/composition-resource-name" = _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
                       }
                       "labels": {
                           "availabilityZone": az
@@ -351,9 +426,11 @@ spec:
                           "region": region
                           "subnetId": pubsn[0][keys[i]].id
                           "tags": labels | {
-                              "Name": "${appName}-${region}${az}"
+                              "Name": "${appName}-${region}${az}",
+                              "availabilityZone": az,
                           } | tags
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
@@ -383,12 +460,13 @@ spec:
           # One route per private route table
           ngwRoutes = [
               {
+                  _resourceName = "ngw-rt-${rtbl[1].id}"
                   "apiVersion": "ec2.aws.upbound.io/v1beta1"
                   "kind": "Route"
                   "metadata": {
                       "annotations": {
-                          "krm.kcl.dev/composition-resource-name" = "ngw-rt-${rtbl[1].id}"
-                          "krm.kcl.dev/ready" = ready(_ocs, "ngw-rt-${rtbl[1].id}")
+                          "krm.kcl.dev/composition-resource-name" = _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
                       }
                       "labels": {
                           "availabilityZone": rtbl[0]
@@ -406,6 +484,7 @@ spec:
                           "region": region
                           "routeTableId": rtbl[1].id
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
@@ -419,12 +498,13 @@ spec:
           # One IGW route per public route table
           igwRoutes = [
               {
+                  _resourceName = "igw-rt-${rtbl[1].id}"
                   "apiVersion": "ec2.aws.upbound.io/v1beta1"
                   "kind": "Route"
                   "metadata": {
                       "annotations": {
-                          "krm.kcl.dev/composition-resource-name" = "igw-rt-${rtbl[1].id}"
-                          "krm.kcl.dev/ready" = ready(_ocs, "igw-rt-${rtbl[1].id}")
+                          "krm.kcl.dev/composition-resource-name" = _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
                       }
                       "labels": {
                           "availabilityZone": rtbl[0]
@@ -441,18 +521,20 @@ spec:
                           "region": region
                           "routeTableId": rtbl[1].id
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
               for i, x in _pubrtbls
               for _, rtbl in zip(zones, [r for _, r in x])
+              if igw and pubsn
           ]
 
           # Create the list of items to return
           _items = [
               i for x in [
-                  subnetsets, acs, eips, natgateways,
-                  ngwRoutes, igwRoutes
+                  subnetsets, acs, eips, igw,
+                  igwRoutes, natgateways, ngwRoutes
               ]
               for i in x if i
           ]
@@ -470,9 +552,8 @@ spec:
       spec:
         source: |-
           import regex
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocs = option("params").ocds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -485,35 +566,74 @@ spec:
               x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
           }
 
-          ready = lambda x: any, y: str -> str {
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
+
+          ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(x, "${y}.Resource.status.conditions", [])
-              "True" if all_true([
-                  get(c, "status", "False") == "True" for c in conditions
-              ]) else "False"
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
+              ])
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          claimRef = get(_oxr, "spec.claimRef", {})
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          labels = get(_oxr, "metadata.labels", {})
-          peeringEnabled = get(_oxr, "spec.peering.enabled", False)
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
-          region = get(_oxr, "spec.region", "eu-central-1")
-          tags = labels | get(_oxr, "spec.tags.common", {}) | {
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          getwparentfb = lambda x: {:}, p: {:}, y: str, z: str, d: any -> any {
+              """
+              Get with fallback to parent status
+              Tries to get a path from a dictionary, if it fails,
+              tries to get it from the parent dictionary.
+
+              If that fails, falls back to the default value provided.
+              """
+              get(x, y, get(p, "${z}", d))
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          appName = get(oxr, "spec.claimRef.name", "")
+          claimRef = get(oxr, "spec.claimRef", {})
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          labels = get(oxr, "metadata.labels", {})
+          peeringEnabled = get(oxr, "spec.peering.enabled", False)
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          region = get(oxr, "spec.region", "eu-central-1")
+          tags = labels | get(oxr, "spec.tags.common", {}) | {
               "region": region,
           }
+
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 
           peering = [
               {
                   "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
                   "kind": "Peering"
                   "metadata": {
+                      _resourceName = "peering-${remoteVpc.name}"
                       "annotations": {
-                          "krm.kcl.dev/composition-resource-name" = "peering-${remoteVpc.name}"
-                          "krm.kcl.dev/ready" = ready(_ocs, "peering-${remoteVpc.name}")
+                          "krm.kcl.dev/composition-resource-name" = _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
                       }
                       "labels": labels | {
                           "vpcName": remoteVpc.name
@@ -524,42 +644,43 @@ spec:
                       "deletionPolicy": dp
                       "enabled": peeringEnabled
                       "localVpcDetails": {
-                          "name": get(_oxr, "spec.claimRef.name", "")
+                          "name": get(oxr, "spec.claimRef.name", "")
                           "cidrBlocks": [
                               c for c in [
-                                  get(_oxr, "status.vpcs.self.cidrBlock", "")
-                              ] + get(_oxr, "status.vpcs.self.additionalCidrBlocks", [])
+                                  get(oxr, "status.vpcs.self.cidrBlock", "")
+                              ] + get(oxr, "status.vpcs.self.additionalCidrBlocks", [])
                               if c
                           ]
                           "region": region
                           "routeTableIds": [
-                              i.id for r in get(_oxr, "status.vpcs.self.publicRouteTables", [])
+                              i.id for r in get(oxr, "status.vpcs.self.publicRouteTables", [])
                               for _, i in r
-                              if get(_oxr, "spec.peering.allowPublic", True)
+                              if get(oxr, "spec.peering.allowPublic", True)
                           ] + [
-                              i.id for r in get(_oxr, "status.vpcs.self.privateRouteTables", [])
+                              i.id for r in get(oxr, "status.vpcs.self.privateRouteTables", [])
                               for _, i in r
                           ]
-                          "vpcId": get(_oxr, "status.vpcs.self.id", "")
+                          "vpcId": get(oxr, "status.vpcs.self.id", "")
                       }
+                      "managementPolicies": mgmtPolicy,
                       "peerVpcDetails": {
                           "name": remoteVpc.name
                           "cidrBlocks": [
                               c for c in [
-                                  get(_oxr, "status.vpcs.${remoteVpc.name}.cidrBlock", "")
-                              ] + get(_oxr, "status.vpcs.${remoteVpc.name}.additionalCidrBlocks", [])
+                                  get(oxr, "status.vpcs.${remoteVpc.name}.cidrBlock", "")
+                              ] + get(oxr, "status.vpcs.${remoteVpc.name}.additionalCidrBlocks", [])
                               if c
                           ]
                           "region": remoteVpc.region
                           "routeTableIds": [
-                              i.id for r in get(_oxr, "status.vpcs.${remoteVpc.name}.publicRouteTables", [])
+                              i.id for r in get(oxr, "status.vpcs.${remoteVpc.name}.publicRouteTables", [])
                               for _, i in r
                               if get(remoteVpc, "allowPublic", True)
                           ] + [
-                              i.id for r in get(_oxr, "status.vpcs.${remoteVpc.name}.privateRouteTables", [])
+                              i.id for r in get(oxr, "status.vpcs.${remoteVpc.name}.privateRouteTables", [])
                               for _, i in r
                           ]
-                          "vpcId": get(_oxr, "status.vpcs.${remoteVpc.name}.id", "")
+                          "vpcId": get(oxr, "status.vpcs.${remoteVpc.name}.id", "")
                       }
                       "tags": {
                           "Name": "${appName}-${region}-${remoteVpc.name}"
@@ -567,11 +688,11 @@ spec:
                       providerConfigRef: pcr
                   }
               }
-              for _, remoteVpc in get(_oxr, "spec.peering.remoteVpcs", [])
+              for _, remoteVpc in get(oxr, "spec.peering.remoteVpcs", [])
               if all_true([
                   peeringEnabled,
-                  get(_oxr, "status.vpcs.self.id", False),
-                  get(_oxr, "status.vpcs.${remoteVpc.name}.id", False),
+                  get(oxr, "status.vpcs.self.id", False),
+                  get(oxr, "status.vpcs.${remoteVpc.name}.id", False),
               ])
           ]
 
@@ -590,9 +711,8 @@ spec:
       spec:
         source: |-
           import regex
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocs = option("params").ocds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -605,29 +725,67 @@ spec:
               x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
           }
 
-          ready = lambda x: any, y: str -> str {
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
+
+          ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(x, "${y}.Resource.status.conditions", [])
-              "True" if all_true([
-                  get(c, "status", "False") == "True" for c in conditions
-              ]) else "False"
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
+              ])
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          claimRef = get(_oxr, "spec.claimRef", {})
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          labels = get(_oxr, "metadata.labels", {})
-          peeringEnabled = get(_oxr, "spec.peering.enabled", False)
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
-          region = get(_oxr, "spec.region", "eu-central-1")
-          tags = labels | get(_oxr, "spec.tags.common", {}) | {
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          getwparentfb = lambda x: {:}, p: {:}, y: str, z: str, d: any -> any {
+              """
+              Get with fallback to parent status
+              Tries to get a path from a dictionary, if it fails,
+              tries to get it from the parent dictionary.
+
+              If that fails, falls back to the default value provided.
+              """
+              get(x, y, get(p, "${z}", d))
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          appName = get(oxr, "spec.claimRef.name", "")
+          claimRef = get(oxr, "spec.claimRef", {})
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          labels = get(oxr, "metadata.labels", {})
+          peeringEnabled = get(oxr, "spec.peering.enabled", False)
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          region = get(oxr, "spec.region", "eu-central-1")
+          tags = labels | get(oxr, "spec.tags.common", {}) | {
               "region": region,
           }
 
-          _ram = get(_oxr, "spec.ram", {enabled: False})
-          _tgwRam = get(_oxr, "spec.transitGateway.ram", {enabled: False})
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+
+          _ram = get(oxr, "spec.ram", {enabled: False})
+          _tgwRam = get(oxr, "spec.transitGateway.ram", {enabled: False})
 
           # If we have both RAM and TGW RAM enabled, we need to disable TGW RAM
           # as it will be built as part of the VPC
@@ -635,30 +793,30 @@ spec:
               _tgwRam.enabled = False
 
           localRouteTableIds = [
-              i.id for r in get(_oxr, "status.vpcs.self.publicRouteTables", [])
+              i.id for r in get(oxr, "status.vpcs.self.publicRouteTables", [])
               for _, i in r
-              if get(_oxr, "spec.transitGateway.allowPublic", True)
+              if get(oxr, "spec.transitGateway.allowPublic", True)
           ] + [
-              i.id for r in get(_oxr, "status.vpcs.privateRouteTables", [])
+              i.id for r in get(oxr, "status.vpcs.privateRouteTables", [])
               for _, i in r
           ]
 
-          preferPublic = get(_oxr, "spec.transitGateway.preferPublicAttachments", False)
+          preferPublic = get(oxr, "spec.transitGateway.preferPublicAttachments", False)
 
           # We can only use one subnet in each availability zone for the TGW attachment
           localSubnetIds = [
-              i.id for j, r in get(_oxr, "status.vpcs.self.publicSubnets", [])
+              i.id for j, r in get(oxr, "status.vpcs.self.publicSubnets", [])
               for _, i in r
               if all_true([
                   j == 0
-                  get(_oxr, "spec.transitGateway.allowPublic", True)
+                  get(oxr, "spec.transitGateway.allowPublic", True)
                   preferPublic
               ])
           ] if all_true([
               preferPublic,
-              get(_oxr, "spec.transitGateway.allowPublic", True),
+              get(oxr, "spec.transitGateway.allowPublic", True),
           ]) else [
-              i.id for j, r in get(_oxr, "status.vpcs.self.privateSubnets", [])
+              i.id for j, r in get(oxr, "status.vpcs.self.privateSubnets", [])
               for _, i in r
               if j == 0
           ]
@@ -666,29 +824,29 @@ spec:
           localVpc = {
               "cidrBlocks": [
                   c for _, c in [
-                      get(_oxr, "status.vpcs.self.cidrBlock", "")
-                  ] + get(_oxr, "status.vpcs.self.additionalCidrBlocks", [])
+                      get(oxr, "status.vpcs.self.cidrBlock", "")
+                  ] + get(oxr, "status.vpcs.self.additionalCidrBlocks", [])
                   if c
               ],
 
-              if get(_oxr, "spec.prefixLists", False):
+              if get(oxr, "spec.prefixLists", False):
                   "prefixLists": [
                       {
                           blackhole: pl.blackhole,
-                          pl.id: get(_oxr, "status.prefixLists.${pl.name}", pl.name),
+                          pl.id: get(oxr, "status.prefixLists.${pl.name}", pl.name),
                       }
-                      for _, pl in get(_oxr, "spec.prefixLists", [])
+                      for _, pl in get(oxr, "spec.prefixLists", [])
                   ]
 
-              "region": get(_oxr, "spec.region", ""),
+              "region": get(oxr, "spec.region", ""),
               "routeTableIds": localRouteTableIds,
               "subnetIds": localSubnetIds,
 
-              if get(_oxr, "status.vpcs.self.id", False):
-                  "vpcId": get(_oxr, "status.vpcs.self.id", ""),
+              if get(oxr, "status.vpcs.self.id", False):
+                  "vpcId": get(oxr, "status.vpcs.self.id", ""),
 
           } if all_true([
-              get(_oxr, "status.vpcs.self.id", False)
+              get(oxr, "status.vpcs.self.id", False)
               localRouteTableIds,
               localSubnetIds,
           ]) else {}
@@ -696,7 +854,7 @@ spec:
           remoteVpcs = [
               {
                   _subnetIds = [
-                      i.id for j, r in get(_oxr, "status.vpcs.${vpc.name}.publicSubnets", [])
+                      i.id for j, r in get(oxr, "status.vpcs.${vpc.name}.publicSubnets", [])
                       for _, i in r
                       if all_true([
                           j == 0
@@ -707,91 +865,134 @@ spec:
                       preferPublic,
                       get(vpc, "allowPublic", True),
                   ]) else [
-                      i.id for j, r in get(_oxr, "status.vpcs.${vpc.name}.privateSubnets", [])
+                      i.id for j, r in get(oxr, "status.vpcs.${vpc.name}.privateSubnets", [])
                       for _, i in r
                       if j == 0
                   ]
                   "cidrBlocks": [
                       c for _, c in [
-                          get(_oxr, "status.vpcs.${vpc.name}.cidrBlock", "")
-                      ] + get(_oxr, "status.vpcs.${vpc.name}.additionalCidrBlocks", [])
+                          get(oxr, "status.vpcs.${vpc.name}.cidrBlock", "")
+                      ] + get(oxr, "status.vpcs.${vpc.name}.additionalCidrBlocks", [])
                       if c
                   ],
                   "name": vpc.name,
-                  "region": get(_oxr, "status.vpcs.${vpc.name}.region", ""),
+                  "region": get(oxr, "status.vpcs.${vpc.name}.region", ""),
                   "routeTableIds": [
-                      i.id for r in get(_oxr, "status.vpcs.${vpc.name}.publicRouteTables", [])
+                      i.id for r in get(oxr, "status.vpcs.${vpc.name}.publicRouteTables", [])
                       for _, i in r
-                      if get(_oxr, "spec.transitGateway.allowPublic", True)
+                      if get(oxr, "spec.transitGateway.allowPublic", True)
                   ] + [
-                      i.id for r in get(_oxr, "status.vpcs.${vpc.name}.privateRouteTables", [])
+                      i.id for r in get(oxr, "status.vpcs.${vpc.name}.privateRouteTables", [])
                       for _, i in r
                   ],
                   "subnetIds": _subnetIds,
-                  "vpcId": get(_oxr, "status.vpcs.${vpc.name}.id", ""),
+                  "vpcId": get(oxr, "status.vpcs.${vpc.name}.id", ""),
               }
-              for _, vpc in get(_oxr, "spec.transitGateway.remoteVpcs", [])
-              if get(_oxr, "status.vpcs.${vpc.name}.id", False)
+              for _, vpc in get(oxr, "spec.transitGateway.remoteVpcs", [])
+              if get(oxr, "status.vpcs.${vpc.name}.id", False)
+          ]
+
+          # Transit Gateway Peers
+          #
+          # For peer to peer TGWs, at the remote TGW must be attached to one of the remote
+          # VPCs.
+          #
+          # A possible future extention is to move `status.vpcs` down one level, maybe to
+          # `status.region.vpcs` to allow for multiple regions to be managed by the
+          # `network lookup` composition function. This would allow for discovery of
+          # additional components that fit outside of the current framework however it
+          # would be a huge breaking change on the API.
+          #
+          # Another option would be to
+          transitGatewayPeers = [
+              {
+                  _aid = getwparentfb(peer, oxr, "accountId", "status.vpcs.self.owner", ""),
+                  "accountId": _aid,
+                  "id": peer.id,
+                  "providerConfigRef": get(peer, "providerConfigRef", pcr),
+                  "region": get(peer, "region", region),
+              }
+              for _, peer in get(oxr, "spec.transitGateway.peers", [])
+              if get(peer, "id", False)
+          ] + [
+              {
+                  "accountId": peer.accountId,
+                  "id": tgw.id,
+                  "providerConfigRef": get(peer, "providerConfigRef", pcr),
+                  "region": peer.region,
+              }
+              for _, peer in get(oxr, "spec.transitGateway.peers", [])
+              for _, vpc in get(oxr, "status.vpcs", [])
+              for name, tgw in get(vpc, "transitGateways", [])
+              if all_true([
+                  get(peer, "name", False),
+                  name == get(peer, "name", False),
+                  not get(peer, "id", False),
+                  get(peer, "accountId", False) == get(vpc, "owner", ""),
+                  get(peer, "region", False) == get(vpc, "region", ""),
+              ])
           ]
 
           tgw = {
+              _resourceName = "transitgw",
               "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1",
               "kind": "TransitGateway",
               "metadata": {
                   "annotations": {
-                      "krm.kcl.dev/composition-resource-name": "transitgw",
-                      "krm.kcl.dev/ready": ready(_ocs, "transitgw"),
+                      "krm.kcl.dev/composition-resource-name": _resourceName,
+                      "krm.kcl.dev/ready": readystr(_resourceName),
                   }
                   "labels": labels,
               },
               "spec": {
-                  "deletionPolicy": get(_oxr, "spec.deletionPolicy", "Delete"),
-                  "claimRef": get(_oxr, "spec.claimRef", {}),
-                  "enabled": get(_oxr, "spec.transitGateway.enabled", False),
-                  if get(_oxr, "spec.amazonSideAsn", False):
-                      "amazonSideAsn": get(_oxr, "spec.amazonSideAsn", 64512),
-                  if get(_oxr, "spec.applianceModeSupport", False):
-                      "applianceModeSupport": get(_oxr, "spec.applianceModeSupport", "disable"),
-                  if get(_oxr, "spec.autoAcceptSharedAttachments", False):
-                      "autoAcceptSharedAttachments": get(_oxr, "spec.autoAcceptSharedAttachments", "disable"),
-                  if get(_oxr, "spec.createPolicyTable", False):
-                      "createPolicyTable": get(_oxr, "spec.createPolicyTable", "disable"),
-                  if get(_oxr, "spec.defaultRouteTableAssociation", False):
-                      "defaultRouteTableAssociation": get(_oxr, "spec.defaultRouteTableAssociation", "disable"),
-                  if get(_oxr, "spec.defaultRouteTablePropagation", False):
-                      "defaultRouteTablePropagation": get(_oxr, "spec.defaultRouteTablePropagation", "disable"),
-                  if get(_oxr, "spec.dnsSupport", False):
-                      "dnsSupport": get(_oxr, "spec.dnsSupport", "disable"),
-                  if get(_oxr, "spec.ipv6Support", False):
-                      "ipv6Support": get(_oxr, "spec.ipv6Support", "disable"),
+                  "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
+                  "claimRef": get(oxr, "spec.claimRef", {}),
+                  "enabled": get(oxr, "spec.transitGateway.enabled", False),
+                  if get(oxr, "spec.amazonSideAsn", False):
+                      "amazonSideAsn": get(oxr, "spec.amazonSideAsn", 64512),
+                  if get(oxr, "spec.applianceModeSupport", False):
+                      "applianceModeSupport": get(oxr, "spec.applianceModeSupport", "disable"),
+                  if get(oxr, "spec.autoAcceptSharedAttachments", False):
+                      "autoAcceptSharedAttachments": get(oxr, "spec.autoAcceptSharedAttachments", "disable"),
+                  if get(oxr, "spec.createPolicyTable", False):
+                      "createPolicyTable": get(oxr, "spec.createPolicyTable", "disable"),
+                  if get(oxr, "spec.defaultRouteTableAssociation", False):
+                      "defaultRouteTableAssociation": get(oxr, "spec.defaultRouteTableAssociation", "disable"),
+                  if get(oxr, "spec.defaultRouteTablePropagation", False):
+                      "defaultRouteTablePropagation": get(oxr, "spec.defaultRouteTablePropagation", "disable"),
+                  if get(oxr, "spec.dnsSupport", False):
+                      "dnsSupport": get(oxr, "spec.dnsSupport", "disable"),
+                  if get(oxr, "spec.ipv6Support", False):
+                      "ipv6Support": get(oxr, "spec.ipv6Support", "disable"),
 
                   "localVpc": localVpc,
+                  "managementPolicies": mgmtPolicy,
 
-                  if get(_oxr, "spec.multicastSupport", False):
-                      "multicastSupport": get(_oxr, "spec.multicastSupport", "disable"),
-                  if get(_oxr, "spec.prefixListSupport", False):
-                      "prefixListSupport": get(_oxr, "spec.prefixListSupport", "disable"),
+                  if get(oxr, "spec.multicastSupport", False):
+                      "multicastSupport": get(oxr, "spec.multicastSupport", "disable"),
+                  if get(oxr, "spec.prefixListSupport", False):
+                      "prefixListSupport": get(oxr, "spec.prefixListSupport", "disable"),
 
                   if get(_ram, "enabled", False):
                       "ram": _ram,
 
                   "remoteVpcs": remoteVpcs,
 
-                  if get(_oxr, "spec.transitGatewayCidrBlocks", False):
-                      "transitGatewayCidrBlocks": get(_oxr, "spec.transitGatewayCidrBlocks", []),
-                  if get(_oxr, "spec.transitGatewayRouteTableAssociation", False):
-                      "transitGatewayRouteTableAssociation": get(_oxr, "spec.transitGatewayRouteTableAssociation", "disable"),
-                  if get(_oxr, "spec.transitGatewayRouteTablePropagation", False):
-                      "transitGatewayRouteTablePropagation": get(_oxr, "spec.transitGatewayRouteTablePropagation", "disable"),
+                  if get(oxr, "spec.transitGatewayCidrBlocks", False):
+                      "transitGatewayCidrBlocks": get(oxr, "spec.transitGatewayCidrBlocks", []),
+                  if get(oxr, "spec.transitGatewayRouteTableAssociation", False):
+                      "transitGatewayRouteTableAssociation": get(oxr, "spec.transitGatewayRouteTableAssociation", "disable"),
+                  if get(oxr, "spec.transitGatewayRouteTablePropagation", False):
+                      "transitGatewayRouteTablePropagation": get(oxr, "spec.transitGatewayRouteTablePropagation", "disable"),
 
-                  # TRANSIT GATEWAY PEERS HERE
+                  "transitGatewayPeers": transitGatewayPeers,
 
-                  "tags": get(_oxr, "spec.tags.common", []),
+                  "tags": get(oxr, "spec.tags.common", []),
 
-                  if get(_oxr, "spec.vpnEcmpSupport", False):
-                      "vpnEcmpSupport": get(_oxr, "spec.vpnEcmpSupport", "disable"),
+                  if get(oxr, "spec.vpnEcmpSupport", False):
+                      "vpnEcmpSupport": get(oxr, "spec.vpnEcmpSupport", "disable"),
 
-                  "providerConfigRef": get(_oxr, "spec.providerConfigRef", {}),
+                  "providerConfigRef": get(oxr, "spec.providerConfigRef", {}),
               }
           }
 
@@ -799,10 +1000,10 @@ spec:
               tgw
               for _ in [True]
               if all_true([
-                  get(_oxr, "spec.transitGateway.enabled", False),
+                  get(oxr, "spec.transitGateway.enabled", False),
                   localVpc,
                   remoteVpcs,
-                  len(remoteVpcs) == len(get(_oxr, "spec.transitGateway.remoteVpcs", [])),
+                  len(remoteVpcs) == len(get(oxr, "spec.transitGateway.remoteVpcs", [])),
                   localRouteTableIds,
                   localSubnetIds,
               ])
@@ -821,9 +1022,8 @@ spec:
       spec:
         source: |-
           import regex
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocs = option("params").ocds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -836,49 +1036,87 @@ spec:
               x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
           }
 
-          ready = lambda x: any, y: str -> str {
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
+
+          ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(x, "${y}.Resource.status.conditions", [])
-              "True" if all_true([
-                  get(c, "status", "False") == "True" for c in conditions
-              ]) else "False"
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
+              ])
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          claimRef = get(_oxr, "spec.claimRef", {})
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          labels = get(_oxr, "metadata.labels", {})
-          peeringEnabled = get(_oxr, "spec.peering.enabled", False)
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
-          region = get(_oxr, "spec.region", "eu-central-1")
-          tags = labels | get(_oxr, "spec.tags.common", {}) | {
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          getwparentfb = lambda x: {:}, p: {:}, y: str, z: str, d: any -> any {
+              """
+              Get with fallback to parent status
+              Tries to get a path from a dictionary, if it fails,
+              tries to get it from the parent dictionary.
+
+              If that fails, falls back to the default value provided.
+              """
+              get(x, y, get(p, "${z}", d))
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          appName = get(oxr, "spec.claimRef.name", "")
+          claimRef = get(oxr, "spec.claimRef", {})
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          labels = get(oxr, "metadata.labels", {})
+          peeringEnabled = get(oxr, "spec.peering.enabled", False)
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          region = get(oxr, "spec.region", "eu-central-1")
+          tags = labels | get(oxr, "spec.tags.common", {}) | {
               "region": region,
           }
 
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+
           privateSubnetsetKeys = sorted([
-                k for k in _ocs
+                k for k in ocds
                 if all_true([
-                  _ocs,
-                  get(_ocs, "${k}.Resource.kind", "") == "SubnetSet",
-                  get(_ocs, "${k}.Resource.spec.type", "") == "private"
+                  ocds,
+                  get(ocds, "${k}.Resource.kind", "") == "SubnetSet",
+                  get(ocds, "${k}.Resource.spec.type", "") == "private"
                 ])
           ])
 
           publicSubnetsetKeys = sorted([
-                k for k in _ocs
+                k for k in ocds
                 if all_true([
-                  _ocs,
-                  get(_ocs, "${k}.Resource.kind", "") == "SubnetSet",
-                  get(_ocs, "${k}.Resource.spec.type", "") == "public"
+                  ocds,
+                  get(ocds, "${k}.Resource.kind", "") == "SubnetSet",
+                  get(ocds, "${k}.Resource.spec.type", "") == "public"
                 ])
           ])
 
           privateRouteTables = [
                 {
                     key = {"id": value}
-                    for key, value in get(_ocs, "${k}.Resource.status.routeTables", {})
+                    for key, value in get(ocds, "${k}.Resource.status.routeTables", {})
                 }
                 for _, k in privateSubnetsetKeys
           ]
@@ -886,7 +1124,7 @@ spec:
           privateSubnets = [
                 {
                     key = {"id": value}
-                    for key, value in get(_ocs, "${k}.Resource.status.subnets", {})
+                    for key, value in get(ocds, "${k}.Resource.status.subnets", {})
                 }
                 for _, k in privateSubnetsetKeys
           ]
@@ -894,7 +1132,7 @@ spec:
           publicRouteTables = [
                 {
                     key = {"id": value}
-                    for key, value in get(_ocs, "${k}.Resource.status.routeTables", {})
+                    for key, value in get(ocds, "${k}.Resource.status.routeTables", {})
                 }
                 for _, k in publicSubnetsetKeys
           ]
@@ -902,13 +1140,13 @@ spec:
           publicSubnets = [
                 {
                     key = {"id": value}
-                    for key, value in get(_ocs, "${k}.Resource.status.subnets", {})
+                    for key, value in get(ocds, "${k}.Resource.status.subnets", {})
                 }
                 for _, k in publicSubnetsetKeys
           ]
 
-          groupByPeer = get(_oxr, "spec.peering.groupBy", False)
-          groupByTgw = get(_oxr, "spec.transitGateway.groupBy", False)
+          groupByPeer = get(oxr, "spec.peering.groupBy", False)
+          groupByTgw = get(oxr, "spec.transitGateway.groupBy", False)
           if groupByPeer and groupByTgw and groupByPeer != groupByTgw:
               assert False, "peering.groupBy and transitGateway.groupBy must be the same if both set"
 
@@ -917,8 +1155,8 @@ spec:
           vpcLookup = {
               "groupBy": groupBy
               "enabled": any_true([
-                  get(_oxr, "spec.transitGateway.enabled", False),
-                  get(_oxr, "spec.peering.enabled", False)
+                  get(oxr, "spec.transitGateway.enabled", False),
+                  get(oxr, "spec.peering.enabled", False)
               ])
               "remoteVpcs": [
                   {
@@ -926,24 +1164,26 @@ spec:
                       "providerConfigRef": get(vpc, "providerConfigRef.name", pcr.name)
                       "region": vpc.region
                   }
-                  for _, vpc in get(_oxr, "spec.transitGateway.remoteVpcs", [])
+                  for _, vpc in get(oxr, "spec.transitGateway.remoteVpcs", [])
               ] + [
                   {
                       "name": vpc.name
                       "providerConfigRef": get(vpc, "providerConfigRef.name", pcr.name)
                       "region": vpc.region
                   }
-                  for _, vpc in get(_oxr, "spec.peering.remoteVpcs", [])
+                  for _, vpc in get(oxr, "spec.peering.remoteVpcs", [])
               ]
           }
 
           cidrs = [
               s.prefix
-              for s in get(_oxr, "spec.subnetsets.cidrs", [])
+              for s in get(oxr, "spec.subnetsets.cidrs", [])
               if s
           ]
 
-          azl = len(get(_oxr, "spec.availabilityZones", []))
+          azl = len(get(oxr, "spec.availabilityZones", []))
+
+          igwId = ocdsstatus("internet-gateway", "id", False)
 
           m = lambda x: str -> int {
               """
@@ -965,7 +1205,7 @@ spec:
           }
 
           newdxr = {
-              **_oxr
+              **oxr
               **{
                   "status": {
                       "subnetBits": [
@@ -978,15 +1218,17 @@ spec:
                               "offset": m(s.offset) - _x if s.offset else 0
                               "newBits": cb(s.public.mask, _x, s.public.count) + cb(s.private.mask, _x, s.private.count)
                           }
-                          for s in get(_oxr, "spec.subnetsets.cidrs", {}) if s
+                          for s in get(oxr, "spec.subnetsets.cidrs", {}) if s
                       ]
                       "vpcLookup": vpcLookup
                       "vpcs": {
                           "self": {
-                              if cidrs:
-                                  "cidrBlock": cidrs[0]
                               if len(cidrs) > 1:
                                   "additionalCidrBlocks" = cidrs[1:]
+                              if cidrs:
+                                  "cidrBlock": cidrs[0]
+                              if igwId:
+                                  "internetGatewayId" = igwId
                               if publicRouteTables:
                                   "publicRouteTables" = publicRouteTables
                               if publicSubnets:
@@ -1004,9 +1246,9 @@ spec:
 
                               "natGateways" = {
                                   name = get(item, "Resource.status.atProvider.id", "")
-                                  for name, item in _ocs
+                                  for name, item in ocds
                                   if all_true([
-                                      _ocs,
+                                      ocds,
                                       get(item, "Resource.kind", "") == "NATGateway"
                                       get(item, "Resource.status.atProvider.id", False)
                                   ])
@@ -1015,9 +1257,9 @@ spec:
                                   name = {
                                       "id": get(item, "Resource.status.atProvider.id", ""),
                                   }
-                                  for name, item in _ocs
+                                  for name, item in ocds
                                   if all_true([
-                                      _ocs,
+                                      ocds,
                                       get(item, "Resource.kind", "") == "TransitGateway"
                                       get(item, "Resource.apiVersion", "") == "xnetworks.crossplane.giantswarm.io/v1alpha1"
                                       get(item, "Resource.status.tgwId", False)
@@ -1029,9 +1271,9 @@ spec:
                                       "id": get(item, "Resource.status.peeringConnectionId", ""),
                                       "arn": get(item, "Resource.status.peeringConnectionArn", ""),
                                   }
-                                  for name, item in _ocs
+                                  for name, item in ocds
                                   if all_true([
-                                      _ocs,
+                                      ocds,
                                       get(item, "Resource.kind", "") == "Peering"
                                       get(item, "Resource.apiVersion", "") == "xnetworks.crossplane.giantswarm.io/v1alpha1"
                                       get(item, "Resourece.status.peeringConnectionId", False)
@@ -1114,6 +1356,9 @@ spec:
           type: FromCompositeFieldPath
         - patchSetName: commontags
           type: PatchSet
+        - fromFieldPath: spec.managementPolicies
+          toFieldPath: spec.managementPolicies
+          type: FromCompositeFieldPath
         - fromFieldPath: spec.claimRef.name
           toFieldPath: spec.forProvider.tags.Name
           type: FromCompositeFieldPath
@@ -1144,40 +1389,9 @@ spec:
           type: PatchSet
         - patchSetName: metadata
           type: PatchSet
-      - base:
-          apiVersion: ec2.aws.upbound.io/v1beta1
-          kind: InternetGateway
-          metadata:
-            creationTimestamp: null
-          spec:
-            forProvider:
-              region: null
-              vpcIdSelector:
-                matchControllerRef: true
-            initProvider: {}
-          status:
-            atProvider: {}
-        name: internet-gateway
-        patches:
-        - fromFieldPath: spec.region
-          toFieldPath: spec.forProvider.region
+        - fromFieldPath: spec.managementPolicies
+          toFieldPath: spec.managementPolicies
           type: FromCompositeFieldPath
-        - patchSetName: commontags
-          type: PatchSet
-        - patchSetName: metadata
-          type: PatchSet
-        - combine:
-            strategy: string
-            string:
-              fmt: '%s-%s-igw'
-            variables:
-            - fromFieldPath: spec.claimRef.name
-            - fromFieldPath: spec.region
-          toFieldPath: spec.forProvider.tags.Name
-          type: CombineFromComposite
-        - fromFieldPath: status.atProvider.id
-          toFieldPath: status.vpcs.self.internetGateway
-          type: ToCompositeFieldPath
     step: patch-and-transform
   - functionRef:
       name: function-auto-ready

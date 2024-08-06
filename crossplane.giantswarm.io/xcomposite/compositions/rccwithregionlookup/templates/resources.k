@@ -16,14 +16,32 @@ get = lambda x: {:}, y: str, d: any -> any {
     x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
 }
 
-ready = lambda x: any, y: str -> str {
+exists = lambda x: any -> bool {
+    """
+    Check if a value exists.
+    """
+    x in list(_ocds)
+}
+
+ready = lambda x: str -> bool {
     """
     Check if a value is ready.
     """
-    conditions = get(x, "${y}.Resource.status.conditions", [])
-    "True" if all_true([
-        get(c, "status", "False") == "True" for c in conditions
-    ]) else "False"
+    conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+    any_true([
+        exists(x),
+        all_true([
+            get(c, "status", "False") == "True"
+            for c in conditions
+        ])
+    ])
+}
+
+readystr = lambda y: str -> str {
+    """
+    Check if a value is ready.
+    """
+    "True" if ready(y) else "False"
 }
 
 _clusterLookup = get(_ocds, "cluster-lookup.Resource", False)
@@ -46,7 +64,7 @@ _kubernetesObject = {
     metadata: {
         annotations: {
             "krm.kcl.dev/composition-resource-name" = "aws-cluster"
-            "krm.kcl.dev/ready": ready(_ocds, "aws-cluster")
+            "krm.kcl.dev/ready": readystr("aws-cluster")
         }
     }
     spec: {

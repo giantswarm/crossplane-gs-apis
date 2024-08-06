@@ -1,9 +1,7 @@
 import regex
 
-_oxr = option("params").oxr
-_dxr = option("params").dxr
-_ocds = option("params").ocds
-_dcds = option("params").dcds
+oxr = option("params").oxr
+ocds = option("params").ocds
 
 get = lambda x: {:}, y: str, d: any -> any {
     """
@@ -31,23 +29,32 @@ ocdsspec = lambda x: str, y: str, d: any -> any {
     """
     Get an item from the spec of an ocds resource.
     """
-    get(_ocds, "${x}.Resource.spec.${y}", d)
+    get(ocds, "${x}.Resource.spec.${y}", d)
 }
 
 ocdsstatus = lambda x: str, y: str, d: any -> any {
     """
     Get an item from the status of an ocds resource.
     """
-    get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+    get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+}
+
+exists = lambda x: any -> bool {
+    """
+    Check if a value exists.
+    """
+    x in list(ocds)
 }
 
 ready = lambda x: str -> bool {
     """
     Check if a value is ready.
     """
-    conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-    all_true([
-        get(c, "status", "False") == "True" for c in conditions
+    conditions = get(ocds, "${x}.Resource.status.conditions", [])
+    any_true([
+        all_true([
+            get(c, "status", "False") == "True" for c in conditions
+        ])
     ])
 }
 
@@ -58,39 +65,50 @@ readystr = lambda x: str -> str {
     "True" if ready(x) else "False"
 }
 
-appName = get(_oxr, "spec.claimRef.name", "")
-createCluster = get(_oxr, "spec.createCluster", True)
-connectionSecret = get(_oxr, "spec.connectionSecret", "")
-engine = get(_oxr, "spec.engine", "")
-dp = get(_oxr, "spec.deletionPolicy", "Delete")
-keyId = get(_oxr, "status.kmsKeyId", False)
-namespace = get(_oxr, "spec.claimRef.namespace", "default")
-region = get(_oxr, "spec.region", "eu-central-1")
-pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
-labels = get(_oxr, "metadata.labels", {}) | {"region": region}
-tags = labels | get(_oxr, "spec.tags", {})
+appName = get(oxr, "spec.claimRef.name", "")
+createCluster = get(oxr, "spec.createCluster", True)
+engine = get(oxr, "spec.engine", "")
+dp = get(oxr, "spec.deletionPolicy", "Delete")
+keyId = get(oxr, "status.kmsKeyId", False)
+namespace = get(oxr, "spec.claimRef.namespace", "default")
+region = get(oxr, "spec.region", "eu-central-1")
+pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+labels = get(oxr, "metadata.labels", {}) | {"region": region}
+tags = labels | get(oxr, "spec.tags", {})
 
-port = get(_oxr, "status.port", False)
+port = get(oxr, "status.port", False)
 restoreToPointInTime = {
     if createCluster:
-        "sourceDbClusterIdentifier": get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
-        "restoreType": get(_oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
+        "sourceDbClusterIdentifier": get(oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
+        "restoreType": get(oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
     else:
-        "sourceDbInstanceIdentifier" = get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None)
-        "sourceDbInstanceAutomatedBackupsArn" = get(_oxr, "spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn", None)
-        "sourceDbiResourceId" = get(_oxr, "spec.restoreToPointInTime.sourceDbiResourceId", None)
+        "sourceDbInstanceIdentifier" = get(oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None)
+        "sourceDbInstanceAutomatedBackupsArn" = get(oxr, "spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn", None)
+        "sourceDbiResourceId" = get(oxr, "spec.restoreToPointInTime.sourceDbiResourceId", None)
 
-    _v = get(_oxr, "spec.restoreToPointInTime.restoreToTime", False)
+    _v = get(oxr, "spec.restoreToPointInTime.restoreToTime", False)
     if _v:
-        "restoreToTime": get(_oxr, "spec.restoreToPointInTime.restoreToTime", None)
+        "restoreToTime": get(oxr, "spec.restoreToPointInTime.restoreToTime", None)
     else:
-        "useLatestRestorableTime": get(_oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True)
+        "useLatestRestorableTime": get(oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True)
 }
 
-s3import = get(_oxr, "spec.s3Import", False)
+s3import = get(oxr, "spec.s3Import", False)
 
-masterInstance = ready("instance-0")
+masterInstance = ready("instance-0") and ocdsstatus("instance-0", "id", False)
 clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
 clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
 endpoint = ocdsstatus("rds-cluster", "endpoint", "")
 clusterArn = ocdsstatus("rds-cluster", "arn", "")
+
+mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+
+_secretRef: bool|str = False
+if createCluster:
+    if ready("rds-cluster"):
+        _secretRef = ocdsspec("rds-cluster", "writeConnectionSecretToRef.name", "")
+else:
+    if ready("instance-0"):
+        _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef.name", "")
+_connectionSecret = _secretRef

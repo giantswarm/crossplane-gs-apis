@@ -9,7 +9,7 @@ metadata:
   name: rcc-with-region-lookup
 spec:
   compositeTypeRef:
-    apiVersion: xaws.crossplane.giantswarm.io/v1alpha1
+    apiVersion: xcomposite.crossplane.giantswarm.io/v1alpha1
     kind: RCCWithRegionLookup
   mode: Pipeline
   pipeline:
@@ -108,21 +108,7 @@ spec:
                 subnetIds: null
                 vpcId: ""
           status:
-            vpc:
-              additionalCidrBlocks: null
-              cidrBlock: ""
-              id: ""
-              internetGateway: ""
-              natGateways: null
-              privateRouteTables: null
-              privateSubnets: null
-              providerConfig: ""
-              publicRouteTables: null
-              publicSubnets: null
-              region: ""
-              securityGroups: null
-              transitGateways: null
-              vpcPeeringConnections: null
+            vpc: {}
         name: rds-cache-cluster
         patches:
         - fromFieldPath: spec.rdsCacheClusterSpec
@@ -208,14 +194,32 @@ spec:
               x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
           }
 
-          ready = lambda x: any, y: str -> str {
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(_ocds)
+          }
+
+          ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(x, "${y}.Resource.status.conditions", [])
-              "True" if all_true([
-                  get(c, "status", "False") == "True" for c in conditions
-              ]) else "False"
+              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True"
+                      for c in conditions
+                  ])
+              ])
+          }
+
+          readystr = lambda y: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(y) else "False"
           }
 
           _clusterLookup = get(_ocds, "cluster-lookup.Resource", False)
@@ -238,7 +242,7 @@ spec:
               metadata: {
                   annotations: {
                       "krm.kcl.dev/composition-resource-name" = "aws-cluster"
-                      "krm.kcl.dev/ready": ready(_ocds, "aws-cluster")
+                      "krm.kcl.dev/ready": readystr("aws-cluster")
                   }
               }
               spec: {

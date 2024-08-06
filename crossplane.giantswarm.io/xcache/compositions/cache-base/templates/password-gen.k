@@ -1,6 +1,6 @@
-esoEnabled = get(_oxr, "spec.eso.enabled", False)
-engine = get(_oxr, "spec.engine", "redis")
-kubernetesPcr = get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+esoEnabled = get(oxr, "spec.eso.enabled", False)
+engine = get(oxr, "spec.engine", "redis")
+kubernetesPcr = get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
 
 has = all_true([
     engine == "redis",
@@ -38,7 +38,8 @@ passwordGenerator = {
                 }
             }
         }
-        "providerConfigRef": get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+        "managementPolicies": mgmtPolicy,
+        "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
     }
 }
 
@@ -84,13 +85,14 @@ passwords = [
                     }
                 }
             }
-            "providerConfigRef": get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+            "managementPolicies": mgmtPolicy,
+            "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
         }
     }
     for _, user in userNames
     if all_true([
-        get(_oxr, "spec.engine", "redis") == "redis",
-        get(_oxr, "spec.createReplicationGroup", True),
+        get(oxr, "spec.engine", "redis") == "redis",
+        get(oxr, "spec.createReplicationGroup", True),
         # don't create a password for the default user
         # as this will be disabled
         user != "default"

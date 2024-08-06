@@ -1,17 +1,19 @@
 import json
 
-clusterId = get(_oxr, "status.clusterIdentifier", None)
-monitoringRoleArn = get(_oxr, "status.monitoringRoleArn", None)
-dbSubnetGroupName = get(_oxr, "status.dbSubnetGroupName", None)
+clusterId = get(oxr, "status.clusterIdentifier", None)
+monitoringRoleArn = get(oxr, "status.monitoringRoleArn", None)
+dbSubnetGroupName = get(oxr, "status.dbSubnetGroupName", None)
 
-partition = get(_oxr, "spec.partition", "aws")
+partition = get(oxr, "spec.partition", "aws")
 
 # Has the master instance been built?
-masterInstanceArn = ocdsstatus("instance-0", "arn", "")
-specInstances = get(_oxr, "spec.instances", [])
+masterInstanceIdentifier = ocdsstatus("instance-0", "identifier", False)
+masterInstanceArn = ocdsstatus("instance-0", "arn", False)
 
-if not _specInstances and get(_oxr, "spec.instanceCount", 0) > 0:
-    _specInstances = [{} for i in range(get(_oxr, "spec.instanceCount", 0))]
+_specInstances = get(oxr, "spec.instances", [])
+
+if not _specInstances and get(oxr, "spec.instanceCount", 0) > 0:
+    _specInstances = [{} for i in range(get(oxr, "spec.instanceCount", 0))]
 
 # This will force the secondary (read) replicas to be built after the primary
 # instance has been built. This is to ensure that the primary instance is
@@ -35,106 +37,113 @@ buildInstances = _specInstances[:1] if not masterInstance else _specInstances
 # common settings across all instances being built-
 instances = [
     {
-        _availabilityZones = get(_oxr, "spec.availabilityZones", [])
-        _az = get(item, "spec.availabilityZone", False)
+        _availabilityZones = get(oxr, "spec.availabilityZones", [])
+        _az = get(item, "availabilityZone", False)
         if not _az and len(_availabilityZones) > 0:
             _az = _availabilityZones[i % len(_availabilityZones)]
         _az = "${region}${_az}" if _az else ""
 
-        _version = "v1beta1" if createCluster else "v1beta2"
+        _instanceRegion = get(item, "region", region)
+        _isCrossRegion = _instanceRegion != region
+
+        _cacert = get(oxr, "status.caCertIdentifier", False),
+        _dbp = get(item, "parameterGroupName", get(oxr, "spec.parameterGroup.name", False)),
+        _isPrimaryInstance = i == 0
+        _multiAz = getwparent(item, oxr, "multiAz", False)
+        _instanceUseAz = not createCluster and not _multiAz
+        _pt = get(item, "promotionTier", False)
+
+        _name = "${appName}-${_az}" if not _multiAz else "${appName}-instance-${i}"
+        if createCluster and not _multiAz:
+            _name = "${appName}-clusterinstance-${i}"
+
+        _version = "v1beta1" if createCluster else "v1beta3"
+
         "apiVersion": "rds.aws.upbound.io/${_version}"
         "kind": "ClusterInstance" if createCluster else "Instance"
         "metadata": {
             "annotations": {
                 "krm.kcl.dev/composition-resource-name" = "instance-${i}"
                 "krm.kcl.dev/ready" = readystr("instance-${i}")
-                "crossplane.io/external-name" = "${appName}-${region}${_az}-${i}"
             }
             "labels": labels
         }
-
-        _cacert = get(_oxr, "status.caCertIdentifier", False),
-        _pt = get(item, "spec.promotionTier", False)
-        _dbp = get(item, "spec.parameterGroupName", get(_oxr, "spec.parameterGroup.name", False)),
-        _isPrimaryInstance = i == 0
-        _multiAz = getwparent(item, _oxr, "multiAz", False)
-        _instanceUseAz = not createCluster and not _multiAz
 
         "spec": {
             "deletionPolicy": dp
             "initProvider": {
                 if any_true([
-                    getwparent(item, _oxr, "allowMajorVersionUpgrade",  True),
-                    getwparent(item, _oxr, "autoMinorVersionUpgrade", True),
+                    getwparent(item, oxr, "allowMajorVersionUpgrade",  True),
+                    getwparent(item, oxr, "autoMinorVersionUpgrade", True),
                 ]):
-                    "engineVersion": getwparent(item, _oxr, "engineVersion", "14.0")
+                    "engineVersion": getwparent(item, oxr, "engineVersion", "14.0")
             }
             "forProvider": {
                 if not createCluster:
                     # These options are specific to the Instance kind
-                    "allowMajorVersionUpgrade": getwparent(item, _oxr, "allowMajorVersionUpgrade", True)
-                    "backupRetentionPeriod": getwparent(item, _oxr, "backupRetentionPeriod", 7)
-                    "backupWindow": getwparent(item, _oxr, "preferredBackupWindow", "03:00-04:00")
-                    "deleteAutomatedBackups": getwparent(item, _oxr, "deleteAutomatedBackups", True)
-                    "deletionProtection": getwparent(item, _oxr, "deletionProtection", False)
+                    "allowMajorVersionUpgrade": getwparent(item, oxr, "allowMajorVersionUpgrade", True)
+                    "backupRetentionPeriod": getwparent(item, oxr, "backupRetentionPeriod", 7)
+                    "backupWindow": getwparent(item, oxr, "preferredBackupWindow", "03:00-04:00")
+                    "deleteAutomatedBackups": getwparent(item, oxr, "deleteAutomatedBackups", True)
+                    "deletionProtection": getwparent(item, oxr, "deletionProtection", False)
 
-                    _v = getwparent(item, _oxr, "domainIamRoleName",  False)
+                    _v = getwparent(item, oxr, "domainIamRoleName",  False)
                     if _v:
                         "domainIamRoleName": _v
 
-                    "enabledCloudwatchLogsExports": getwparent(item, _oxr, "enabledCloudwatchLogsExports", [])
+                    "enabledCloudwatchLogsExports": getwparent(item, oxr, "enabledCloudwatchLogsExports", [])
 
-                    _v = getwparent(item, _oxr, "spec.finalSnapshotIdentifier", False)
+                    _v = getwparent(item, oxr, "spec.finalSnapshotIdentifier", False)
                     if _v:
                         "finalSnapshotIdentifier": _v,
 
-                    "iamDatabaseAuthenticationEnabled": getwparent(item, _oxr, "iamDatabaseAuthenticationEnabled", False)
-                    "iops": getwparent(item, _oxr, "iops", 0)
+                    "iamDatabaseAuthenticationEnabled": getwparent(item, oxr, "iamDatabaseAuthenticationEnabled", False)
+                    "iops": getwparent(item, oxr, "iops", 0)
                     "kmsKeyId": keyId,
 
-                    _v = getwparent(item, _oxr, "licenseModel", False)
+                    _v = getwparent(item, oxr, "licenseModel", False)
                     if _v:
                         "licenseModel": _v
 
-                    "maintenanceWindow": getwparent(item, _oxr, "preferredMaintenanceWindow", "sun:05:00-sun:06:00"),
+                    "maintenanceWindow": getwparent(item, oxr, "preferredMaintenanceWindow", "sun:05:00-sun:06:00"),
                     "multiAz": _multiAz,
-                    "networkType": getwparent(item, _oxr, "networkType", "ipv4")
+                    "networkType": getwparent(item, oxr, "networkType", "ipv4")
 
                     "identifierPrefix": appName
                     # Option group is specific to non-postgresql instances but
                     # may be set for mysql and mssql instance types
-                    _v = getwparent(item, _oxr, "optionGroupName", False)
+                    _v = getwparent(item, oxr, "optionGroupName", False)
                     if _v:
                         "optionGroupName": _v
 
-                    if restoreToPointInTime and get(_oxr, "spec.restoreToPointInTime.identifier", False):
+                    if restoreToPointInTime and get(oxr, "spec.restoreToPointInTime.identifier", False):
                         "restoreToPointInTime": [
                             restoreToPointInTime
                         ],
 
-                    _skipFS = getwparent(item, _oxr, "skipFinalSnapshot", True)
+                    _skipFS = getwparent(item, oxr, "skipFinalSnapshot", True)
                     "skipFinalSnapshot": _skipFS
                     if not _skipFS:
-                        "snapshotIdentifier": getwparent(item, _oxr, "snapshotIdentifier", appName)
+                        "snapshotIdentifier": getwparent(item, oxr, "snapshotIdentifier", appName)
 
-                    "storageEncrypted": getwparent(item, _oxr, "storageEncrypted", True)
+                    "storageEncrypted": getwparent(item, oxr, "storageEncrypted", True)
 
-                    _storageType = getwparent(item, _oxr, "storageType", "gp2")
+                    _storageType = getwparent(item, oxr, "storageType", "gp2")
                     if _storageType == "gp3":
-                        "storageThroughput": getwparent(item, _oxr, "spec.storageThroughput", 0)
+                        "storageThroughput": getwparent(item, oxr, "spec.storageThroughput", 0)
                     "storageType": _storageType
                     "vpcSecurityGroupIds": [
-                        get(_oxr, "status.securityGroupId", "")
+                        get(oxr, "status.securityGroupId", "")
                         for _ in [True]
-                        if get(_oxr, "status.securityGroupId", False)
+                        if get(oxr, "status.securityGroupId", False)
                     ],
 
                     # You cannot have read replicas with manage master user password
                     #
                     # This means that in the longer term, this will be removed as an option
                     # and instead, the password will be pushed to secretsmanager via ESO
-                    _managedMasterUserPassword = False # get(item, "spec.manageMasterUserPassword", get(_oxr, "spec.manageMasterUserPassword", True)),
-                    _autoGeneratePassword = getwparent(item, _oxr, "autoGeneratePassword", True)
+                    _managedMasterUserPassword = False # get(item, "manageMasterUserPassword", get(oxr, "spec.manageMasterUserPassword", True)),
+                    _autoGeneratePassword = getwparent(item, oxr, "autoGeneratePassword", True)
 
                     # If this is the primary (non-cluster) instance, set
                     # the database name and master user password. Additionally,
@@ -148,15 +157,16 @@ instances = [
                                 "name": "${appName}-${region}-rds-autogen-pass",
                             }
 
-                        "allocatedStorage": getwparent(item, _oxr, "allocatedStorage", 20)
+                        "allocatedStorage": getwparent(item, oxr, "allocatedStorage", 20)
 
-                        _dbName = getwparent(item, _oxr, "databaseName", False)
+                        _dbName = getwparent(item, oxr, "databaseName", False)
                         if _dbName:
                             "dbName": _dbName,
                         if _managedMasterUserPassword:
                             "manageMasterUserPassword": _managedMasterUserPassword,
                             # masterUserSecretKmsKeyId: _keyId,
-                        username: getwparent(item, _oxr, "username", None)
+                        "username": get(item, "username", get(oxr, "spec.masterUsername", "")),
+
                         if s3import:
                             "s3import": s3import,
 
@@ -165,35 +175,34 @@ instances = [
                     if all_true([
                         not _isPrimaryInstance,
                         masterInstance,
-                        masterInstanceArn
+                        masterInstanceIdentifier,
                     ]):
-                        "replicateSourceDb": masterInstanceArn,
+                        "replicateSourceDb": masterInstanceIdentifier if not _isCrossRegion else masterInstanceArn,
                     if _dbp:
                         "parameterGroupName": _dbp
 
-                "applyImmediately": getwparent(item, _oxr, "applyImmediately", True)
-                "autoMinorVersionUpgrade": getwparent(item, _oxr, "autoMinorVersionUpgrade", True)
+                "applyImmediately": getwparent(item, oxr, "applyImmediately", True)
+                "autoMinorVersionUpgrade": getwparent(item, oxr, "autoMinorVersionUpgrade", True)
                 "dbSubnetGroupName": dbSubnetGroupName,
                 "engine": engine,
                 if any_true([
-                    not getwparent(item, _oxr, "allowMajorVersionUpgrade" True)
-                    not getwparent(item, _oxr, "autoMinorVersionUpgrade", True)
+                    not getwparent(item, oxr, "allowMajorVersionUpgrade" True)
+                    not getwparent(item, oxr, "autoMinorVersionUpgrade", True)
                 ]):
-                    "engineVersion": getwparent(item, _oxr, "engineVersion", "14.0"),
+                    "engineVersion": getwparent(item, oxr, "engineVersion", "14.0"),
 
                 # cannot use getwparent here as the parameter names differ
-                "instanceClass": get(item, "instanceClass", get(_oxr, "spec.dbClusterInstanceClass", "db.t3.medium")),
-                "monitoringInterval": get(item, "monitoringInterval", get(_oxr, "spec.enhancedMonitoring.monitoringInterval", 0)),
+                "instanceClass": get(item, "instanceClass", get(oxr, "spec.dbClusterInstanceClass", "db.t3.medium")),
+                "monitoringInterval": get(item, "monitoringInterval", get(oxr, "spec.enhancedMonitoring.monitoringInterval", 0)),
 
                 if monitoringRoleArn:
                     "monitoringRoleArn": monitoringRoleArn,
 
-
-                _v = getwparent(item, _oxr, "performanceInsightsEnabled" False)
+                _v = getwparent(item, oxr, "performanceInsightsEnabled" False)
                 if _v:
                     "performanceInsightsEnabled": _v
-                    "performanceInsightsKmsKeyId": getwparent(item, _oxr, "performanceInsightsKmsKeyId", keyId)
-                    "performanceInsightsRetentionPeriod": getwparent(item, _oxr, "performanceInsightsRetentionPeriod", 7)
+                    "performanceInsightsKmsKeyId": getwparent(item, oxr, "performanceInsightsKmsKeyId", keyId)
+                    "performanceInsightsRetentionPeriod": getwparent(item, oxr, "performanceInsightsRetentionPeriod", 7)
 
                 # Only set the availability zone if this is a cluster instance
                 # or if the instance is not multi-AZ and an availability zone is
@@ -211,18 +220,18 @@ instances = [
                     if _dbp:
                         "dbParameterGroupName": _dbp,
 
-                "copyTagsToSnapshot": getwparent(item, _oxr, "copyTagsToSnapshot", True)
-                "publiclyAccessible": getwparent(item, _oxr, "publiclyAccessible", False)
+                "copyTagsToSnapshot": getwparent(item, oxr, "copyTagsToSnapshot", True)
+                "publiclyAccessible": getwparent(item, oxr, "publiclyAccessible", False)
                 "region": region,
                 "tags": tags | {
-                    "Name": "${appName}-${region}${_az}-${i}"
+                    "Name": _name
                 },
             }
-
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
             if not createCluster and _isPrimaryInstance:
                 "writeConnectionSecretToRef": {
-                    "namespace": get(_oxr, "spec.claimRef.namespace", "default")
+                    "namespace": get(oxr, "spec.claimRef.namespace", "default")
                     "name": "${appName}-${region}-rds",
                 }
         }
@@ -241,7 +250,7 @@ if all_true([
     not createCluster,
     ready("instance-0"),
 ]):
-    _secretRef = get(_ocds, "instance-0.Resource.spec.writeConnectionSecretToRef", "")
+    _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef", "")
 
 ##
 # OptionGroups may be specified for non-cluster, non-postgresql instances.
@@ -254,7 +263,7 @@ optionGroup = [
             "annotations": {
                 "krm.kcl.dev/composition-resource-name" = "option-group"
                 "krm.kcl.dev/ready" = readystr("option-group")
-                "crossplane.io/external-name" = get(_oxr, "spec.optionGroup.name", "")
+                "crossplane.io/external-name" = get(oxr, "spec.optionGroup.name", "")
             }
             "labels": labels
         }
@@ -262,7 +271,7 @@ optionGroup = [
             "deletionPolicy": dp
             "forProvider": {
                 "engineName": engine,
-                "majorEngineVersion": get(_oxr, "spec.engineVersion", "14.0"),
+                "majorEngineVersion": get(oxr, "spec.engineVersion", "14.0"),
                 "option": [
                     {
                         if get(item, "dbSecurityGroupMemberships", False):
@@ -276,22 +285,23 @@ optionGroup = [
                             for key, value in get(item, "optionSettings", [])
                         ],
                     }
-                    for i, item in get(_oxr, "spec.optionGroup.options", {})
+                    for i, item in get(oxr, "spec.optionGroup.options", {})
                 ],
 
                 "region": region,
-                if get(_oxr, "spec.optionGroup.version", False):
-                    "version": get(_oxr, "spec.optionGroup.version", ""),
+                if get(oxr, "spec.optionGroup.version", False):
+                    "version": get(oxr, "spec.optionGroup.version", ""),
 
-                "optionGroupDescription": get(_oxr, "spec.optionGroup.description", "${appName} Option group"),
+                "optionGroupDescription": get(oxr, "spec.optionGroup.description", "${appName} Option group"),
 
                 "tags": tags | {
                     "Name": "${appName}-option-group"
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
-    } if not createCluster and get(_oxr, "spec.optionGroup.create", False) else {}
+    } if not createCluster and get(oxr, "spec.optionGroup.create", False) else {}
 ]
 
 endpoints = [
@@ -310,20 +320,21 @@ endpoints = [
         spec: {
             "deletionPolicy": dp
             "forProvider": {
-                "clusterEndpointIdentifier": get(item, "spec.clusterEndpointIdentifier", None),
+                "clusterEndpointIdentifier": get(item, "clusterEndpointIdentifier", None),
                 "clusterIdentifier": clusterId,
-                "customEndpointType": get(item, "spec.type", "ANY"),
-                "excludeMembers": get(item, "spec.excludeMembers", []),
-                "staticMembers": get(item, "spec.staticMembers", []),
+                "customEndpointType": get(item, "type", "ANY"),
+                "excludeMembers": get(item, "excludeMembers", []),
+                "staticMembers": get(item, "staticMembers", []),
                 "region": region,
                 "tags": tags | {
                     "Name": "${appName}-${region}-${i}"
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
-    for i, item in get(_oxr, "spec.endpoints", []) if all_true([
+    for i, item in get(oxr, "spec.endpoints", []) if all_true([
         createCluster, clusterId != None
     ])
 ]
@@ -367,15 +378,16 @@ iam_roles = [
                     "Name": "${appName}-${region}-${i}"
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
-    for i, item in get(_oxr, "spec.iamRoles", [])
+    for i, item in get(oxr, "spec.iamRoles", [])
 ]
 
 createMonitoringRole = all_true([
-    get(_oxr, "spec.enhancedMonitoring.enabled", False),
-    get(_oxr, "spec.enhancedMonitoring.monitoringInterval", 0) > 0,
+    get(oxr, "spec.enhancedMonitoring.enabled", False),
+    get(oxr, "spec.enhancedMonitoring.monitoringInterval", 0) > 0,
 ])
 
 monitoringRole = [
@@ -406,17 +418,18 @@ monitoringRole = [
                     ]
                 }, ignore_private=True),
 
-                "description": get(_oxr, "spec.enhancedMonitoring.description", "Role for RDS monitoring"),
-                "managedPolicyArns": get(_oxr, "spec.enhancedMonitoring.managedPolicyArns", None),
-                "permissionsBoundary": get(_oxr, "spec.enhancedMonitoring.permissionsBoundary", None),
-                "forceDetachPolicies": get(_oxr, "spec.enhancedMonitoring.forceDetachPolicies", False),
-                "maxSessionDuration": get(_oxr, "spec.enhancedMonitoring.maxSessionDuration", None),
-                "path": get(_oxr, "spec.enhancedMonitoring.path", "/"),
+                "description": get(oxr, "spec.enhancedMonitoring.description", "Role for RDS monitoring"),
+                "managedPolicyArns": get(oxr, "spec.enhancedMonitoring.managedPolicyArns", None),
+                "permissionsBoundary": get(oxr, "spec.enhancedMonitoring.permissionsBoundary", None),
+                "forceDetachPolicies": get(oxr, "spec.enhancedMonitoring.forceDetachPolicies", False),
+                "maxSessionDuration": get(oxr, "spec.enhancedMonitoring.maxSessionDuration", None),
+                "path": get(oxr, "spec.enhancedMonitoring.path", "/"),
                 "name": "rds-monitoring-role",
-                "tags": tags | get(_oxr, "spec.enhancedMonitoring.tags", {}) | {
+                "tags": tags | get(oxr, "spec.enhancedMonitoring.tags", {}) | {
                     "Name": "${appName}-monitoring-role"
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     } if createMonitoringRole else {}
@@ -433,7 +446,7 @@ monitoringRole = [
             "labels": labels
         }
         "spec": {
-            "deletionPolicy": get(_oxr, "spec.deletionPolicy", "Delete"),
+            "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
             "forProvider": {
                 "policyArn": "arn:${partition}:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole",
                 "role": "rds-monitoring-role",
@@ -441,12 +454,13 @@ monitoringRole = [
                     "Name": "${appName}-monitoring-role-attachment"
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     } if createMonitoringRole else {}
 ]
 
-instanceCreated = get(_ocds, "instance-0.Resource.status.atProvider.id", False) and createCluster
+instanceCreated = ocdsstatus("instance-0", "id", False) and createCluster
 
 # Define autoscaling if this is the required scaling mode for RDS Cluster builds
 autoscalingTarget = [
@@ -464,31 +478,32 @@ autoscalingTarget = [
         "spec": {
             "deletionPolicy": dp
             "forProvider": {
-                "maxCapacity": get(_oxr, "spec.autoscaling.maxCapacity", 2),
-                "minCapacity": get(_oxr, "spec.autoscaling.minCapacity", 2),
+                "maxCapacity": get(oxr, "spec.autoscaling.maxCapacity", 2),
+                "minCapacity": get(oxr, "spec.autoscaling.minCapacity", 2),
                 "resourceId": "cluster:${clusterId}",
                 "region": region,
                 "scalableDimension": "rds:cluster:ReadReplicaCount",
                 "serviceNamespace": "rds",
-                "tags": tags | get(_oxr, "spec.autoscaling.tags", {}) | {
+                "tags": tags | get(oxr, "spec.autoscaling.tags", {}) | {
                     "Name": "${appName}-autoscaling"
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     } if all_true([
         instanceCreated,
-        get(_oxr, "spec.autoscaling.enabled", False),
+        get(oxr, "spec.autoscaling.enabled", False),
         createCluster,
      ]) else {}
 ]
 
 _metricTypes = {
-    "RDSReaderAverageCPUUtilization": get(_oxr, "spec.autoscaling.targetCPU", 70),
-    "RDSReaderAverageDatabaseConnections": get(_oxr, "spec.autoscaling.targetConnections", 700),
+    "RDSReaderAverageCPUUtilization": get(oxr, "spec.autoscaling.targetCPU", 70),
+    "RDSReaderAverageDatabaseConnections": get(oxr, "spec.autoscaling.targetConnections", 700),
 }
 
-tc = get(_oxr, "spec.autoscaling.metricType", "RDSReaderAverageCPUUtilization")
+tc = get(oxr, "spec.autoscaling.metricType", "RDSReaderAverageCPUUtilization")
 tv =  _metricTypes[tc]
 
 autoscalingTargetCreated = ocdsstatus("autoscaling-target", "id", False)
@@ -518,26 +533,27 @@ autoscalingPolicy = [
                                 "predefinedMetricType": tc,
                             },
                         ],
-                        "disableScaleIn": get(_oxr, "spec.autoscaling.disableScaleIn", False),
-                        "scaleInCooldown": get(_oxr, "spec.autoscaling.scaleInCooldown", 60),
-                        "scaleOutCooldown": get(_oxr, "spec.autoscaling.scaleOutCooldown", 60),
+                        "disableScaleIn": get(oxr, "spec.autoscaling.disableScaleIn", False),
+                        "scaleInCooldown": get(oxr, "spec.autoscaling.scaleInCooldown", 60),
+                        "scaleOutCooldown": get(oxr, "spec.autoscaling.scaleOutCooldown", 60),
                         "targetValue": tv
                     },
                 ],
                 "region": region,
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     } if all_true([
         autoscalingTargetCreated,
-        get(_oxr, "spec.autoscaling.enabled", False),
+        get(oxr, "spec.autoscaling.enabled", False),
         createCluster,
      ]) else {}
 ]
 
 autoscaling = autoscalingTarget + autoscalingPolicy
 
-optionGroupPort = get(_oxr, "spec.optionGroup.port", False)
+optionGroupPort = get(oxr, "spec.optionGroup.port", False)
 
 # Create security group rules for the cluster
 securityGroupRules = [
@@ -554,7 +570,7 @@ securityGroupRules = [
         "spec": {
             "deletionPolicy": dp
             "forProvider": {
-                "securityGroupId": get(_oxr, "status.securityGroupId", ""),
+                "securityGroupId": get(oxr, "status.securityGroupId", ""),
                 "cidrBlocks": [cidr],
                 "fromPort": port,
                 "protocol": "tcp",
@@ -562,12 +578,13 @@ securityGroupRules = [
                 "toPort": port,
                 "type": "ingress",
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
-    for i, cidr in get(_oxr, "spec.cidrBlocks", []) if all_true([
+    for i, cidr in get(oxr, "spec.cidrBlocks", []) if all_true([
         port, cidr,
-        get(_oxr, "status.securityGroupId", False),
+        get(oxr, "status.securityGroupId", False),
     ])
 ] + [
     {
@@ -584,7 +601,7 @@ securityGroupRules = [
         "spec": {
             "deletionPolicy": dp
             "forProvider": {
-                "securityGroupId": get(_oxr, "status.securityGroupId", ""),
+                "securityGroupId": get(oxr, "status.securityGroupId", ""),
                 "cidrBlocks": [cidr],
                 "fromPort": optionGroupPort,
                 "protocol": "tcp",
@@ -592,12 +609,13 @@ securityGroupRules = [
                 "toPort": optionGroupPort,
                 type: "ingress",
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
-    for i, cidr in get(_oxr, "spec.cidrBlocks", []) if all_true([
-        get(_oxr, "spec.optionGroup.enabled", False),
-        get(_oxr, "status.securityGroupId", False),
+    for i, cidr in get(oxr, "spec.cidrBlocks", []) if all_true([
+        get(oxr, "spec.optionGroup.enabled", False),
+        get(oxr, "status.securityGroupId", False),
         optionGroupPort, port,
         optionGroupPort != port,
         cidr
@@ -613,24 +631,25 @@ clusterParameterGroup = [
             "annotations": {
                 "krm.kcl.dev/composition-resource-name" = "cluster-parameter-group"
                 "krm.kcl.dev/ready" = readystr("cluster-parameter-group")
-                "crossplane.io/external-name" = get(_oxr, "spec.dbClusterParameterGroup.name", "")
+                "crossplane.io/external-name" = get(oxr, "spec.dbClusterParameterGroup.name", "")
             }
             "labels": labels
         }
         "spec": {
             "deletionPolicy": dp
             "forProvider": {
-                "description": get(_oxr, "spec.parameterGroup.description", "Cluster parameter group"),
-                "family": get(_oxr, "spec.parameterGroup.family", "aurora-postgresql11"),
-                "parameter": get(_oxr, "spec.parameterGroup.parameters", {}),
+                "description": get(oxr, "spec.parameterGroup.description", "Cluster parameter group"),
+                "family": get(oxr, "spec.parameterGroup.family", "aurora-postgresql11"),
+                "parameter": get(oxr, "spec.parameterGroup.parameters", {}),
                 "region": region,
                 "tags": tags | {
                     "Name": "${appName}-cluster-parameter-group"
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
-    } if get(_oxr, "spec.dbClusterParameterGroup.create", False) and createCluster else {}
+    } if get(oxr, "spec.dbClusterParameterGroup.create", False) and createCluster else {}
 ]
 
 # If the db parameter group is requested create it
@@ -642,29 +661,30 @@ dbParameterGroup = [
             "annotations": {
                 "krm.kcl.dev/composition-resource-name" = "db-parameter-group"
                 "krm.kcl.dev/ready" = readystr("db-parameter-group")
-                "crossplane.io/external-name" = get(_oxr, "spec.dbParameterGroup.name", "")
+                "crossplane.io/external-name" = get(oxr, "spec.dbParameterGroup.name", "")
             }
             "labels": labels
         }
         "spec": {
-            "deletionPolicy": get(_oxr, "spec.deletionPolicy", "Delete"),
+            "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
             "forProvider": {
-                "description": get(_oxr, "spec.parameterGroup.description", "DB parameter group"),
-                "family": get(_oxr, "spec.parameterGroup.family", "aurora-postgresql11"),
-                "parameter": get(_oxr, "spec.parameterGroup.parameters", {}),
+                "description": get(oxr, "spec.parameterGroup.description", "DB parameter group"),
+                "family": get(oxr, "spec.parameterGroup.family", "aurora-postgresql11"),
+                "parameter": get(oxr, "spec.parameterGroup.parameters", {}),
                 "region": region,
                 "tags": tags | {
                     "Name": "${appName}-db-parameter-group"
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
-    } if get(_oxr, "spec.dbParameterGroup.create", False) else {}
+    } if get(oxr, "spec.dbParameterGroup.create", False) else {}
 ]
 
 # Cloudwatch log groups
-logGroups = get(_oxr, "spec.enabledCloudwatchLogsExports", [])
-lgEnabled = get(_oxr, "spec.cloudwatchLogGroupParameters.create", False) and len(logGroups) > 0
+logGroups = get(oxr, "spec.enabledCloudwatchLogsExports", [])
+lgEnabled = get(oxr, "spec.cloudwatchLogGroupParameters.create", False) and len(logGroups) > 0
 cloudwatchLogGroups = [
     {
         "apiVersion": "cloudwatchlogs.aws.upbound.io/v1beta1"
@@ -680,15 +700,16 @@ cloudwatchLogGroups = [
         "spec": {
             "deletionPolicy": dp,
             "forProvider": {
-                "logGroupClass": get(item, "spec.cloudwatchLogGroupParameters.class", "Standard"),
-                "retentionInDays": get(item, "spec.cloudwatchLogGroupParameters.retentionInDays", 0),
+                "logGroupClass": get(item, "cloudwatchLogGroupParameters.class", "Standard"),
+                "retentionInDays": get(item, "cloudwatchLogGroupParameters.retentionInDays", 0),
                 "kmsKeyId": keyId,
-                "skipDestroy": get(item, "spec.cloudwatchLogGroupParameters.skipDestroy", False),
+                "skipDestroy": get(item, "cloudwatchLogGroupParameters.skipDestroy", False),
                 "region": region,
                 "tags": tags | {
                     "Name": "${appName}-log-group-${i}"
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
@@ -711,18 +732,19 @@ clusterActivityStream = [
         "spec": {
             "deletionPolicy": dp
             "forProvider": {
-                "applyImmediately": get(_oxr, "spec.activityStream.applyImmediately", True),
-                "enabled": get(_oxr, "spec.activityStream.enabled", False),
-                "kmsKeyId": get(_oxr, "status.kmsKeyId", None),
-                "mode": get(_oxr, "spec.activityStream.mode", "sync"),
+                "applyImmediately": get(oxr, "spec.activityStream.applyImmediately", True),
+                "enabled": get(oxr, "spec.activityStream.enabled", False),
+                "kmsKeyId": get(oxr, "status.kmsKeyId", None),
+                "mode": get(oxr, "spec.activityStream.mode", "sync"),
                 "region": region,
                 "tags": tags | {
                     "Name": "${appName}-activity-stream"
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
-    } if get(_oxr, "spec.activityStream.enabled", False) and createCluster else {}
+    } if get(oxr, "spec.activityStream.enabled", False) and createCluster else {}
 ]
 
 # If secret rotation is enabled, create the secret rotation resource
@@ -741,22 +763,23 @@ secretRotation = [
         "spec": {
             "deletionPolicy": dp
             "forProvider": {
-                "secretId": get(_oxr, "status.secretId", ""),
+                "secretId": get(oxr, "status.secretId", ""),
                 "region": region,
-                "rotateImmediately": get(_oxr, "spec.secretRotation.rotateImmediately", False),
+                "rotateImmediately": get(oxr, "spec.secretRotation.rotateImmediately", False),
                 "rotationRules": [
                     {
-                        "duration": get(_oxr, "spec.secretRotation.duration", 0),
+                        "duration": get(oxr, "spec.secretRotation.duration", 0),
                     } | {
-                        "automaticallyAfterDays": get(_oxr, "spec.secretRotation.afterDays", 30),
-                    } if get(_oxr, "spec.secretRotation.afterDays", False) != False else {
-                        "scheduleExpression": get(_oxr, "spec.secretRotation.scheduleExpression", "")
+                        "automaticallyAfterDays": get(oxr, "spec.secretRotation.afterDays", 30),
+                    } if get(oxr, "spec.secretRotation.afterDays", False) != False else {
+                        "scheduleExpression": get(oxr, "spec.secretRotation.scheduleExpression", "")
                     }
                 ],
             }
-            providerConfigRef: pcr
+            "managementPolicies": mgmtPolicy,
+            "providerConfigRef": pcr
         }
-    } if get(_oxr, "spec.secretRotation.enabled", False) else {}
+    } if get(oxr, "spec.secretRotation.enabled", False) else {}
 ]
 
 # Merge all resources into a single flat list

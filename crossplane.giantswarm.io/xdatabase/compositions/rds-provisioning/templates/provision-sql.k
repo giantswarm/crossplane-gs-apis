@@ -1,4 +1,4 @@
-e = get(_oxr, "spec.engine", False)
+e = get(oxr, "spec.engine", False)
 _engine = ""
 
 if e and e in ["mysql", "aurora-mysql", "mariadb"]:
@@ -8,12 +8,12 @@ elif e and e in ["postgres", "aurora-postgresql"]:
 else:
     assert False, "Unsupported engine: ${e}"
 
-appName = get(_oxr, "spec.claimRef.name", "")
-connectionSecret = get(_oxr, "spec.connectionSecret", "")
+appName = get(oxr, "spec.claimRef.name", "")
+connectionSecret = get(oxr, "spec.connectionSecretName", "")
 _requiredDatabases = {}
 
 if _engine == "mysql":
-    _requiredDatabases = get(_oxr, "spec.databases", {}) | {
+    _requiredDatabases = get(oxr, "spec.databases", {}) | {
         "${appName}": {
             "name": appName,
             "users": [
@@ -32,7 +32,7 @@ if _engine == "mysql":
     }
 
 if _engine == "postgresql":
-    _requiredDatabases = get(_oxr, "spec.databases", {}) | {
+    _requiredDatabases = get(oxr, "spec.databases", {}) | {
         "${appName}": {
             "name": appName,
             "users": [
@@ -55,6 +55,7 @@ if _engine == "postgresql":
     }
 
 # Create provider connection secret for the database
+newPcrName = "${appName}-${_engine}-provider-config"
 
 providerConnectionSecret = [
     {
@@ -66,25 +67,25 @@ providerConnectionSecret = [
                 "krm.kcl.dev/composition-resource-name": _resourceName
                 "krm.kcl.dev/ready": readystr(_resourceName)
             }
-            "name": "${appName}-${_engine}-connection-secret"
+            "name": newPcrName
         }
         "spec": {
             "deletionPolicy": dp
             "providerConfigRef": {
-                "name": get(_oxr, "spec.kubernetesProviderConfig.name", "")
+                "name": get(oxr, "spec.kubernetesProviderConfig.name", "")
             }
             "forProvider": {
                 "manifest": {
                     "apiVersion": "${_engine}.sql.crossplane.io/v1alpha1"
                     "kind": "ProviderConfig"
                     "metadata": {
-                        "name": "${appName}-${_engine}-provider-config"
+                        "name": newPcrName
                     }
                     "spec": {
                         "credentials": {
                             "connectionSecretRef": {
                                 "name": connectionSecret
-                                "namespace": get(_oxr, "spec.claimRef.namespace", "")
+                                "namespace": get(oxr, "spec.claimRef.namespace", "")
                             }
                             "source": "MySQLConnectionSecret" if _engine == "mysql" else "PostgreSQLConnectionSecret"
                         }
@@ -99,13 +100,10 @@ providerConnectionSecret = [
     }
 ] if all_true([
     connectionSecret, _requiredDatabases,
-    # Do not create the connection secret if one
-    # is provided to us already
-    not get(_oxr, "spec.providerConfigRef", False),
 ]) else []
 
-providerConfigName = get(_oxr, "spec.providerConfigRef.name", "${appName}-${_engine}-provider-config")
-
+_providerConfigName = get(oxr, "spec.providerConfigRef.name", "")
+providerConfigName = newPcrName if connectionSecret else _providerConfigName
 # Create each required database
 databases = [
     {
@@ -129,10 +127,7 @@ databases = [
     }
 
     for database, _ in _requiredDatabases
-    if all_true([
-        get(_ocds, "${_engine}-connection-secret", False),
-        connectionSecret, _requiredDatabases,
-    ])
+    if _requiredDatabases
 ]
 
 # Create each required user
@@ -188,10 +183,7 @@ users = [
     }
 
     for database, user in _requiredDatabases
-    if all_true([
-        get(_ocds, "${_engine}-connection-secret", False),
-        connectionSecret, _requiredDatabases, databases,
-    ])
+    if _requiredDatabases and databases
 ]
 
 grants = [
@@ -228,13 +220,12 @@ grants = [
     }
     for database, user in _requiredDatabases
     if all_true([
-        get(_ocds, "${_engine}-connection-secret", False),
-        connectionSecret, _requiredDatabases,
+        _requiredDatabases,
         databases, users,
     ])
 ]
 
-provisionSql = get(_oxr, "spec.provisionSql", True)
+provisionSql = get(oxr, "spec.provisionSql", True)
 _items = [
     i for r in [
         providerConnectionSecret, databases,

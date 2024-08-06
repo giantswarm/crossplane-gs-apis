@@ -33,7 +33,7 @@ import (
 // +kubebuilder:resource:scope=Cluster,categories=crossplane
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Region",type=string,JSONPath=`.spec.region`
-// +kubebuilder:printcolumn:name="VpcID",type=string,JSONPath=`.status.vpcID`
+// +kubebuilder:printcolumn:name="VpcID",type=string,JSONPath=`.status.vpcs.self.id`
 // +kubebuilder:resource:shortName=pvpc
 // +crossbuilder:generate:xrd:claimNames:kind=PeeredVpcNetworkClaim,plural=peeredvpcnetworkclaims
 // +crossbuilder:generate:xrd:defaultCompositionRef:name=peered-vpc-network

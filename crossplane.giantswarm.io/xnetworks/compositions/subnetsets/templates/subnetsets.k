@@ -1,7 +1,7 @@
 import regex
-_oxr = option("params").oxr
+oxr = option("params").oxr
 _dxr = option("params").dxr
-_ocds = option("params").ocds
+ocds = option("params").ocds
 
 get = lambda x: {:}, y: str, d: any -> any {
     """
@@ -14,13 +14,23 @@ get = lambda x: {:}, y: str, d: any -> any {
     x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
 }
 
-ready = lambda y: str -> bool {
+exists = lambda x: any -> bool {
+    """
+    Check if a value exists.
+    """
+    x in list(ocds)
+}
+
+ready = lambda x: str -> bool {
     """
     Check if a value is ready.
     """
-    conditions = get(_ocds, "${y}.Resource.status.conditions", [])
-    all_true([
-        get(c, "status", "False") == "True" for c in conditions
+    conditions = get(ocds, "${x}.Resource.status.conditions", [])
+    any_true([
+        exists(x),
+        all_true([
+            get(c, "status", "False") == "True" for c in conditions
+        ])
     ])
 }
 
@@ -32,16 +42,18 @@ readystr = lambda y: str -> str {
 }
 
 
-appIndex = get(_oxr, "spec.appIndex", "")
-appName = get(_oxr, "spec.claimRef.name", "") + "-" + appIndex
-dp = get(_oxr, "spec.deletionPolicy", "Delete")
-labels = get(_oxr, "metadata.labels", {})
-pcr = get(_oxr, "spec.providerConfigRef", {})
-region = get(_oxr, "spec.region", "")
-subnets = get(_oxr, "spec.subnets", {})
-tags = get(_oxr, "spec.tags.all", {})
-tpe = get(_oxr, "spec.type", "")
-vpcId = get(_oxr, "spec.vpcId", "")
+appIndex = get(oxr, "spec.appIndex", "")
+appName = get(oxr, "spec.claimRef.name", "") + "-" + appIndex
+dp = get(oxr, "spec.deletionPolicy", "Delete")
+labels = get(oxr, "metadata.labels", {})
+mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+pcr = get(oxr, "spec.providerConfigRef", {})
+publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+region = get(oxr, "spec.region", "")
+subnets = get(oxr, "spec.subnets", {})
+tags = get(oxr, "spec.tags.all", {})
+tpe = get(oxr, "spec.type", "")
+vpcId = get(oxr, "spec.vpcId", "")
 
 subnetsets = [
     {
@@ -73,6 +85,7 @@ subnetsets = [
 
                 "vpcId": vpcId
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
@@ -104,6 +117,7 @@ routeTables = [
                 }
                 "vpcId": vpcId
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
@@ -139,6 +153,7 @@ associations = [
                     }
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
@@ -147,18 +162,18 @@ associations = [
 
 subnetIds = {
     get(item, "Resource.metadata.labels.availabilityZone", "") = get(item, "Resource.status.atProvider.id", "")
-    for _, item in _ocds
+    for _, item in ocds
     if get(item, "Resource.kind", "") == "Subnet"
 }
 
 routeTableIds = {
     get(item, "Resource.metadata.labels.availabilityZone", "") = get(item, "Resource.status.atProvider.id", "")
-    for _, item in _ocds
+    for _, item in ocds
     if get(item, "Resource.kind", "") == "RouteTable"
 }
 
 newdxr = {
-    **_oxr,
+    **oxr,
     **{
         "status": {
             "subnets": {

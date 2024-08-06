@@ -1,11 +1,11 @@
-esoEnabled = get(_oxr, "spec.eso.enabled", False)
-esoConnectionSecret = get(_oxr, "status.esoConnectionSecret", "")
-sqlEnabled = get(_oxr, "spec.provisionSql.enabled", True)
+esoEnabled = get(oxr, "spec.eso.enabled", False)
+esoConnectionSecret = get(oxr, "status.esoConnectionSecret", False)
+sqlEnabled = get(oxr, "spec.provisionSql.enabled", True)
 
 if createCluster and sqlEnabled:
     assert esoEnabled != False, "ESO must be enabled when creating a cluster with SQL provisioning enabled."
 
-useConnectionSecret = esoConnectionSecret if esoEnabled else connectionSecret
+useConnectionSecret: str|bool = esoConnectionSecret if esoEnabled else _connectionSecret
 
 _items = [
     {
@@ -19,12 +19,14 @@ _items = [
         }
         spec: {
             "deletionPolicy": dp,
-            "engine": get(_oxr, "spec.engine", "postgres")
+            "engine": get(oxr, "spec.engine", "postgres")
+            "claimRef": get(oxr, "spec.claimRef", {})
             "connectionSecretName": useConnectionSecret
-            "databases": get(_oxr, "spec.databases", {})
-            "kubernetesProviderConfig": get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+            "databases": get(oxr, "spec.databases", {})
+            "kubernetesProviderConfig": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+            "managementPolicies": mgmtPolicy,
         }
     }
     for _ in [True]
-    if get(_oxr, "spec.provisionSql.enabled", True)
+    if get(oxr, "spec.provisionSql.enabled", True) and useConnectionSecret
 ]

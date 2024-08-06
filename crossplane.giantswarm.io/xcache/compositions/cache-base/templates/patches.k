@@ -23,8 +23,8 @@ if ready(globalClusterName):
     _globalConnectionSecretName = ocdsspec(globalClusterName, "writeConnectionSecretToRef.name", "")
 
 
-cc = get(_oxr, "spec.cacheClusters", [])
-rclen = len(cc) if cc else get(_oxr, "spec.numCacheClusters", 1)
+cc = get(oxr, "spec.cacheClusters", [])
+rclen = len(cc) if cc else get(oxr, "spec.numCacheClusters", 1)
 clusterEndpoints = [
     e for e in [
         ocdsstatus("elasticache-cluster-${i}", "clusterAddress", "")
@@ -36,14 +36,14 @@ clusterEndpoints = [
 _globalReplicationId = ocdsstatus("elasticache-replication-group-global", "id", "")
 _localReplicationId = ocdsstatus("elasticache-replication-group-local", "id", "")
 
-_ipgn = get(_oxr, "spec.parameterGroupName", "")
-if get(_oxr, "spec.parameterGroupConfiguration", False):
-    _ipgn = get(_oxr, "spec.parameterGroupConfiguration.name", "")
+_ipgn = get(oxr, "spec.parameterGroupName", "")
+if get(oxr, "spec.parameterGroupConfiguration", False):
+    _ipgn = get(oxr, "spec.parameterGroupConfiguration.name", "")
 
 _ugId = ocdsstatus("elasticache-user-group", "id", "")
 
-dxr = {
-    **_oxr,
+newdxr = {
+    **oxr,
     **{
         "status": {
             if _connectionSecretName:
@@ -85,4 +85,4 @@ dxr = {
     }
 }
 
-_items = [dxr]
+_items = [newdxr]

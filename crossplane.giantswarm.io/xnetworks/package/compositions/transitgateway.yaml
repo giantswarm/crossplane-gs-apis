@@ -23,9 +23,15 @@ spec:
       spec:
         source: |-
           import regex
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocs = option("params").ocds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -38,20 +44,34 @@ spec:
               x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
           }
 
+          gpcr = lambda x: {:} -> {:} {
+              """
+              Get the ProviderConfigRef from the given object
+
+              If this is not set it will attempt to return the ProviderConfigRef from
+              the Observed Composite Resource, and if that isn't set, will return an
+              object with an empty name.
+              """
+              get(x, "providerConfigRef", get(oxr, "spec.providerConfigRef", {name: ""}))
+          }
+
           ocdsstatus = lambda x: str, y: str, d: any -> any {
               """
               Get an item from the status of an ocds resource.
               """
-              get(_ocs, "${x}.Resource.status.atProvider.${y}", d)
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(_ocs, "${x}.Resource.status.conditions", [])
-              all_true([
-                  get(c, "status", "False") == "True" for c in conditions
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
               ])
           }
 
@@ -62,144 +82,43 @@ spec:
               "True" if ready(x) else "False"
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          labels = get(_oxr, "metadata.labels", {})
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
-          region = get(_oxr, "spec.localVpc.region", "eu-central-1")
-          tags = get(_oxr, "spec.tags.common", {}) | {
+          appName = get(oxr, "spec.claimRef.name", "")
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          labels = get(oxr, "metadata.labels", {})
+          localVpc = get(oxr, "spec.localVpc", {})
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          region = get(oxr, "spec.localVpc.region", "eu-central-1")
+          tags = get(oxr, "spec.tags.common", {}) | {
               region: region,
           }
 
-          tgwEnabled = get(_oxr, "spec.enabled", False)
-
-          rpcr = lambda x: {:} -> {:} {
-              """
-              Get the ProviderConfigRef from the given object
-
-              If this is not set it will attempt to return the ProviderConfigRef from
-              the Observed Composite Resource, and if that isn't set, will return an
-              object with an empty name.
-              """
-              get(x, "providerConfigRef", get(_oxr, "spec.providerConfigRef", {name: ""}))
+          localAttachmentIds = {
+              "${appName}": ocdsstatus("tgwa-${appName}-${region}", "id", "")
+              for _ in [True]
+              if ocdsstatus("tgwa-${appName}-${region}", "id", False)
           }
 
-          # Create the main transit gateway
-          # The Id of this transit gateway will be published to _oxr.status.tgwId
-          transitGateway = [
-              {
-                  _resourceName = "transitgateway-${appName}-${region}"
-                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "TransitGateway"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name" = _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                      "labels": labels | {
-                          "vpcName": appName
-                      }
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "forProvider": {
-                          "amazonSideAsn": get(_oxr, "spec.amazonSideAsn", 64512),
-                          "autoAcceptSharedAttachments": get(_oxr, "spec.autoAcceptSharedAttachments", "disable"),
-                          "defaultRouteTableAssociation": "enable" if get(_oxr, "spec.defaultRouteTableAssociation", False) else "disable",
-                          "defaultRouteTablePropagation": "enable" if get(_oxr, "spec.defaultRouteTablePropagation", False) else "disable",
-                          "description": "${appName} Transit Gateway in ${region}",
-                          "dnsSupport": get(_oxr, "spec.dnsSupport", "enable"),
-                          "multicastSupport": get(_oxr, "spec.multicastSupport", "disable"),
-                          "region": region,
-                          "tags": tags | {
-                              "Name": "${appName}-${region}"
-                          },
-                          "transitGatewayCidrBlocks": [
-                              get(_oxr, "spec.transitGatewayCidrBlock", "")
-                              for _ in [True]
-                              if get(_oxr, "spec.transitGatewayCidrBlock", False)
-                          ]
-                          "vpnEcmpSupport": get(_oxr, "spec.vpnEcmpSupport", "enable"),
-                      }
-                      "providerConfigRef": pcr
-                  }
-              }
-              for _ in [True]
-              if tgwEnabled
-          ]
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
 
-          tgwId = ocdsstatus("transitgateway-${appName}-${region}", "id", False)
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
           tgwArn = ocdsstatus("transitgateway-${appName}-${region}", "arn", False)
+          tgwEnabled = get(oxr, "spec.enabled", False)
+          tgwId = ocdsstatus("transitgateway-${appName}-${region}", "id", False)
+          tgwRouteTableId = ocdsstatus("tgwrt-${appName}-${region}", "id", False)
 
-          # Create the main transit gateway route table
-          # The Id of this route table will be published to _oxr.status.tgwRouteTableId
-          tgwRouteTable = [
-              {
-                  _resourceName = "tgwrt-${appName}-${region}"
-                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "TransitGatewayRouteTable"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                      "labels": labels | {
-                          "vpcName": appName
-                      }
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "forProvider": {
-                          "region": region,
-                          "tags": tags | {
-                              "Name": "${appName}-${region}",
-                          }
-                          "transitGatewayId": tgwId,
-                      }
-                      "providerConfigRef": pcr
-                  }
-              }
-              for _ in [True]
-              if all_true([
-                  tgwId, tgwEnabled,
-              ])
-          ]
+          remoteAttachementIds = {
+              "${remoteVpc.name}": ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", "")
+              for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", False)
+          }
 
-          tgwRouteTableId = get(_ocs, "tgwrt-${appName}-${region}.Resource.status.atProvider.id", False)
+          peerAttachmentIds = {
+              "${peer.name}": ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", "")
+              for _, peer in get(oxr, "spec.peers", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", False)
+          }
 
-          tgwPolicyTable = [
-              {
-                  _resourceName = "tgwpt-${appName}-${region}"
-                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "TransitGatewayPolicyTable"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                      "labels": labels | {
-                          "vpcName": appName
-                      }
-                  }
-                  "spec": {
-                      "deletionPolicy": get(_oxr, "spec.deletionPolicy", "Delete"),
-                      "forProvider": {
-                          "region": region,
-                          "tags": tags | {
-                              Name: "${appName}-${region}",
-                          }
-                          "transitGatewayId": tgwId,
-                      }
-                      "providerConfigRef": pcr
-                  }
-              }
-              for _ in [True]
-              if all_true([
-                  tgwId, tgwEnabled,
-                  get(_oxr, "spec.createPolicyTable", True),
-              ])
-          ]
-
+          # Create the attachment to the local VPC
           localAttachments = [
               {
                   _resourceName = "tgwa-${appName}-${region}"
@@ -217,322 +136,139 @@ spec:
                   "spec": {
                       "deletionPolicy": dp
                       "forProvider": {
-                          "applianceModeSupport": get(_oxr, "spec.applianceModeSupport", "disable"),
-                          "dnsSupport": get(_oxr, "spec.dnsSupport", "enable"),
-                          "ipv6Support": get(_oxr, "spec.ipv6Support", "disable"),
+                          "applianceModeSupport": get(oxr, "spec.applianceModeSupport", "disable"),
+                          "dnsSupport": get(oxr, "spec.dnsSupport", "enable"),
+                          "ipv6Support": get(oxr, "spec.ipv6Support", "disable"),
                           "region": region,
-                          "subnetIds": get(_oxr, "spec.localVpc.subnetIds", []),
+                          "subnetIds": get(localVpc, "subnetIds", []),
                           "tags": tags | {
                               Name: "${appName}-${region}"
                           }
-                          "transitGatewayDefaultRouteTableAssociation": get(_oxr, "spec.defaultRouteTableAssociation", False),
-                          "transitGatewayDefaultRouteTablePropagation": get(_oxr, "spec.defaultRouteTablePropagation", False),
+                          "transitGatewayDefaultRouteTableAssociation": get(oxr, "spec.defaultRouteTableAssociation", False),
+                          "transitGatewayDefaultRouteTablePropagation": get(oxr, "spec.defaultRouteTablePropagation", False),
                           "transitGatewayId": tgwId,
-                          "vpcId": get(_oxr, "spec.localVpc.vpcId", ""),
+                          "vpcId": get(localVpc, "vpcId", ""),
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
               for _ in [True]
               if all_true([
                   tgwEnabled, tgwId,
+                  localVpc,
               ])
           ]
 
-          remoteAttachments = [
-              {
-                  _resourceName = "tgwa-${appName}-${region}-${remoteVpc.name}"
-                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "TransitGatewayVPCAttachment"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
+          lentries = [
+              x for r in [
+                  [
+                      {
+                          "cidr": cidr,
+                          "description": "${remoteVpc.name} CIDR Block ${i}",
                       }
-                      "labels": labels | {
-                          "vpcName": remoteVpc.name
+                      for i, cidr in [
+                          get(oxr, "status.vpcs.${remoteVpc.name}.cidrBlock", "")
+                      ] + get(oxr, "status.vpcs.${remoteVpc.name}.additionalCidrBlocks", [])
+                      if cidr
+                  ]
+                  for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
+              ] + [
+                  [
+                      {
+                          "cidr": e.cidr,
+                          "description": "${appName} CIDR Block ${i}",
                       }
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "forProvider": {
-                          "applianceModeSupport": get(_oxr, "spec.applianceModeSupport", "disable"),
-                          "dnsSupport": get(_oxr, "spec.dnsSupport", "enable"),
-                          "ipv6Support": get(_oxr, "spec.ipv6Support", "disable"),
-                          "region": get(remoteVpc, "region", region),
-                          "subnetIds": get(remoteVpc, "subnetIds", []),
-                          "tags": tags | {
-                              Name: "${appName}-${region}-${remoteVpc.name}"
-                          }
-                          "transitGatewayDefaultRouteTableAssociation": get(_oxr, "spec.defaultRouteTableAssociation", False),
-                          "transitGatewayDefaultRouteTablePropagation": get(_oxr, "spec.defaultRouteTablePropagation", False),
-                          "transitGatewayId": tgwId,
-                          "vpcId": get(remoteVpc, "vpcId", ""),
-                      }
-                      "providerConfigRef": rpcr(remoteVpc)
-                  }
-              }
-              for _, remoteVpc in get(_oxr, "spec.remoteVpcs", [])
+                      for _, pl in get(oxr, "spec.localVpc.prefixLists", [])
+                      for i, e in get(pl, "entries", {})
+                      if all_true([
+                          e,
+                          not get(pl, "tgwAttach", False),
+                          not get(pl, "id", False),
+                          not get(pl, "blackhole", False),
+                      ])
+                  ]
+              ] for x in r if x
+          ]
+
+          lEntriesBh = [
+              e
+              for _, pl in get(oxr, "spec.localVpc.prefixLists", [])
+              for i, e in get(pl, "entries", {})
               if all_true([
-                  tgwEnabled, tgwId,
+                  e,
+                  not get(pl, "tgwAttach", False),
+                  not get(pl, "id", False),
+                  get(pl, "blackhole", False),
               ])
           ]
 
-          remoteAttachementIds = {
-              "${remoteVpc.name}": get(_ocs, "tgwa-${appName}-${region}-${remoteVpc.name}.Resource.status.atProvider.id", "")
-              for _, remoteVpc in get(_oxr, "spec.remoteVpcs", [])
-              if get(_ocs, "tgwa-${appName}-${region}-${remoteVpc.name}.Resource.status.atProvider.id", False)
-          }
-
-          localAttachmentIds = {
-              "${appName}": get(_ocs, "tgwa-${appName}-${region}.Resource.status.atProvider.id", "")
-              for _ in [True]
-              if get(_ocs, "tgwa-${appName}-${region}.Resource.status.atProvider.id", False)
-          }
-
-          attachmentAccepters = [
-              {
-                  _resourceName = "tgwaa-${appName}-${region}-${remoteVpc.name}"
-                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "TransitGatewayVpcAttachmentAccepter"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                      "labels": labels | {
-                          "vpcName": remoteVpc.name
-                      }
+          lmpl = {
+              "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
+              "kind": "ManagedPrefixList"
+              "metadata": {
+                  _resourceName = "lmpl-${appName}-${region}"
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name": _resourceName
+                      "krm.kcl.dev/ready" = readystr(_resourceName)
                   }
-                  "spec": {
-                      "deletionPolicy": get(_oxr, "spec.deletionPolicy", "Delete"),
-                      "forProvider": {
-                          "region": get(remoteVpc, "region", region),
-                          "transitGatewayAttachmentId": get(remoteAttachementIds, remoteVpc.name, ""),
-                      }
-                      "providerConfigRef": rpcr(remoteVpc)
+                  "labels": labels | {
+                      "vpcName": appName
                   }
               }
-              for _, remoteVpc in get(_oxr, "spec.remoteVpcs", [])
-              if all_true([
-                  any_true([
-                      get(remoteVpc, "region", region) != region,
-                      rpcr(remoteVpc).name != get(_oxr, "spec.providerConfigRef.name", ""),
-                  ]),
-                  get(remoteAttachementIds, remoteVpc.name, False),
-                  tgwEnabled,
-              ])
-          ]
-
-          tgwRemotePrefixLists = [
-              {
-                  _id = get(remoteAttachementIds, remoteVpc.name, "")
-                  _bh = "-bh" if get(pl, "blackhole", False) else ""
-                  _resourceName = "tgwpl-${appName}-${region}-${_id}${_bh}"
-                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "TransitGatewayPrefixListReference"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name" = _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                      "labels": labels | {
-                          "vpcName": remoteVpc.name
-                      }
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "forProvider": {
-                          "blackhole": pl.blackhole,
-                          "prefixListId": pl.id,
-                          "region": region,
-                          "tags": tags | {
-                              Name: "${appName}-${region}",
-                          }
-                          "transitGatewayAttachmentId": _id,
-                          "transitGatewayRouteTableId": tgwRouteTableId,
-                      }
-                      "providerConfigRef": pcr
-                  }
-              }
-              for _, remoteVpc in get(_oxr, "spec.remoteVpcs", [])
-              for _, pl in get(remoteVpc, "prefixLists", [])
-              if all_true([
-                  tgwId, tgwEnabled,
-                  get(_oxr, "spec.prefixList.enabled", False),
-              ])
-          ]
-
-          tgwLocalPrefixList = [
-              {
-                  _bh = "-bh" if get(pl, "blackhole", False) else ""
-                  _resourceName = "tgwpl-${appName}-${region}${_bh}"
-                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "TransitGatewayPrefixListReference"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                      "labels": labels | {
-                          "vpcName": appName
-                      }
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "forProvider": {
-                          "blackhole": pl.blackhole,
-                          "prefixListId": pl.id,
-                          "region": region,
-                          "tags": tags | {
-                              "Name": "${appName}-${region}",
-                          }
-                          "transitGatewayAttachmentId": get(localAttachmentIds, appName, ""),
-                          "transitGatewayRouteTableId": tgwRouteTableId,
-                      }
-                      "providerConfigRef": pcr
-                  }
-              }
-              for _, pl in get(_oxr, "spec.localVpc.prefixLists", [])
-              if all_true([
-                  tgwId, tgwEnabled,
-                  get(_oxr, "spec.prefixListSupport", False),
-              ])
-          ]
-
-          propagation = [
-              {
-                  _resourceName = "tgwrtp-${appName}-${region}-${id}"
-                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "TransitGatewayRouteTablePropagation"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name" = _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                      "labels": labels | {
-                          "vpcName": appName
-                      }
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "forProvider": {
-                          "region": region,
-                          "transitGatewayAttachmentId": id,
-                          "transitGatewayRouteTableId": tgwRouteTableId,
-                      }
-                      "providerConfigRef": pcr
-                  }
-              }
-              for _, id in localAttachmentIds | remoteAttachementIds
-              if all_true([
-                  localAttachmentIds, remoteAttachementIds,
-                  tgwEnabled, tgwRouteTableId,
-              ])
-          ]
-
-          tgwAssociations = [
-              {
-                  _resourceName = "tgwa-${appName}-${region}-${id}"
-                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "TransitGatewayRouteTableAssociation"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                      "labels": labels | {
-                          "vpcName": appName
-                      }
-                  }
-                  "spec": {
-                      "deletionPolicy": get(_oxr, "spec.deletionPolicy", "Delete"),
-                      "forProvider": {
-                          "region": region,
-                          "transitGatewayAttachmentId": id,
-                          "transitGatewayRouteTableId": tgwRouteTableId,
-                      }
-                      "providerConfigRef": get(_oxr, "spec.providerConfigRef", {})
-                  }
-              }
-              for _, id in localAttachmentIds | remoteAttachementIds
-              if all_true([
-                  localAttachmentIds, remoteAttachementIds,
-                  tgwEnabled, tgwRouteTableId,
-              ])
-          ]
-
-          # Map comprehension to create transit gateway routes
-          # We use map-comprehension here to prevent duplicate
-          # routes from being added to the list
-          tgwRemoteRoutes = {
-              "${tgw.cidrBlock}": {
-                  "bh": get(tgw, "blackhole", False),
-                  "aid": get(remoteAttachementIds, remoteVpc.name, "")
-                  "region": get(remoteVpc, "region", region),
-                  "name": remoteVpc.name
-                  "pcr": rpcr(remoteVpc)
-              }
-              for _, remoteVpc in get(_oxr, "spec.remoteVpcs", [])
-              for tgw in get(remoteVpc, "additionalRoutes", []) + [
-                  {cidrBlock: cidr, blackhole: False}
-                  for _, cidr in get(remoteVpc, "cidrBlocks", [])
-              ]
-              if all_true([
-                  tgwEnabled
-                  get(remoteAttachementIds, remoteVpc.name, False)
-              ])
-          }
-
-          tgwLocalRoutes = {
-              "${tgw.cidrBlock}": {
-                  "bh": get(tgw, "blackhole", False),
-                  "aid": get(localAttachmentIds, appName, ""),
-                  "name": appName,
+              "spec": {
+                  "addressFamily": "IPv4",
+                  "deletionPolicy": dp,
+                  "entries": lentries,
+                  "managementPolicies": mgmtPolicy,
+                  "name": "${appName}-${region}",
                   "region": region,
-                  "pcr": get(_oxr, "spec.providerConfigRef", {}),
+                  "tags": tags | {
+                      "Name": "${appName}-${region}",
+                  }
               }
-              for tgw in get(_oxr, "spec.localVpc.additionalRoutes", []) + [
-                  {cidrBlock: cidr, blackhole: False}
-                  for _, cidr in get(_oxr, "spec.localVpc.cidrBlocks", [])
-              ]
           }
 
-          transitGatewayRoutes = [
-              {
-                  _name = regex.replace(key, "\.|\/", "-")
-                  _resourceName = "tgwr-${appName}-${region}-${_name}"
-                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "TransitGatewayRoute"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                      "labels": labels | {
-                          "routeType": "transitGateway",
-                          "vpcName": value.name
-                      }
+          lmplbh = {
+              "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
+              "kind": "ManagedPrefixList"
+              "metadata": {
+                  _resourceName = "lmpl-${appName}-${region}-bh"
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name": _resourceName
+                      "krm.kcl.dev/ready" = readystr(_resourceName)
                   }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "forProvider": {
-                          "blackhole": value.bh
-                          "destinationCidrBlock": key,
-                          "region": value.region,
-                          "transitGatewayAttachmentId": value.aid,
-                          "transitGatewayRouteTableId": tgwRouteTableId,
-                      }
-                      "providerConfigRef": value.pcr
+                  "labels": labels | {
+                      "vpcName": appName
                   }
               }
-              for key, value in tgwRemoteRoutes | tgwLocalRoutes
-              if all_true([
-                  tgwLocalRoutes, tgwRemoteRoutes,
-                  tgwEnabled, tgwRouteTableId,
-              ])
+              "spec": {
+                  "addressFamily": "IPv4",
+                  "deletionPolicy": dp,
+                  "entries": lEntriesBh,
+                  "managementPolicies": mgmtPolicy,
+                  "name": "${appName}-${region}-bh",
+                  "region": region,
+                  "tags": tags | {
+                      "Name": "${appName}-${region}-bh",
+                  }
+              }
+          }
+
+          localPrefixLists = [
+              lmpl,
+              lmplbh,
           ]
 
+          prefixListIds = [
+              c for c in [
+                  ocdsstatus("lmpl-${appName}-${region}", "id", ""),
+                  ocdsstatus("lmpl-${appName}-${region}-bh", "id", ""),
+              ] if c
+          ]
+
+          # Create the routes right at the end so we can set up
+          # the prefix lists properly first
           localRoutes = [
               {
                   _resourceName = "peering-rt-${id}"
@@ -551,246 +287,547 @@ spec:
                   "spec": {
                       "deletionPolicy": dp
                       "forProvider": {
-                          "destinationCidrBlock": cidr,
+                          "destinationPrefixListId": pl,
                           "routeTableId": id,
                           "region": region,
                           "transitGatewayId": tgwId,
                       },
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
-              for _, remoteVpc in get(_oxr, "spec.remoteVpcs", [])
-              for _, cidr in get(remoteVpc, "cidrBlocks", [])
-              for _, id in get(_oxr, "spec.localVpc.routeTableIds", [])
+              for _, id in get(oxr, "spec.localVpc.routeTableIds", [])
+              for pl in prefixListIds
               if all_true([
                   tgwId, tgwEnabled,
               ])
           ]
 
-          remoteRoutes = [
+          _items = [
+              i for r in [
+                  localAttachments,
+                  localPrefixLists,
+                  localRoutes,
+              ]
+              for i in r if i
+          ]
+
+          items = _items
+        target: ""
+    step: function-kcl-local
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+          oxr = option("params").oxr
+          ocds = option("params").ocds
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
+
+          get = lambda x: {:}, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          gpcr = lambda x: {:} -> {:} {
+              """
+              Get the ProviderConfigRef from the given object
+
+              If this is not set it will attempt to return the ProviderConfigRef from
+              the Observed Composite Resource, and if that isn't set, will return an
+              object with an empty name.
+              """
+              get(x, "providerConfigRef", get(oxr, "spec.providerConfigRef", {name: ""}))
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          ready = lambda x: str -> bool {
+              """
+              Check if a value is ready.
+              """
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
+              ])
+          }
+
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          appName = get(oxr, "spec.claimRef.name", "")
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          labels = get(oxr, "metadata.labels", {})
+          localVpc = get(oxr, "spec.localVpc", {})
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          region = get(oxr, "spec.localVpc.region", "eu-central-1")
+          tags = get(oxr, "spec.tags.common", {}) | {
+              region: region,
+          }
+
+          localAttachmentIds = {
+              "${appName}": ocdsstatus("tgwa-${appName}-${region}", "id", "")
+              for _ in [True]
+              if ocdsstatus("tgwa-${appName}-${region}", "id", False)
+          }
+
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+          tgwArn = ocdsstatus("transitgateway-${appName}-${region}", "arn", False)
+          tgwEnabled = get(oxr, "spec.enabled", False)
+          tgwId = ocdsstatus("transitgateway-${appName}-${region}", "id", False)
+          tgwRouteTableId = ocdsstatus("tgwrt-${appName}-${region}", "id", False)
+
+          remoteAttachementIds = {
+              "${remoteVpc.name}": ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", "")
+              for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", False)
+          }
+
+          peerAttachmentIds = {
+              "${peer.name}": ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", "")
+              for _, peer in get(oxr, "spec.peers", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", False)
+          }
+
+          # ManagedPrefixLists
+
+          tgwLocalCidrs = [
+              {"cidr": c, "description": "${appName} CIDR Block ${i}"}
+              for i, c in [
+                  get(oxr, "status.vpcs.self.cidrBlock", "")
+              ] + get(oxr, "status.vpcs.self.additionalCidrBlocks", [])
+              if c
+          ] + [
+              e
+              for _, pl in get(oxr, "spec.localVpc.prefixLists", [])
+              for e in get(pl, "entries", [])
+              if all_true([
+                  e,
+                  not get(pl, "tgwAttach", False),
+                  not get(pl, "id", False),
+                  not get(pl, "blackhole", False),
+              ])
+          ]
+
+          tgwLocalCidrsBh = [
+              e
+              for _, pl in get(oxr, "spec.localVpc.prefixLists", [])
+              for i, e in get(pl, "entries", [])
+              if all_true([
+                  e,
+                  not get(pl, "tgwAttach", False),
+                  not get(pl, "id", False),
+                  get(pl, "blackhole", False),
+              ])
+          ]
+
+          tgwLocalPrefixList = {
+              "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
+              "kind": "ManagedPrefixList"
+              "metadata": {
+                  _resourceName = "lmpl-${appName}-${region}"
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name": _resourceName
+                      "krm.kcl.dev/ready" = readystr(_resourceName)
+                  }
+                  "labels": labels | {
+                      "vpcName": appName
+                  }
+              },
+              "spec": {
+                  "addressFamily": get(oxr, "spec.localVpc.addressFamily", "IPv4"),
+                  "deletionPolicy": dp,
+                  "name": "${appName}-${region}-local",
+                  "entries": tgwLocalCidrs,
+                  "region": region,
+                  "tags": tags | {
+                      "Name": "${appName}-${region}"
+                  }
+                  "managementPolicies": mgmtPolicy,
+                  "providerConfigRef": pcr,
+              },
+          }
+
+          tgwLocalPrefixListBh = {
+              "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
+              "kind": "ManagedPrefixList"
+              "metadata": {
+                  _resourceName = "lmpl-${appName}-${region}-bh"
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name": _resourceName
+                      "krm.kcl.dev/ready" = readystr(_resourceName)
+                  }
+                  "labels": labels | {
+                      "vpcName": appName
+                  }
+              },
+              "spec": {
+                  "addressFamily": get(oxr, "spec.localVpc.addressFamily", "IPv4"),
+                  "deletionPolicy": dp,
+                  "name": "${appName}-${region}-local-bh",
+                  "entries": tgwLocalCidrsBh,
+                  "region": region,
+                  "tags": tags | {
+                      "Name": "${appName}-${region}"
+                  }
+                  "managementPolicies": mgmtPolicy,
+                  "providerConfigRef": pcr,
+              },
+          }
+
+          tgwLocalPrefixLists = [
+              tgwLocalPrefixList,
+              tgwLocalPrefixListBh,
+          ]
+
+          tgwLocalPrefixListIds = [
+              c for c in [
+                  {"id": ocdsstatus("lmpl-${appName}-${region}", "id", False), "blackhole": False},
+                  {"id": ocdsstatus("lmpl-${appName}-${region}-bh", "id", False), "blackhole": True},
+              ] + [
+                  {"id": get(pl, "id", False), "blackhole": get(pl, "blackhole", False)}
+                  for _, pl in get(oxr, "spec.localVpc.prefixLists", [])
+                  if all_true([
+                      get(pl, "id", False),
+                      get(pl, "tgwAttach", False),
+                  ])
+              ]
+              if c.id
+          ]
+
+          tgwLocalPrefixListReferences = [
               {
-                  _resourceName = "peering-rt-${id}"
+                  _bh = "-bh" if get(pl, "blackhole", False) else ""
+                  _resourceName = "ltgwpl-${appName}-${region}${_bh}"
                   "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "Route"
+                  "kind": "TransitGatewayPrefixListReference"
                   "metadata": {
                       "annotations": {
                           "krm.kcl.dev/composition-resource-name": _resourceName
                           "krm.kcl.dev/ready" = readystr(_resourceName)
                       }
                       "labels": labels | {
-                          "routeType": "peering",
-                          "vpcName": remoteVpc.name
+                          "vpcName": appName
                       }
                   }
                   "spec": {
                       "deletionPolicy": dp
                       "forProvider": {
-                          "destinationCidrBlock": cidr,
-                          "routeTableId": id,
-                          "region": get(remoteVpc, "region", region),
-                          "transitGatewayId": tgwId,
-                      },
-                      "providerConfigRef": rpcr(remoteVpc),
+                          "blackhole": pl.blackhole,
+                          "prefixListId": pl.id,
+                          "region": region,
+                          "tags": tags | {
+                              "Name": "${appName}-${region}${_bh}",
+                          }
+                          "transitGatewayAttachmentId": get(localAttachmentIds, appName, ""),
+                          "transitGatewayRouteTableId": tgwRouteTableId,
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": pcr
                   }
               }
-              for _, remoteVpc in get(_oxr, "spec.remoteVpcs", [])
-              for _, cidr in get(_oxr, "spec.localVpc.cidrBlocks", [])
-              for _, id in get(remoteVpc, "routeTableIds", [])
+              for i, pl in tgwLocalPrefixListIds
               if all_true([
-                  tgwId, tgwEnabled,
+                  tgwId, pl.id,
+                  get(oxr, "spec.prefixList.enabled", False),
               ])
           ]
 
-          # Transit Gateway Peering
+          tgwRemoteCidrs = {
+              "${rVpc.name}": [
+                  {"cidr": c "description": "${appName} remote vpc ${rVpc.name} CIDR Block ${i}"}
+                  for i, c in [
+                      get(oxr, "status.vpcs.${rVpc.name}.cidrBlocks", "")
+                  ] + get(oxr, "status.vpcs.${rVpc.name}.additionalCidrBlocks", [])
+                  if c
+              ] + [
+                  e
+                  for _, pl in get(oxr, "spec.remoteVpcs.${rVpc.name}.prefixLists", [])
+                  for e in get(pl, "entries", [])
+                  if all_true([
+                      e,
+                      get(pl, "tgwAttach", False),
+                      not get(pl, "id", False),
+                      not get(pl, "blackhole", False),
+                  ])
+              ]
+              for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+          }
 
-          tgwPeers = [
+          tgwRemoteCidrsBh = {
+              "${rVpc.name}" = [
+                  e
+                  for _, pl in get(oxr, "spec.remoteVpcs.${rVpc.name}.prefixLists", [])
+                  for i, e in get(pl, "entries", [])
+                  if all_true([
+                      e,
+                      get(pl, "tgwAttach", False),
+                      not get(pl, "id", False),
+                      get(pl, "blackhole", False),
+                  ])
+              ]
+              for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+          }
+
+
+          tgwRemotePrefixLists = [
               {
-                  _resourceName = "tgw-peer-${appName}-${region}-${peer.name}"
+                  "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
+                  "kind": "ManagedPrefixList"
+                  "metadata": {
+                      _resourceName = "rmpl-${appName}-${region}-${i}"
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name": _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                      "labels": labels | {
+                          "vpcName": remoteVpc.name
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": dp,
+                      "entries": get(pl, "entries", []),
+                      "managementPolicies": mgmtPolicy,
+                      "name": "${appName}-${region}-remote-${i}",
+                      "region": get(remoteVpc, "region", region),
+                      "tags": tags | {
+                          "Name": "${appName}-${region}",
+                      }
+                  }
+              }
+              for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
+              for i, pl in get(remoteVpc, "prefixLists", [])
+              if all_true([
+                  tgwId, tgwEnabled,
+                  get(oxr, "spec.prefixListSupport", False),
+                  not get(pl, "id", False),
+                  len(get(pl, "entries", [])) > 0,
+              ])
+          ]
+
+          tgwRemotePrefixListIds = {
+              "${rVpc.name}": [
+                  c for c in [
+                      {
+                          "id": ocdsstatus("rmpl-${appName}-${region}-${rVpc.name}", "id", False),
+                          "blackhole": False,
+                      },
+                      {
+                          "id": ocdsstatus("rmpl-${appName}-${region}-${rVpc.name}-bh", "id", False),
+                          "blackhole": True,
+                      },
+                  ] + [
+                      {
+                          "id": get(pl, "id", False),
+                          "blackhole": get(pl, "blackhole", False),
+                      }
+                      for i, pl in get(rVpc, "prefixLists", [])
+                      if all_true([
+                          get(pl, "id", False),
+                          get(pl, "tgwAttach", False),
+                      ])
+                  ]
+              ]
+              for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+              if all_true([
+                  tgwId, tgwEnabled,
+                  get(oxr, "spec.prefixListSupport", False),
+              ])
+          }
+
+          tgwRemotePrefixListReferences = [
+              {
+                  _id = get(remoteAttachementIds, name, "")
+                  _bh = "-bh" if pl.blackhole else ""
+                  _resourceName = "rtgwpl-${appName}-${region}-${_id}${_bh}-${i}"
                   "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "TransitGatewayPeeringAttachment"
+                  "kind": "TransitGatewayPrefixListReference"
                   "metadata": {
                       "annotations": {
                           "krm.kcl.dev/composition-resource-name" = _resourceName
                           "krm.kcl.dev/ready" = readystr(_resourceName)
                       }
                       "labels": labels | {
-                          "vpcName": peer.name
+                          "vpcName": name
                       }
                   }
                   "spec": {
-                      "deletionPolicy": get(_oxr, "spec.deletionPolicy", "Delete"),
+                      "deletionPolicy": dp
                       "forProvider": {
-                          "peerAccountId": peer.accountId,
-                          "peerRegion": peer.region,
-                          "peerTransitGatewayId": peer.tgwId,
+                          "blackhole": pl.blackhole,
+                          "prefixListId": pl.id,
                           "region": region,
                           "tags": tags | {
-                              Name: "${appName}-${region}-${peer.name}"
+                              Name: _resourceName,
                           }
-                          "transitGatewayId": tgwId,
+                          "transitGatewayAttachmentId": _id,
+                          "transitGatewayRouteTableId": tgwRouteTableId,
                       }
-                      "providerConfigRef": rpcr(peer)
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": pcr,
                   }
               }
-              for peer in get(_oxr, "spec.transitGatewayPeers", [])
+              for name, remoteVpc in tgwRemotePrefixListIds
+              for i, pl in remoteVpc
               if all_true([
                   tgwId, tgwEnabled,
+                  get(pl, "id", False),
               ])
           ]
 
-          peeringIds = [
-              ocdsstatus("tgw-peer-${appName}-${region}-${peer.name}", "id", "")
-              for peer in get(_oxr, "spec.transitGatewayPeers", [])
-              if ocdsstatus("tgw-peer-${appName}-${region}-${peer.name}", "id", False)
+          _items = [
+              i for r in [
+                  tgwLocalPrefixLists, tgwRemotePrefixLists,
+                  tgwLocalPrefixListReferences,
+                  tgwRemotePrefixListReferences,
+              ] for i in r if i
           ]
 
-          tgwPeeringAccepters = [
-              {
-                  _resourceName = "tgw-peer-accepter-${appName}-${region}-${id}"
-                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "TransitGatewayPeeringAttachmentAccepter"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "forProvider": {
-                          "region": region,
-                          "transitGatewayAttachmentId": id,
-                      }
-                      "providerConfigRef": pcr
-                  }
-              }
-              for _, id in peeringIds
-              if tgwEnabled
-          ]
+          items = _items
+        target: ""
+    step: function-kcl-mpl
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
-          # RAM Resource management
-          # These are only enabled if RAM is enabled
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
 
-          # NOTE:
-          # These may become their own composition in the future
+          get = lambda x: {:}, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
 
-          ramEnabled = tgwEnabled and get(_oxr, "spec.ram.enabled", False)
+          gpcr = lambda x: {:} -> {:} {
+              """
+              Get the ProviderConfigRef from the given object
 
-          ramShare = [
-              {
-                  _resourceName = "tgw-share-${appName}-${region}"
-                  "apiVersion": "ram.aws.upbound.io/v1beta1"
-                  "kind": "ResourceShare"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "forProvider": {
-                          "allowExternalPrincipals": get(_oxr, "spec.ram.allowExternalPrincipals", True),
-                          "name": "${appName}-${region}",
-                          "region": region,
-                          "tags": tags,
-                      }
-                      "providerConfigRef": pcr
-                  }
-              }
+              If this is not set it will attempt to return the ProviderConfigRef from
+              the Observed Composite Resource, and if that isn't set, will return an
+              object with an empty name.
+              """
+              get(x, "providerConfigRef", get(oxr, "spec.providerConfigRef", {name: ""}))
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          ready = lambda x: str -> bool {
+              """
+              Check if a value is ready.
+              """
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
+              ])
+          }
+
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          appName = get(oxr, "spec.claimRef.name", "")
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          labels = get(oxr, "metadata.labels", {})
+          localVpc = get(oxr, "spec.localVpc", {})
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          region = get(oxr, "spec.localVpc.region", "eu-central-1")
+          tags = get(oxr, "spec.tags.common", {}) | {
+              region: region,
+          }
+
+          localAttachmentIds = {
+              "${appName}": ocdsstatus("tgwa-${appName}-${region}", "id", "")
               for _ in [True]
-              if ramEnabled
-          ]
+              if ocdsstatus("tgwa-${appName}-${region}", "id", False)
+          }
 
-          ramShareId = ocdsstatus("tgw-share-${appName}-${region}", "id", False)
-          ramShareArn = ocdsstatus("tgw-share-${appName}-${region}", "arn", False)
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
 
-          ramAssociation = [
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+          tgwArn = ocdsstatus("transitgateway-${appName}-${region}", "arn", False)
+          tgwEnabled = get(oxr, "spec.enabled", False)
+          tgwId = ocdsstatus("transitgateway-${appName}-${region}", "id", False)
+          tgwRouteTableId = ocdsstatus("tgwrt-${appName}-${region}", "id", False)
+
+          remoteAttachementIds = {
+              "${remoteVpc.name}": ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", "")
+              for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", False)
+          }
+
+          peerAttachmentIds = {
+              "${peer.name}": ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", "")
+              for _, peer in get(oxr, "spec.peers", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", False)
+          }
+
+          ramShareArn = ocdsstatus("ram-${appName}-${region}", "arn", False)
+          ramShareId = ocdsstatus("ram-${appName}-${region}", "id", False)
+
+          _items = [
               {
-                  _resourceName = "tgw-assoc-${appName}-${region}"
-                  "apiVersion": "ram.aws.upbound.io/v1beta1"
-                  "kind": "ResourceAssociation"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "forProvider": {
-                          "associationType": "resource",
-                          "region": region,
-                          "resourceArn": tgwArn,
-                          "resourceShareArn": ramShareArn,
-                      }
-                      "providerConfigRef": pcr
-                  }
-              }
-              for _ in [True]
-              if all_true([
-                  ramEnabled, ramShareArn, tgwArn,
-                  get(_oxr, "status.tgwArn", False),
-              ])
-          ]
-
-          ramPrincipleAssoc = [
-              {
-                  _resourceName = "ram-pcple-${appName}-${region}-${id}"
-                  "apiVersion": "ram.aws.upbound.io/v1beta1"
-                  "kind": "PrincipalAssociation"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "forProvider": {
-                          "principal": id,
-                          "region": region,
-                          "resourceShareArn": ramShareArn,
-                      }
-                      "providerConfigRef": pcr
-                  }
-              }
-              for _, id in get(_oxr, "spec.ram.principals", [])
-              if all_true([
-                  ramEnabled, ramShareArn,
-                  get(_oxr, "spec.ram.principals", False),
-              ])
-          ]
-
-          ramShareAccepter = [
-              {
-                  _resourceName = "ram-share-accepter-${appName}-${region}"
-                  "apiVersion": "ram.aws.upbound.io/v1beta1"
-                  "kind": "ResourceShareAccepter"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready" = readystr(_resourceName)
-                      }
-                  }
-                  "spec": {
-                      "deletionPolicy": pcr
-                      "forProvider": {
-                          "region": region,
-                          "shareArn": ramShareArn,
-                      }
-                      "providerConfigRef": pcr
-                  }
-              }
-              for _ in [True]
-              if all_true([
-                  ramEnabled, ramShareArn,
-              ])
-          ]
-
-          newdxr = [
-              {
-                  **_oxr,
+                  **oxr,
                   **{
                       "status": {
                           if tgwId:
@@ -814,28 +851,822 @@ spec:
               if tgwEnabled
           ]
 
+          items = _items
+        target: ""
+    step: function-kcl-patching
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+          oxr = option("params").oxr
+          ocds = option("params").ocds
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
+
+          get = lambda x: {:}, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          gpcr = lambda x: {:} -> {:} {
+              """
+              Get the ProviderConfigRef from the given object
+
+              If this is not set it will attempt to return the ProviderConfigRef from
+              the Observed Composite Resource, and if that isn't set, will return an
+              object with an empty name.
+              """
+              get(x, "providerConfigRef", get(oxr, "spec.providerConfigRef", {name: ""}))
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          ready = lambda x: str -> bool {
+              """
+              Check if a value is ready.
+              """
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
+              ])
+          }
+
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          appName = get(oxr, "spec.claimRef.name", "")
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          labels = get(oxr, "metadata.labels", {})
+          localVpc = get(oxr, "spec.localVpc", {})
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          region = get(oxr, "spec.localVpc.region", "eu-central-1")
+          tags = get(oxr, "spec.tags.common", {}) | {
+              region: region,
+          }
+
+          localAttachmentIds = {
+              "${appName}": ocdsstatus("tgwa-${appName}-${region}", "id", "")
+              for _ in [True]
+              if ocdsstatus("tgwa-${appName}-${region}", "id", False)
+          }
+
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+          tgwArn = ocdsstatus("transitgateway-${appName}-${region}", "arn", False)
+          tgwEnabled = get(oxr, "spec.enabled", False)
+          tgwId = ocdsstatus("transitgateway-${appName}-${region}", "id", False)
+          tgwRouteTableId = ocdsstatus("tgwrt-${appName}-${region}", "id", False)
+
+          remoteAttachementIds = {
+              "${remoteVpc.name}": ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", "")
+              for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", False)
+          }
+
+          peerAttachmentIds = {
+              "${peer.name}": ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", "")
+              for _, peer in get(oxr, "spec.peers", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", False)
+          }
+
+          # Transit Gateway Peering
+
+          tgwPeers = [
+              {
+                  _resourceName = "tgw-peer-${appName}-${region}-${peer.name}"
+                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
+                  "kind": "TransitGatewayPeeringAttachment"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name" = _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                      "labels": labels | {
+                          "vpcName": peer.name
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
+                      "forProvider": {
+                          "peerAccountId": peer.accountId,
+                          "peerRegion": peer.region,
+                          "peerTransitGatewayId": peer.tgwId,
+                          "region": region,
+                          "tags": tags | {
+                              Name: "${appName}-${region}-${peer.name}"
+                          }
+                          "transitGatewayId": tgwId,
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": gpcr(peer)
+                  }
+              }
+              for peer in get(oxr, "spec.transitGatewayPeers", [])
+              if all_true([
+                  tgwId, tgwEnabled,
+              ])
+          ]
+
+          peeringIds = [
+              ocdsstatus("tgw-peer-${appName}-${region}-${peer.name}", "id", "")
+              for peer in get(oxr, "spec.transitGatewayPeers", [])
+              if ocdsstatus("tgw-peer-${appName}-${region}-${peer.name}", "id", False)
+          ]
+
+          tgwPeeringAccepters = [
+              {
+                  _resourceName = "tgw-peer-accepter-${appName}-${region}-${id}"
+                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
+                  "kind": "TransitGatewayPeeringAttachmentAccepter"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name": _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": dp
+                      "forProvider": {
+                          "region": region,
+                          "transitGatewayAttachmentId": id,
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": pcr
+                  }
+              }
+              for _, id in peeringIds
+              if tgwEnabled
+          ]
+
+          pentries = {
+              "${peer.name}": [
+                  {
+                      "cidr": p.cidr,
+                      "description": p.description,
+                  }
+                  for p in get(peer, "prefixLists", [])
+                  if not get(p, "blackhole", False)
+              ]
+              for peer in get(oxr, "spec.peers", [])
+          }
+
+          tgwPeerPrefixLists = {
+              "${peer.name}": {
+                  "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
+                  "kind": "ManagedPrefixList"
+                  "metadata": {
+                      _resourceName = "pmpl-${appName}-${region}-${peer.name}"
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name": _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                      "labels": labels | {
+                          "peer": peer.name
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": dp,
+                      "entries": get(pentries, peer.name, []), # FIXME: rentriesbh is not defined
+                      "managementPolicies": mgmtPolicy,
+                      "name": "${appName}-${region}-remote-${peer.name}",
+                      "region": get(peer, "region", region),
+                      "tags": tags | {
+                          "Name": "${appName}-${region}",
+                      }
+                      "providerConfigRef": gpcr(peer)
+                  }
+              }
+              for _, peer in get(oxr, "spec.peers", [])
+              if all_true([
+                  tgwId, tgwEnabled,
+                  not get(peer, "id", False),
+              ])
+          }
+
+          tgwPeerPrefixListIds = {
+              "${peer.name}": [
+                  c for c in [
+                      {
+                          "id":  ocdsstatus("pmpl-${appName}-${region}-${peer.name}", "id", ""),
+                          "blackhole": False,
+                      },
+                      {
+                          "id":  ocdsstatus("pmpl-${appName}-${region}-${peer.name}-bh", "id", ""),
+                          "blackhole": True,
+                      }
+                  ] + [
+                      {
+                          "id": get(pl, "id", False),
+                          "blackhole": get(pl, "blackhole", False),
+                      }
+                      for i, pl in get(peer, "prefixLists", [])
+                  ]
+              ]
+              for _, peer in get(oxr, "spec.peers", [])
+              if all_true([
+                  tgwId, tgwEnabled,
+                  not get(peer, "id", False),
+              ])
+          }
+
+          tgwPeerPrefixListReferences = [
+              {
+                  _id = get(peerAttachmentIds, name, "")
+                  _bh = "-bh" if pl.blackhole else ""
+                  _resourceName = "ptrgwpol-${appName}-${region}-${_id}${_bh}-${i}"
+                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
+                  "kind": "TransitGatewayPrefixListReference"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name" = _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                      "labels": labels | {
+                          "vpcName": name
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": dp
+                      "forProvider": {
+                          "blackhole": pl.blackhole,
+                          "prefixListId": pl.id,
+                          "region": region,
+                          "tags": tags | {
+                              Name: _resourceName,
+                          }
+                          "transitGatewayAttachmentId": _id,
+                          "transitGatewayRouteTableId": tgwRouteTableId,
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": pcr,
+                  }
+              }
+              for name, peer in tgwPeerPrefixListIds
+              for i, pl in peer
+              if all_true([
+                  tgwId, tgwEnabled,
+                  tgwRouteTableId,
+                  get(pl, "id", False),
+              ])
+          ]
+
+          _items = [
+              i for r in [
+                  tgwPeers,
+                  tgwPeeringAccepters,
+                  [p for _, p in tgwPeerPrefixLists],
+          ] for i in r]
+
+          items = _items
+        target: ""
+    step: function-kcl-peering
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+          oxr = option("params").oxr
+          ocds = option("params").ocds
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
+
+          get = lambda x: {:}, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          gpcr = lambda x: {:} -> {:} {
+              """
+              Get the ProviderConfigRef from the given object
+
+              If this is not set it will attempt to return the ProviderConfigRef from
+              the Observed Composite Resource, and if that isn't set, will return an
+              object with an empty name.
+              """
+              get(x, "providerConfigRef", get(oxr, "spec.providerConfigRef", {name: ""}))
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          ready = lambda x: str -> bool {
+              """
+              Check if a value is ready.
+              """
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
+              ])
+          }
+
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          appName = get(oxr, "spec.claimRef.name", "")
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          labels = get(oxr, "metadata.labels", {})
+          localVpc = get(oxr, "spec.localVpc", {})
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          region = get(oxr, "spec.localVpc.region", "eu-central-1")
+          tags = get(oxr, "spec.tags.common", {}) | {
+              region: region,
+          }
+
+          localAttachmentIds = {
+              "${appName}": ocdsstatus("tgwa-${appName}-${region}", "id", "")
+              for _ in [True]
+              if ocdsstatus("tgwa-${appName}-${region}", "id", False)
+          }
+
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+          tgwArn = ocdsstatus("transitgateway-${appName}-${region}", "arn", False)
+          tgwEnabled = get(oxr, "spec.enabled", False)
+          tgwId = ocdsstatus("transitgateway-${appName}-${region}", "id", False)
+          tgwRouteTableId = ocdsstatus("tgwrt-${appName}-${region}", "id", False)
+
+          remoteAttachementIds = {
+              "${remoteVpc.name}": ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", "")
+              for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", False)
+          }
+
+          peerAttachmentIds = {
+              "${peer.name}": ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", "")
+              for _, peer in get(oxr, "spec.peers", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", False)
+          }
+
+          # Optional RAM
+          resources = [
+              tgwArn,
+          ] + get(oxr, "spec.ram.resources", [])
+
+          _items = [
+              {
+                  "apiVersion": "xaws.crossplane.giantswarm.io/v1alpha1"
+                  "kind": "ResourceAccessManager"
+                  "metadata": {
+                      _resourceName = "ram-${appName}-${region}"
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name": _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                      "labels": labels | {
+                          "vpcName": appName
+                      }
+                  }
+                  "spec": {
+                      "allowExternalPrincipals": get(oxr, "spec.ram.allowExternalPrincipals", False),
+                      "deletionPolicy": dp
+                      "managementPolicies": mgmtPolicy,
+                      "name": appName,
+                      "permissions": get(oxr, "spec.ram.permissions", []),
+                      "principals": get(oxr, "spec.ram.principals", []),
+                      "resources": resources,
+                      "providerConfigRef": pcr
+                      "region": region,
+                  }
+              }
+              for _ in [True]
+              if get(oxr, "spec.ram.enabled", False)
+          ]
+
+          items = _items
+        target: ""
+    step: function-kcl-ram
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+          oxr = option("params").oxr
+          ocds = option("params").ocds
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
+
+          get = lambda x: {:}, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          gpcr = lambda x: {:} -> {:} {
+              """
+              Get the ProviderConfigRef from the given object
+
+              If this is not set it will attempt to return the ProviderConfigRef from
+              the Observed Composite Resource, and if that isn't set, will return an
+              object with an empty name.
+              """
+              get(x, "providerConfigRef", get(oxr, "spec.providerConfigRef", {name: ""}))
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          ready = lambda x: str -> bool {
+              """
+              Check if a value is ready.
+              """
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
+              ])
+          }
+
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          appName = get(oxr, "spec.claimRef.name", "")
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          labels = get(oxr, "metadata.labels", {})
+          localVpc = get(oxr, "spec.localVpc", {})
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          region = get(oxr, "spec.localVpc.region", "eu-central-1")
+          tags = get(oxr, "spec.tags.common", {}) | {
+              region: region,
+          }
+
+          localAttachmentIds = {
+              "${appName}": ocdsstatus("tgwa-${appName}-${region}", "id", "")
+              for _ in [True]
+              if ocdsstatus("tgwa-${appName}-${region}", "id", False)
+          }
+
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+          tgwArn = ocdsstatus("transitgateway-${appName}-${region}", "arn", False)
+          tgwEnabled = get(oxr, "spec.enabled", False)
+          tgwId = ocdsstatus("transitgateway-${appName}-${region}", "id", False)
+          tgwRouteTableId = ocdsstatus("tgwrt-${appName}-${region}", "id", False)
+
+          remoteAttachementIds = {
+              "${remoteVpc.name}": ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", "")
+              for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", False)
+          }
+
+          peerAttachmentIds = {
+              "${peer.name}": ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", "")
+              for _, peer in get(oxr, "spec.peers", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", False)
+          }
+
+          # Create the main transit gateway
+          # The Id of this transit gateway will be published to oxr.status.tgwId
+          transitGateway = [
+              {
+                  _resourceName = "transitgateway-${appName}-${region}"
+                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
+                  "kind": "TransitGateway"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name" = _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                      "labels": labels | {
+                          "vpcName": appName
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": dp
+                      "forProvider": {
+                          "amazonSideAsn": get(oxr, "spec.amazonSideAsn", 64512),
+                          "autoAcceptSharedAttachments": get(oxr, "spec.autoAcceptSharedAttachments", "disable"),
+                          "defaultRouteTableAssociation": "enable" if get(oxr, "spec.defaultRouteTableAssociation", False) else "disable",
+                          "defaultRouteTablePropagation": "enable" if get(oxr, "spec.defaultRouteTablePropagation", False) else "disable",
+                          "description": "${appName} Transit Gateway in ${region}",
+                          "dnsSupport": get(oxr, "spec.dnsSupport", "enable"),
+                          "multicastSupport": get(oxr, "spec.multicastSupport", "disable"),
+                          "region": region,
+                          "tags": tags | {
+                              "Name": "${appName}-${region}"
+                          },
+                          "transitGatewayCidrBlocks": [
+                              get(oxr, "spec.transitGatewayCidrBlock", "")
+                              for _ in [True]
+                              if get(oxr, "spec.transitGatewayCidrBlock", False)
+                          ]
+                          "vpnEcmpSupport": get(oxr, "spec.vpnEcmpSupport", "enable"),
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": pcr
+                  }
+              }
+              for _ in [True]
+              if tgwEnabled
+          ]
+
+
+          # Create the main transit gateway route table
+          # The Id of this route table will be published to oxr.status.tgwRouteTableId
+          tgwRouteTable = [
+              {
+                  _resourceName = "tgwrt-${appName}-${region}"
+                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
+                  "kind": "TransitGatewayRouteTable"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name": _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                      "labels": labels | {
+                          "vpcName": appName
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": dp
+                      "forProvider": {
+                          "region": region,
+                          "tags": tags | {
+                              "Name": "${appName}-${region}",
+                          }
+                          "transitGatewayId": tgwId,
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": pcr
+                  }
+              }
+              for _ in [True]
+              if all_true([
+                  tgwId, tgwEnabled,
+              ])
+          ]
+
+          tgwPolicyTable = [
+              {
+                  _resourceName = "tgwpt-${appName}-${region}"
+                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
+                  "kind": "TransitGatewayPolicyTable"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name": _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                      "labels": labels | {
+                          "vpcName": appName
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
+                      "forProvider": {
+                          "region": region,
+                          "tags": tags | {
+                              Name: "${appName}-${region}",
+                          }
+                          "transitGatewayId": tgwId,
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": pcr
+                  }
+              }
+              for _ in [True]
+              if all_true([
+                  tgwId, tgwEnabled,
+                  get(oxr, "spec.createPolicyTable", True),
+              ])
+          ]
+
+          tgwAssociations = [
+              {
+                  _resourceName = "tgwa-${appName}-${region}-${id}"
+                  "apiVersion": "ec2.aws.upbound.io/v1beta1"
+                  "kind": "TransitGatewayRouteTableAssociation"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name": _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                      "labels": labels | {
+                          "vpcName": appName
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
+                      "forProvider": {
+                          "region": region,
+                          "transitGatewayAttachmentId": id,
+                          "transitGatewayRouteTableId": tgwRouteTableId,
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": get(oxr, "spec.providerConfigRef", {})
+                  }
+              }
+              for _, id in localAttachmentIds | remoteAttachementIds
+              if all_true([
+                  localAttachmentIds, remoteAttachementIds,
+                  tgwEnabled, tgwRouteTableId,
+              ])
+          ]
+
           _items =  [
               i for r in [
-                  transitGateway, localAttachments,
-                  remoteAttachments, tgwRouteTable,
-                  transitGatewayRoutes, localRoutes,
-                  remoteRoutes, tgwAssociations,
-                  attachmentAccepters, propagation,
-                  tgwRemotePrefixLists, tgwLocalPrefixList,
-                  tgwPeers, tgwPeeringAccepters,
-
-                  # RAM Resources
-                  ramShare, ramAssociation,
-                  ramPrincipleAssoc, ramShareAccepter,
-
-                  # DesiredCompositeResource
-                  newdxr,
+                  transitGateway,
+                  tgwRouteTable,
+                  tgwAssociations,
+                  tgwPolicyTable,
               ] for i in r if i
           ]
 
           items = _items
         target: ""
-    step: function-kcl-create-peering
+    step: function-kcl-create-resources
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+          oxr = option("params").oxr
+          ocds = option("params").ocds
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
+
+          get = lambda x: {:}, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          gpcr = lambda x: {:} -> {:} {
+              """
+              Get the ProviderConfigRef from the given object
+
+              If this is not set it will attempt to return the ProviderConfigRef from
+              the Observed Composite Resource, and if that isn't set, will return an
+              object with an empty name.
+              """
+              get(x, "providerConfigRef", get(oxr, "spec.providerConfigRef", {name: ""}))
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          ready = lambda x: str -> bool {
+              """
+              Check if a value is ready.
+              """
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
+              ])
+          }
+
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          appName = get(oxr, "spec.claimRef.name", "")
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          labels = get(oxr, "metadata.labels", {})
+          localVpc = get(oxr, "spec.localVpc", {})
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          region = get(oxr, "spec.localVpc.region", "eu-central-1")
+          tags = get(oxr, "spec.tags.common", {}) | {
+              region: region,
+          }
+
+          localAttachmentIds = {
+              "${appName}": ocdsstatus("tgwa-${appName}-${region}", "id", "")
+              for _ in [True]
+              if ocdsstatus("tgwa-${appName}-${region}", "id", False)
+          }
+
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+          tgwArn = ocdsstatus("transitgateway-${appName}-${region}", "arn", False)
+          tgwEnabled = get(oxr, "spec.enabled", False)
+          tgwId = ocdsstatus("transitgateway-${appName}-${region}", "id", False)
+          tgwRouteTableId = ocdsstatus("tgwrt-${appName}-${region}", "id", False)
+
+          remoteAttachementIds = {
+              "${remoteVpc.name}": ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", "")
+              for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${remoteVpc.name}", "id", False)
+          }
+
+          peerAttachmentIds = {
+              "${peer.name}": ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", "")
+              for _, peer in get(oxr, "spec.peers", [])
+              if ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", False)
+          }
+
+
+
+          items = _items
+        target: ""
+    step: function-kcl-remote
   - functionRef:
       name: function-auto-ready
     step: function-auto-ready

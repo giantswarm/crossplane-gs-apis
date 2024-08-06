@@ -37,13 +37,19 @@ type TransitGatewaySpec struct {
 
 	// Contains details about the local VPC (Where the TGW will be built)
 	//
-	// +required
-	LocalVpc TransitGatewayVpc `json:"localVpc"`
+	// +optional
+	LocalVpc TransitGatewayVpc `json:"localVpc,omitempty"`
 
 	// Contains details about the remote VPCs
 	//
-	// +required
-	RemoteVpcs []TransitGatewayVpcWithProviderConfig `json:"remoteVpcs"`
+	// +optional
+	RemoteVpcs []TransitGatewayVpcWithProviderConfig `json:"remoteVpcs,omitempty"`
+
+	// Peers defines other transit gateways that this transit gateway
+	// should peer with
+	//
+	// +optional
+	Peers []TransitGatewayPeer `json:"peers,omitempty"`
 
 	// TransitGatewayParameters defines the desired state of TransitGateway
 	TransitGatewayParameters `json:",inline"`
@@ -120,12 +126,6 @@ type TransitGatewayParameters struct {
 	// +default=disable
 	MulticastSupport string `json:"multicastSupport,omitempty"`
 
-	// If the prefix lists are supported.
-	//
-	// +optional
-	// +default=false
-	PrefixListSupport bool `json:"prefixListSupport,omitempty"`
-
 	// Resource Access Management (RAM)
 	//
 	// +optional
@@ -151,12 +151,6 @@ type TransitGatewayParameters struct {
 	// +kube:validation:Enum=disable;enable
 	// +default=disable
 	TransitGatewayDefaultRouteTablePropagation string `json:"transitGatewayDefaultRouteTablePropagation,omitempty"`
-
-	// TransitGatewayPeers defines other transit gateways that this transit gateway
-	// should peer with
-	//
-	// +optional
-	TransitGatewayPeers []TransitGatewayPeer `json:"transitGatewayPeers,omitempty"`
 
 	// The tags for the transit gateway.
 	//
@@ -201,8 +195,14 @@ type TransitGatewayStatus struct {
 	// +optional
 	TgwRouteTableId string `json:"tgwRouteTableId,omitempty"`
 
+	// If Resource Access Management is enabled, the ID of the RAM share
+	//
+	// +optional
 	RamShareId string `json:"ramShareId,omitempty"`
 
+	// If Resource Access Management is enabled, the ARN of the RAM share
+	//
+	// +optional
 	RamShareArn string `json:"ramShareArn,omitempty"`
 }
 
@@ -216,6 +216,17 @@ type TransitGatewayPeer struct {
 	//
 	// +required
 	Id string `json:"id"`
+
+	// The name of the peer
+	//
+	// +optional
+	Name string `json:"name"`
+
+	// ManagedPrefixList contains CIDRs for networks that can be traversed
+	// via this transit gateway.
+	//
+	// +optional
+	PrefixLists []PrefixList `json:"managedPrefixList,omitempty"`
 
 	// ProviderConfigRef references a ProviderConfig used to create this
 	// resource
@@ -308,6 +319,7 @@ type TransitGatewayVpcWithProviderConfig struct {
 	ProviderConfigRef xpv1.Reference `json:"providerConfigRef"`
 }
 
+// +
 type PrefixList struct {
 	// If this is a blackhole route
 	//
@@ -317,8 +329,17 @@ type PrefixList struct {
 
 	// The ID of the prefix list.
 	//
-	// +required
+	// +optional
 	Id string `json:"id"`
+
+	// If this is true, the prefix list will be added to the transit gateway
+	// route table for the current attachment. Ignored for peering attachments.
+	//
+	// +optional
+	// +default=false
+	TgwAttach bool `json:"tgwAttach"`
+
+	ManagedPrefixListSubParameters `json:",inline"`
 }
 
 // Resource Access Management (RAM)

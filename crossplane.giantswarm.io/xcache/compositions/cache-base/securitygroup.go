@@ -31,6 +31,7 @@ func createSecurityGroup() xpt.ComposedTemplate {
 				Type:         xpt.PatchTypePatchSet,
 				PatchSetName: cb.StrPtr("commontags"),
 			},
+			cb.FromPatch("spec.managementPolicies", "spec.managementPolicies"),
 			{
 				Type:         xpt.PatchTypePatchSet,
 				PatchSetName: cb.StrPtr("metadata"),

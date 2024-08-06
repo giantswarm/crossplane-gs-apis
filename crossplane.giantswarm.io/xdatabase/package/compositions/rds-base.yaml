@@ -66,6 +66,9 @@ spec:
             atProvider: {}
         name: kms
         patches:
+        - fromFieldPath: spec.managementPolicies
+          toFieldPath: spec.managementPolicies
+          type: FromCompositeFieldPath
         - fromFieldPath: spec.region
           toFieldPath: spec.forProvider.region
           type: FromCompositeFieldPath
@@ -108,6 +111,9 @@ spec:
           type: FromCompositeFieldPath
         - patchSetName: commontags
           type: PatchSet
+        - fromFieldPath: spec.managementPolicies
+          toFieldPath: spec.managementPolicies
+          type: FromCompositeFieldPath
         - patchSetName: metadata
           type: PatchSet
         - fromFieldPath: status.atProvider.id
@@ -144,6 +150,9 @@ spec:
           type: FromCompositeFieldPath
         - patchSetName: commontags
           type: PatchSet
+        - fromFieldPath: spec.managementPolicies
+          toFieldPath: spec.managementPolicies
+          type: FromCompositeFieldPath
         - patchSetName: metadata
           type: PatchSet
         - combine:
@@ -211,13 +220,22 @@ spec:
               get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(_ocds)
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
               conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-              all_true([
-                  get(c, "status", "False") == "True" for c in conditions
+              any_true([
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
               ])
           }
 
@@ -230,7 +248,6 @@ spec:
 
           appName = get(_oxr, "spec.claimRef.name", "")
           createCluster = get(_oxr, "spec.createCluster", True)
-          connectionSecret = get(_oxr, "spec.connectionSecret", "")
           engine = get(_oxr, "spec.engine", "")
           dp = get(_oxr, "spec.deletionPolicy", "Delete")
           keyId = get(_oxr, "status.kmsKeyId", False)
@@ -259,11 +276,23 @@ spec:
 
           s3import = get(_oxr, "spec.s3Import", False)
 
-          masterInstance = ready("instance-0")
+          masterInstance = ready("instance-0") and ocdsstatus("instance-0", "id", False)
           clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
           clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
+
+          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
+          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+
+          _secretRef: bool|str = False
+          if createCluster:
+              if ready("rds-cluster"):
+                  _secretRef = ocdsspec("rds-cluster", "writeConnectionSecretToRef.name", "")
+          else:
+              if ready("instance-0"):
+                  _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef.name", "")
+          _connectionSecret = _secretRef
 
           ipgn = get(_oxr, "spec.dbParameterGroup.name", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else ""
           provisioned = get(_oxr, "spec.engineMode", "provisioned") == "provisioned"
@@ -402,7 +431,8 @@ spec:
                       if ipgn:
                           "dbInstanceParameterGroupName": ipgn
                   }
-                  "providerConfigRef": pcr
+                  "managementPolicies": mgmtPolicy,
+                  "providerConfigRef": pcr,
                   "writeConnectionSecretToRef": {
                       "name": "${appName}-${region}-rds"
                       "namespace": get(_oxr, "spec.claimRef.namespace", "default")
@@ -470,13 +500,22 @@ spec:
               get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(_ocds)
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
               conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-              all_true([
-                  get(c, "status", "False") == "True" for c in conditions
+              any_true([
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
               ])
           }
 
@@ -489,7 +528,6 @@ spec:
 
           appName = get(_oxr, "spec.claimRef.name", "")
           createCluster = get(_oxr, "spec.createCluster", True)
-          connectionSecret = get(_oxr, "spec.connectionSecret", "")
           engine = get(_oxr, "spec.engine", "")
           dp = get(_oxr, "spec.deletionPolicy", "Delete")
           keyId = get(_oxr, "status.kmsKeyId", False)
@@ -518,11 +556,23 @@ spec:
 
           s3import = get(_oxr, "spec.s3Import", False)
 
-          masterInstance = ready("instance-0")
+          masterInstance = ready("instance-0") and ocdsstatus("instance-0", "id", False)
           clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
           clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
+
+          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
+          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+
+          _secretRef: bool|str = False
+          if createCluster:
+              if ready("rds-cluster"):
+                  _secretRef = ocdsspec("rds-cluster", "writeConnectionSecretToRef.name", "")
+          else:
+              if ready("instance-0"):
+                  _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef.name", "")
+          _connectionSecret = _secretRef
 
           import json
 
@@ -533,8 +583,10 @@ spec:
           partition = get(_oxr, "spec.partition", "aws")
 
           # Has the master instance been built?
-          masterInstanceArn = ocdsstatus("instance-0", "arn", "")
-          specInstances = get(_oxr, "spec.instances", [])
+          masterInstanceIdentifier = ocdsstatus("instance-0", "identifier", False)
+          masterInstanceArn = ocdsstatus("instance-0", "arn", False)
+
+          _specInstances = get(_oxr, "spec.instances", [])
 
           if not _specInstances and get(_oxr, "spec.instanceCount", 0) > 0:
               _specInstances = [{} for i in range(get(_oxr, "spec.instanceCount", 0))]
@@ -562,29 +614,36 @@ spec:
           instances = [
               {
                   _availabilityZones = get(_oxr, "spec.availabilityZones", [])
-                  _az = get(item, "spec.availabilityZone", False)
+                  _az = get(item, "availabilityZone", False)
                   if not _az and len(_availabilityZones) > 0:
                       _az = _availabilityZones[i % len(_availabilityZones)]
                   _az = "${region}${_az}" if _az else ""
 
-                  _version = "v1beta1" if createCluster else "v1beta2"
+                  _instanceRegion = get(item, "region", region)
+                  _isCrossRegion = _instanceRegion != region
+
+                  _cacert = get(_oxr, "status.caCertIdentifier", False),
+                  _dbp = get(item, "parameterGroupName", get(_oxr, "spec.parameterGroup.name", False)),
+                  _isPrimaryInstance = i == 0
+                  _multiAz = getwparent(item, _oxr, "multiAz", False)
+                  _instanceUseAz = not createCluster and not _multiAz
+                  _pt = get(item, "promotionTier", False)
+
+                  _name = "${appName}-${_az}" if not _multiAz else "${appName}-instance-${i}"
+                  if createCluster and not _multiAz:
+                      _name = "${appName}-clusterinstance-${i}"
+
+                  _version = "v1beta1" if createCluster else "v1beta3"
+
                   "apiVersion": "rds.aws.upbound.io/${_version}"
                   "kind": "ClusterInstance" if createCluster else "Instance"
                   "metadata": {
                       "annotations": {
                           "krm.kcl.dev/composition-resource-name" = "instance-${i}"
                           "krm.kcl.dev/ready" = readystr("instance-${i}")
-                          "crossplane.io/external-name" = "${appName}-${region}${_az}-${i}"
                       }
                       "labels": labels
                   }
-
-                  _cacert = get(_oxr, "status.caCertIdentifier", False),
-                  _pt = get(item, "spec.promotionTier", False)
-                  _dbp = get(item, "spec.parameterGroupName", get(_oxr, "spec.parameterGroup.name", False)),
-                  _isPrimaryInstance = i == 0
-                  _multiAz = getwparent(item, _oxr, "multiAz", False)
-                  _instanceUseAz = not createCluster and not _multiAz
 
                   "spec": {
                       "deletionPolicy": dp
@@ -659,7 +718,7 @@ spec:
                               #
                               # This means that in the longer term, this will be removed as an option
                               # and instead, the password will be pushed to secretsmanager via ESO
-                              _managedMasterUserPassword = False # get(item, "spec.manageMasterUserPassword", get(_oxr, "spec.manageMasterUserPassword", True)),
+                              _managedMasterUserPassword = False # get(item, "manageMasterUserPassword", get(_oxr, "spec.manageMasterUserPassword", True)),
                               _autoGeneratePassword = getwparent(item, _oxr, "autoGeneratePassword", True)
 
                               # If this is the primary (non-cluster) instance, set
@@ -682,7 +741,8 @@ spec:
                                   if _managedMasterUserPassword:
                                       "manageMasterUserPassword": _managedMasterUserPassword,
                                       # masterUserSecretKmsKeyId: _keyId,
-                                  username: getwparent(item, _oxr, "username", None)
+                                  "username": get(item, "username", get(_oxr, "spec.masterUsername", "")),
+
                                   if s3import:
                                       "s3import": s3import,
 
@@ -691,9 +751,9 @@ spec:
                               if all_true([
                                   not _isPrimaryInstance,
                                   masterInstance,
-                                  masterInstanceArn
+                                  masterInstanceIdentifier,
                               ]):
-                                  "replicateSourceDb": masterInstanceArn,
+                                  "replicateSourceDb": masterInstanceIdentifier if not _isCrossRegion else masterInstanceArn,
                               if _dbp:
                                   "parameterGroupName": _dbp
 
@@ -713,7 +773,6 @@ spec:
 
                           if monitoringRoleArn:
                               "monitoringRoleArn": monitoringRoleArn,
-
 
                           _v = getwparent(item, _oxr, "performanceInsightsEnabled" False)
                           if _v:
@@ -741,10 +800,10 @@ spec:
                           "publiclyAccessible": getwparent(item, _oxr, "publiclyAccessible", False)
                           "region": region,
                           "tags": tags | {
-                              "Name": "${appName}-${region}${_az}-${i}"
+                              "Name": _name
                           },
                       }
-
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                       if not createCluster and _isPrimaryInstance:
                           "writeConnectionSecretToRef": {
@@ -815,6 +874,7 @@ spec:
                               "Name": "${appName}-option-group"
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               } if not createCluster and get(_oxr, "spec.optionGroup.create", False) else {}
@@ -836,16 +896,17 @@ spec:
                   spec: {
                       "deletionPolicy": dp
                       "forProvider": {
-                          "clusterEndpointIdentifier": get(item, "spec.clusterEndpointIdentifier", None),
+                          "clusterEndpointIdentifier": get(item, "clusterEndpointIdentifier", None),
                           "clusterIdentifier": clusterId,
-                          "customEndpointType": get(item, "spec.type", "ANY"),
-                          "excludeMembers": get(item, "spec.excludeMembers", []),
-                          "staticMembers": get(item, "spec.staticMembers", []),
+                          "customEndpointType": get(item, "type", "ANY"),
+                          "excludeMembers": get(item, "excludeMembers", []),
+                          "staticMembers": get(item, "staticMembers", []),
                           "region": region,
                           "tags": tags | {
                               "Name": "${appName}-${region}-${i}"
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
@@ -893,6 +954,7 @@ spec:
                               "Name": "${appName}-${region}-${i}"
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
@@ -943,6 +1005,7 @@ spec:
                               "Name": "${appName}-monitoring-role"
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               } if createMonitoringRole else {}
@@ -967,6 +1030,7 @@ spec:
                               "Name": "${appName}-monitoring-role-attachment"
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               } if createMonitoringRole else {}
@@ -1000,6 +1064,7 @@ spec:
                               "Name": "${appName}-autoscaling"
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               } if all_true([
@@ -1052,6 +1117,7 @@ spec:
                           ],
                           "region": region,
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               } if all_true([
@@ -1088,6 +1154,7 @@ spec:
                           "toPort": port,
                           "type": "ingress",
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
@@ -1118,6 +1185,7 @@ spec:
                           "toPort": optionGroupPort,
                           type: "ingress",
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
@@ -1154,6 +1222,7 @@ spec:
                               "Name": "${appName}-cluster-parameter-group"
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               } if get(_oxr, "spec.dbClusterParameterGroup.create", False) and createCluster else {}
@@ -1183,6 +1252,7 @@ spec:
                               "Name": "${appName}-db-parameter-group"
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               } if get(_oxr, "spec.dbParameterGroup.create", False) else {}
@@ -1206,15 +1276,16 @@ spec:
                   "spec": {
                       "deletionPolicy": dp,
                       "forProvider": {
-                          "logGroupClass": get(item, "spec.cloudwatchLogGroupParameters.class", "Standard"),
-                          "retentionInDays": get(item, "spec.cloudwatchLogGroupParameters.retentionInDays", 0),
+                          "logGroupClass": get(item, "cloudwatchLogGroupParameters.class", "Standard"),
+                          "retentionInDays": get(item, "cloudwatchLogGroupParameters.retentionInDays", 0),
                           "kmsKeyId": keyId,
-                          "skipDestroy": get(item, "spec.cloudwatchLogGroupParameters.skipDestroy", False),
+                          "skipDestroy": get(item, "cloudwatchLogGroupParameters.skipDestroy", False),
                           "region": region,
                           "tags": tags | {
                               "Name": "${appName}-log-group-${i}"
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
@@ -1246,6 +1317,7 @@ spec:
                               "Name": "${appName}-activity-stream"
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               } if get(_oxr, "spec.activityStream.enabled", False) and createCluster else {}
@@ -1280,7 +1352,8 @@ spec:
                               }
                           ],
                       }
-                      providerConfigRef: pcr
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": pcr
                   }
               } if get(_oxr, "spec.secretRotation.enabled", False) else {}
           ]
@@ -1351,13 +1424,22 @@ spec:
               get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(_ocds)
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
               conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-              all_true([
-                  get(c, "status", "False") == "True" for c in conditions
+              any_true([
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
               ])
           }
 
@@ -1370,7 +1452,6 @@ spec:
 
           appName = get(_oxr, "spec.claimRef.name", "")
           createCluster = get(_oxr, "spec.createCluster", True)
-          connectionSecret = get(_oxr, "spec.connectionSecret", "")
           engine = get(_oxr, "spec.engine", "")
           dp = get(_oxr, "spec.deletionPolicy", "Delete")
           keyId = get(_oxr, "status.kmsKeyId", False)
@@ -1399,16 +1480,23 @@ spec:
 
           s3import = get(_oxr, "spec.s3Import", False)
 
-          masterInstance = ready("instance-0")
+          masterInstance = ready("instance-0") and ocdsstatus("instance-0", "id", False)
           clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
           clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
+          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
+          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+
           _secretRef: bool|str = False
           if createCluster:
               if ready("rds-cluster"):
                   _secretRef = ocdsspec("rds-cluster", "writeConnectionSecretToRef.name", "")
+          else:
+              if ready("instance-0"):
+                  _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef.name", "")
+          _connectionSecret = _secretRef
 
           clusterCreated: bool = ready("rds-cluster")
 
@@ -1416,7 +1504,7 @@ spec:
               **_oxr,
               **{
                   "status": {
-                      if get(_oxr, "spec.eso.enabled", True) and connectionSecret:
+                      if get(_oxr, "spec.eso.enabled", True) and _connectionSecret:
                           "esoConnectionSecret" = "${appName}-rds-master"
                       if not createCluster and masterInstance:
                           "endpoint" = ocdsstatus("instance-0", "address", ""),
@@ -1498,13 +1586,22 @@ spec:
               get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(_ocds)
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
               conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-              all_true([
-                  get(c, "status", "False") == "True" for c in conditions
+              any_true([
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
               ])
           }
 
@@ -1517,7 +1614,6 @@ spec:
 
           appName = get(_oxr, "spec.claimRef.name", "")
           createCluster = get(_oxr, "spec.createCluster", True)
-          connectionSecret = get(_oxr, "spec.connectionSecret", "")
           engine = get(_oxr, "spec.engine", "")
           dp = get(_oxr, "spec.deletionPolicy", "Delete")
           keyId = get(_oxr, "status.kmsKeyId", False)
@@ -1546,11 +1642,23 @@ spec:
 
           s3import = get(_oxr, "spec.s3Import", False)
 
-          masterInstance = ready("instance-0")
+          masterInstance = ready("instance-0") and ocdsstatus("instance-0", "id", False)
           clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
           clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
+
+          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
+          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+
+          _secretRef: bool|str = False
+          if createCluster:
+              if ready("rds-cluster"):
+                  _secretRef = ocdsspec("rds-cluster", "writeConnectionSecretToRef.name", "")
+          else:
+              if ready("instance-0"):
+                  _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef.name", "")
+          _connectionSecret = _secretRef
 
           externalSecretStores = [
               {
@@ -1593,14 +1701,14 @@ spec:
                   "apiVersion": "kubernetes.crossplane.io/v1alpha2"
                   "kind": "Object"
                   "metadata": {
-                      annotations: {
+                      "annotations": {
                           "krm.kcl.dev/composition-resource-name" = "${appName}-externalsecret"
                           "krm.kcl.dev/ready": readystr("${appName}-externalsecret")
                       }
                   }
                   "spec": {
-                      deletionPolicy: dp,
-                      forProvider: {
+                      "deletionPolicy": dp,
+                      "forProvider": {
                           manifest: {
                               "apiVersion": "external-secrets.io/v1alpha1"
                               "kind": "ExternalSecret"
@@ -1617,7 +1725,7 @@ spec:
                                       {
                                           "secretKey": k.r,
                                           "remoteRef": {
-                                              "key": connectionSecret,
+                                              "key": _connectionSecret,
                                               "property": k.p
                                           }
                                       }
@@ -1635,13 +1743,14 @@ spec:
                               }
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": {
                           "name": get(_oxr, "spec.kubernetesProviderConfig.name", "")
                       }
                   }
               }
               for _, value in externalSecretStores
-              if connectionSecret and get(_oxr, "spec.eso.enabled", True)
+              if _connectionSecret and get(_oxr, "spec.eso.enabled", True)
           ]
 
           pushSecret = [
@@ -1656,9 +1765,6 @@ spec:
                   }
                   "spec": {
                       "deletionPolicy": dp
-                      "providerConfigRef": {
-                          name: get(_oxr, "spec.kubernetesProviderConfig.name", "")
-                      }
                       "forProvider": {
                           "manifest": {
                               "apiVersion": "external-secrets.io/v1alpha1"
@@ -1685,6 +1791,10 @@ spec:
                                   updatePolicy: "Replace"
                               }
                           }
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": {
+                          name: get(_oxr, "spec.kubernetesProviderConfig.name", "")
                       }
                   }
               } for _ in [True] if pushSecretStores and get(_oxr, "spec.eso.enabled", True)
@@ -1750,13 +1860,22 @@ spec:
               get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(_ocds)
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
               conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-              all_true([
-                  get(c, "status", "False") == "True" for c in conditions
+              any_true([
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
               ])
           }
 
@@ -1769,7 +1888,6 @@ spec:
 
           appName = get(_oxr, "spec.claimRef.name", "")
           createCluster = get(_oxr, "spec.createCluster", True)
-          connectionSecret = get(_oxr, "spec.connectionSecret", "")
           engine = get(_oxr, "spec.engine", "")
           dp = get(_oxr, "spec.deletionPolicy", "Delete")
           keyId = get(_oxr, "status.kmsKeyId", False)
@@ -1798,20 +1916,32 @@ spec:
 
           s3import = get(_oxr, "spec.s3Import", False)
 
-          masterInstance = ready("instance-0")
+          masterInstance = ready("instance-0") and ocdsstatus("instance-0", "id", False)
           clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
           clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
+          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
+          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+
+          _secretRef: bool|str = False
+          if createCluster:
+              if ready("rds-cluster"):
+                  _secretRef = ocdsspec("rds-cluster", "writeConnectionSecretToRef.name", "")
+          else:
+              if ready("instance-0"):
+                  _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef.name", "")
+          _connectionSecret = _secretRef
+
           esoEnabled = get(_oxr, "spec.eso.enabled", False)
-          esoConnectionSecret = get(_oxr, "status.esoConnectionSecret", "")
+          esoConnectionSecret = get(_oxr, "status.esoConnectionSecret", False)
           sqlEnabled = get(_oxr, "spec.provisionSql.enabled", True)
 
           if createCluster and sqlEnabled:
               assert esoEnabled != False, "ESO must be enabled when creating a cluster with SQL provisioning enabled."
 
-          useConnectionSecret = esoConnectionSecret if esoEnabled else connectionSecret
+          useConnectionSecret: str|bool = esoConnectionSecret if esoEnabled else _connectionSecret
 
           _items = [
               {
@@ -1826,13 +1956,15 @@ spec:
                   spec: {
                       "deletionPolicy": dp,
                       "engine": get(_oxr, "spec.engine", "postgres")
+                      "claimRef": get(_oxr, "spec.claimRef", {})
                       "connectionSecretName": useConnectionSecret
                       "databases": get(_oxr, "spec.databases", {})
                       "kubernetesProviderConfig": get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+                      "managementPolicies": mgmtPolicy,
                   }
               }
               for _ in [True]
-              if get(_oxr, "spec.provisionSql.enabled", True)
+              if get(_oxr, "spec.provisionSql.enabled", True) and useConnectionSecret
           ]
 
           items = _items

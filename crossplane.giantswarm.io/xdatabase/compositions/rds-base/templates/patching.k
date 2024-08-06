@@ -1,15 +1,10 @@
-_secretRef: bool|str = False
-if createCluster:
-    if ready("rds-cluster"):
-        _secretRef = ocdsspec("rds-cluster", "writeConnectionSecretToRef.name", "")
-
 clusterCreated: bool = ready("rds-cluster")
 
 newdxr = {
-    **_oxr,
+    **oxr,
     **{
         "status": {
-            if get(_oxr, "spec.eso.enabled", True) and connectionSecret:
+            if get(oxr, "spec.eso.enabled", True) and _connectionSecret:
                 "esoConnectionSecret" = "${appName}-rds-master"
             if not createCluster and masterInstance:
                 "endpoint" = ocdsstatus("instance-0", "address", ""),

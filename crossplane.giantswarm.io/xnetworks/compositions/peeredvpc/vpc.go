@@ -2,6 +2,7 @@ package main
 
 import (
 	xpt "github.com/crossplane-contrib/function-patch-and-transform/input/v1beta1"
+	cb "github.com/mproffitt/crossbuilder/pkg/generate/utils"
 	ec2v1beta1 "github.com/upbound/provider-aws/apis/ec2/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -44,6 +45,7 @@ func createVpcResource() xpt.ComposedTemplate {
 				Type:         xpt.PatchTypePatchSet,
 				PatchSetName: strPtr("commontags"),
 			},
+			cb.FromPatch("spec.managementPolicies", "spec.managementPolicies"),
 			{
 				Type: xpt.PatchTypeFromCompositeFieldPath,
 				Patch: xpt.Patch{

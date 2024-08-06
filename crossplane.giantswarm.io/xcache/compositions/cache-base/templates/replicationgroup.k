@@ -1,17 +1,16 @@
-if get(_oxr, "spec.createReplicationGroup", False):
-    assert get(_oxr, "spec.engine", "redis") == "redis", "engine must be redis when createReplicationGroup is true"
+if get(oxr, "spec.createReplicationGroup", False):
+    assert get(oxr, "spec.engine", "redis") == "redis", "engine must be redis when createReplicationGroup is true"
 
-created = get(_ocds, "elasticache-replication-group.Resource", {})
-clusterModeEnabled = get(_oxr, "spec.clusterMode.enabled", False)
-ipgn = get(_oxr, "status.parameterGroupName", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else ""
+clusterModeEnabled = get(oxr, "spec.clusterMode.enabled", False)
+ipgn = get(oxr, "status.parameterGroupName", "") if get(oxr, "spec.allowMajorVersionUpgrade", False) else ""
 
 securityGroupIds = [
-    get(_oxr, "status.securityGroupId", None),
+    get(oxr, "status.securityGroupId", None),
 ] + [
-    i for r in get(_oxr, "spec.securityGroupIds", []) for i in r
+    i for r in get(oxr, "spec.securityGroupIds", []) for i in r
 ]
 
-subnetGroup = get(_oxr, "status.subnetGroupName", False)
+subnetGroup = get(oxr, "status.subnetGroupName", False)
 
 # Currently Crossplane does not support the GlobalReplicationGroup resource
 #
@@ -23,8 +22,8 @@ subnetGroup = get(_oxr, "status.subnetGroupName", False)
 
 # In order to create a global replication group, we must be creating a
 # local replication group as well. Global is secondary.
-primaryGlobalRID = get(_oxr, "spec.globalReplicationGroupId", "") if globalEnabled else ""
-replicationGlobalRID = get(_oxr, "status.globalReplicationGroupId", "") if globalEnabled else get(_oxr, "spec.globalReplicationGroupId", "")
+primaryGlobalRID = get(oxr, "spec.globalReplicationGroupId", "") if globalEnabled else ""
+replicationGlobalRID = get(oxr, "status.globalReplicationGroupId", "") if globalEnabled else get(oxr, "spec.globalReplicationGroupId", "")
 
 parameterGroup = [
     {
@@ -42,25 +41,26 @@ parameterGroup = [
             "deletionPolicy": dp
             "forProvider": {
                 "description": appName + " Parameter Group"
-                "family": get(_oxr, "spec.parameterGroupFamily", "redis6.x")
+                "family": get(oxr, "spec.parameterGroupFamily", "redis6.x")
                 "name": appName + "-parameter-group"
-                if get(_oxr, "spec.parameters", False):
+                if get(oxr, "spec.parameters", False):
                     "parameter" = [
                         {
                             name: k,
                             value: v,
                         }
-                        for k, v in get(_oxr, "spec.parameterGroupConfiguration.parameters", {})
+                        for k, v in get(oxr, "spec.parameterGroupConfiguration.parameters", {})
                     ]
                 "region" = region
                 "tags" = tags | {
                     "Name": "${appName}-${region}"
-                } | get(_oxr, "spec.parameterGroupConfiguration.tags", {})
+                } | get(oxr, "spec.parameterGroupConfiguration.tags", {})
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
-] if get(_oxr, "spec.parameterGroupConfiguration", False) else []
+] if get(oxr, "spec.parameterGroupConfiguration", False) else []
 
 globalReplicationGroup = [{
     "apiVersion": "elasticache.aws.upbound.io/v1beta1"
@@ -76,12 +76,12 @@ globalReplicationGroup = [{
     "spec": {
         "deletionPolicy": dp
         "forProvider": {
-            "automaticFailoverEnabled": get(_oxr, "spec.globalReplicationGroup.automaticFailoverEnabled", False)
-            "cacheNodeType": get(_oxr, "spec.globalReplicationGroup.cacheNodeType", "cache.t3.micro")
-            "globalReplicationGroupIdSuffix": get(_oxr, "spec.globalReplicationGroup.suffix", "")
+            "automaticFailoverEnabled": get(oxr, "spec.globalReplicationGroup.automaticFailoverEnabled", False)
+            "cacheNodeType": get(oxr, "spec.globalReplicationGroup.cacheNodeType", "cache.t3.micro")
+            "globalReplicationGroupIdSuffix": get(oxr, "spec.globalReplicationGroup.suffix", "")
             "globalReplicationGroupDescription": appName + " Global Replication Group"
-            if get(_oxr, "spec.globalReplicationGroup.numNodeGroups", False):
-                "numNodeGroups": get(_oxr, "spec.globalReplicationGroup.numNodeGroups", 1)
+            if get(oxr, "spec.globalReplicationGroup.numNodeGroups", False):
+                "numNodeGroups": get(oxr, "spec.globalReplicationGroup.numNodeGroups", 1)
 
             if primaryGlobalRID:
                 "primaryReplicationGroupId": primaryGlobalRID
@@ -92,6 +92,7 @@ globalReplicationGroup = [{
                 "Name": "${appName}-${region}-global"
             }
         }
+        "managementPolicies": mgmtPolicy,
         "providerConfigRef": pcr
     }
 }] if globalEnabled else []
@@ -124,33 +125,33 @@ replicationGroups = [
         "spec": {
             "deletionPolicy": dp
             "initProvider": {
-                if get(_oxr, "spec.autoMinorVersionUpgrade", False):
-                    if get(_oxr, "spec.engineVersion", False):
-                        "engineVersion": get(_oxr, "spec.engineVersion", "")
+                if get(oxr, "spec.autoMinorVersionUpgrade", False):
+                    if get(oxr, "spec.engineVersion", False):
+                        "engineVersion": get(oxr, "spec.engineVersion", "")
             }
             "forProvider": {
-                if get(_oxr, "spec.applyImmediately", None) != None:
-                    "applyImmediately": get(_oxr, "spec.applyImmediately", True)
+                if get(oxr, "spec.applyImmediately", None) != None:
+                    "applyImmediately": get(oxr, "spec.applyImmediately", True)
 
-                "atRestEncryptionEnabled" = get(_oxr, "spec.atRestEncryptionEnabled", True)
+                "atRestEncryptionEnabled" = get(oxr, "spec.atRestEncryptionEnabled", True)
 
-                if get(_oxr, "spec.transitEncryptionEnabled", False):
+                if get(oxr, "spec.transitEncryptionEnabled", False):
                     "autoGenerateAuthToken": True
                     "authTokenSecretRef": {
                         "key": "token"
                         "name": "${appName}-elasticache-auth-token"
-                        "namespace": get(_oxr, "spec.claimRef.namespace", "default")
+                        "namespace": get(oxr, "spec.claimRef.namespace", "default")
                     }
-                    "transitEncryptionEnabled": get(_oxr, "spec.transitEncryptionEnabled", True)
+                    "transitEncryptionEnabled": get(oxr, "spec.transitEncryptionEnabled", True)
 
-                if get(_oxr, "spec.authTokenUpdateStrategy", False):
-                    "authTokenUpdateStrategy": get(_oxr, "spec.authTokenUpdateStrategy", "ROTATE")
-                if get(_oxr, "spec.autoMinorVersionUpgrade", None) != None:
-                    "autoMinorVersionUpgrade": get(_oxr, "spec.autoMinorVersionUpgrade", True)
-                if get(_oxr, "spec.automaticFailoverEnabled", None) != None:
-                    "automaticFailoverEnabled": get(_oxr, "spec.automaticFailoverEnabled", False)
-                if get(_oxr, "spec.dataTieringEnabled", False):
-                    "dataTieringEnabled": get(_oxr, "spec.dataTieringEnabled", False)
+                if get(oxr, "spec.authTokenUpdateStrategy", False):
+                    "authTokenUpdateStrategy": get(oxr, "spec.authTokenUpdateStrategy", "ROTATE")
+                if get(oxr, "spec.autoMinorVersionUpgrade", None) != None:
+                    "autoMinorVersionUpgrade": get(oxr, "spec.autoMinorVersionUpgrade", True)
+                if get(oxr, "spec.automaticFailoverEnabled", None) != None:
+                    "automaticFailoverEnabled": get(oxr, "spec.automaticFailoverEnabled", False)
+                if get(oxr, "spec.dataTieringEnabled", False):
+                    "dataTieringEnabled": get(oxr, "spec.dataTieringEnabled", False)
 
                 if i == "global":
                     "description": appName + " Replication Group ${region} (Global)"
@@ -158,69 +159,69 @@ replicationGroups = [
                 if i == "local":
                     "description": appName + " Replication Group ${region} (Local)"
 
-                if get(_oxr, "spec.engine", False):
-                    "engine": get(_oxr, "spec.engine", "redis")
+                if get(oxr, "spec.engine", False):
+                    "engine": get(oxr, "spec.engine", "redis")
 
-                if not get(_oxr, "spec.autoMinorVersionUpgrade", False):
-                    if get(_oxr, "spec.engineVersion", False):
-                        "engineVersion": get(_oxr, "spec.engineVersion", "7.x")
+                if not get(oxr, "spec.autoMinorVersionUpgrade", False):
+                    if get(oxr, "spec.engineVersion", False):
+                        "engineVersion": get(oxr, "spec.engineVersion", "7.x")
 
-                if get(_oxr, "spec.finalSnapshotIdentifier", False):
-                    "finalSnapshotIdentifier": get(_oxr, "spec.finalSnapshotIdentifier", "")
+                if get(oxr, "spec.finalSnapshotIdentifier", False):
+                    "finalSnapshotIdentifier": get(oxr, "spec.finalSnapshotIdentifier", "")
 
                 if replicationGlobalRID:
                     "globalReplicationGroupId": replicationGlobalRID
 
-                if get(_oxr, "spec.ipDiscovery", False):
-                    "ipDiscovery": get(_oxr, "spec.ipDiscovery", "ipv4")
+                if get(oxr, "spec.ipDiscovery", False):
+                    "ipDiscovery": get(oxr, "spec.ipDiscovery", "ipv4")
 
                 "kmsKeyId": keyId
 
-                if get(_oxr, "spec.maintenanceWindow", False):
-                    "maintenanceWindow": get(_oxr, "spec.maintenanceWindow", "")
-                if get(_oxr, "spec.multiAzEnabled", None) != None:
-                    "multiAzEnabled": get(_oxr, "spec.multiAzEnabled", True)
-                if get(_oxr, "spec.networkType", False):
-                    "networkType": get(_oxr, "spec.networkType", "ipv4")
+                if get(oxr, "spec.maintenanceWindow", False):
+                    "maintenanceWindow": get(oxr, "spec.maintenanceWindow", "")
+                if get(oxr, "spec.multiAzEnabled", None) != None:
+                    "multiAzEnabled": get(oxr, "spec.multiAzEnabled", True)
+                if get(oxr, "spec.networkType", False):
+                    "networkType": get(oxr, "spec.networkType", "ipv4")
 
-                if get(_oxr, "spec.notificationTopicArn", False):
-                    "notificationTopicArn": get(_oxr, "spec.notificationTopicArn", "")
+                if get(oxr, "spec.notificationTopicArn", False):
+                    "notificationTopicArn": get(oxr, "spec.notificationTopicArn", "")
 
                 if all_true([
-                    get(_oxr, "spec.numCacheClusters", False),
-                    not get(_oxr, "spec.numNodeGroups", False),
+                    get(oxr, "spec.numCacheClusters", False),
+                    not get(oxr, "spec.numNodeGroups", False),
                     not clusterModeEnabled
                 ]):
-                    "numCacheClusters": get(_oxr, "spec.numCacheClusters", 1)
+                    "numCacheClusters": get(oxr, "spec.numCacheClusters", 1)
 
                 # numNodeGroups cannot be set if global replication group id is set
                 if any_true([
-                    get(_oxr, "spec.globalReplicationGroupId", False),
+                    get(oxr, "spec.globalReplicationGroupId", False),
                     i == "global"
                     all_true([
-                        not get(_oxr, "spec.globalReplicationGroup.enabled", False),
-                        not get(_oxr, "spec.globalReplicationGroupId", False),
+                        not get(oxr, "spec.globalReplicationGroup.enabled", False),
+                        not get(oxr, "spec.globalReplicationGroupId", False),
                         i == "local"
                     ])
                 ]):
-                    if get(_oxr, "spec.nodeType", False):
-                        "nodeType": get(_oxr, "spec.nodeType", "cache.t3.micro")
+                    if get(oxr, "spec.nodeType", False):
+                        "nodeType": get(oxr, "spec.nodeType", "cache.t3.micro")
                     if all_true([
                         clusterModeEnabled,
-                        get(_oxr, "spec.numNodeGroups", False)
+                        get(oxr, "spec.numNodeGroups", False)
                     ]):
-                        "numNodeGroups": get(_oxr, "spec.numNodeGroups", 1)
+                        "numNodeGroups": get(oxr, "spec.numNodeGroups", 1)
                 if ipgn:
                     "parameterGroupName": ipgn
 
-                if get(_oxr, "spec.port", False):
-                    "port": get(_oxr, "spec.port", 6379)
+                if get(oxr, "spec.port", False):
+                    "port": get(oxr, "spec.port", 6379)
 
                 if azs:
                     "preferredCacheClusterAzs": azs
 
-                if get(_oxr, "spec.replicasPerNodeGroup", None) != None:
-                    "replicasPerNodeGroup": get(_oxr, "spec.replicasPerNodeGroup", 0)
+                if get(oxr, "spec.replicasPerNodeGroup", None) != None:
+                    "replicasPerNodeGroup": get(oxr, "spec.replicasPerNodeGroup", 0)
 
                 "region": region
 
@@ -230,46 +231,47 @@ replicationGroups = [
                 if any_true([
                     all_true([
                         i == "global",
-                        get(_oxr, "status.subnetGroupName", False),
+                        get(oxr, "status.subnetGroupName", False),
                     ]),
                     all_true([
-                        not get(_oxr, "spec.globalReplicationGroup.enabled", False),
+                        not get(oxr, "spec.globalReplicationGroup.enabled", False),
                         i == "local",
-                        get(_oxr, "status.subnetGroupName", False),
+                        get(oxr, "status.subnetGroupName", False),
                     ])
                 ]):
                     "subnetGroupName": subnetGroup
 
-                if get(_oxr, "spec.snapshotRetentionLimit", False):
-                    "snapshotRetentionLimit": get(_oxr, "spec.snapshotRetentionLimit", 1)
-                if get(_oxr, "spec.snapshotWindow", False):
-                    "snapshotWindow": get(_oxr, "spec.snapshotWindow", "00:00-01:00")
-                if get(_oxr, "spec.userGroupIds", False):
+                if get(oxr, "spec.snapshotRetentionLimit", False):
+                    "snapshotRetentionLimit": get(oxr, "spec.snapshotRetentionLimit", 1)
+                if get(oxr, "spec.snapshotWindow", False):
+                    "snapshotWindow": get(oxr, "spec.snapshotWindow", "00:00-01:00")
+                if get(oxr, "spec.userGroupIds", False):
                     "userGroupIds": [
-                        get(_oxr, "status.userGroupId", "")
+                        get(oxr, "status.userGroupId", "")
                     ]
 
                 "tags": tags | {
                     "Name": "${appName}-${region}-${i}"
                 }
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
 
             "writeConnectionSecretToRef": {
                 "name": "${appName}-elasticache-${i}"
-                "namespace": get(_oxr, "spec.claimRef.namespace", "default")
+                "namespace": get(oxr, "spec.claimRef.namespace", "default")
             }
         }
     } for _, i in enabledReplicationGroups if all_true([
         createReplicationGroup, keyId, i,
-        get(_oxr, "spec.engine", "redis") == "redis",
+        get(oxr, "spec.engine", "redis") == "redis",
         any_true([
             i == "global",
             all_true([i == "local", not globalEnabled]),
             all_true([i == "local", globalEnabled, replicationGlobalRID]),
         ]),
-        get(_oxr, "status.subnetGroupName", False)
-        get(_oxr, "status.securityGroupId", False)
+        get(oxr, "status.subnetGroupName", False)
+        get(oxr, "status.securityGroupId", False)
     ])
 ]
 

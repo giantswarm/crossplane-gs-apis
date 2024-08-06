@@ -1,9 +1,7 @@
 import regex
 
-_oxr = option("params").oxr
-_dxr = option("params").dxr
-_ocds = option("params").ocds
-_dcds = option("params").dcds
+oxr = option("params").oxr
+ocds = option("params").ocds
 
 get = lambda x: {:}, y: str, d: any -> any {
     """
@@ -35,23 +33,33 @@ ocdsspec = lambda x: str, y: str, d: any -> any {
     """
     Get an item from the spec of an ocds resource.
     """
-    get(_ocds, "${x}.Resource.spec.${y}", d)
+    get(ocds, "${x}.Resource.spec.${y}", d)
 }
 
 ocdsstatus = lambda x: str, y: str, d: any -> any {
     """
     Get an item from the status of an ocds resource.
     """
-    get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+    get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+}
+
+exists = lambda x: any -> bool {
+    """
+    Check if a value exists.
+    """
+    x in list(ocds)
 }
 
 ready = lambda x: str -> bool {
     """
     Check if a value is ready.
     """
-    conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-    all_true([
-        get(c, "status", "False") == "True" for c in conditions
+    conditions = get(ocds, "${x}.Resource.status.conditions", [])
+    any_true([
+        exists(x),
+        all_true([
+            get(c, "status", "False") == "True" for c in conditions
+        ])
     ])
 }
 
@@ -62,25 +70,27 @@ readystr = lambda x: str -> str {
     "True" if ready(x) else "False"
 }
 
-appName = get(_oxr, "spec.claimRef.name", "")
-createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
-dp = get(_oxr, "spec.deletionPolicy", "Delete")
-keyId = get(_oxr, "status.kmsKeyId", False)
-namespace = get(_oxr, "spec.claimRef.namespace", "default")
-region = get(_oxr, "spec.region", "eu-central-1")
-pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
+appName = get(oxr, "spec.claimRef.name", "")
+createReplicationGroup = get(oxr, "spec.createReplicationGroup", True)
+dp = get(oxr, "spec.deletionPolicy", "Delete")
+keyId = get(oxr, "status.kmsKeyId", False)
+namespace = get(oxr, "spec.claimRef.namespace", "default")
+region = get(oxr, "spec.region", "eu-central-1")
+pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
 azs = [
     "${region}${az}"
-    for az in get(_oxr, "spec.availabilityZones", [])
+    for az in get(oxr, "spec.availabilityZones", [])
 ]
-labels = get(_oxr, "metadata.labels", {}) | {"region": region}
+labels = get(oxr, "metadata.labels", {}) | {"region": region}
 
-tags = labels | get(_oxr, "spec.tags", {})
+tags = labels | get(oxr, "spec.tags", {})
 
 globalEnabled = all_true([
     False,
     createReplicationGroup,
-    get(_oxr, "spec.globalReplicationGroup.enabled", False)
+    get(oxr, "spec.globalReplicationGroup.enabled", False)
 ])
 
-userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
+userNames = get(oxr, "spec.userNames", []) + [appName, "default"]
+mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})

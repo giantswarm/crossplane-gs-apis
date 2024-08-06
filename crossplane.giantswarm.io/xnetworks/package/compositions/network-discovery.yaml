@@ -29,20 +29,19 @@ spec:
         regionRef: spec.region
         vpcRef: spec.remoteVpcs
     step: network-discovery
-
-  - step: patch-and-transform
-    functionRef:
+  - functionRef:
       name: function-patch-and-transform
     input:
       apiVersion: pt.fn.crossplane.io/v1beta1
       kind: Resources
+      metadata:
+        creationTimestamp: null
       resources:
-      - name: deployment
-        base:
+      - base:
           apiVersion: kubernetes.crossplane.io/v1alpha2
           kind: Object
           metadata:
-            name: network-discovery
+            creationTimestamp: null
           spec:
             forProvider:
               manifest:
@@ -53,27 +52,35 @@ spec:
                   namespace: ""
                 spec:
                   data: {}
-            providerConfigRef:
-              name: default
+            readiness: {}
+          status:
+            atProvider:
+              manifest: null
+        name: configmap
         patches:
         - fromFieldPath: spec.claimRef.name
           toFieldPath: metadata.name
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.kubernetesProviderConfigRef
+          toFieldPath: spec.providerConfigRef
+          type: FromCompositeFieldPath
         - fromFieldPath: spec.claimRef.namespace
           toFieldPath: spec.forProvider.manifest.metadata.namespace
+          type: FromCompositeFieldPath
         - fromFieldPath: spec.claimRef.name
           toFieldPath: spec.forProvider.manifest.metadata.name
           transforms:
-          - type: string
-            string:
+          - string:
+              fmt: '%s-network-discovery'
               type: Format
-              fmt: "%s-network-discovery"
+            type: string
+          type: FromCompositeFieldPath
         - fromFieldPath: status.vpcs
           toFieldPath: spec.forProvider.manifest.data.vpcs
           transforms:
-          - type: string
-            string:
-              type: Convert
+          - string:
               convert: ToJson
-  - functionRef:
-      name: function-auto-ready
-    step: function-auto-ready
+              type: Convert
+            type: string
+          type: FromCompositeFieldPath
+    step: function-patch-and-transform

@@ -2,6 +2,7 @@ package main
 
 import (
 	"crossbuilder/v1alpha1"
+	"strings"
 
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 	xpt "github.com/crossplane-contrib/function-patch-and-transform/input/v1beta1"
@@ -37,12 +38,24 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		})
 
 	var (
-		kclPatchTemplate string
-		resources        []xpt.ComposedTemplate = createResources()
-		err              error
+		kclPatchTemplate  string
+		kclEsoTemplate    string
+		kclCommonTemplate string
+		resources         []xpt.ComposedTemplate = createResources()
+		err               error
 	)
 
 	kclPatchTemplate, err = build.LoadTemplate("compositions/rds-cache-cluster/templates/patching.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclEsoTemplate, err = build.LoadTemplate("compositions/rds-cache-cluster/templates/eso-flux-enablement.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclCommonTemplate, err = build.LoadTemplate("compositions/rds-cache-cluster/templates/common.k")
 	if err != nil {
 		panic(err)
 	}
@@ -65,6 +78,22 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 			},
 		})
 
+	c.NewPipelineStep("function-kcl-create-eso-secret").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclCommonTemplate, kclEsoTemplate, "items = _items"}, "\n\n"),
+				},
+			},
+		})
+
 	c.NewPipelineStep("function-kcl-dynamic-patch").
 		WithFunctionRef(xapiextv1.FunctionReference{
 			Name: "function-kcl",
@@ -76,7 +105,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: kclPatchTemplate,
+					Source: strings.Join([]string{kclCommonTemplate, kclPatchTemplate}, "\n\n"),
 				},
 			},
 		})
@@ -106,8 +135,9 @@ func createResources() []xpt.ComposedTemplate {
 				cb.FromPatch("spec.availabilityZones", "spec.availabilityZones"),
 				cb.FromPatch("spec.claimRef", "spec.claimRef"),
 				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
+				cb.FromPatch("spec.managementPolicies", "spec.managementPolicies"),
 				cb.FromPatch("spec.region", "spec.region"),
-				cb.FromPatch(("spec.providerConfigRef"), "spec.providerConfigRef"),
+				cb.FromPatch("spec.providerConfigRef", "spec.providerConfigRef"),
 				cb.ToPatch("status.vpc", "status.vpcs.self"),
 			},
 		},
@@ -128,7 +158,8 @@ func createResources() []xpt.ComposedTemplate {
 				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
 				cb.FromPatch("spec.eso", "spec.eso"),
 				cb.FromPatch("spec.kubernetesProviderConfig", "spec.kubernetesProviderConfig"),
-				cb.FromPatch(("spec.providerConfigRef"), "spec.providerConfigRef"),
+				cb.FromPatch("spec.managementPolicies", "spec.managementPolicies"),
+				cb.FromPatch("spec.providerConfigRef", "spec.providerConfigRef"),
 				cb.FromPatch("spec.region", "spec.region"),
 				{
 					Type: xpt.PatchTypeFromCompositeFieldPath,
@@ -144,7 +175,6 @@ func createResources() []xpt.ComposedTemplate {
 				cb.ToPatch("status.cacheClusterEndpoints", "status.clusterEndpoints"),
 				cb.ToPatch("status.cacheEndpoint", "status.endpoint"),
 				cb.ToPatch("status.cacheReaderEndpoint", "status.readerEndpoint"),
-
 				cb.ToPatch("status.cacheGlobalConnectionSecret", "status.globalConnectionSecret"),
 				cb.ToPatch("status.cacheGlobalEndpoint", "status.globalEndpoint"),
 				cb.ToPatch("status.cacheGlobalReaderEndpoint", "status.globalReaderEndpoint"),
@@ -168,6 +198,7 @@ func createResources() []xpt.ComposedTemplate {
 				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
 				cb.FromPatch("spec.eso", "spec.eso"),
 				cb.FromPatch("spec.kubernetesProviderConfig", "spec.kubernetesProviderConfig"),
+				cb.FromPatch("spec.managementPolicies", "spec.managementPolicies"),
 				cb.FromPatch("spec.providerConfigRef", "spec.providerConfigRef"),
 				cb.FromPatch("spec.region", "spec.region"),
 				{

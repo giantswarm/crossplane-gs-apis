@@ -23,6 +23,5 @@ var (
 )
 
 func init() {
-	SchemeBuilder.Register(&RdsCacheCluster{}, &RdsCacheClusterList{})
-	SchemeBuilder.Register(&RCCWithRegionLookup{}, &RCCWithRegionLookupList{})
+	SchemeBuilder.Register(&ResourceAccessManager{}, &ResourceAccessManagerList{})
 }

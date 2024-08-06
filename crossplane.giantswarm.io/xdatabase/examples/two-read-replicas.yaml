@@ -1,5 +1,5 @@
 ---
-apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
+apiVersion: xaws.crossplane.giantswarm.io/v1alpha1
 kind: RdsCacheClusterClaim
 metadata:
   name: cloudtest-rds-elasticache
@@ -13,6 +13,13 @@ metadata:
     app.kubernetes.io/managed-by: crossplane
 spec:
   availabilityZones: ["a", "b", "c"]
+
+  kubernetesProviderConfig:
+    name: default
+
+  eso:
+    enabled: true
+    kubernetesSecretStore: default
 
   cache:
     createReplicationGroup: true
@@ -42,9 +49,6 @@ spec:
     storageType: io1
 
   deletionPolicy: Delete
-
-  kubernetesProviderConfig:
-    name: default
 
   providerConfigRef:
     name: aws-golem

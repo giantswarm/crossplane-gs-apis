@@ -10,7 +10,6 @@ replace (
 )
 
 require (
-	github.com/crossplane-contrib/function-go-templating v0.4.1
 	github.com/crossplane-contrib/function-kcl v0.8.0
 	github.com/crossplane-contrib/function-patch-and-transform v0.5.0
 	github.com/crossplane-contrib/provider-kubernetes v0.14.0

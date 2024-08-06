@@ -72,6 +72,9 @@ spec:
         - fromFieldPath: status.atProvider.arn
           toFieldPath: status.kmsKeyId
           type: ToCompositeFieldPath
+        - fromFieldPath: spec.managementPolicies
+          toFieldPath: spec.managementPolicies
+          type: FromCompositeFieldPath
         - combine:
             strategy: string
             string:
@@ -108,6 +111,9 @@ spec:
           type: FromCompositeFieldPath
         - patchSetName: commontags
           type: PatchSet
+        - fromFieldPath: spec.managementPolicies
+          toFieldPath: spec.managementPolicies
+          type: FromCompositeFieldPath
         - patchSetName: metadata
           type: PatchSet
         - fromFieldPath: status.atProvider.id
@@ -144,6 +150,9 @@ spec:
           type: FromCompositeFieldPath
         - patchSetName: commontags
           type: PatchSet
+        - fromFieldPath: spec.managementPolicies
+          toFieldPath: spec.managementPolicies
+          type: FromCompositeFieldPath
         - patchSetName: metadata
           type: PatchSet
         - combine:
@@ -215,13 +224,23 @@ spec:
               get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(_ocds)
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
               conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-              all_true([
-                  get(c, "status", "False") == "True" for c in conditions
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
               ])
           }
 
@@ -254,6 +273,8 @@ spec:
           ])
 
           userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
+          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
+          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
 
           if get(_oxr, "spec.createReplicationGroup", False):
               assert get(_oxr, "spec.engine", "redis") == "redis", "engine must be redis when createReplicationGroup is true"
@@ -314,6 +335,7 @@ spec:
                               "Name": "${appName}-${region}"
                           } | get(_oxr, "spec.parameterGroupConfiguration.tags", {})
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
@@ -349,6 +371,7 @@ spec:
                           "Name": "${appName}-${region}-global"
                       }
                   }
+                  "managementPolicies": mgmtPolicy,
                   "providerConfigRef": pcr
               }
           }] if globalEnabled else []
@@ -510,6 +533,7 @@ spec:
                               "Name": "${appName}-${region}-${i}"
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
 
                       "writeConnectionSecretToRef": {
@@ -596,13 +620,23 @@ spec:
               get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(_ocds)
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
               conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-              all_true([
-                  get(c, "status", "False") == "True" for c in conditions
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
               ])
           }
 
@@ -635,6 +669,8 @@ spec:
           ])
 
           userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
+          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
+          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
 
           # If we are not creating a replication group, check how many cache clusters have
           # been requested and default a list of empty dictionaries as being the cache
@@ -795,6 +831,7 @@ spec:
                           if _v:
                               "transitEncryptionEnabled" = _v
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
@@ -828,6 +865,7 @@ spec:
                           "toPort": port,
                           "type": "ingress",
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": get(_oxr, "spec.providerConfigRef", {"name": "default"})
                   }
               }
@@ -902,13 +940,23 @@ spec:
               get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(_ocds)
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
               conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-              all_true([
-                  get(c, "status", "False") == "True" for c in conditions
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
               ])
           }
 
@@ -941,6 +989,8 @@ spec:
           ])
 
           userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
+          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
+          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
 
           users = [
               {
@@ -987,6 +1037,7 @@ spec:
                           }
                           "userName": name
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
@@ -1028,6 +1079,7 @@ spec:
                       }
                       "userIds": userIds
                   }
+                  "managementPolicies": mgmtPolicy,
                   "providerConfigRef": pcr
               }
           }] if all_true([
@@ -1097,13 +1149,23 @@ spec:
               get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(_ocds)
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
               conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-              all_true([
-                  get(c, "status", "False") == "True" for c in conditions
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
               ])
           }
 
@@ -1136,6 +1198,8 @@ spec:
           ])
 
           userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
+          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
+          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
 
           esoEnabled = get(_oxr, "spec.eso.enabled", False)
           engine = get(_oxr, "spec.engine", "redis")
@@ -1177,6 +1241,7 @@ spec:
                           }
                       }
                   }
+                  "managementPolicies": mgmtPolicy,
                   "providerConfigRef": get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
               }
           }
@@ -1223,6 +1288,7 @@ spec:
                               }
                           }
                       }
+                      "managementPolicies": mgmtPolicy,
                       "providerConfigRef": get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
                   }
               }
@@ -1297,13 +1363,23 @@ spec:
               get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(_ocds)
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
               conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-              all_true([
-                  get(c, "status", "False") == "True" for c in conditions
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
               ])
           }
 
@@ -1336,6 +1412,8 @@ spec:
           ])
 
           userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
+          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
+          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
 
           globalEndpoint = ocdsstatus("elasticache-replication-group-global", "primaryEndpointAddress", "") if globalEnabled else ""
           globalROEndpoint = ocdsstatus("elasticache-replication-group-global", "readerEndpointAddress", "") if globalEnabled else ""

@@ -36,26 +36,27 @@ users = [
                             "type": "password"
                         }
                     ]
-                "engine": get(_oxr, "spec.engine", "redis")
+                "engine": get(oxr, "spec.engine", "redis")
                 "region": region
                 "tags" = tags | {
                     "Name": "${appName}-${region}-${name}"
                 }
                 "userName": name
             }
+            "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr
         }
     }
     for name in userNames
 ] if all_true([
-    get(_oxr, "spec.engine", "redis") == "redis",
-    get(_oxr, "spec.createReplicationGroup", True),
+    get(oxr, "spec.engine", "redis") == "redis",
+    get(oxr, "spec.createReplicationGroup", True),
 ]) else []
 
 userIds = [
     i for i in [
         get(item, "Resource.status.atProvider.id", "")
-        for _, item in _ocds
+        for _, item in ocds
         if all_true([
             get(item, "Resource.kind", "") == "User",
             get(item, "Resource.apiVersion", "") == "elasticache.aws.upbound.io/v1beta1",
@@ -77,19 +78,20 @@ userGroup = [{
     "spec": {
         "deletionPolicy": dp
         "forProvider": {
-            "engine": get(_oxr, "spec.engine", "redis")
+            "engine": get(oxr, "spec.engine", "redis")
             "region": region
             "tags": tags | {
                 "Name": "${appName}-${region}"
             }
             "userIds": userIds
         }
+        "managementPolicies": mgmtPolicy,
         "providerConfigRef": pcr
     }
 }] if all_true([
     userIds,
-    get(_oxr, "spec.engine", "redis") == "redis",
-    get(_oxr, "spec.createReplicationGroup", True),
+    get(oxr, "spec.engine", "redis") == "redis",
+    get(oxr, "spec.createReplicationGroup", True),
 ]) else []
 
 _items = users + userGroup
