@@ -6,7 +6,7 @@ description: |
 weight: 100
 crd:
   claim_name: DiscoveryClaim
-  claim_name_plural: networkdiscoveryclaims
+  claim_name_plural: discoveryclaims
   default_composition_ref: network-discovery
   enforced_composition_ref: network-discovery
   name_camelcase: Discovery
@@ -46,7 +46,7 @@ source_repository_ref: main
 <dt class="claimname">Claim name:</dt>
 <dd class="claimname">DiscoveryClaim</dd>
 <dt class="claimnamesplural">Claim plural names:</dt>
-<dd class="claimnamesplural">networkdiscoveryclaims</dd>
+<dd class="claimnamesplural">discoveryclaims</dd>
 <dt class="defaultcompositionref">Default composition ref:</dt>
 <dd class="defaultcompositionref">network-discovery</dd>
 <dt class="enforcedcompositionref">Enforced composition ref:</dt>
@@ -95,16 +95,83 @@ See the design doc for more information: https://github.com/crossplane/crossplan
 |Property |Value    |
 |:--------|:--------|
 |Type     |boolean|
-|Required |**Yes**|
+|Required |No|
 
+Whether this discovery is enabled.
 
 #### `.spec.groupBy`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |string|
+|Required |No|
+
+A tag that can be referenced to group subnets and route tables
+into subnetsets.
+
+The tag must have an integer value
+
+#### `.spec.kubernetesProviderConfigRef`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
 |Required |**Yes**|
 
+The name of the provider config to use for creating kubernetes resources.
+
+#### `.spec.kubernetesProviderConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.spec.kubernetesProviderConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.kubernetesProviderConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.kubernetesProviderConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
 
 #### `.spec.managementPolicies`
 
@@ -209,6 +276,7 @@ reference on every reconcile.
 |Type     |string|
 |Required |**Yes**|
 
+The name of the provider config to use for looking up remote VPCs.
 
 #### `.spec.publishConnectionDetailsTo`
 
@@ -344,6 +412,7 @@ Name is the name of the connection secret.
 |Type     |string|
 |Required |**Yes**|
 
+The default region to look in.
 
 #### `.spec.remoteVpcs`
 
@@ -354,6 +423,7 @@ Name is the name of the connection secret.
 |Min Items|0|
 |Max Items|Unlimited|
 
+Details about the remove VPCs to look up.
 
 #### `.spec.remoteVpcs[*]`
 

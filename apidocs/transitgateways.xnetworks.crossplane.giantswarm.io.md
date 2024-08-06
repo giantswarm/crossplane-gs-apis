@@ -179,7 +179,7 @@ If IPv6 support is enabled for the transit gateway.
 |Property |Value    |
 |:--------|:--------|
 |Type     |object|
-|Required |**Yes**|
+|Required |No|
 
 Contains details about the local VPC (Where the TGW will be built)
 
@@ -260,6 +260,21 @@ Prefix lists for the VPC
 |Required |No|
 
 
+#### `.spec.localVpc.prefixLists[*].addressFamily`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|ipv4|
+
+Allowed Values:
+
+- ipv4
+- ipv6
+
+The address family (ipv4 or ipv6) for the prefix list.
+
 #### `.spec.localVpc.prefixLists[*].blackhole`
 
 |Property |Value    |
@@ -269,14 +284,71 @@ Prefix lists for the VPC
 
 If this is a blackhole route
 
+#### `.spec.localVpc.prefixLists[*].entries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The prefix list entries.
+
+#### `.spec.localVpc.prefixLists[*].entries[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.localVpc.prefixLists[*].entries[*].cidr`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
+
+The CIDR block for the prefix list entry.
+
+#### `.spec.localVpc.prefixLists[*].entries[*].description`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The description for the prefix list entry.
+
 #### `.spec.localVpc.prefixLists[*].id`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |string|
-|Required |**Yes**|
+|Required |No|
 
 The ID of the prefix list.
+
+#### `.spec.localVpc.prefixLists[*].maxEntries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |integer|
+|Required |No|
+
+The maximum number of entries for the prefix list.
+
+#### `.spec.localVpc.prefixLists[*].tgwAttach`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If this is true, the prefix list will be added to the transit gateway
+route table for the current attachment. Ignored for peering attachments.
 
 #### `.spec.localVpc.region`
 
@@ -381,6 +453,239 @@ can take on an external resource.
 Multicast support. Indicates whether multicast is enabled on the transit gateway.
 
 Currently unused in this composition
+
+#### `.spec.peers`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Peers defines other transit gateways that this transit gateway
+should peer with
+
+#### `.spec.peers[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.peers[*].accountId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The Account ID this VPC is associated with
+
+#### `.spec.peers[*].id`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The ID of the gateway to peer with
+
+#### `.spec.peers[*].managedPrefixList`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+ManagedPrefixList contains CIDRs for networks that can be traversed
+via this transit gateway.
+
+#### `.spec.peers[*].managedPrefixList[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.peers[*].managedPrefixList[*].addressFamily`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|ipv4|
+
+Allowed Values:
+
+- ipv4
+- ipv6
+
+The address family (ipv4 or ipv6) for the prefix list.
+
+#### `.spec.peers[*].managedPrefixList[*].blackhole`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If this is a blackhole route
+
+#### `.spec.peers[*].managedPrefixList[*].entries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The prefix list entries.
+
+#### `.spec.peers[*].managedPrefixList[*].entries[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.peers[*].managedPrefixList[*].entries[*].cidr`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
+
+The CIDR block for the prefix list entry.
+
+#### `.spec.peers[*].managedPrefixList[*].entries[*].description`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The description for the prefix list entry.
+
+#### `.spec.peers[*].managedPrefixList[*].id`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The ID of the prefix list.
+
+#### `.spec.peers[*].managedPrefixList[*].maxEntries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |integer|
+|Required |No|
+
+The maximum number of entries for the prefix list.
+
+#### `.spec.peers[*].managedPrefixList[*].tgwAttach`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If this is true, the prefix list will be added to the transit gateway
+route table for the current attachment. Ignored for peering attachments.
+
+#### `.spec.peers[*].name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The name of the peer
+
+#### `.spec.peers[*].providerConfigRef`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+ProviderConfigRef references a ProviderConfig used to create this
+resource
+
+If not provided, will fall back to the top-level ProviderConfigRef
+
+Required for cross account transit gateway peering
+
+#### `.spec.peers[*].providerConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.spec.peers[*].providerConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.peers[*].providerConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.peers[*].providerConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
+
+#### `.spec.peers[*].region`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Region the remote transit gateway is located in
 
 #### `.spec.prefixListSupport`
 
@@ -634,7 +939,7 @@ Principals that are allowed to access the resource
 |Property |Value    |
 |:--------|:--------|
 |Type     |array|
-|Required |**Yes**|
+|Required |No|
 |Min Items|0|
 |Max Items|Unlimited|
 
@@ -734,6 +1039,21 @@ Prefix lists for the VPC
 |Required |No|
 
 
+#### `.spec.remoteVpcs[*].prefixLists[*].addressFamily`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|ipv4|
+
+Allowed Values:
+
+- ipv4
+- ipv6
+
+The address family (ipv4 or ipv6) for the prefix list.
+
 #### `.spec.remoteVpcs[*].prefixLists[*].blackhole`
 
 |Property |Value    |
@@ -743,14 +1063,71 @@ Prefix lists for the VPC
 
 If this is a blackhole route
 
+#### `.spec.remoteVpcs[*].prefixLists[*].entries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The prefix list entries.
+
+#### `.spec.remoteVpcs[*].prefixLists[*].entries[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.remoteVpcs[*].prefixLists[*].entries[*].cidr`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
+
+The CIDR block for the prefix list entry.
+
+#### `.spec.remoteVpcs[*].prefixLists[*].entries[*].description`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The description for the prefix list entry.
+
 #### `.spec.remoteVpcs[*].prefixLists[*].id`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |string|
-|Required |**Yes**|
+|Required |No|
 
 The ID of the prefix list.
+
+#### `.spec.remoteVpcs[*].prefixLists[*].maxEntries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |integer|
+|Required |No|
+
+The maximum number of entries for the prefix list.
+
+#### `.spec.remoteVpcs[*].prefixLists[*].tgwAttach`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If this is true, the prefix list will be added to the transit gateway
+route table for the current attachment. Ignored for peering attachments.
 
 #### `.spec.remoteVpcs[*].providerConfigRef`
 
@@ -931,120 +1308,6 @@ attachments are automatically associated with the default association route tabl
 TransitGatewayDefaultRouteTablePropagation. Indicates whether resource
 attachments automatically propagate routes to the default propagation route table.
 
-#### `.spec.transitGatewayPeers`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-TransitGatewayPeers defines other transit gateways that this transit gateway
-should peer with
-
-#### `.spec.transitGatewayPeers[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-
-#### `.spec.transitGatewayPeers[*].accountId`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-The Account ID this VPC is associated with
-
-#### `.spec.transitGatewayPeers[*].id`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |**Yes**|
-
-The ID of the gateway to peer with
-
-#### `.spec.transitGatewayPeers[*].providerConfigRef`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-ProviderConfigRef references a ProviderConfig used to create this
-resource
-
-If not provided, will fall back to the top-level ProviderConfigRef
-
-Required for cross account transit gateway peering
-
-#### `.spec.transitGatewayPeers[*].providerConfigRef.name`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |**Yes**|
-
-Name of the referenced object.
-
-#### `.spec.transitGatewayPeers[*].providerConfigRef.policy`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-Policies for referencing.
-
-#### `.spec.transitGatewayPeers[*].providerConfigRef.policy.resolution`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-|Default Value|Required|
-
-Allowed Values:
-
-- Required
-- Optional
-
-Resolution specifies whether resolution of this reference is required.
-The default is 'Required', which means the reconcile will fail if the
-reference cannot be resolved. 'Optional' means this reference will be
-a no-op if it cannot be resolved.
-
-#### `.spec.transitGatewayPeers[*].providerConfigRef.policy.resolve`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-Allowed Values:
-
-- Always
-- IfNotPresent
-
-Resolve specifies when this reference should be resolved. The default
-is 'IfNotPresent', which will attempt to resolve the reference only when
-the corresponding field is not present. Use 'Always' to resolve the
-reference on every reconcile.
-
-#### `.spec.transitGatewayPeers[*].region`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-Region the remote transit gateway is located in
-
 #### `.spec.vpnEcmpSupport`
 
 |Property |Value    |
@@ -1174,6 +1437,7 @@ map of local attachments
 |Type     |string|
 |Required |No|
 
+If Resource Access Management is enabled, the ARN of the RAM share
 
 #### `.status.ramShareId`
 
@@ -1182,6 +1446,7 @@ map of local attachments
 |Type     |string|
 |Required |No|
 
+If Resource Access Management is enabled, the ID of the RAM share
 
 #### `.status.remoteAttachmentIds`
 

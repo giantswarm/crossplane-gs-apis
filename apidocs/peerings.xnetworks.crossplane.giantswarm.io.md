@@ -724,6 +724,15 @@ Status of this condition; is it currently True, False, or Unknown?
 Type of this condition. At most one of each condition type may apply to
 a resource at any point in time.
 
+#### `.status.peeringConnectionArn`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The ARN of the VPC peering connection.
+
 #### `.status.peeringConnectionId`
 
 |Property |Value    |
