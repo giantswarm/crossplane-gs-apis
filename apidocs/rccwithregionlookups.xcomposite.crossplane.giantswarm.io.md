@@ -1172,17 +1172,6 @@ is 'IfNotPresent', which will attempt to resolve the reference only when
 the corresponding field is not present. Use 'Always' to resolve the
 reference on every reconcile.
 
-#### `.spec.rdsCacheClusterSpec.cache.kubernetesSecretStore`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-Secret store to be used by external-secrets-operator
-
-Required if engine is redis and kubernetesProviderConfig is provided.
-
 #### `.spec.rdsCacheClusterSpec.cache.logDeliveryConfigurations`
 
 |Property |Value    |
@@ -3260,6 +3249,21 @@ Eso is the configuration for the external secrets operator
 Enabled Whether or not to enable `external-secrets-operator` object
 deployments using `provider-kubernetes.
 
+#### `.spec.rdsCacheClusterSpec.eso.fluxSSASecretName`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+FluxSSASecretName is the name of the secret that contains SSA details
+for each project built with infrastructure components.
+
+This secret will be updated with the name of the current project with
+all hyphens, underscores and dots replaced with an empty string.
+
+This secret must exist in the same namespace as the current project.
+
 #### `.spec.rdsCacheClusterSpec.eso.kubernetesSecretStore`
 
 |Property |Value    |
@@ -4215,6 +4219,128 @@ If IPv6 support is enabled for the transit gateway.
 Multicast support. Indicates whether multicast is enabled on the transit gateway.
 
 Currently unused in this composition
+
+#### `.spec.rdsCacheClusterSpec.vpc.transitGateway.peers`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Peers is a list of transit gateway peers to connect to
+
+#### `.spec.rdsCacheClusterSpec.vpc.transitGateway.peers[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.rdsCacheClusterSpec.vpc.transitGateway.peers[*].accountId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The Account ID this VPC is associated with
+
+#### `.spec.rdsCacheClusterSpec.vpc.transitGateway.peers[*].id`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The ID of the gateway to peer with
+
+#### `.spec.rdsCacheClusterSpec.vpc.transitGateway.peers[*].name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the transit gateway to peer with
+
+#### `.spec.rdsCacheClusterSpec.vpc.transitGateway.peers[*].providerConfigRef`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+ProviderConfigRef references a ProviderConfig used to create this
+resource
+
+If not provided, will fall back to the top-level ProviderConfigRef
+
+Required for cross account transit gateway peering
+
+#### `.spec.rdsCacheClusterSpec.vpc.transitGateway.peers[*].providerConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.spec.rdsCacheClusterSpec.vpc.transitGateway.peers[*].providerConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.rdsCacheClusterSpec.vpc.transitGateway.peers[*].providerConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.rdsCacheClusterSpec.vpc.transitGateway.peers[*].providerConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
+
+#### `.spec.rdsCacheClusterSpec.vpc.transitGateway.peers[*].region`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Region the remote transit gateway is located in
 
 #### `.spec.rdsCacheClusterSpec.vpc.transitGateway.prefixList`
 
