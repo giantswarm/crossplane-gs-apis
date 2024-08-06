@@ -11,11 +11,13 @@ source_repositories:
     commit_reference: main
     crd_paths:
       - crossplane.giantswarm.io/xaws/package/xrds
+      - crossplane.giantswarm.io/xcomposite/package/xrds
       - crossplane.giantswarm.io/xcache/package/xrds
       - crossplane.giantswarm.io/xdatabase/package/xrds
       - crossplane.giantswarm.io/xnetworks/package/xrds
     cr_paths:
       - crossplane.giantswarm.io/xaws/examples
+      - crossplane.giantswarm.io/xcomposite/examples
       - crossplane.giantswarm.io/xcache/examples
       - crossplane.giantswarm.io/xdatabase/examples
       - crossplane.giantswarm.io/xnetworks/examples
@@ -76,7 +78,7 @@ source_repositories:
           - cache
           - crossplane
           - elasticache
-      rccwithregionlookups.xaws.crossplane.giantswarm.io:
+      rccwithregionlookups.xcomposite.crossplane.giantswarm.io:
         owner:
           - https://github.com/orgs/giantswarm/teams/team-honeybadger
         topics:
@@ -86,7 +88,7 @@ source_repositories:
           - database
           - elasticache
           - rds
-      rdscacheclusters.xaws.crossplane.giantswarm.io:
+      rdscacheclusters.xcomposite.crossplane.giantswarm.io:
         owner:
           - https://github.com/orgs/giantswarm/teams/team-honeybadger
         topics:
@@ -96,3 +98,11 @@ source_repositories:
           - database
           - elasticache
           - rds
+      resourceaccessmanagers.xaws.crossplane.giantswarm.io:
+        owner:
+          - https://github.com/orgs/giantswarm/teams/team-honeybadger
+        topics:
+          - aws
+          - crossplane
+          - ram
+

@@ -485,13 +485,6 @@ spec:
                     required:
                     - name
                     type: object
-                  kubernetesSecretStore:
-                    description: |-
-                      Secret store to be used by external-secrets-operator
-
-
-                      Required if engine is redis and kubernetesProviderConfig is provided.
-                    type: string
                   logDeliveryConfigurations:
                     description: |-
                       LogDeliveryConfiguration is a list of log delivery configurations for
@@ -1624,6 +1617,18 @@ spec:
                       Enabled Whether or not to enable `external-secrets-operator` object
                       deployments using `provider-kubernetes.
                     type: boolean
+                  fluxSSASecretName:
+                    description: |-
+                      FluxSSASecretName is the name of the secret that contains SSA details
+                      for each project built with infrastructure components.
+
+
+                      This secret will be updated with the name of the current project with
+                      all hyphens, underscores and dots replaced with an empty string.
+
+
+                      This secret must exist in the same namespace as the current project.
+                    type: string
                   kubernetesSecretStore:
                     description: |-
                       KubernetesSecretStore is the Kubernetes secret store to use.
@@ -2206,6 +2211,71 @@ spec:
 
                           Currently unused in this composition
                         type: string
+                      peers:
+                        description: Peers is a list of transit gateway peers to connect
+                          to
+                        items:
+                          properties:
+                            accountId:
+                              description: The Account ID this VPC is associated with
+                              type: string
+                            id:
+                              description: The ID of the gateway to peer with
+                              type: string
+                            name:
+                              description: Name of the transit gateway to peer with
+                              type: string
+                            providerConfigRef:
+                              description: |-
+                                ProviderConfigRef references a ProviderConfig used to create this
+                                resource
+
+
+                                If not provided, will fall back to the top-level ProviderConfigRef
+
+
+                                Required for cross account transit gateway peering
+                              properties:
+                                name:
+                                  description: Name of the referenced object.
+                                  type: string
+                                policy:
+                                  description: Policies for referencing.
+                                  properties:
+                                    resolution:
+                                      default: Required
+                                      description: |-
+                                        Resolution specifies whether resolution of this reference is required.
+                                        The default is 'Required', which means the reconcile will fail if the
+                                        reference cannot be resolved. 'Optional' means this reference will be
+                                        a no-op if it cannot be resolved.
+                                      enum:
+                                      - Required
+                                      - Optional
+                                      type: string
+                                    resolve:
+                                      description: |-
+                                        Resolve specifies when this reference should be resolved. The default
+                                        is 'IfNotPresent', which will attempt to resolve the reference only when
+                                        the corresponding field is not present. Use 'Always' to resolve the
+                                        reference on every reconcile.
+                                      enum:
+                                      - Always
+                                      - IfNotPresent
+                                      type: string
+                                  type: object
+                              required:
+                              - name
+                              type: object
+                            region:
+                              description: Region the remote transit gateway is located
+                                in
+                              type: string
+                          required:
+                          - id
+                          - name
+                          type: object
+                        type: array
                       prefixList:
                         description: Prefix lists for the VPC
                         items:

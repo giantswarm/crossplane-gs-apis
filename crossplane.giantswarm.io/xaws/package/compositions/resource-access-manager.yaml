@@ -1,0 +1,227 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  creationTimestamp: null
+  labels:
+    component: aws
+    provider: aws
+    type: resource-access-manager
+  name: resource-access-manager
+spec:
+  compositeTypeRef:
+    apiVersion: xaws.crossplane.giantswarm.io/v1alpha1
+    kind: ResourceAccessManager
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+          oxr = option("params").oxr
+          ocds = option("params").ocds
+
+          get = lambda x: {:}, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
+
+          ready = lambda x: str -> bool {
+              """
+              Check if a value is ready.
+              """
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  exists(x),
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
+              ])
+          }
+
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          appName = get(oxr, "spec.claimRef.name", "")
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          labels = get(oxr, "metadata.labels", {})
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          region = get(oxr, "spec.localVpc.region", "eu-central-1")
+          tags = get(oxr, "spec.tags.common", {}) | {
+              region: region,
+          }
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+
+          ramShare = [
+              {
+                  _resourceName = "ram-share-${appName}-${region}"
+                  "apiVersion": "ram.aws.upbound.io/v1beta1"
+                  "kind": "ResourceShare"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name": _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": dp
+                      "forProvider": {
+                          "allowExternalPrincipals": get(oxr, "spec.ram.allowExternalPrincipals", True),
+                          "name": "${appName}-${region}",
+                          "region": region,
+                          "tags": tags,
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": pcr
+                  }
+              }
+              for _ in [True]
+          ]
+
+          ramShareId = ocdsstatus("ram-share-${appName}-${region}", "id", False)
+          ramShareArn = ocdsstatus("ram-share-${appName}-${region}", "arn", False)
+
+          ramAssociations = [
+              {
+                  _resourceName = "ram-r-assoc-${i}"
+                  "apiVersion": "ram.aws.upbound.io/v1beta1"
+                  "kind": "ResourceAssociation"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name": _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": dp
+                      "forProvider": {
+                          "associationType": "resource",
+                          "region": region,
+                          "resourceArn": get(resource, "arn", ""),
+                          "resourceShareArn": ramShareArn,
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": pcr
+                  }
+              }
+              for i, resource in get(oxr, "spec.resources", [])
+              if all_true([
+                  get(oxr, "spec.resources", False),
+                  ramShareArn, get(resource, "arn", False),
+              ])
+          ]
+
+          ramPrincipleAssociations = [
+              {
+                  _resourceName = "ram-p-assoc-${i}"
+                  "apiVersion": "ram.aws.upbound.io/v1beta1"
+                  "kind": "PrincipalAssociation"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name": _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": dp
+                      "forProvider": {
+                          "principal": id,
+                          "region": region,
+                          "resourceShareArn": ramShareArn,
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": pcr
+                  }
+              }
+              for i, id in get(oxr, "spec.principals", [])
+              if all_true([
+                  ramShareArn,
+                  get(oxr, "spec.principals", False),
+              ])
+          ]
+
+          ramShareAccepters = [
+              {
+                  _resourceName = "ram-share-accepter-${i}"
+                  "apiVersion": "ram.aws.upbound.io/v1beta1"
+                  "kind": "ResourceShareAccepter"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name": _resourceName
+                          "krm.kcl.dev/ready" = readystr(_resourceName)
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": pcr
+                      "forProvider": {
+                          "region": region,
+                          "shareArn": ramShareArn,
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": get(principal, "providerConfigRef", pcr)
+                  }
+              }
+              for i, principal in get(oxr, "spec.principals", [])
+              if all_true([
+                  ramShareArn,
+                  get(oxr, "spec.principals", False),
+              ])
+          ]
+
+          newdxr = {
+              **oxr,
+              **{
+
+                  "status": {
+                      if ramShareId:
+                          "id": ramShareId,
+                      if ramShareArn:
+                          "arn": ramShareArn,
+                  }
+              }
+          }
+
+          _items = [
+              i for r in [
+                  ramShare, ramAssociations, newdxr,
+                  ramPrincipleAssociations, ramShareAccepters
+              ]
+              for i in r if i
+          ]
+
+          items = _items
+        target: ""
+    step: function-kcl-create-ram
+  - functionRef:
+      name: function-auto-ready
+    step: function-auto-ready

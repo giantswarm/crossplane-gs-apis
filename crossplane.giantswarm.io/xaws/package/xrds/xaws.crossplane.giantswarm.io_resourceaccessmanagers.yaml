@@ -1,0 +1,164 @@
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: (devel)
+  creationTimestamp: null
+  name: resourceaccessmanagers.xaws.crossplane.giantswarm.io
+spec:
+  claimNames:
+    kind: ResourceAccessManager
+    plural: ram
+  defaultCompositionRef:
+    name: resource-access-manager
+  enforcedCompositionRef:
+    name: resouce-access-manager
+  group: xaws.crossplane.giantswarm.io
+  names:
+    kind: ResourceAccessManager
+    listKind: ResourceAccessManagerList
+    plural: resourceaccessmanagers
+    shortNames:
+    - mpl
+    singular: resourceaccessmanager
+  versions:
+  - name: v1alpha1
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              allowExternalPrincipals:
+                type: boolean
+              name:
+                description: The name of the resource access manager.
+                type: string
+              permissions:
+                description: The permissions to associate with the resource access
+                  manager.
+                items:
+                  type: string
+                type: array
+              principles:
+                description: A list of principals to associate with the resource access
+                  manager.
+                items:
+                  properties:
+                    principal:
+                      description: |-
+                        The principal to associate with the resource access manager.
+
+
+                        Possible values are AWS Account ID, AWS Organization ID, or AWS organizations.
+                      type: string
+                    providerConfig:
+                      description: Provider config for accepting the share
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                  required:
+                  - principal
+                  type: object
+                type: array
+              region:
+                description: The region in which the resource should be created.
+                type: string
+              resources:
+                description: A list of resources to associate with the resource access
+                  manager.
+                items:
+                  type: string
+                type: array
+              tags:
+                additionalProperties:
+                  type: string
+                description: The tags to associate with the resource access manager.
+                maxProperties: 50
+                type: object
+            required:
+            - name
+            - region
+            type: object
+          status:
+            properties:
+              arn:
+                description: The ARN of the resource access manager.
+                type: string
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        LastTransitionTime is the last time this condition transitioned from one
+                        status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        A Message containing details about this condition's last transition from
+                        one status to another, if any.
+                      type: string
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: |-
+                        Type of this condition. At most one of each condition type may apply to
+                        a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              id:
+                description: The ID of the resource access manager.
+                type: string
+            type: object
+        required:
+        - spec
+        type: object
+    served: true

@@ -75,6 +75,7 @@ spec:
               allowPublic: false
               cidrBlocks: null
               enabled: false
+              peers: null
               prefixList: null
               prefixLists: null
               ram:
@@ -272,6 +273,203 @@ spec:
               y = ".".join(p[1:])
               x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
           }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(_ocds)
+          }
+
+          ready = lambda x: str -> bool {
+              """
+              Check if a value is ready.
+              """
+              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
+              ])
+          }
+
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+
+          # AppName here must be all lowercase with all symbols removed
+          appName = regex.replace(get(_oxr, "spec.claimRef.name", ""), "[-_\.]", "").lower()
+          dp = get(_oxr, "spec.deletionPolicy", "Delete")
+          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
+          namespace = get(_oxr, "spec.claimRef.namespace", "default")
+          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
+
+          ssasecret = get(_oxr, "spec.eso.fluxSSASecret", "")
+          # The resource created here is to enable switching Flux SSA from `Ignore` to
+          # `Merge`.
+          #
+          # This allows Flux to ignore the creation of resources until the related
+          # infrastructure has been created and is ready.
+          #
+          # To enable this, Any resources created by Flux kustomization should have the
+          # annotation `kustomize.toolkit.fluxcd.io/ssa: ${PROJECT_NAME_SSA:=Ignore}`.
+          #
+          # This will then force SSA to `Ingore` the resource by default.
+          #
+          # Next, the flux kusomization should have its `postBuild` set up like follows:
+          #
+          # ```yaml
+          # postBuild:
+          #   substitute:
+          #     var_substitution_enabled: "true"
+          #   substituteFrom:
+          #   - kind: Secret
+          #     name: flux-project-ssa
+          # ```
+          _items = [
+              {
+                  "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+                  "kind": "Object"
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name" = "${appName}-externalsecret"
+                          "krm.kcl.dev/ready": readystr("${appName}-externalsecret")
+                      }
+                  }
+                  "spec": {
+                      "deletionPolicy": dp,
+                      "forProvider": {
+                          "manifest": {
+                              "apiVersion": "external-secrets.io/v1beta1",
+                              "kind": "ExternalSecret",
+                              "metadata": {
+                                  "namespace": namespace,
+                              },
+                              "spec": {
+                                  "refreshInterval": "1d",
+                                  "secretStoreRef": {
+                                      "name": get(_oxr, "spec.eso.secretStoreRef.name", ""),
+                                      "kind": "SecretStore",
+                                  },
+                                  "dataFrom": [
+                                      {
+                                          "extract": {
+                                              "key": ssasecret,
+                                              "version": "v1",
+                                          },
+                                      },
+                                  ],
+                                  "target": {
+                                      "name": ssasecret,
+                                      "creationPolicy": "Orphan",
+                                      "template": {
+                                          "engineVersion": "v2",
+                                          "mergePolicy": "Merge",
+                                          "data": {
+                                              "${ssasecret}": "",
+                                              "${appName}" = '{{ "Merge" | b64enc }}',
+                                          },
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                      "managementPolicies": mgmtPolicy,
+                      "providerConfigRef": {
+                          "name": get(_oxr, "spec.kubernetesProviderConfig.name", "")
+                      }
+                  }
+              }
+              for _ in [True]
+              if all_true([
+                  get(_oxr, "spec.eso.enabled", False),
+                  get(_oxr, "spec.eso.fluxSSASecret", False),
+                  get(_oxr, "status.cacheConnectionSecret", False),
+                  get(_oxr, "status.rdsConnectionSecret", False),
+              ])
+          ]
+
+          items = _items
+        target: ""
+    step: function-kcl-create-eso-secret
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+
+          _oxr = option("params").oxr
+          _dxr = option("params").dxr
+          _ocds = option("params").ocds
+          _dcds = option("params").dcds
+
+          get = lambda x: {:}, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+          }
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(_ocds)
+          }
+
+          ready = lambda x: str -> bool {
+              """
+              Check if a value is ready.
+              """
+              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              any_true([
+                  all_true([
+                      get(c, "status", "False") == "True" for c in conditions
+                  ])
+              ])
+          }
+
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+
+          # AppName here must be all lowercase with all symbols removed
+          appName = regex.replace(get(_oxr, "spec.claimRef.name", ""), "[-_\.]", "").lower()
+          dp = get(_oxr, "spec.deletionPolicy", "Delete")
+          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
+          namespace = get(_oxr, "spec.claimRef.namespace", "default")
+          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
 
           _subnets = get(_oxr, "status.vpc.privateSubnets", [])
 

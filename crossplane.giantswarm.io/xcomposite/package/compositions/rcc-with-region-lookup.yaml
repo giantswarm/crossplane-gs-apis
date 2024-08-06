@@ -96,6 +96,7 @@ spec:
                 allowPublic: false
                 cidrBlocks: null
                 enabled: false
+                peers: null
                 prefixList: null
                 prefixLists: null
                 ram:
