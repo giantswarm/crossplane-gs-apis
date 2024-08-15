@@ -24,6 +24,4 @@ _items = [
             }
         }
     }
-    for _ in [True]
-    if tgwEnabled
 ]

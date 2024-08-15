@@ -35,7 +35,12 @@ ocdsstatus = lambda x: str, y: str, d: any -> any {
     """
     Get an item from the status of an ocds resource.
     """
-    get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+    _x = None
+    if get(ocds, "${x}.Resource.status.atProvider", False):
+        _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+    else:
+        _x = get(ocds, "${x}.Resource.status.${y}", d)
+    _x if _x else d
 }
 
 ready = lambda x: str -> bool {
@@ -66,7 +71,7 @@ pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
 region = get(oxr, "spec.localVpc.region", "eu-central-1")
 tags = get(oxr, "spec.tags.common", {}) | {
     region: region,
-}
+} | labels
 
 localAttachmentIds = {
     "${appName}": ocdsstatus("tgwa-${appName}-${region}", "id", "")
@@ -78,7 +83,6 @@ mgmtPolicy = get(oxr, "spec.managementPolicies", [])
 
 publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 tgwArn = ocdsstatus("transitgateway-${appName}-${region}", "arn", False)
-tgwEnabled = get(oxr, "spec.enabled", False)
 tgwId = ocdsstatus("transitgateway-${appName}-${region}", "id", False)
 tgwRouteTableId = ocdsstatus("tgwrt-${appName}-${region}", "id", False)
 
@@ -92,4 +96,285 @@ peerAttachmentIds = {
     "${peer.name}": ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", "")
     for _, peer in get(oxr, "spec.peers", [])
     if ocdsstatus("tgwa-${appName}-${region}-${peer.name}", "id", False)
+}
+
+routingTables = {
+    "${appName}": {
+        "vpc": {
+            "open": [
+                # Outbound from the local VPC needs the remote cidr blocks
+                {
+                    "cidr": cidr,
+                    "description": "${remoteVpc.name} CIDR Block ${i}",
+                }
+                for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
+                for i, cidr in get(remoteVpc, "cidrBlocks", [])
+            ] + [
+                e
+                for _, pl in get(localVpc, "prefixLists", [])
+                for e in get(pl, "entries", [])
+                if all_true([
+                    e,
+                    get(pl, "outbound", False),
+                    not get(pl, "id", False),
+                    not get(pl, "blackhole", False),
+                ])
+            ],
+            "blackhole": [
+                e
+                for _, pl in get(localVpc, "prefixLists", [])
+                for e in get(pl, "entries", [])
+                if all_true([
+                    e,
+                    get(pl, "outbound", False),
+                    not get(pl, "id", False),
+                    get(pl, "blackhole", False),
+                ])
+            ]
+        },
+        "tgw": {
+            "open": [
+                e
+                for _, pl in get(localVpc, "prefixLists", [])
+                for e in get(pl, "entries", [])
+                if all_true([
+                    e,
+                    not get(pl, "outbound", True),
+                    not get(pl, "id", False),
+                    not get(pl, "blackhole", False),
+                ])
+            ],
+            "blackhole": [
+                e
+                for _, pl in get(localVpc, "prefixLists", [])
+                for e in get(pl, "entries", [])
+                if all_true([
+                    e,
+                    not get(pl, "outbound", True),
+                    not get(pl, "id", False),
+                    get(pl, "blackhole", False),
+                ])
+            ]
+        }
+    }
+} | {
+    "${r.name}": {
+        "vpc": {
+            "open": [
+                # Add the primary VPC cidr blocks
+                {
+                    "cidr": cidr,
+                    "description": "${appName} CIDR Block ${i}",
+                }
+                for i, cidr in get(localVpc, "cidrBlocks", [])
+            ] + [
+                # Add the remote VPC cidr blocks where the remote VPC is not the
+                # same as the current VPC
+                {
+                    "cidr": cidr,
+                    "description": "${remoteVpc.name} CIDR Block ${i}",
+                }
+                for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
+                for i, cidr in get(remoteVpc, "cidrBlocks", [])
+                if all_true([
+                    remoteVpc.name != r.name,
+                ])
+            ] + [
+                # Add any prefix list entries that need creating
+                e
+                for _, pl in get(r, "prefixLists", [])
+                for e in get(pl, "entries", [])
+                if all_true([
+                    e,
+                    get(pl, "outbound", False),
+                    not get(pl, "id", False),
+                    not get(pl, "blackhole", False),
+                ])
+            ],
+            "blackhole": [
+                e
+                for _, pl in get(r, "prefixLists", [])
+                for e in get(pl, "entries", [])
+                if all_true([
+                    e,
+                    get(pl, "outbound", False),
+                    not get(pl, "id", False),
+                    get(pl, "blackhole", False),
+                ])
+            ]
+        },
+        "tgw": {
+            "open": [
+                e
+                for _, pl in get(r, "prefixLists", [])
+                for e in get(pl, "entries", [])
+                if all_true([
+                    e,
+                    not get(pl, "outbound", True),
+                    not get(pl, "id", False),
+                    not get(pl, "blackhole", False),
+                ])
+
+            ],
+            "blackhole": [
+                e
+                for _, pl in get(r, "prefixLists", [])
+                for e in get(pl, "entries", [])
+                if all_true([
+                    e,
+                    not get(pl, "outbound", True),
+                    not get(pl, "id", False),
+                    get(pl, "blackhole", False),
+                ])
+            ]
+        }
+    }
+    for _, r in get(oxr, "spec.remoteVpcs", [])
+} | {
+    "peering-${peer.name}": {
+        "remote": {
+            "open": [
+                e
+                for _, pl in get(peer, "prefixLists", [])
+                for e in get(pl, "entries", [])
+                if all_true([
+                    e,
+                    get(pl, "outbound", False),
+                    not get(pl, "id", False),
+                    not get(pl, "blackhole", False),
+                ])
+            ],
+            "blackhole": [
+                e
+                for _, pl in get(peer, "prefixLists", [])
+                for e in get(pl, "entries", [])
+                if all_true([
+                    e,
+                    get(pl, "outbound", False),
+                    not get(pl, "id", False),
+                    get(pl, "blackhole", False),
+                ])
+            ]
+        },
+        "tgw": {
+            "open": [
+                e
+                for _, pl in get(peer, "prefixLists", [])
+                for e in get(pl, "entries", [])
+                if all_true([
+                    e,
+                    not get(pl, "outbound", True),
+                    not get(pl, "id", False),
+                    not get(pl, "blackhole", False),
+                ])
+            ],
+            "blackhole": [
+                e
+                for _, pl in get(peer, "prefixLists", [])
+                for e in get(pl, "entries", [])
+                if all_true([
+                    e,
+                    not get(pl, "outbound", True),
+                    not get(pl, "id", False),
+                    get(pl, "blackhole", False),
+                ])
+            ]
+        }
+    }
+    for _, peer in get(oxr, "spec.peers", [])
+}
+
+mpl = lambda n : str, r: str, a: str, b: bool, isp: bool, e: [], p: {:} -> {:} {
+    """
+    Create a ManagedPrefixList object.
+
+    n: The name of the ManagedPrefixList
+    r: The region the ManagedPrefixList is in
+    a: The address family of the ManagedPrefixList
+    b: Whether the ManagedPrefixList is a blackhole
+    isp: Whether the ManagedPrefixList is for a peering connection
+    e: The entries for the ManagedPrefixList
+    p: The ProviderConfigRef for the ManagedPrefixList
+
+    Returns a ManagedPrefixList object.
+    """
+    _bh = "-bh" if b else ""
+    _n = "${appName}-${region}-${n}${_bh}" if n != appName else "${appName}-${region}${_bh}"
+    _isp = "-tgw" if isp else ""
+    _resourceName = "mpl-${_n}" if not isp else "p-mpl-${_n}"
+    {
+        "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1",
+        "kind": "ManagedPrefixList",
+        "metadata": {
+            "annotations": {
+                "krm.kcl.dev/composition-resource-name": _resourceName,
+                "krm.kcl.dev/ready": readystr(_resourceName),
+            },
+            "labels": labels | {
+                "vpcName": n,
+            },
+        },
+        "spec": {
+            "addressFamily": a,
+            "claimRef": get(oxr, "spec.claimRef", {}),
+            "deletionPolicy": dp,
+            "entries": e,
+            "managementPolicies": mgmtPolicy,
+            "name": "${_n}${_isp}",
+            "region": r,
+            "providerConfigRef": p,
+            "tags": tags | {
+                "Name": "${_n}${_isp}",
+            },
+        }
+    } if len(e) > 0 else {}
+}
+
+plr = lambda n : str, r: str, pid: str, aid: str, rid: str, b: bool, isp: bool, p: {:} -> {:} {
+    """
+    Create a TransitGatewayPrefixListReference object.
+
+    n: The name of the PrefixList reference
+    r: The region the PrefixList reference should be created in
+    b: Whether the PrefixList is a blackhole
+    pid: The PrefixListId for the PrefixList reference
+    aid: The TransitGatewayAttachmentId for the PrefixList reference
+    rid: The TransitGatewayRouteTableId for the PrefixList reference
+    isp: Whether the PrefixList reference is for a peering connection
+    p: The ProviderConfigRef for the PrefixList
+
+    Returns a TransitGatewayPrefixListReference object.
+    """
+    {
+        _bh = "-bh" if b else ""
+        _n = "${appName}-${region}-${n}${_bh}" if n != appName else "${appName}-${region}${_bh}"
+        _resourceName = "tgwplr-${aid}" if not isp else "p-tgwplr-${aid}"
+        "apiVersion": "ec2.aws.upbound.io/v1beta1",
+        "kind": "TransitGatewayPrefixListReference",
+        "metadata": {
+            "annotations": {
+                "krm.kcl.dev/composition-resource-name": _resourceName,
+                "krm.kcl.dev/ready": readystr(_resourceName),
+            },
+            "labels": labels | {
+                "vpcName": n,
+            } if not isp else {
+                "peerName": n,
+            },
+        },
+        "spec": {
+            "deletionPolicy": dp,
+            "forProvider": {
+                "blackhole": b,
+                "prefixListId": pid,
+                "region": r,
+                "transitGatewayAttachmentId": aid,
+                "transitGatewayRouteTableId": rid,
+            },
+            "managementPolicies": mgmtPolicy,
+            "providerConfigRef": p,
+        }
+    } if all_true([
+        pid, aid, rid,
+    ]) else {}
 }

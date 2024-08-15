@@ -1,5 +1,6 @@
 import regex
 oxr = option("params").oxr
+dxr = option("params").dxr
 ocds = option("params").ocds
 
 get = lambda x: {:}, y: str, d: any -> any {

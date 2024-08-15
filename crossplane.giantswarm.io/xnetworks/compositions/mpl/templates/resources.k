@@ -52,7 +52,7 @@ dp = get(oxr, "spec.deletionPolicy", "Delete")
 labels = get(oxr, "metadata.labels", {})
 mgmtPolicy = get(oxr, "spec.managementPolicies", [])
 pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
-region = get(oxr, "spec.localVpc.region", "eu-central-1")
+region = get(oxr, "spec.region", "eu-central-1")
 tags = get(oxr, "spec.tags.common", {}) | {
     region: region,
 }
@@ -72,7 +72,7 @@ managedPrefixList = [
             "deletionPolicy": dp
             "forProvider": {
                 "addressFamily": get(oxr, "spec.addressFamily", "IPv4"),
-                "maxEntries": get(oxr, "spec.maxEntries", 1000),
+                "maxEntries": get(oxr, "spec.maxEntries", 20),
                 "name": get(oxr, "spec.name", ""),
                 "region": region,
                 "tags": tags,
@@ -108,7 +108,7 @@ managedPrefixListEntries = [
             "forProvider": {
                 "cidr": get(entry, "cidr", ""),
                 "description": get(entry, "description", ""),
-                "managedPrefixListId": managedPrefixListId,
+                "prefixListId": managedPrefixListId,
                 "region": region,
             }
             "managementPolicies": mgmtPolicy,
@@ -125,12 +125,13 @@ newdxr = {
     **oxr,
     **{
         "status": {
-            "managedPrefixListId" = managedPrefixListId,
+            if managedPrefixListId:
+                "id" = managedPrefixListId,
         }
     }
 }
 
 _items = [
-    i for r in [managedPrefixList, managedPrefixListEntries]
+    i for r in [managedPrefixList, managedPrefixListEntries, [newdxr]]
     for i in r if i
 ]

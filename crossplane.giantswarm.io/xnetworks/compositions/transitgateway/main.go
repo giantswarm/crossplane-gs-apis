@@ -39,7 +39,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		kclCommon            string
 		kclFooter            string = "items = _items"
 		kclLocalTemplate     string
-		kclMplTemplate       string
+		kclTgwConfigTemplate string
 		kclPeeringTemplate   string
 		kclPatchingTemplate  string
 		kclRamTemplate       string
@@ -57,7 +57,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		panic(err)
 	}
 
-	kclMplTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/mpl.k")
+	kclTgwConfigTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/tgw-config.k")
 	if err != nil {
 		panic(err)
 	}
@@ -82,6 +82,11 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		panic(err)
 	}
 
+	kclRemoteTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/remote.k")
+	if err != nil {
+		panic(err)
+	}
+
 	c.NewPipelineStep("function-kcl-local").
 		WithFunctionRef(xapiextv1.FunctionReference{
 			Name: "function-kcl",
@@ -98,7 +103,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 			},
 		})
 
-	c.NewPipelineStep("function-kcl-mpl").
+	c.NewPipelineStep("function-kcl-tgwconfig").
 		WithFunctionRef(xapiextv1.FunctionReference{
 			Name: "function-kcl",
 		}).
@@ -109,7 +114,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: strings.Join([]string{kclCommon, kclMplTemplate, kclFooter}, "\n\n"),
+					Source: strings.Join([]string{kclCommon, kclTgwConfigTemplate, kclFooter}, "\n\n"),
 				},
 			},
 		})

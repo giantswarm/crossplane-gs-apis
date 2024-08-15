@@ -34,7 +34,7 @@ remoteAttachments = [
     }
     for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
     if all_true([
-        tgwEnabled, tgwId,
+        tgwId,
         get(oxr, "spec.remoteVpcs", []),
     ])
 ]
@@ -71,118 +71,50 @@ attachmentAccepters = [
             gpcr(remoteVpc).name != get(oxr, "spec.providerConfigRef.name", ""),
         ]),
         get(remoteAttachementIds, remoteVpc.name, False),
-        tgwEnabled,
     ])
 ]
 
-rentries =  {
-    "${rVpc.name}": [
-        x for r in [
-            [
-                {
-                    "cidr": cidr,
-                    "description": "${remoteVpc.name} CIDR Block ${i}",
-                }
-                for i, cidr in [
-                    get(oxr, "status.vpcs.${remoteVpc.name}.cidrBlock", "")
-                ] + get(oxr, "status.vpcs.${remoteVpc.name}.additionalCidrBlocks", [])
-                if cidr
-            ]
-            # Add self VPC to the list here so we capture its CIDRs for the other end
-            for _, remoteVpc in get(oxr, "spec.remoteVpcs", []) + [{"name": "self"}]
-            if remoteVpc.name != rVpc.name
-        ] + [
-            [
-                {
-                    "cidr": e.cidr,
-                    "description": "${appName} CIDR Block ${i}",
-                }
-                for _, pl in get(rVpc, "prefixLists", [])
-                for i, e in get(pl, "entries", [])
-                if not get(pl, "blackhole", False)
-            ]
-        ]
-        for x in r if x
-    ]
-    for _, rVpc in get(oxr, "spec.remoteVpcs", [])
-}
-
-rentriesbh = {
-    "${rVpc.name}": [
-        e
-        for _, pl in get(rVpc, "prefixLists", [])
-        for i, e in get(pl, "entries", [])
-        if get(pl, "blackhole", False)
-    ]
-    for _, rVpc in get(oxr, "spec.remoteVpcs", [])
-}
-
-rmpl = {
-    "${rVpc.name}": {
-        "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
-        "kind": "ManagedPrefixList"
-        "metadata": {
-            _resourceName = "rmpl-${appName}-${region}-${rVpc.name}"
-            "annotations": {
-                "krm.kcl.dev/composition-resource-name": _resourceName
-                "krm.kcl.dev/ready" = readystr(_resourceName)
-            }
-            "labels": labels | {
-                "vpcName": rVpc.name
-            }
-        }
-        "spec": {
-            "deletionPolicy": dp,
-            "entries": get(rentries, rVpc.name, []),
-            "managementPolicies": mgmtPolicy,
-            "name": "${appName}-${region}-remote-${rVpc.name}",
-            "region": get(rVpc, "region", region),
-            "tags": tags | {
-                "Name": "${appName}-${region}",
-            }
-        }
-    }
-    for _, rVpc in get(oxr, "spec.remoteVpcs", [])
-}
-
-rmplbh = {
-    "${rVpc.name}": {
-        "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
-        "kind": "ManagedPrefixList"
-        "metadata": {
-            _resourceName = "rmpl-${appName}-${region}-${rVpc.name}"
-            "annotations": {
-                "krm.kcl.dev/composition-resource-name": _resourceName
-                "krm.kcl.dev/ready" = readystr(_resourceName)
-            }
-            "labels": labels | {
-                "vpcName": rVpc.name
-            }
-        }
-        "spec": {
-            "deletionPolicy": dp,
-            "entries": get(rentriesbh, rVpc.name, []),
-            "managementPolicies": mgmtPolicy,
-            "name": "${appName}-${region}-remote-${rVpc.name}",
-            "region": get(rVpc, "region", region),
-            "tags": tags | {
-                "Name": "${appName}-${region}",
-            }
-        }
-    }
-    for _, rVpc in get(oxr, "spec.remoteVpcs", [])
-}
-
 remotePrefixLists = [
-    item
-    for _, item in rmpl | rmplbh
-    if item
+    i for r in [
+        [
+            mpl(
+                remoteVpc.name,
+                get(remoteVpc, "region", region),
+                get(remoteVpc, "addressFamily", "IPv4"),
+                False,
+                False,
+                get(routingTables, "${remoteVpc.name}.vpc.open", {}),
+                gpcr(remoteVpc),
+            ),
+            mpl(
+                remoteVpc.name,
+                get(remoteVpc, "region", region),
+                get(remoteVpc, "addressFamily", "IPv4"),
+                True,
+                False,
+                get(routingTables, "${remoteVpc.name}.vpc.blackhole", {}),
+                gpcr(remoteVpc),
+            ),
+        ]
+        for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
+    ] for i in r
 ]
 
 remotePrefixListIds = {
     "${rVpc.name}": [
-        ocdsstatus("rmpl-${appName}-${region}-${rVpc.name}", "id", "")
-        ocdsstatus("rmpl-${appName}-${region}-${rVpc.name}-bh", "id", False)
+        c for c in [
+            ocdsstatus("rmpl-${appName}-${region}-${rVpc.name}", "id", "")
+            ocdsstatus("rmpl-${appName}-${region}-${rVpc.name}-bh", "id", False)
+        ] if c
+    ] + [
+        c for c in [
+            get(pl, "id", "")
+            for _, pl in get(rVpc, "prefixLists", [])
+            if all_true([
+                get(pl, "id", False),
+                get(pl, "outbound", True),
+            ])
+        ]
     ]
     for _, rVpc in get(oxr, "spec.remoteVpcs", [])
 }
@@ -218,49 +150,47 @@ remoteRoutes = [
     for _, id in get(remoteVpc, "routeTableIds", [])
     for pl in get(remotePrefixListIds, remoteVpc.name, [])
     if all_true([
-        tgwId, tgwEnabled,
+        tgwId, remotePrefixListIds,
     ])
 ]
 
 remotePropagation = [
     {
         _resourceName = "tgwrtp-${appName}-${region}-${id}"
-        "apiVersion": "ec2.aws.upbound.io/v1beta1"
-        "kind": "TransitGatewayRouteTablePropagation"
+        "apiVersion": "ec2.aws.upbound.io/v1beta1",
+        "kind": "TransitGatewayRouteTablePropagation",
         "metadata": {
             "annotations": {
-                "krm.kcl.dev/composition-resource-name" = _resourceName
-                "krm.kcl.dev/ready" = readystr(_resourceName)
-            }
+                "krm.kcl.dev/composition-resource-name" = _resourceName,
+                "krm.kcl.dev/ready" = readystr(_resourceName),
+            },
             "labels": labels | {
-                "vpcName": appName
+                "vpcName": appName,
             }
-        }
+        },
         "spec": {
-            "deletionPolicy": dp
+            "deletionPolicy": dp,
             "forProvider": {
                 "region": region,
                 "transitGatewayAttachmentId": id,
                 "transitGatewayRouteTableId": tgwRouteTableId,
             }
             "managementPolicies": mgmtPolicy,
-            "providerConfigRef": pcr
-        }
+            "providerConfigRef": pcr,
+        },
     }
     for _, id in remoteAttachementIds
     if all_true([
         remoteAttachementIds,
-        tgwEnabled, tgwRouteTableId,
+        tgwRouteTableId,
     ])
 ]
 
 _items = [
     i for r in [
-        remoteAttachments,
-        attachmentAccepters,
-        remotePrefixLists,
-        remoteRoutes,
+        remoteAttachments, attachmentAccepters,
+        remotePrefixLists, remoteRoutes,
+        remotePropagation,
     ]
-    for i in r
-    if i
+    for i in r if i
 ]

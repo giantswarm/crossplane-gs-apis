@@ -110,8 +110,8 @@ cb = lambda x: str, s: int, c: int -> [] {
 newdxr = {
     **oxr
     **{
-        "status": {
-            "subnetBits": [
+        "status" = {
+            "subnetBits" = [
                 {
                     _vpcSize = s.prefix.split("/")[1]
                     _public = s.public.count
@@ -123,15 +123,15 @@ newdxr = {
                 }
                 for s in get(oxr, "spec.subnetsets.cidrs", {}) if s
             ]
-            "vpcLookup": vpcLookup
-            "vpcs": {
+            "vpcLookup" = vpcLookup
+            "vpcs" = {
                 "self": {
                     if len(cidrs) > 1:
                         "additionalCidrBlocks" = cidrs[1:]
                     if cidrs:
                         "cidrBlock": cidrs[0]
                     if igwId:
-                        "internetGatewayId" = igwId
+                        "internetGateway" = igwId
                     if publicRouteTables:
                         "publicRouteTables" = publicRouteTables
                     if publicSubnets:

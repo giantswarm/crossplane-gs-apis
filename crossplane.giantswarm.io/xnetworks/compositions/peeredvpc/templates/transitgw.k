@@ -161,7 +161,6 @@ tgw = {
     "spec": {
         "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
         "claimRef": get(oxr, "spec.claimRef", {}),
-        "enabled": get(oxr, "spec.transitGateway.enabled", False),
         if get(oxr, "spec.amazonSideAsn", False):
             "amazonSideAsn": get(oxr, "spec.amazonSideAsn", 64512),
         if get(oxr, "spec.applianceModeSupport", False):
@@ -199,7 +198,7 @@ tgw = {
         if get(oxr, "spec.transitGatewayRouteTablePropagation", False):
             "transitGatewayRouteTablePropagation": get(oxr, "spec.transitGatewayRouteTablePropagation", "disable"),
 
-        "transitGatewayPeers": transitGatewayPeers,
+        "peers": transitGatewayPeers,
 
         "tags": get(oxr, "spec.tags.common", []),
 

@@ -1,6 +1,13 @@
 # Optional RAM
+
+sharedMpl = get(oxr, "status.sharedMplArns", {})
+
 resources = [
-    tgwArn,
+    c for r in [
+        [tgwArn],
+        sharedMpl,
+    ]
+    for c in r
 ] + get(oxr, "spec.ram.resources", [])
 
 _items = [

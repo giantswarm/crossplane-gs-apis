@@ -1,47 +1,43 @@
 # Create the main transit gateway
 # The Id of this transit gateway will be published to oxr.status.tgwId
-transitGateway = [
-    {
-        _resourceName = "transitgateway-${appName}-${region}"
-        "apiVersion": "ec2.aws.upbound.io/v1beta1"
-        "kind": "TransitGateway"
-        "metadata": {
-            "annotations": {
-                "krm.kcl.dev/composition-resource-name" = _resourceName
-                "krm.kcl.dev/ready" = readystr(_resourceName)
-            }
-            "labels": labels | {
-                "vpcName": appName
-            }
+transitGateway = {
+    _resourceName = "transitgateway-${appName}-${region}"
+    "apiVersion": "ec2.aws.upbound.io/v1beta1"
+    "kind": "TransitGateway"
+    "metadata": {
+        "annotations": {
+            "krm.kcl.dev/composition-resource-name" = _resourceName
+            "krm.kcl.dev/ready" = readystr(_resourceName)
         }
-        "spec": {
-            "deletionPolicy": dp
-            "forProvider": {
-                "amazonSideAsn": get(oxr, "spec.amazonSideAsn", 64512),
-                "autoAcceptSharedAttachments": get(oxr, "spec.autoAcceptSharedAttachments", "disable"),
-                "defaultRouteTableAssociation": "enable" if get(oxr, "spec.defaultRouteTableAssociation", False) else "disable",
-                "defaultRouteTablePropagation": "enable" if get(oxr, "spec.defaultRouteTablePropagation", False) else "disable",
-                "description": "${appName} Transit Gateway in ${region}",
-                "dnsSupport": get(oxr, "spec.dnsSupport", "enable"),
-                "multicastSupport": get(oxr, "spec.multicastSupport", "disable"),
-                "region": region,
-                "tags": tags | {
-                    "Name": "${appName}-${region}"
-                },
-                "transitGatewayCidrBlocks": [
-                    get(oxr, "spec.transitGatewayCidrBlock", "")
-                    for _ in [True]
-                    if get(oxr, "spec.transitGatewayCidrBlock", False)
-                ]
-                "vpnEcmpSupport": get(oxr, "spec.vpnEcmpSupport", "enable"),
-            }
-            "managementPolicies": mgmtPolicy,
-            "providerConfigRef": pcr
+        "labels": labels | {
+            "vpcName": appName
         }
     }
-    for _ in [True]
-    if tgwEnabled
-]
+    "spec": {
+        "deletionPolicy": dp
+        "forProvider": {
+            "amazonSideAsn": get(oxr, "spec.amazonSideAsn", 64512),
+            "autoAcceptSharedAttachments": get(oxr, "spec.autoAcceptSharedAttachments", "disable"),
+            "defaultRouteTableAssociation": "enable" if get(oxr, "spec.defaultRouteTableAssociation", False) else "disable",
+            "defaultRouteTablePropagation": "enable" if get(oxr, "spec.defaultRouteTablePropagation", False) else "disable",
+            "description": "${appName} Transit Gateway in ${region}",
+            "dnsSupport": get(oxr, "spec.dnsSupport", "enable"),
+            "multicastSupport": get(oxr, "spec.multicastSupport", "disable"),
+            "region": region,
+            "tags": tags | {
+                "Name": "${appName}-${region}"
+            },
+            "transitGatewayCidrBlocks": [
+                get(oxr, "spec.transitGatewayCidrBlock", "")
+                for _ in [True]
+                if get(oxr, "spec.transitGatewayCidrBlock", False)
+            ]
+            "vpnEcmpSupport": get(oxr, "spec.vpnEcmpSupport", "enable"),
+        }
+        "managementPolicies": mgmtPolicy,
+        "providerConfigRef": pcr
+    }
+}
 
 
 # Create the main transit gateway route table
@@ -73,10 +69,7 @@ tgwRouteTable = [
             "providerConfigRef": pcr
         }
     }
-    for _ in [True]
-    if all_true([
-        tgwId, tgwEnabled,
-    ])
+    for _ in [True] if tgwId
 ]
 
 tgwPolicyTable = [
@@ -108,7 +101,7 @@ tgwPolicyTable = [
     }
     for _ in [True]
     if all_true([
-        tgwId, tgwEnabled,
+        tgwId,
         get(oxr, "spec.createPolicyTable", True),
     ])
 ]
@@ -141,13 +134,13 @@ tgwAssociations = [
     for _, id in localAttachmentIds | remoteAttachementIds
     if all_true([
         localAttachmentIds, remoteAttachementIds,
-        tgwEnabled, tgwRouteTableId,
+        tgwRouteTableId,
     ])
 ]
 
 _items =  [
     i for r in [
-        transitGateway,
+        [transitGateway],
         tgwRouteTable,
         tgwAssociations,
         tgwPolicyTable,

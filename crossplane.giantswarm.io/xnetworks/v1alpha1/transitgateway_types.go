@@ -56,12 +56,6 @@ type TransitGatewaySpec struct {
 }
 
 type TransitGatewayParameters struct {
-	// Determines if the TransitGateway should be enabled
-	//
-	// +optional
-	// +default=true
-	Enabled bool `json:"enabled"`
-
 	// Amazon side ASN. Private autonomous system number (ASN) for
 	// the Amazon side of a BGP session.
 	//
@@ -130,11 +124,6 @@ type TransitGatewayParameters struct {
 	//
 	// +optional
 	RAM RAM `json:"ram,omitempty"`
-
-	// Transit gateway CIDR blocks. A list of CIDR blocks for the VPCs.
-	//
-	// +optional
-	TransitGatewayCidrBlocks []string `json:"transitG1atewayCidrBlocks,omitempty"`
 
 	// TransitGatewayDefaultRouteTableAssociation. Indicates whether resource
 	// attachments are automatically associated with the default association route table.
@@ -212,14 +201,25 @@ type TransitGatewayPeer struct {
 	// +optional
 	AccountId string `json:"accountId"`
 
+	// Is Dynamic routing support enabled on this peer
+	//
+	// +optional
+	// +default=false
+	DynamicRouting bool `json:"dynamicRouting"`
+
 	// The ID of the gateway to peer with
 	//
 	// +required
 	Id string `json:"id"`
 
+	// The ID of the remote route table
+	//
+	// +required
+	RouteTableId string `json:"routeTableId"`
+
 	// The name of the peer
 	//
-	// +optional
+	// +required
 	Name string `json:"name"`
 
 	// ManagedPrefixList contains CIDRs for networks that can be traversed
@@ -253,25 +253,7 @@ type TransitGatewayNamedVpc struct {
 	TransitGatewayVpc `json:",inline"`
 }
 
-type TransitGatewayRoute struct {
-	// Is this a blackhole route
-	//
-	// +optional
-	// +default=false
-	Blackhole bool `json:"blackhole"`
-
-	// The CIDR block for the route
-	//
-	// +required
-	CidrBlock string `json:"cidrBlock"`
-}
-
 type TransitGatewayVpc struct {
-	// Additional routes to apply to the attachment
-	//
-	// +optional
-	AdditionalRoutes []TransitGatewayRoute `json:"additionalRoutes"`
-
 	// Cidr blocks for the VPC
 	//
 	// +optional
@@ -332,12 +314,14 @@ type PrefixList struct {
 	// +optional
 	Id string `json:"id"`
 
-	// If this is true, the prefix list will be added to the transit gateway
-	// route table for the current attachment. Ignored for peering attachments.
+	// Outbound route
+	//
+	// This places it in the ManagedPrefixList attached
+	// to the outbound route table
 	//
 	// +optional
-	// +default=false
-	TgwAttach bool `json:"tgwAttach"`
+	// +default=true
+	Outbound bool `json:"outbound"`
 
 	ManagedPrefixListSubParameters `json:",inline"`
 }

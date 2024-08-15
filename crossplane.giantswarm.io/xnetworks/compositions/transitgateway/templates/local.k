@@ -35,115 +35,45 @@ localAttachments = [
     }
     for _ in [True]
     if all_true([
-        tgwEnabled, tgwId,
-        localVpc,
+        tgwId, localVpc,
     ])
 ]
 
-lentries = [
-    x for r in [
-        [
-            {
-                "cidr": cidr,
-                "description": "${remoteVpc.name} CIDR Block ${i}",
-            }
-            for i, cidr in [
-                get(oxr, "status.vpcs.${remoteVpc.name}.cidrBlock", "")
-            ] + get(oxr, "status.vpcs.${remoteVpc.name}.additionalCidrBlocks", [])
-            if cidr
-        ]
-        for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
-    ] + [
-        [
-            {
-                "cidr": e.cidr,
-                "description": "${appName} CIDR Block ${i}",
-            }
-            for _, pl in get(oxr, "spec.localVpc.prefixLists", [])
-            for i, e in get(pl, "entries", {})
-            if all_true([
-                e,
-                not get(pl, "tgwAttach", False),
-                not get(pl, "id", False),
-                not get(pl, "blackhole", False),
-            ])
-        ]
-    ] for x in r if x
-]
-
-lEntriesBh = [
-    e
-    for _, pl in get(oxr, "spec.localVpc.prefixLists", [])
-    for i, e in get(pl, "entries", {})
-    if all_true([
-        e,
-        not get(pl, "tgwAttach", False),
-        not get(pl, "id", False),
-        get(pl, "blackhole", False),
-    ])
-]
-
-lmpl = {
-    "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
-    "kind": "ManagedPrefixList"
-    "metadata": {
-        _resourceName = "lmpl-${appName}-${region}"
-        "annotations": {
-            "krm.kcl.dev/composition-resource-name": _resourceName
-            "krm.kcl.dev/ready" = readystr(_resourceName)
-        }
-        "labels": labels | {
-            "vpcName": appName
-        }
-    }
-    "spec": {
-        "addressFamily": "IPv4",
-        "deletionPolicy": dp,
-        "entries": lentries,
-        "managementPolicies": mgmtPolicy,
-        "name": "${appName}-${region}",
-        "region": region,
-        "tags": tags | {
-            "Name": "${appName}-${region}",
-        }
-    }
-}
-
-lmplbh = {
-    "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
-    "kind": "ManagedPrefixList"
-    "metadata": {
-        _resourceName = "lmpl-${appName}-${region}-bh"
-        "annotations": {
-            "krm.kcl.dev/composition-resource-name": _resourceName
-            "krm.kcl.dev/ready" = readystr(_resourceName)
-        }
-        "labels": labels | {
-            "vpcName": appName
-        }
-    }
-    "spec": {
-        "addressFamily": "IPv4",
-        "deletionPolicy": dp,
-        "entries": lEntriesBh,
-        "managementPolicies": mgmtPolicy,
-        "name": "${appName}-${region}-bh",
-        "region": region,
-        "tags": tags | {
-            "Name": "${appName}-${region}-bh",
-        }
-    }
-}
-
+# Local VPC prefix lists
 localPrefixLists = [
-    lmpl,
-    lmplbh,
+    mpl(
+        appName,
+        region,
+        get(localVpc, "addressFamily", "IPv4"),
+        False,
+        False,
+        get(routingTables, "${appName}.vpc.open", {}),
+        pcr,
+    ),
+    mpl(
+        appName,
+        region,
+        get(localVpc, "addressFamily", "IPv4"),
+        True,
+        False,
+        get(routingTables, "${appName}.vpc.blackhole", {}),
+        pcr,
+    ),
 ]
 
 prefixListIds = [
     c for c in [
-        ocdsstatus("lmpl-${appName}-${region}", "id", ""),
-        ocdsstatus("lmpl-${appName}-${region}-bh", "id", ""),
+        ocdsstatus("mpl-${appName}-${region}", "id", ""),
+        ocdsstatus("mpl-${appName}-${region}-bh", "id", ""),
+    ] if c
+] + [
+    c for c in [
+        get(pl, "id", "")
+        for pl in get(localVpc, "prefixLists", [])
+        if all_true([
+            get(pl, "id", False),
+            get(pl, "outbound", True),
+        ])
     ] if c
 ]
 
@@ -178,16 +108,45 @@ localRoutes = [
     }
     for _, id in get(oxr, "spec.localVpc.routeTableIds", [])
     for pl in prefixListIds
+    if tgwId
+]
+
+localPropagation = [
+    {
+        _resourceName = "propagation-rt-${id}"
+        "apiVersion": "ec2.aws.upbound.io/v1beta1",
+        "kind": "TransitGatewayRouteTablePropagation",
+        "metadata": {
+            "annotations": {
+                "krm.kcl.dev/composition-resource-name": _resourceName,
+                "krm.kcl.dev/ready" = readystr(_resourceName),
+            },
+            "labels": labels | {
+                "vpcName": appName,
+            },
+        },
+        "spec": {
+            "deletionPolicy": dp,
+            "forProvider": {
+                "region": region,
+                "transitGatewayAttachmentId": id,
+                "transitGatewayRouteTableId": tgwRouteTableId,
+            },
+            "managementPolicies": mgmtPolicy,
+            "providerConfigRef": pcr,
+        },
+    }
+    for _, id in localAttachmentIds
     if all_true([
-        tgwId, tgwEnabled,
+        tgwRouteTableId,
+        localAttachmentIds,
     ])
 ]
 
 _items = [
     i for r in [
-        localAttachments,
-        localPrefixLists,
-        localRoutes,
+        localAttachments, localPrefixLists,
+        localRoutes, localPropagation,
     ]
     for i in r if i
 ]

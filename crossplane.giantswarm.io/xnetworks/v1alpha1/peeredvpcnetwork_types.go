@@ -120,6 +120,12 @@ type TransitGatewayWrapper struct {
 
 	TgwVpcDetailsWrapper `json:",inline"`
 
+	// Enabled specifies if the transit gateway is enabled.
+	//
+	// +optional
+	// +default=false
+	Enabled bool `json:"enabled"`
+
 	// Peers is a list of transit gateway peers to connect to
 	//
 	// +optional

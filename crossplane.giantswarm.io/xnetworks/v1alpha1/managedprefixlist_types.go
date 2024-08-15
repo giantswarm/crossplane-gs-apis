@@ -25,7 +25,7 @@ var (
 // +kubebuilder:resource:scope=Cluster,categories=crossplane
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=mpl
-// +crossbuilder:generate:xrd:claimNames:kind=ManagedPrefixList,plural=managedprefixlists
+// +crossbuilder:generate:xrd:claimNames:kind=ManagedPrefixListClaim,plural=managedprefixlistclaims
 // +crossbuilder:generate:xrd:defaultCompositionRef:name=managed-prefix-list
 // +crossbuilder:generate:xrd:enforcedCompositionRef:name=managed-prefix-list
 type ManagedPrefixList struct {
@@ -52,6 +52,11 @@ type ManagedPrefixListSpec struct {
 
 type ManagedPrefixListStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
+
+	// The ID of the prefix list.
+	//
+	// +optional
+	ID *string `json:"id,omitempty"`
 }
 
 type ManagedPrefixListParameters struct {
@@ -79,8 +84,8 @@ type ManagedPrefixListSubParameters struct {
 	// The address family (ipv4 or ipv6) for the prefix list.
 	//
 	// +optional
-	// +kubebuilder:validation:Enum=ipv4;ipv6
-	// +kubebuilder:default=ipv4
+	// +kubebuilder:validation:Enum=IPv4;IPv6
+	// +kubebuilder:default=IPv4
 	AddressFamily *string `json:"addressFamily,omitempty"`
 
 	// The prefix list entries.

@@ -509,20 +509,6 @@ spec:
                 description: TransitGateway is the transit gateway to attach to the
                   VPC.
                 properties:
-                  additionalRoutes:
-                    description: Additional routes to apply to the attachment
-                    items:
-                      properties:
-                        blackhole:
-                          description: Is this a blackhole route
-                          type: boolean
-                        cidrBlock:
-                          description: The CIDR block for the route
-                          type: string
-                      required:
-                      - cidrBlock
-                      type: object
-                    type: array
                   allowPublic:
                     description: |-
                       AllowPublic specifies if the VPC peering connections should be allowed to
@@ -567,7 +553,7 @@ spec:
                     description: Dns support. Indicates whether DNS support is enabled.
                     type: string
                   enabled:
-                    description: Determines if the TransitGateway should be enabled
+                    description: Enabled specifies if the transit gateway is enabled.
                     type: boolean
                   ipv6Support:
                     description: If IPv6 support is enabled for the transit gateway.
@@ -587,6 +573,10 @@ spec:
                         accountId:
                           description: The Account ID this VPC is associated with
                           type: string
+                        dynamicRouting:
+                          description: Is Dynamic routing support enabled on this
+                            peer
+                          type: boolean
                         id:
                           description: The ID of the gateway to peer with
                           type: string
@@ -597,12 +587,12 @@ spec:
                           items:
                             properties:
                               addressFamily:
-                                default: ipv4
+                                default: IPv4
                                 description: The address family (ipv4 or ipv6) for
                                   the prefix list.
                                 enum:
-                                - ipv4
-                                - ipv6
+                                - IPv4
+                                - IPv6
                                 type: string
                               blackhole:
                                 description: If this is a blackhole route
@@ -630,10 +620,13 @@ spec:
                                   prefix list.
                                 format: int64
                                 type: integer
-                              tgwAttach:
+                              outbound:
                                 description: |-
-                                  If this is true, the prefix list will be added to the transit gateway
-                                  route table for the current attachment. Ignored for peering attachments.
+                                  Outbound route
+
+
+                                  This places it in the ManagedPrefixList attached
+                                  to the outbound route table
                                 type: boolean
                             type: object
                           type: array
@@ -686,9 +679,13 @@ spec:
                           description: Region the remote transit gateway is located
                             in
                           type: string
+                        routeTableId:
+                          description: The ID of the remote route table
+                          type: string
                       required:
                       - id
                       - name
+                      - routeTableId
                       type: object
                     type: array
                   prefixList:
@@ -696,12 +693,12 @@ spec:
                     items:
                       properties:
                         addressFamily:
-                          default: ipv4
+                          default: IPv4
                           description: The address family (ipv4 or ipv6) for the prefix
                             list.
                           enum:
-                          - ipv4
-                          - ipv6
+                          - IPv4
+                          - IPv6
                           type: string
                         blackhole:
                           description: If this is a blackhole route
@@ -727,28 +724,28 @@ spec:
                             list.
                           format: int64
                           type: integer
-                        tgwAttach:
+                        outbound:
                           description: |-
-                            If this is true, the prefix list will be added to the transit gateway
-                            route table for the current attachment. Ignored for peering attachments.
+                            Outbound route
+
+
+                            This places it in the ManagedPrefixList attached
+                            to the outbound route table
                           type: boolean
                       type: object
                     type: array
                     x-kubernetes-list-type: atomic
-                  prefixListSupport:
-                    description: If the prefix lists are supported.
-                    type: boolean
                   prefixLists:
                     description: Prefix lists for the VPC
                     items:
                       properties:
                         addressFamily:
-                          default: ipv4
+                          default: IPv4
                           description: The address family (ipv4 or ipv6) for the prefix
                             list.
                           enum:
-                          - ipv4
-                          - ipv6
+                          - IPv4
+                          - IPv6
                           type: string
                         blackhole:
                           description: If this is a blackhole route
@@ -774,10 +771,13 @@ spec:
                             list.
                           format: int64
                           type: integer
-                        tgwAttach:
+                        outbound:
                           description: |-
-                            If this is true, the prefix list will be added to the transit gateway
-                            route table for the current attachment. Ignored for peering attachments.
+                            Outbound route
+
+
+                            This places it in the ManagedPrefixList attached
+                            to the outbound route table
                           type: boolean
                       type: object
                     type: array
@@ -807,20 +807,6 @@ spec:
                         TgwWrappedVpcWithProviderConfig defines the parameters for creating a VPC with
                         the option of peered subnets.
                       properties:
-                        additionalRoutes:
-                          description: Additional routes to apply to the attachment
-                          items:
-                            properties:
-                              blackhole:
-                                description: Is this a blackhole route
-                                type: boolean
-                              cidrBlock:
-                                description: The CIDR block for the route
-                                type: string
-                            required:
-                            - cidrBlock
-                            type: object
-                          type: array
                         allowPublic:
                           description: |-
                             AllowPublic specifies if the VPC peering connections should be allowed to
@@ -842,12 +828,12 @@ spec:
                           items:
                             properties:
                               addressFamily:
-                                default: ipv4
+                                default: IPv4
                                 description: The address family (ipv4 or ipv6) for
                                   the prefix list.
                                 enum:
-                                - ipv4
-                                - ipv6
+                                - IPv4
+                                - IPv6
                                 type: string
                               blackhole:
                                 description: If this is a blackhole route
@@ -875,10 +861,13 @@ spec:
                                   prefix list.
                                 format: int64
                                 type: integer
-                              tgwAttach:
+                              outbound:
                                 description: |-
-                                  If this is true, the prefix list will be added to the transit gateway
-                                  route table for the current attachment. Ignored for peering attachments.
+                                  Outbound route
+
+
+                                  This places it in the ManagedPrefixList attached
+                                  to the outbound route table
                                 type: boolean
                             type: object
                           type: array
@@ -978,12 +967,6 @@ spec:
                     maxProperties: 50
                     type: object
                     x-kubernetes-map-type: atomic
-                  transitG1atewayCidrBlocks:
-                    description: Transit gateway CIDR blocks. A list of CIDR blocks
-                      for the VPCs.
-                    items:
-                      type: string
-                    type: array
                   transitGatewayDefaultRouteTableAssociation:
                     description: |-
                       TransitGatewayDefaultRouteTableAssociation. Indicates whether resource

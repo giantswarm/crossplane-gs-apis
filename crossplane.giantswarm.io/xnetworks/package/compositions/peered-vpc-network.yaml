@@ -51,6 +51,7 @@ spec:
         source: |-
           import regex
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
@@ -553,6 +554,7 @@ spec:
         source: |-
           import regex
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
@@ -712,6 +714,7 @@ spec:
         source: |-
           import regex
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
@@ -947,7 +950,6 @@ spec:
               "spec": {
                   "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
                   "claimRef": get(oxr, "spec.claimRef", {}),
-                  "enabled": get(oxr, "spec.transitGateway.enabled", False),
                   if get(oxr, "spec.amazonSideAsn", False):
                       "amazonSideAsn": get(oxr, "spec.amazonSideAsn", 64512),
                   if get(oxr, "spec.applianceModeSupport", False):
@@ -985,7 +987,7 @@ spec:
                   if get(oxr, "spec.transitGatewayRouteTablePropagation", False):
                       "transitGatewayRouteTablePropagation": get(oxr, "spec.transitGatewayRouteTablePropagation", "disable"),
 
-                  "transitGatewayPeers": transitGatewayPeers,
+                  "peers": transitGatewayPeers,
 
                   "tags": get(oxr, "spec.tags.common", []),
 
@@ -1023,6 +1025,7 @@ spec:
         source: |-
           import regex
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
@@ -1207,8 +1210,8 @@ spec:
           newdxr = {
               **oxr
               **{
-                  "status": {
-                      "subnetBits": [
+                  "status" = {
+                      "subnetBits" = [
                           {
                               _vpcSize = s.prefix.split("/")[1]
                               _public = s.public.count
@@ -1220,15 +1223,15 @@ spec:
                           }
                           for s in get(oxr, "spec.subnetsets.cidrs", {}) if s
                       ]
-                      "vpcLookup": vpcLookup
-                      "vpcs": {
+                      "vpcLookup" = vpcLookup
+                      "vpcs" = {
                           "self": {
                               if len(cidrs) > 1:
                                   "additionalCidrBlocks" = cidrs[1:]
                               if cidrs:
                                   "cidrBlock": cidrs[0]
                               if igwId:
-                                  "internetGatewayId" = igwId
+                                  "internetGateway" = igwId
                               if publicRouteTables:
                                   "publicRouteTables" = publicRouteTables
                               if publicSubnets:

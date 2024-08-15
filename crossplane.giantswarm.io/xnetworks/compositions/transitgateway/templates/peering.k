@@ -1,6 +1,6 @@
 # Transit Gateway Peering
 
-tgwPeers = [
+peerAttachments = [
     {
         _resourceName = "tgw-peer-${appName}-${region}-${peer.name}"
         "apiVersion": "ec2.aws.upbound.io/v1beta1"
@@ -17,6 +17,10 @@ tgwPeers = [
         "spec": {
             "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
             "forProvider": {
+                if get(peer, "dynamicRouting", None) != None:
+                    "options": {
+                        "dynamicRouting": "enabled" if peer.dynamicRouting else "disabled"
+                    }
                 "peerAccountId": peer.accountId,
                 "peerRegion": peer.region,
                 "peerTransitGatewayId": peer.tgwId,
@@ -30,19 +34,13 @@ tgwPeers = [
             "providerConfigRef": gpcr(peer)
         }
     }
-    for peer in get(oxr, "spec.transitGatewayPeers", [])
-    if all_true([
-        tgwId, tgwEnabled,
-    ])
+    for peer in get(oxr, "spec.peers", [])
+    if tgwId
 ]
 
-peeringIds = [
-    ocdsstatus("tgw-peer-${appName}-${region}-${peer.name}", "id", "")
-    for peer in get(oxr, "spec.transitGatewayPeers", [])
-    if ocdsstatus("tgw-peer-${appName}-${region}-${peer.name}", "id", False)
-]
-
-tgwPeeringAccepters = [
+# If the peering attachment is in a remote region or account,
+# we need to accept the peering attachment via a peering accepter.
+peeringAccepters = [
     {
         _resourceName = "tgw-peer-accepter-${appName}-${region}-${id}"
         "apiVersion": "ec2.aws.upbound.io/v1beta1"
@@ -63,56 +61,37 @@ tgwPeeringAccepters = [
             "providerConfigRef": pcr
         }
     }
-    for _, id in peeringIds
-    if tgwEnabled
+    for _, id in peerAttachmentIds
+    if len(list(peerAttachmentIds)) > 0
 ]
 
-pentries = {
-    "${peer.name}": [
-        {
-            "cidr": p.cidr,
-            "description": p.description,
-        }
-        for p in get(peer, "prefixLists", [])
-        if not get(p, "blackhole", False)
-    ]
-    for peer in get(oxr, "spec.peers", [])
-}
+peerPrefixLists = [
+    i for r in [
+        [
+            mpl(
+                peer.name,
+                get(peer, "region", region),
+                get(peer, "addressFamily", "IPv4"),
+                False,
+                True,
+                get(routingTables, "${peer.name}.remote.open", {}),
+                gpcr(peer),
+            ),
+            mpl(
+                peer.name,
+                get(peer, "region", region),
+                get(peer, "addressFamily", "IPv4"),
+                True,
+                True,
+                get(routingTables, "${peer.name}.remote.blackhole", {}),
+                gpcr(peer),
+            ),
+        ]
+        for _, peer in get(oxr, "spec.peers", [])
+    ] for i in r
+]
 
-tgwPeerPrefixLists = {
-    "${peer.name}": {
-        "apiVersion": "xnetworks.crossplane.giantswarm.io/v1alpha1"
-        "kind": "ManagedPrefixList"
-        "metadata": {
-            _resourceName = "pmpl-${appName}-${region}-${peer.name}"
-            "annotations": {
-                "krm.kcl.dev/composition-resource-name": _resourceName
-                "krm.kcl.dev/ready" = readystr(_resourceName)
-            }
-            "labels": labels | {
-                "peer": peer.name
-            }
-        }
-        "spec": {
-            "deletionPolicy": dp,
-            "entries": get(pentries, peer.name, []), # FIXME: rentriesbh is not defined
-            "managementPolicies": mgmtPolicy,
-            "name": "${appName}-${region}-remote-${peer.name}",
-            "region": get(peer, "region", region),
-            "tags": tags | {
-                "Name": "${appName}-${region}",
-            }
-            "providerConfigRef": gpcr(peer)
-        }
-    }
-    for _, peer in get(oxr, "spec.peers", [])
-    if all_true([
-        tgwId, tgwEnabled,
-        not get(peer, "id", False),
-    ])
-}
-
-tgwPeerPrefixListIds = {
+peerPrefixListIds = {
     "${peer.name}": [
         c for c in [
             {
@@ -133,14 +112,16 @@ tgwPeerPrefixListIds = {
     ]
     for _, peer in get(oxr, "spec.peers", [])
     if all_true([
-        tgwId, tgwEnabled,
+        tgwId,
         not get(peer, "id", False),
     ])
 }
 
-tgwPeerPrefixListReferences = [
+# These create the prefix list references on the remote peer, not on the
+# transit gateway created as part of this composition - see tgw/resources for that
+peerPrefixListReferences = [
     {
-        _id = get(peerAttachmentIds, name, "")
+        _id = peer.id
         _bh = "-bh" if pl.blackhole else ""
         _resourceName = "ptrgwpol-${appName}-${region}-${_id}${_bh}-${i}"
         "apiVersion": "ec2.aws.upbound.io/v1beta1"
@@ -151,7 +132,7 @@ tgwPeerPrefixListReferences = [
                 "krm.kcl.dev/ready" = readystr(_resourceName)
             }
             "labels": labels | {
-                "vpcName": name
+                "peerName": peer.name
             }
         }
         "spec": {
@@ -164,24 +145,24 @@ tgwPeerPrefixListReferences = [
                     Name: _resourceName,
                 }
                 "transitGatewayAttachmentId": _id,
-                "transitGatewayRouteTableId": tgwRouteTableId,
+                "transitGatewayRouteTableId": peer.id,
             }
             "managementPolicies": mgmtPolicy,
             "providerConfigRef": pcr,
         }
     }
-    for name, peer in tgwPeerPrefixListIds
-    for i, pl in peer
+    for _, peer in get(oxr, "spec.peers", [])
+    for i, pl in get(peerPrefixListIds, peer.name, {})
     if all_true([
-        tgwId, tgwEnabled,
-        tgwRouteTableId,
-        get(pl, "id", False),
+        tgwId, peer,
+        get(peer, "id", False),
+        get(peerPrefixListIds, peer.name, False),
     ])
 ]
 
 _items = [
     i for r in [
-        tgwPeers,
-        tgwPeeringAccepters,
-        [p for _, p in tgwPeerPrefixLists],
+        peerAttachments, peeringAccepters,
+        peerPrefixLists,
+        peerPrefixListReferences,
 ] for i in r]
