@@ -87,14 +87,14 @@ type TransitGatewayParameters struct {
 	// are automatically associated with the default association route table.
 	//
 	// +optional
-	// +default=false
+	// +default=true
 	DefaultRouteTableAssociation bool `json:"defaultRouteTableAssociation,omitempty"`
 
 	// Default route table propagation. Indicates whether resource attachments
 	// automatically propagate routes to the default propagation route table.
 	//
 	// +optional
-	// +default=false
+	// +default=true
 	DefaultRouteTablePropagation bool `json:"defaultRouteTablePropagation,omitempty"`
 
 	// Dns support. Indicates whether DNS support is enabled.

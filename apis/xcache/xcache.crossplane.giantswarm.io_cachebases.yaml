@@ -69,6 +69,20 @@ spec:
                 items:
                   type: string
                 type: array
+              azMode:
+                description: |-
+                  AzMode specifies the Availability Zone mode of the cluster.
+
+
+                  This parameter is only valid when the Engine parameter is memcached.
+                  For resiliance, we recommend setting the AzMode parameter to cross-az and
+                  this is the default value. In this mode, the number of nodes must be > 1
+                  If memcached is selected, the number of nodes will default to 3, one per
+                  availability zone.
+                enum:
+                - single-az
+                - cross-az
+                type: string
               cacheClusters:
                 description: |-
                   CacheClusters is a list of cache clusters in the replication group.

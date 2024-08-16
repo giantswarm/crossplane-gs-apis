@@ -3,13 +3,13 @@ engine = get(oxr, "spec.engine", "redis")
 kubernetesPcr = get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
 
 has = all_true([
-    engine == "redis",
     esoEnabled,
     kubernetesPcr,
 ])
 
-assert engine == "redis" and esoEnabled, "External Secrets (eso) must be enabled for Redis engine"
-assert has, "Missing required kubernetes ProviderConfig and SecretStore fields for password generation"
+if engine == "redis":
+    assert esoEnabled, "External Secrets (eso) must be enabled for Redis engine"
+    assert has, "Missing required kubernetes ProviderConfig and SecretStore fields for password generation"
 
 passwordGenerator = {
     "apiVersion": "kubernetes.crossplane.io/v1alpha2"
@@ -101,6 +101,7 @@ passwords = [
     ])
 ]
 
+_endpoint = globalEndpoint if globalEnabled else endpoint
 esoConnectionSecret = {
     "apiVersion": "kubernetes.crossplane.io/v1alpha2"
     "kind": "Object"
@@ -124,9 +125,8 @@ esoConnectionSecret = {
                     "refreshInterval": "1h"
                     "secretStoreRef": {
                         "kind": "SecretStore",
-                        "name": get(oxr, "spec.eso.secretStoreRef.name", ""),
+                        "name": get(oxr, "spec.eso.kubernetesSecretStore", ""),
                     },
-                    _endpoint = globalEndpoint if globalEnabled else endpoint
                     "target": {
                         "name": "${appName}-cache-connection-details"
                         "template": {
@@ -138,29 +138,29 @@ esoConnectionSecret = {
                                     "literal": """
                                         host: ${_endpoint}
                                         port: ${_port}
-                                        username: {{ index . "username" }}
+                                        username: ${appName}
                                         password:  {{ index . "password" }}
                                     """
                                 }
                             ],
-                            "dataFrom": [
-                                {
-                                    "extract": {
-                                        "key": "${appName}-externalsecret-${user}",
-                                    }
-                                }
-                            ],
                         },
                     },
+                    "dataFrom": [
+                        {
+                            "extract": {
+                                "key": "elasticache-user-${appName}",
+                            }
+                        }
+                    ],
                 }
             }
         }
         "managementPolicies": mgmtPolicy,
         "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
     }
-}
+} if _endpoint and _port else {}
 
 _items = [
     c for c in passwords + [passwordGenerator, esoConnectionSecret]
-    if esoEnabled
+    if esoEnabled and c
 ]

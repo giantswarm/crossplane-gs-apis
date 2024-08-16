@@ -16,6 +16,8 @@ pushSecretStores = [
 usernameField = "username" if not createCluster else "master_username"
 passwordField = "password" if not createCluster else "attribute.master_password"
 
+ep = "endpoint" if createCluster and clusterCreated else "address" if not createCluster and masterInstance else ""
+
 pushSecretData = [
     {
         conversionStrategy: "None"
@@ -28,9 +30,9 @@ pushSecretData = [
         }
     }
     for _, k in [
-        "endpoint", "port",
-        "password", "username",
+        ep, "port", "password", "username",
     ]
+    if ep
 ]
 
 deletionPolicy = "Delete" if dp == "Delete" else "Retain"
@@ -68,7 +70,7 @@ esoSqlSecret = [
                                 }
                             }
                             for _, k in [
-                                {r: "endpoint", p:"endpoint"},
+                                {r: "endpoint", p: ep},
                                 {r: "port", p: "port"},
                                 {r: "password", p: passwordField},
                                 {r: "username", p: usernameField},

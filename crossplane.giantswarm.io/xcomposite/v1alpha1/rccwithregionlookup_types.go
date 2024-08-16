@@ -35,7 +35,6 @@ type RCCWithRegionLookupList struct {
 }
 
 type ClusterDiscovery struct {
-	xpv1.ResourceSpec `json:",inline"`
 	// Name is the name of the cluster to discover
 	//
 	// +required
@@ -50,19 +49,31 @@ type ClusterDiscovery struct {
 // RCCWithRegionLookupSpec contains the structure required for building the
 // infrastructure for an RDS + Elasticache Cluster.
 type RCCWithRegionLookupSpec struct {
+	xpv1.ResourceSpec `json:",inline"`
+
 	// ClusterDiscovery is the reference to the cluster to discover
 	//
 	// +required
 	ClusterDiscovery ClusterDiscovery `json:"clusterDiscovery"`
 
+	// KubernetesProviderConfig
+	//
+	// +required
+	KubernetesProviderConfig *xpv1.Reference `json:"kubernetesProviderConfig"`
+
 	// RdsCacheClusterSpec is the spec for the RDS Cache Cluster
 	//
 	// +required
-	RdsCacheClusterSpec RdsCacheClusterSpec `json:"rdsCacheClusterSpec"`
+	RdsCacheClusterParameters RdsCacheClusterParameters `json:"rdsCacheClusterParameters"`
 }
 
 type RCCWithRegionLookupStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
+
+	// AvailabilityZones is the list of availability zones to be used by the cluster
+	//
+	// +optional
+	AvailabilityZones []string `json:"availabilityZones,omitempty"`
 
 	// CacheClusterEndpoints is a list of endpoints of the Elasticache clusters
 	// when the cache is configured in cluster mode
@@ -114,6 +125,11 @@ type RCCWithRegionLookupStatus struct {
 	//
 	// +optional
 	CacheSubnets []string `json:"cacheSubnets,omitempty"`
+
+	// Region is the region in which the resources are created
+	//
+	// +optional
+	Region string `json:"region,omitempty"`
 
 	// RdsConnectionSecret is the secret containing the connection details
 	// for the database

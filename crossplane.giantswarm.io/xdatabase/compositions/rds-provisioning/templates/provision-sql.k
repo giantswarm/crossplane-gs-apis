@@ -1,3 +1,4 @@
+import yaml
 e = get(oxr, "spec.engine", False)
 _engine = ""
 
@@ -40,7 +41,7 @@ if _engine == "postgresql":
                     "name": appName,
                     "connectionLimit": 10,
                     "privileges" = [
-                        "ALL PRIVILEGES",
+                        "ALL",
                     ],
                     "bypassRls": False,
                     "createDb": False,
@@ -93,6 +94,8 @@ providerConnectionSecret = [
                             "tls" = "preferred"
                         if _engine == "postgresql":
                             "defaultDatabase" = "postgres"
+                            # https://github.com/crossplane-contrib/provider-sql/issues/102
+                            "sslMode" = "require"
                     }
                 }
             }
@@ -152,10 +155,12 @@ users = [
             "deletionPolicy": dp
             "forProvider": {
                 if _engine == "mysql":
-                    "maxQueriesPerHour": get(user, "maxQueriesPerHour", 1000)
-                    "maxUpdatesPerHour": get(user, "maxUpdatesPerHour", 1000)
-                    "maxConnectionsPerHour": get(user, "maxConnectionsPerHour", 100)
-                    "maxUserConnections": get(user, "maxUserConnections", 10)
+                    "resourceOptions": {
+                        "maxQueriesPerHour": get(user, "maxQueriesPerHour", 1000)
+                        "maxUpdatesPerHour": get(user, "maxUpdatesPerHour", 1000)
+                        "maxConnectionsPerHour": get(user, "maxConnectionsPerHour", 100)
+                        "maxUserConnections": get(user, "maxUserConnections", 10)
+                    }
                 if _engine == "postgresql":
                     if get(user, "configurationParameters", False):
                         "configurationParameters": [
@@ -179,10 +184,15 @@ users = [
             "providerConfigRef": {
                 "name": providerConfigName
             }
+            "writeConnectionSecretToRef": {
+                "name": "${appName}-${_engine}-user-${user.name}" if user.name != appName else "${appName}-${_engine}-user"
+                "namespace": get(oxr, "spec.claimRef.namespace", "")
+            }
         }
     }
 
-    for database, user in _requiredDatabases
+    for database, config in _requiredDatabases
+    for _, user in get(config, "users", [])
     if _requiredDatabases and databases
 ]
 
@@ -209,21 +219,29 @@ grants = [
                 "name": providerConfigName
             }
             "forProvider": {
-                "database": database
+                "database" = database,
+                "privileges" = get(user, "privileges", []),
                 if _engine == "mysql":
-                    "user": user.name
+                    "user" = user.name
                 if _engine == "postgresql":
                     "role": user.name
-                "privileges": get(user, "privileges", [])
             }
         }
     }
-    for database, user in _requiredDatabases
+    for database, config in _requiredDatabases
+    for _, user in get(config, "users", [])
     if all_true([
         _requiredDatabases,
-        databases, users,
+        databases,
+        users,
+        user,
+        get(user, "privileges", False),
     ])
 ]
+print(_engine)
+print(yaml.encode(_requiredDatabases))
+print(yaml.encode(grants))
+
 
 provisionSql = get(oxr, "spec.provisionSql", True)
 _items = [

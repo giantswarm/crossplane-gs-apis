@@ -1,0 +1,3 @@
+resources:
+- cache-base.yaml
+- xcache.crossplane.giantswarm.io_cachebases.yaml

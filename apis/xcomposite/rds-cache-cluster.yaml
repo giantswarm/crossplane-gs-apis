@@ -71,7 +71,6 @@ spec:
               function: ""
             tags: {}
             transitGateway:
-              additionalRoutes: null
               allowPublic: false
               cidrBlocks: null
               enabled: false
@@ -278,7 +277,12 @@ spec:
               """
               Get an item from the status of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              _x = None
+              if get(_ocds, "${x}.Resource.status.atProvider", False):
+                  get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              else:
+                  _x = get(_ocds, "${x}.Resource.status.${y}", d)
+              _x if _x else d
           }
 
           exists = lambda x: any -> bool {
@@ -435,7 +439,12 @@ spec:
               """
               Get an item from the status of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              _x = None
+              if get(_ocds, "${x}.Resource.status.atProvider", False):
+                  get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              else:
+                  _x = get(_ocds, "${x}.Resource.status.${y}", d)
+              _x if _x else d
           }
 
           exists = lambda x: any -> bool {
@@ -480,6 +489,17 @@ spec:
           _cachesnindex = get(_oxr, "spec.subnetGroupIndexes.cache", False)
           _cacheSnIds = [k.id for _, k in _subnets[_cachesnindex]] if _cachesnindex != False and _subnets else []
 
+
+          vpcs = ocdsstatus("peered-vpc-network", "vpcs", {})
+
+          cidrBlocks = [
+              i for r in [
+                  [ get(vpc, "cidrBlock", "") ] + get(vpc, "additionalCidrBlocks", [])
+                  for _, vpc in vpcs
+              ]
+              for i in r if i
+          ]
+
           _dbPatch = {
               **get(_dcds, "rds-base.Resource", {}),
               **{
@@ -489,9 +509,7 @@ spec:
                       }
                   }
                   "spec": {
-                      "cidrBlocks": [
-                          get(_oxr, "status.vpc.cidrBlock", "")
-                      ] + get(_oxr, "status.vpc.additionalCidrBlocks", []),
+                      "cidrBlocks": cidrBlocks,
                       "subnetIds": _dbSnIds
                   }
               }
@@ -510,9 +528,7 @@ spec:
                       }
                   }
                   "spec": {
-                      "cidrBlocks": [
-                          get(_oxr, "status.vpcCidrBlock", "")
-                      ] + get(_oxr, "status.vpc.additionalCidrBlocks", []),
+                      "cidrBlocks": cidrBlocks,
                       "subnetIds": _cacheSnIds
                   }
               }

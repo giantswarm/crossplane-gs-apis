@@ -103,8 +103,8 @@ remotePrefixLists = [
 remotePrefixListIds = {
     "${rVpc.name}": [
         c for c in [
-            ocdsstatus("rmpl-${appName}-${region}-${rVpc.name}", "id", "")
-            ocdsstatus("rmpl-${appName}-${region}-${rVpc.name}-bh", "id", False)
+            ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "id", "")
+            ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "id", False)
         ] if c
     ] + [
         c for c in [

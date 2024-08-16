@@ -1,0 +1,5 @@
+resources:
+- rcc-with-region-lookup.yaml
+- rds-cache-cluster.yaml
+- xcomposite.crossplane.giantswarm.io_rdscacheclusters.yaml
+- xcomposite.crossplane.giantswarm.io_rccwithregionlookups.yaml

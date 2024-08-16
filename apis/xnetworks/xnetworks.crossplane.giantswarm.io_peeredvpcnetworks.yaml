@@ -985,8 +985,6 @@ spec:
                     description: Vpn ecmp support. Indicates whether Equal Cost Multipath
                       Protocol support is enabled.
                     type: string
-                required:
-                - remoteVpcs
                 type: object
               writeConnectionSecretToRef:
                 description: |-

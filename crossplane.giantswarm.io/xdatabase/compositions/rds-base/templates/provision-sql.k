@@ -28,5 +28,9 @@ _items = [
         }
     }
     for _ in [True]
-    if get(oxr, "spec.provisionSql.enabled", True) and useConnectionSecret
+    if all_true([
+        get(oxr, "spec.provisionSql.enabled", True),
+        useConnectionSecret,
+        ready("instance-0")
+    ])
 ]

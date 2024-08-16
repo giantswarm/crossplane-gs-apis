@@ -116,6 +116,11 @@ spec:
           type: FromCompositeFieldPath
         - patchSetName: metadata
           type: PatchSet
+        - fromFieldPath: spec.claimRef.name
+          policy:
+            toFieldPath: MergeObjects
+          toFieldPath: spec.forProvider.tags.Name
+          type: FromCompositeFieldPath
         - fromFieldPath: status.atProvider.id
           toFieldPath: status.subnetGroupName
           type: ToCompositeFieldPath
@@ -155,6 +160,11 @@ spec:
           type: FromCompositeFieldPath
         - patchSetName: metadata
           type: PatchSet
+        - fromFieldPath: spec.claimRef.name
+          policy:
+            toFieldPath: MergeObjects
+          toFieldPath: spec.forProvider.tags.Name
+          type: FromCompositeFieldPath
         - combine:
             strategy: string
             string:
@@ -826,6 +836,7 @@ spec:
                               "parameterGroupName" = _v
 
                           _v = getwparent(cluster, oxr, "port", False)
+                          if _v:
                               "port" = _v
 
                           if not get(cluster, "availabilityZone", False):
@@ -894,9 +905,11 @@ spec:
                   "kind": "SecurityGroupRule"
                   "metadata": {
                       "annotations": {
-                          "krm.kcl.dev/composition-resource-name": "elasticache-security-group-rule-inbound-${i}"
-                          "krm.kcl.dev/ready": readystr("elasticache-security-group-rule-inbound-${i}")
-                          "crossplane.io/external-name": "${appName}-cache-sg-rule-inbound"
+                          _cm = regex.replace(cidr, "[^0-9]", "")
+                          _resourceName = "security-group-rule-${_cm}"
+                          "krm.kcl.dev/composition-resource-name": _resourceName
+                          "krm.kcl.dev/ready": readystr(_resourceName)
+                          "crossplane.io/external-name": "${appName}-cache-sg-${_cm}"
                       }
                   }
                   "spec": {
@@ -1297,13 +1310,13 @@ spec:
           kubernetesPcr = get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
 
           has = all_true([
-              engine == "redis",
               esoEnabled,
               kubernetesPcr,
           ])
 
-          assert engine == "redis" and esoEnabled, "External Secrets (eso) must be enabled for Redis engine"
-          assert has, "Missing required kubernetes ProviderConfig and SecretStore fields for password generation"
+          if engine == "redis":
+              assert esoEnabled, "External Secrets (eso) must be enabled for Redis engine"
+              assert has, "Missing required kubernetes ProviderConfig and SecretStore fields for password generation"
 
           passwordGenerator = {
               "apiVersion": "kubernetes.crossplane.io/v1alpha2"
@@ -1395,6 +1408,7 @@ spec:
               ])
           ]
 
+          _endpoint = globalEndpoint if globalEnabled else endpoint
           esoConnectionSecret = {
               "apiVersion": "kubernetes.crossplane.io/v1alpha2"
               "kind": "Object"
@@ -1418,9 +1432,8 @@ spec:
                               "refreshInterval": "1h"
                               "secretStoreRef": {
                                   "kind": "SecretStore",
-                                  "name": get(oxr, "spec.eso.secretStoreRef.name", ""),
+                                  "name": get(oxr, "spec.eso.kubernetesSecretStore", ""),
                               },
-                              _endpoint = globalEndpoint if globalEnabled else endpoint
                               "target": {
                                   "name": "${appName}-cache-connection-details"
                                   "template": {
@@ -1432,31 +1445,31 @@ spec:
                                               "literal": """
                                                   host: ${_endpoint}
                                                   port: ${_port}
-                                                  username: {{ index . "username" }}
+                                                  username: ${appName}
                                                   password:  {{ index . "password" }}
                                               """
                                           }
                                       ],
-                                      "dataFrom": [
-                                          {
-                                              "extract": {
-                                                  "key": "${appName}-externalsecret-${user}",
-                                              }
-                                          }
-                                      ],
                                   },
                               },
+                              "dataFrom": [
+                                  {
+                                      "extract": {
+                                          "key": "elasticache-user-${appName}",
+                                      }
+                                  }
+                              ],
                           }
                       }
                   }
                   "managementPolicies": mgmtPolicy,
                   "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
               }
-          }
+          } if _endpoint and _port else {}
 
           _items = [
               c for c in passwords + [passwordGenerator, esoConnectionSecret]
-              if esoEnabled
+              if esoEnabled and c
           ]
 
           items = _items
@@ -1617,40 +1630,40 @@ spec:
               **{
                   "status": {
                       if _connectionSecretName:
-                          "connectionSecret": _connectionSecretName,
+                          "connectionSecret" = _connectionSecretName,
 
                       if clusterEndpoints:
                           "clusterEndpoints" = clusterEndpoints,
 
                       if endpoint:
-                          "endpoint": endpoint,
+                          "endpoint" = endpoint,
 
                       if _globalConnectionSecretName:
-                          "globalConnectionSecret": _globalConnectionSecretName,
+                          "globalConnectionSecret" = _globalConnectionSecretName,
 
                       if globalEndpoint:
-                          "globalEndpoint": globalEndpoint,
+                          "globalEndpoint" = globalEndpoint,
 
                       if globalROEndpoint:
-                          "globalReaderEndpoint": globalROEndpoint,
+                          "globalReaderEndpoint" = globalROEndpoint,
 
                       if _globalReplicationId:
-                          "globalReplicationGroupId": _globalReplicationId,
+                          "globalReplicationGroupId" = _globalReplicationId,
 
                       if _localReplicationId:
-                          "replicationGroupId": _localReplicationId,
+                          "replicationGroupId" = _localReplicationId,
 
                       if _ipgn:
                           "parameterGroupName": _ipgn,
 
                       if _port:
-                          "port": _port,
+                          "port" = _port,
 
                       if readerep:
-                          "readerEndpoint": readerep,
+                          "readerEndpoint" = readerep,
 
                       if _ugId:
-                          "userGroupId": _ugId,
+                          "userGroupId" = _ugId,
                   },
               }
           }

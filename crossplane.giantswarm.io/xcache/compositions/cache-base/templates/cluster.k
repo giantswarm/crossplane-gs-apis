@@ -107,6 +107,7 @@ clusters = [
                     "parameterGroupName" = _v
 
                 _v = getwparent(cluster, oxr, "port", False)
+                if _v:
                     "port" = _v
 
                 if not get(cluster, "availabilityZone", False):
@@ -175,9 +176,11 @@ securityGroupRules = [
         "kind": "SecurityGroupRule"
         "metadata": {
             "annotations": {
-                "krm.kcl.dev/composition-resource-name": "elasticache-security-group-rule-inbound-${i}"
-                "krm.kcl.dev/ready": readystr("elasticache-security-group-rule-inbound-${i}")
-                "crossplane.io/external-name": "${appName}-cache-sg-rule-inbound"
+                _cm = regex.replace(cidr, "[^0-9]", "")
+                _resourceName = "security-group-rule-${_cm}"
+                "krm.kcl.dev/composition-resource-name": _resourceName
+                "krm.kcl.dev/ready": readystr(_resourceName)
+                "crossplane.io/external-name": "${appName}-cache-sg-${_cm}"
             }
         }
         "spec": {

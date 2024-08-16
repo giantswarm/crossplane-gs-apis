@@ -17,9 +17,9 @@ transitGateway = {
         "deletionPolicy": dp
         "forProvider": {
             "amazonSideAsn": get(oxr, "spec.amazonSideAsn", 64512),
-            "autoAcceptSharedAttachments": get(oxr, "spec.autoAcceptSharedAttachments", "disable"),
-            "defaultRouteTableAssociation": "enable" if get(oxr, "spec.defaultRouteTableAssociation", False) else "disable",
-            "defaultRouteTablePropagation": "enable" if get(oxr, "spec.defaultRouteTablePropagation", False) else "disable",
+            "autoAcceptSharedAttachments": get(oxr, "spec.autoAcceptSharedAttachments", "enable"),
+            "defaultRouteTableAssociation": "enable" if get(oxr, "spec.defaultRouteTableAssociation", True) else "disable",
+            "defaultRouteTablePropagation": "enable" if get(oxr, "spec.defaultRouteTablePropagation", True) else "disable",
             "description": "${appName} Transit Gateway in ${region}",
             "dnsSupport": get(oxr, "spec.dnsSupport", "enable"),
             "multicastSupport": get(oxr, "spec.multicastSupport", "disable"),
@@ -124,6 +124,10 @@ tgwAssociations = [
             "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
             "forProvider": {
                 "region": region,
+                "replaceExistingAssociation": all_true([
+                    id == get(localAttachmentIds, appName, False),
+                    # Extension later
+                ]),
                 "transitGatewayAttachmentId": id,
                 "transitGatewayRouteTableId": tgwRouteTableId,
             }

@@ -8,8 +8,8 @@ metadata:
   name: resourceaccessmanagers.xaws.crossplane.giantswarm.io
 spec:
   claimNames:
-    kind: ResourceAccessManager
-    plural: ram
+    kind: ResourceAccessManagerClaim
+    plural: resourceaccessmanagerclaims
   defaultCompositionRef:
     name: resource-access-manager
   enforcedCompositionRef:

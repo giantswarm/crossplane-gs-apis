@@ -36,6 +36,7 @@ func createSecurityGroup() xpt.ComposedTemplate {
 				Type:         xpt.PatchTypePatchSet,
 				PatchSetName: cb.StrPtr("metadata"),
 			},
+			cb.FromPatchMergeObjects("spec.claimRef.name", "spec.forProvider.tags.Name"),
 			{
 				Type: xpt.PatchTypeCombineFromComposite,
 				Patch: xpt.Patch{

@@ -116,6 +116,11 @@ spec:
           type: FromCompositeFieldPath
         - patchSetName: metadata
           type: PatchSet
+        - fromFieldPath: spec.claimRef.name
+          policy:
+            toFieldPath: MergeObjects
+          toFieldPath: spec.forProvider.tags.Name
+          type: FromCompositeFieldPath
         - fromFieldPath: status.atProvider.id
           toFieldPath: status.dbSubnetGroupName
           type: ToCompositeFieldPath
@@ -155,6 +160,11 @@ spec:
           type: FromCompositeFieldPath
         - patchSetName: metadata
           type: PatchSet
+        - fromFieldPath: spec.claimRef.name
+          policy:
+            toFieldPath: MergeObjects
+          toFieldPath: spec.forProvider.tags.Name
+          type: FromCompositeFieldPath
         - combine:
             strategy: string
             string:
@@ -291,6 +301,8 @@ spec:
               if ready("instance-0"):
                   _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef.name", "")
           _connectionSecret = _secretRef
+
+          clusterCreated: bool = ready("rds-cluster")
 
           ipgn = get(oxr, "spec.dbParameterGroup.name", "") if get(oxr, "spec.allowMajorVersionUpgrade", False) else ""
           provisioned = get(oxr, "spec.engineMode", "provisioned") == "provisioned"
@@ -570,6 +582,8 @@ spec:
                   _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef.name", "")
           _connectionSecret = _secretRef
 
+          clusterCreated: bool = ready("rds-cluster")
+
           import json
 
           clusterId = get(oxr, "status.clusterIdentifier", None)
@@ -755,7 +769,13 @@ spec:
 
                           "applyImmediately": getwparent(item, oxr, "applyImmediately", True)
                           "autoMinorVersionUpgrade": getwparent(item, oxr, "autoMinorVersionUpgrade", True)
-                          "dbSubnetGroupName": dbSubnetGroupName,
+
+                          # This needs verifying for postgres - it previously worked
+                          # when building posgtres instances
+                          if _isPrimaryInstance or engine not in ["mysql", "mariadb"]:
+                              "dbSubnetGroupName": dbSubnetGroupName,
+
+
                           "engine": engine,
                           if any_true([
                               not getwparent(item, oxr, "allowMajorVersionUpgrade" True)
@@ -1164,9 +1184,11 @@ spec:
                   "kind": "SecurityGroupRule"
                   "metadata": {
                       "annotations": {
-                          "krm.kcl.dev/composition-resource-name" = "security-group-rule-${i}"
-                          "krn.kcl.dev/ready" = readystr("security-group-rule-${i}")
-                          "crossplane.io/external-name" = "${appName}-sgr-${i}"
+                          _cm = regex.replace(cidr, "[^0-9]", "")
+                          _resourceName = "security-group-rule-${_cm}"
+                          "krm.kcl.dev/composition-resource-name" = _resourceName
+                          "krn.kcl.dev/ready" = readystr(_resourceName)
+                          "crossplane.io/external-name" = "${appName}-sgr-${_cm}"
                       }
                       "labels": labels
                   }
@@ -1505,6 +1527,7 @@ spec:
                           "port" = ocdsstatus("instance-0", "port", 0),
                       if _secretRef:
                           "connectionSecret" = _secretRef
+
                       if createCluster and clusterCreated:
                           if clusterIdentifier:
                               "clusterIdentifier" = clusterIdentifier
@@ -1652,6 +1675,8 @@ spec:
                   _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef.name", "")
           _connectionSecret = _secretRef
 
+          clusterCreated: bool = ready("rds-cluster")
+
           externalSecretStores = [
               {
                   "name": get(oxr, "spec.eso.kubernetesSecretStore", "default"),
@@ -1670,6 +1695,8 @@ spec:
           usernameField = "username" if not createCluster else "master_username"
           passwordField = "password" if not createCluster else "attribute.master_password"
 
+          ep = "endpoint" if createCluster and clusterCreated else "address" if not createCluster and masterInstance else ""
+
           pushSecretData = [
               {
                   conversionStrategy: "None"
@@ -1682,9 +1709,9 @@ spec:
                   }
               }
               for _, k in [
-                  "endpoint", "port",
-                  "password", "username",
+                  ep, "port", "password", "username",
               ]
+              if ep
           ]
 
           deletionPolicy = "Delete" if dp == "Delete" else "Retain"
@@ -1722,7 +1749,7 @@ spec:
                                           }
                                       }
                                       for _, k in [
-                                          {r: "endpoint", p:"endpoint"},
+                                          {r: "endpoint", p: ep},
                                           {r: "port", p: "port"},
                                           {r: "password", p: passwordField},
                                           {r: "username", p: usernameField},
@@ -1924,6 +1951,8 @@ spec:
                   _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef.name", "")
           _connectionSecret = _secretRef
 
+          clusterCreated: bool = ready("rds-cluster")
+
           esoEnabled = get(oxr, "spec.eso.enabled", False)
           esoConnectionSecret = get(oxr, "status.esoConnectionSecret", False)
           sqlEnabled = get(oxr, "spec.provisionSql.enabled", True)
@@ -1954,7 +1983,11 @@ spec:
                   }
               }
               for _ in [True]
-              if get(oxr, "spec.provisionSql.enabled", True) and useConnectionSecret
+              if all_true([
+                  get(oxr, "spec.provisionSql.enabled", True),
+                  useConnectionSecret,
+                  ready("instance-0")
+              ])
           ]
 
           items = _items

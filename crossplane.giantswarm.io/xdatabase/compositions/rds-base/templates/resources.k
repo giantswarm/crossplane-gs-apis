@@ -183,7 +183,13 @@ instances = [
 
                 "applyImmediately": getwparent(item, oxr, "applyImmediately", True)
                 "autoMinorVersionUpgrade": getwparent(item, oxr, "autoMinorVersionUpgrade", True)
-                "dbSubnetGroupName": dbSubnetGroupName,
+
+                # This needs verifying for postgres - it previously worked
+                # when building posgtres instances
+                if _isPrimaryInstance or engine not in ["mysql", "mariadb"]:
+                    "dbSubnetGroupName": dbSubnetGroupName,
+
+
                 "engine": engine,
                 if any_true([
                     not getwparent(item, oxr, "allowMajorVersionUpgrade" True)
@@ -592,9 +598,11 @@ securityGroupRules = [
         "kind": "SecurityGroupRule"
         "metadata": {
             "annotations": {
-                "krm.kcl.dev/composition-resource-name" = "security-group-rule-${i}"
-                "krn.kcl.dev/ready" = readystr("security-group-rule-${i}")
-                "crossplane.io/external-name" = "${appName}-sgr-${i}"
+                _cm = regex.replace(cidr, "[^0-9]", "")
+                _resourceName = "security-group-rule-${_cm}"
+                "krm.kcl.dev/composition-resource-name" = _resourceName
+                "krn.kcl.dev/ready" = readystr(_resourceName)
+                "crossplane.io/external-name" = "${appName}-sgr-${_cm}"
             }
             "labels": labels
         }

@@ -50,11 +50,32 @@ type SubnetGroupIndexes struct {
 	Cache int `json:"cache"`
 }
 
-// RdsCacheClusterSpec contains the structure required for building the
-// infrastructure for an RDS + Elasticache Cluster.
 type RdsCacheClusterSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
 
+	// AvailabilityZones is the list of availability zones to be used by the cluster
+	//
+	// +required
+	// +kubebuilder:validation:MinItems=3
+	// +kubebuilder:validation:MaxItems=3
+	AvailabilityZones []string `json:"availabilityZones"`
+
+	// KubernetesProviderConfig
+	//
+	// +required
+	KubernetesProviderConfig *xpv1.Reference `json:"kubernetesProviderConfig"`
+
+	// Region is the region in which this collection will be created
+	//
+	// +required
+	Region string `json:"region"`
+
+	RdsCacheClusterParameters `json:",inline"`
+}
+
+// RdsCacheClusterSpec contains the structure required for building the
+// infrastructure for an RDS + Elasticache Cluster.
+type RdsCacheClusterParameters struct {
 	// Cache defines the cache settings
 	//
 	// +required
@@ -70,27 +91,10 @@ type RdsCacheClusterSpec struct {
 	// +optional
 	Eso *eso.Eso `json:"eso,omitempty"`
 
-	// KubernetesProviderConfig
-	//
-	// +required
-	KubernetesProviderConfig *xpv1.Reference `json:"kubernetesProviderConfig"`
-
 	// SubnetGroupIndexes is a map of service name to subnet set indexes
 	//
 	// +required
 	SubnetGroupIndexes SubnetGroupIndexes `json:"subnetGroupIndexes,omitempty"`
-
-	// Region is the region in which this collection will be created
-	//
-	// +required
-	Region string `json:"region"`
-
-	// AvailabilityZones is the list of availability zones to be used by the cluster
-	//
-	// +required
-	// +kubebuilder:validation:MinItems=3
-	// +kubebuilder:validation:MaxItems=3
-	AvailabilityZones []string `json:"availabilityZones"`
 
 	// Vpc defines the VPC settings
 	//

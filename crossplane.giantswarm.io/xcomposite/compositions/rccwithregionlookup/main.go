@@ -100,10 +100,6 @@ func createResources() []xpt.ComposedTemplate {
 							ManagementPolicies: xpv1.ManagementPolicies{
 								xpv1.ManagementActionObserve,
 							},
-							ProviderConfigReference: &xpv1.Reference{
-								Name: "test-provider",
-							},
-							DeletionPolicy: xpv1.DeletionDelete,
 						},
 						ForProvider: ccKubernetes.ObjectParameters{
 							Manifest: runtime.RawExtension{
@@ -125,7 +121,7 @@ func createResources() []xpt.ComposedTemplate {
 			Patches: []xpt.ComposedPatch{
 				cb.FromPatch("spec.clusterDiscovery.name", "spec.forProvider.manifest.metadata.name"),
 				cb.FromPatch("spec.clusterDiscovery.namespace", "spec.forProvider.manifest.metadata.namespace"),
-				cb.FromPatch("spec.clusterDiscovery.deletionPolicy", "spec.deletionPolicy"),
+				cb.FromPatch("spec.kubernetesProviderConfigRef", "spec.providerConfigRef"),
 			},
 		},
 		{
@@ -133,13 +129,19 @@ func createResources() []xpt.ComposedTemplate {
 			Base: &runtime.RawExtension{
 				Object: &v1alpha1.RdsCacheCluster{
 					TypeMeta: metav1.TypeMeta{
-						APIVersion: "xdatabase.crossplane.giantswarm.io/v1alpha1",
+						APIVersion: "xcomposite.crossplane.giantswarm.io/v1alpha1",
 						Kind:       "RdsCacheCluster",
 					},
 				},
 			},
 			Patches: []xpt.ComposedPatch{
-				cb.FromPatch("spec.rdsCacheClusterSpec", "spec"),
+				cb.FromPatch("spec.rdsCacheClusterParameters", "spec"),
+				cb.FromPatch("spec.claimRef", "spec.claimRef"),
+				cb.FromPatch("spec.providerConfigRef", "spec.providerConfigRef"),
+				cb.FromPatch("spec.kubernetesProviderConfig", "spec.kubernetesProviderConfig"),
+				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
+				cb.FromPatch("spec.managementPolicies", "spec.managementPolicies"),
+
 				{
 					Type: xpt.PatchTypeFromCompositeFieldPath,
 					Patch: xpt.Patch{

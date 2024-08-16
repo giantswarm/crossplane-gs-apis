@@ -20,7 +20,12 @@ ocdsstatus = lambda x: str, y: str, d: any -> any {
     """
     Get an item from the status of an ocds resource.
     """
-    get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+    _x = None
+    if get(_ocds, "${x}.Resource.status.atProvider", False):
+        get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+    else:
+        _x = get(_ocds, "${x}.Resource.status.${y}", d)
+    _x if _x else d
 }
 
 exists = lambda x: any -> bool {

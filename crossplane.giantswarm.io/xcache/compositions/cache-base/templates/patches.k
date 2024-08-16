@@ -22,40 +22,40 @@ newdxr = {
     **{
         "status": {
             if _connectionSecretName:
-                "connectionSecret": _connectionSecretName,
+                "connectionSecret" = _connectionSecretName,
 
             if clusterEndpoints:
                 "clusterEndpoints" = clusterEndpoints,
 
             if endpoint:
-                "endpoint": endpoint,
+                "endpoint" = endpoint,
 
             if _globalConnectionSecretName:
-                "globalConnectionSecret": _globalConnectionSecretName,
+                "globalConnectionSecret" = _globalConnectionSecretName,
 
             if globalEndpoint:
-                "globalEndpoint": globalEndpoint,
+                "globalEndpoint" = globalEndpoint,
 
             if globalROEndpoint:
-                "globalReaderEndpoint": globalROEndpoint,
+                "globalReaderEndpoint" = globalROEndpoint,
 
             if _globalReplicationId:
-                "globalReplicationGroupId": _globalReplicationId,
+                "globalReplicationGroupId" = _globalReplicationId,
 
             if _localReplicationId:
-                "replicationGroupId": _localReplicationId,
+                "replicationGroupId" = _localReplicationId,
 
             if _ipgn:
                 "parameterGroupName": _ipgn,
 
             if _port:
-                "port": _port,
+                "port" = _port,
 
             if readerep:
-                "readerEndpoint": readerep,
+                "readerEndpoint" = readerep,
 
             if _ugId:
-                "userGroupId": _ugId,
+                "userGroupId" = _ugId,
         },
     }
 }

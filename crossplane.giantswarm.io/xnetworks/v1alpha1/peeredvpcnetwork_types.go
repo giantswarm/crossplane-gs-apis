@@ -138,6 +138,8 @@ type TransitGatewayWrapper struct {
 	PrefixList []PrefixList `json:"prefixList"`
 
 	// RemoteVpcs is a list of VPCs build a transit gateway between
+	//
+	// +optional
 	RemoteVpcs []TgwWrappedVpcWithProviderConfig `json:"remoteVpcs"`
 }
 

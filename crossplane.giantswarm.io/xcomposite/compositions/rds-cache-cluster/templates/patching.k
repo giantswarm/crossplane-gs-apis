@@ -6,6 +6,17 @@ _dbSnIds = [k.id for _, k in _subnets[_dbsnindex]] if _dbsnindex != False and _s
 _cachesnindex = get(_oxr, "spec.subnetGroupIndexes.cache", False)
 _cacheSnIds = [k.id for _, k in _subnets[_cachesnindex]] if _cachesnindex != False and _subnets else []
 
+
+vpcs = ocdsstatus("peered-vpc-network", "vpcs", {})
+
+cidrBlocks = [
+    i for r in [
+        [ get(vpc, "cidrBlock", "") ] + get(vpc, "additionalCidrBlocks", [])
+        for _, vpc in vpcs
+    ]
+    for i in r if i
+]
+
 _dbPatch = {
     **get(_dcds, "rds-base.Resource", {}),
     **{
@@ -15,9 +26,7 @@ _dbPatch = {
             }
         }
         "spec": {
-            "cidrBlocks": [
-                get(_oxr, "status.vpc.cidrBlock", "")
-            ] + get(_oxr, "status.vpc.additionalCidrBlocks", []),
+            "cidrBlocks": cidrBlocks,
             "subnetIds": _dbSnIds
         }
     }
@@ -36,9 +45,7 @@ _cachePatch = {
             }
         }
         "spec": {
-            "cidrBlocks": [
-                get(_oxr, "status.vpcCidrBlock", "")
-            ] + get(_oxr, "status.vpc.additionalCidrBlocks", []),
+            "cidrBlocks": cidrBlocks,
             "subnetIds": _cacheSnIds
         }
     }

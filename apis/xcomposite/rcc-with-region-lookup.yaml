@@ -27,7 +27,6 @@ spec:
           metadata:
             creationTimestamp: null
           spec:
-            deletionPolicy: Delete
             forProvider:
               manifest:
                 apiVersion: cluster.x-k8s.io/v1beta1
@@ -45,8 +44,6 @@ spec:
                   infrastructureReady: false
             managementPolicies:
             - Observe
-            providerConfigRef:
-              name: test-provider
             readiness: {}
           status:
             atProvider:
@@ -59,11 +56,11 @@ spec:
         - fromFieldPath: spec.clusterDiscovery.namespace
           toFieldPath: spec.forProvider.manifest.metadata.namespace
           type: FromCompositeFieldPath
-        - fromFieldPath: spec.clusterDiscovery.deletionPolicy
-          toFieldPath: spec.deletionPolicy
+        - fromFieldPath: spec.kubernetesProviderConfigRef
+          toFieldPath: spec.providerConfigRef
           type: FromCompositeFieldPath
       - base:
-          apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
+          apiVersion: xcomposite.crossplane.giantswarm.io/v1alpha1
           kind: RdsCacheCluster
           metadata:
             creationTimestamp: null
@@ -92,7 +89,6 @@ spec:
                 function: ""
               tags: {}
               transitGateway:
-                additionalRoutes: null
                 allowPublic: false
                 cidrBlocks: null
                 enabled: false
@@ -112,8 +108,23 @@ spec:
             vpc: {}
         name: rds-cache-cluster
         patches:
-        - fromFieldPath: spec.rdsCacheClusterSpec
+        - fromFieldPath: spec.rdsCacheClusterParameters
           toFieldPath: spec
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.claimRef
+          toFieldPath: spec.claimRef
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.providerConfigRef
+          toFieldPath: spec.providerConfigRef
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.kubernetesProviderConfig
+          toFieldPath: spec.kubernetesProviderConfig
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.deletionPolicy
+          toFieldPath: spec.deletionPolicy
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.managementPolicies
+          toFieldPath: spec.managementPolicies
           type: FromCompositeFieldPath
         - fromFieldPath: status.region
           policy:
@@ -223,17 +234,22 @@ spec:
               "True" if ready(y) else "False"
           }
 
-          _clusterLookup = get(_ocds, "cluster-lookup.Resource", False)
+          _clusterLookup = get(_ocds, "cluster-lookup.Resource", {})
 
-          _kind = get(_clusterLookup, "spec.infrastructureRef.kind", "")
-          assert _kind in ["AWSCluster", "AWSManagedCluster"], "Unsupported kind: ${_kind}"
+          _apiVersion = get(_clusterLookup, "status.atProvider.manifest.spec.infrastructureRef.apiVersion", "")
+          _kind = get(_clusterLookup, "status.atProvider.manifest.spec.infrastructureRef.kind", "")
+          _name = get(_clusterLookup, "status.atProvider.manifest.metadata.name", "")
+          _namespace = get(_clusterLookup, "status.atProvider.manifest.metadata.namespace", "")
+
+          if _kind:
+              assert _kind in ["AWSCluster", "AWSManagedCluster"], "Unsupported kind: ${_kind}"
 
           _awsClusterObject = {} if not _clusterLookup else {
-              apiVersion: get(_clusterLookup, "spec.infrastructureRef.apiVersion", ""),
+              apiVersion: _apiVersion,
               kind: _kind,
               metadata: {
-                  name: get(_clusterLookup, "spec.infrastructureRef.name", "")
-                  namespace: get(_clusterLookup, "spec.infrastructureRef.namespace", "")
+                  name: _name,
+                  namespace: _namespace,
               }
           }
 
@@ -248,25 +264,27 @@ spec:
               }
               spec: {
                   managementPolicies: ["Observe"],
-                  deletionPolicy: get(_oxr, "spec.clusterDiscovery.deletionPolicy", "Delete"),
-                  }
                   forProvider: {
                       manifest: _awsClusterObject,
                   }
-                  providerConfigRef: get(_oxr, "spec.clusterDiscovery.providerConfigRef", {"name": "default"}),
+                  providerConfigRef: get(_oxr, "spec.kubernetesProviderConfigRef", {"name": "default"}),
+              }
           } if _awsClusterObject else {}
 
-          _region = get(_ocds, "aws-cluster.Resource.spec.region", False)
+          _region = get(_ocds, "aws-cluster.Resource.status.atProvider.manifest.spec.region", False)
           _availabilityZones = {} if not _region else {
-              regex.replace(k.availabilityZone, _region, "") = False for k in get(_ocds, "aws-cluster.Resource.spec.network.subnets", [])
+              regex.replace(k.availabilityZone, _region, "") = False
+              for k in get(_ocds, "aws-cluster.Resource.status.atProvider.manifest.spec.network.subnets", [])
           }
 
+          print("OBJ REGION: ", _region)
+          print("OBJ AZs: ", _availabilityZones)
           _dxr = {
               **_oxr,
               **{
                   "status": {
-                          region = _region
-                          availabilityZones = sorted([k for k, _ in _availabilityZones])
+                          "region" = _region
+                          "availabilityZones" = sorted([k for k, _ in _availabilityZones])
                   }
               },
           } if _region and _availabilityZones else {}

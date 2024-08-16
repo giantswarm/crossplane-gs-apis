@@ -44,17 +44,22 @@ readystr = lambda y: str -> str {
     "True" if ready(y) else "False"
 }
 
-_clusterLookup = get(_ocds, "cluster-lookup.Resource", False)
+_clusterLookup = get(_ocds, "cluster-lookup.Resource", {})
 
-_kind = get(_clusterLookup, "spec.infrastructureRef.kind", "")
-assert _kind in ["AWSCluster", "AWSManagedCluster"], "Unsupported kind: ${_kind}"
+_apiVersion = get(_clusterLookup, "status.atProvider.manifest.spec.infrastructureRef.apiVersion", "")
+_kind = get(_clusterLookup, "status.atProvider.manifest.spec.infrastructureRef.kind", "")
+_name = get(_clusterLookup, "status.atProvider.manifest.metadata.name", "")
+_namespace = get(_clusterLookup, "status.atProvider.manifest.metadata.namespace", "")
+
+if _kind:
+    assert _kind in ["AWSCluster", "AWSManagedCluster"], "Unsupported kind: ${_kind}"
 
 _awsClusterObject = {} if not _clusterLookup else {
-    apiVersion: get(_clusterLookup, "spec.infrastructureRef.apiVersion", ""),
+    apiVersion: _apiVersion,
     kind: _kind,
     metadata: {
-        name: get(_clusterLookup, "spec.infrastructureRef.name", "")
-        namespace: get(_clusterLookup, "spec.infrastructureRef.namespace", "")
+        name: _name,
+        namespace: _namespace,
     }
 }
 
@@ -69,25 +74,27 @@ _kubernetesObject = {
     }
     spec: {
         managementPolicies: ["Observe"],
-        deletionPolicy: get(_oxr, "spec.clusterDiscovery.deletionPolicy", "Delete"),
-        }
         forProvider: {
             manifest: _awsClusterObject,
         }
-        providerConfigRef: get(_oxr, "spec.clusterDiscovery.providerConfigRef", {"name": "default"}),
+        providerConfigRef: get(_oxr, "spec.kubernetesProviderConfigRef", {"name": "default"}),
+    }
 } if _awsClusterObject else {}
 
-_region = get(_ocds, "aws-cluster.Resource.spec.region", False)
+_region = get(_ocds, "aws-cluster.Resource.status.atProvider.manifest.spec.region", False)
 _availabilityZones = {} if not _region else {
-    regex.replace(k.availabilityZone, _region, "") = False for k in get(_ocds, "aws-cluster.Resource.spec.network.subnets", [])
+    regex.replace(k.availabilityZone, _region, "") = False
+    for k in get(_ocds, "aws-cluster.Resource.status.atProvider.manifest.spec.network.subnets", [])
 }
 
+print("OBJ REGION: ", _region)
+print("OBJ AZs: ", _availabilityZones)
 _dxr = {
     **_oxr,
     **{
         "status": {
-                region = _region
-                availabilityZones = sorted([k for k, _ in _availabilityZones])
+                "region" = _region
+                "availabilityZones" = sorted([k for k, _ in _availabilityZones])
         }
     },
 } if _region and _availabilityZones else {}

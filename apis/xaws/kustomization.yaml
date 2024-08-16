@@ -1,0 +1,3 @@
+resources:
+- resource-access-manager.yaml
+- xaws.crossplane.giantswarm.io_resourceaccessmanagers.yaml

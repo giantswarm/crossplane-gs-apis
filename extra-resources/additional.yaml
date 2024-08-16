@@ -1,0 +1,27 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: xfn-aws-provider-secrets-access
+  namespace: crossplane
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: xfn-aws-provider-secrets-access
+  namespace: crossplane
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: xfn-aws-provider-secrets-access
+subjects:
+  - kind: ServiceAccount
+    name: xfn-network-discovery
+    namespace: crossplane

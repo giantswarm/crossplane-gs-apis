@@ -25,7 +25,7 @@ var (
 // +kubebuilder:resource:scope=Cluster,categories=crossplane
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=mpl
-// +crossbuilder:generate:xrd:claimNames:kind=ResourceAccessManager,plural=ram
+// +crossbuilder:generate:xrd:claimNames:kind=ResourceAccessManagerClaim,plural=resourceaccessmanagerclaims
 // +crossbuilder:generate:xrd:defaultCompositionRef:name=resource-access-manager
 // +crossbuilder:generate:xrd:enforcedCompositionRef:name=resouce-access-manager
 type ResourceAccessManager struct {

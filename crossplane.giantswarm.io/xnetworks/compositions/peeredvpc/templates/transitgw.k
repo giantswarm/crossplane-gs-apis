@@ -7,29 +7,35 @@ if _tgwRam.enabled and _ram.enabled:
     _tgwRam.enabled = False
 
 localRouteTableIds = [
-    i.id for r in get(oxr, "status.vpcs.self.publicRouteTables", [])
+    i.id
+    for _, r in get(oxr, "status.vpcs.self.publicRouteTables", [])
     for _, i in r
-    if get(oxr, "spec.transitGateway.allowPublic", True)
+    if all_true([
+        get(oxr, "spec.transitGateway.allowPublic", True),
+        get(oxr, "status.vpcs.self.publicRouteTables", False),
+    ])
 ] + [
-    i.id for r in get(oxr, "status.vpcs.privateRouteTables", [])
+    i.id
+    for _, r in get(oxr, "status.vpcs.self.privateRouteTables", [])
     for _, i in r
 ]
 
-preferPublic = get(oxr, "spec.transitGateway.preferPublicAttachments", False)
+preferPublic = all_true([
+    get(oxr, "spec.transitGateway.preferPublicAttachments", False),
+    get(oxr, "spec.transitGateway.allowPublic", False),
+    get(oxr, "status.vpcs.self.publicSubnets", False),
+])
 
 # We can only use one subnet in each availability zone for the TGW attachment
 localSubnetIds = [
-    i.id for j, r in get(oxr, "status.vpcs.self.publicSubnets", [])
+    i.id
+    for j, r in get(oxr, "status.vpcs.self.publicSubnets", [])
     for _, i in r
     if all_true([
-        j == 0
-        get(oxr, "spec.transitGateway.allowPublic", True)
-        preferPublic
+        j == 0,
+        preferPublic,
     ])
-] if all_true([
-    preferPublic,
-    get(oxr, "spec.transitGateway.allowPublic", True),
-]) else [
+] if preferPublic else [
     i.id for j, r in get(oxr, "status.vpcs.self.privateSubnets", [])
     for _, i in r
     if j == 0
@@ -60,7 +66,7 @@ localVpc = {
         "vpcId": get(oxr, "status.vpcs.self.id", ""),
 
 } if all_true([
-    get(oxr, "status.vpcs.self.id", False)
+    get(oxr, "status.vpcs.self.id", False),
     localRouteTableIds,
     localSubnetIds,
 ]) else {}
@@ -209,15 +215,22 @@ tgw = {
     }
 }
 
+print("TGW VPC", localVpc)
+print("TGW RVPC", remoteVpcs)
+print("TGW LSNIDs", localSubnetIds)
+print("TGW LRTIDs", localRouteTableIds)
+print("TGW ENABLED", get(oxr, "spec.transitGateway.enabled", False))
+print("TGW LENs MATCH", len(remoteVpcs) == len(get(oxr, "spec.transitGateway.remoteVpcs", [])))
+
 _items = [
     tgw
     for _ in [True]
     if all_true([
-        get(oxr, "spec.transitGateway.enabled", False),
         localVpc,
         remoteVpcs,
-        len(remoteVpcs) == len(get(oxr, "spec.transitGateway.remoteVpcs", [])),
-        localRouteTableIds,
         localSubnetIds,
+        localRouteTableIds,
+        get(oxr, "spec.transitGateway.enabled", False),
+        len(remoteVpcs) == len(get(oxr, "spec.transitGateway.remoteVpcs", [])),
     ])
 ]

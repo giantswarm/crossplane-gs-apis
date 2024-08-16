@@ -1,0 +1,14 @@
+resources:
+- xnetworks.crossplane.giantswarm.io_discoveries.yaml
+- peered-vpc-network.yaml
+- network-discovery.yaml
+- managed-prefix-list.yaml
+- xnetworks.crossplane.giantswarm.io_vpcnetworks.yaml
+- xnetworks.crossplane.giantswarm.io_managedprefixlists.yaml
+- xnetworks.crossplane.giantswarm.io_subnetsets.yaml
+- subnetset.yaml
+- transitgateway.yaml
+- xnetworks.crossplane.giantswarm.io_peeredvpcnetworks.yaml
+- xnetworks.crossplane.giantswarm.io_peerings.yaml
+- vpcpeering.yaml
+- xnetworks.crossplane.giantswarm.io_transitgateways.yaml

@@ -438,6 +438,19 @@ type ParameterGroup struct {
 
 // ReplicationGroup
 type ReplicationGroup struct {
+	// AzMode specifies the Availability Zone mode of the cluster.
+	//
+	// This parameter is only valid when the Engine parameter is memcached.
+	// For resiliance, we recommend setting the AzMode parameter to cross-az and
+	// this is the default value. In this mode, the number of nodes must be > 1
+	// If memcached is selected, the number of nodes will default to 3, one per
+	// availability zone.
+	//
+	// +optional
+	// +default=cross-az
+	// +kubebuilder:validation:Enum=single-az;cross-az
+	AzMode *string `json:"azMode,omitempty"`
+
 	// ApplyImmediately specifies whether the changes should be applied
 	// immediately or during the next maintenance window.
 	//

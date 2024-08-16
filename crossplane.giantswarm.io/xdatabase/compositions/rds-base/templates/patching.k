@@ -1,5 +1,3 @@
-clusterCreated: bool = ready("rds-cluster")
-
 newdxr = {
     **oxr,
     **{
@@ -11,6 +9,7 @@ newdxr = {
                 "port" = ocdsstatus("instance-0", "port", 0),
             if _secretRef:
                 "connectionSecret" = _secretRef
+
             if createCluster and clusterCreated:
                 if clusterIdentifier:
                     "clusterIdentifier" = clusterIdentifier

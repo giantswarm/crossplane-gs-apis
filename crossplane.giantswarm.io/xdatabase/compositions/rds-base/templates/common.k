@@ -112,3 +112,5 @@ else:
     if ready("instance-0"):
         _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef.name", "")
 _connectionSecret = _secretRef
+
+clusterCreated: bool = ready("rds-cluster")

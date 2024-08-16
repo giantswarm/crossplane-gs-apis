@@ -44,6 +44,7 @@ func createSubnetGroup() xpt.ComposedTemplate {
 				Type:         xpt.PatchTypePatchSet,
 				PatchSetName: cb.StrPtr("metadata"),
 			},
+			cb.FromPatchMergeObjects("spec.claimRef.name", "spec.forProvider.tags.Name"),
 			cb.ToPatch("status.subnetGroupName", "status.atProvider.id"),
 			{
 				Type: xpt.PatchTypeCombineFromComposite,
