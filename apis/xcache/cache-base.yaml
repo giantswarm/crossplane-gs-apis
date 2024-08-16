@@ -179,10 +179,8 @@ spec:
         source: |-
           import regex
 
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocds = option("params").ocds
-          _dcds = option("params").dcds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -214,28 +212,28 @@ spec:
               """
               Get an item from the spec of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.spec.${y}", d)
+              get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
           ocdsstatus = lambda x: str, y: str, d: any -> any {
               """
               Get an item from the status of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
               """
-              x in list(_ocds)
+              x in list(ocds)
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
                   exists(x),
                   all_true([
@@ -251,45 +249,69 @@ spec:
               "True" if ready(x) else "False"
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          keyId = get(_oxr, "status.kmsKeyId", False)
-          namespace = get(_oxr, "spec.claimRef.namespace", "default")
-          region = get(_oxr, "spec.region", "eu-central-1")
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
+          appName = get(oxr, "spec.claimRef.name", "")
+          createReplicationGroup = get(oxr, "spec.createReplicationGroup", True)
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          keyId = get(oxr, "status.kmsKeyId", False)
+          namespace = get(oxr, "spec.claimRef.namespace", "default")
+          region = get(oxr, "spec.region", "eu-central-1")
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
           azs = [
               "${region}${az}"
-              for az in get(_oxr, "spec.availabilityZones", [])
+              for az in get(oxr, "spec.availabilityZones", [])
           ]
-          labels = get(_oxr, "metadata.labels", {}) | {"region": region}
+          labels = get(oxr, "metadata.labels", {}) | {"region": region}
 
-          tags = labels | get(_oxr, "spec.tags", {})
+          tags = labels | get(oxr, "spec.tags", {})
 
           globalEnabled = all_true([
               False,
               createReplicationGroup,
-              get(_oxr, "spec.globalReplicationGroup.enabled", False)
+              get(oxr, "spec.globalReplicationGroup.enabled", False)
           ])
 
-          userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
-          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
-          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+          userNames = get(oxr, "spec.userNames", []) + [appName, "default"]
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 
-          if get(_oxr, "spec.createReplicationGroup", False):
-              assert get(_oxr, "spec.engine", "redis") == "redis", "engine must be redis when createReplicationGroup is true"
 
-          created = get(_ocds, "elasticache-replication-group.Resource", {})
-          clusterModeEnabled = get(_oxr, "spec.clusterMode.enabled", False)
-          ipgn = get(_oxr, "status.parameterGroupName", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else ""
+          globalEndpoint = ocdsstatus("elasticache-replication-group-global", "primaryEndpointAddress", "") if globalEnabled else ""
+          globalROEndpoint = ocdsstatus("elasticache-replication-group-global", "readerEndpointAddress", "") if globalEnabled else ""
 
-          securityGroupIds = [
-              get(_oxr, "status.securityGroupId", None),
-          ] + [
-              i for r in get(_oxr, "spec.securityGroupIds", []) for i in r
+          cc = get(oxr, "spec.cacheClusters", [])
+          rclen = len(cc) if cc else get(oxr, "spec.numCacheClusters", 1)
+          clusterEndpoints = [
+              e for e in [
+                  ocdsstatus("elasticache-cluster-${i}", "clusterAddress", "")
+                  for i in range(rclen)
+              ]
+              if e
           ]
 
-          subnetGroup = get(_oxr, "status.subnetGroupName", False)
+          endpoint = ocdsstatus("elasticache-replication-group-local", "primaryEndpointAddress", "") if createReplicationGroup else clusterEndpoints[0] if clusterEndpoints else ""
+          readerep = ocdsstatus("elasticache-replication-group-local", "readerEndpointAddress", "") if createReplicationGroup else endpoint
+
+          _port = 0
+          if globalEnabled:
+              _port = ocdsstatus("elasticache-replication-group-global", "port", False)
+          elif createReplicationGroup:
+              _port = ocdsstatus("elasticache-replication-group-local", "port", False)
+          else:
+              _port = ocdsstatus("elasticache-cluster-0", "port", False)
+
+          if get(oxr, "spec.createReplicationGroup", False):
+              assert get(oxr, "spec.engine", "redis") == "redis", "engine must be redis when createReplicationGroup is true"
+
+          clusterModeEnabled = get(oxr, "spec.clusterMode.enabled", False)
+          ipgn = get(oxr, "status.parameterGroupName", "") if get(oxr, "spec.allowMajorVersionUpgrade", False) else ""
+
+          securityGroupIds = [
+              get(oxr, "status.securityGroupId", None),
+          ] + [
+              i for r in get(oxr, "spec.securityGroupIds", []) for i in r
+          ]
+
+          subnetGroup = get(oxr, "status.subnetGroupName", False)
 
           # Currently Crossplane does not support the GlobalReplicationGroup resource
           #
@@ -301,8 +323,8 @@ spec:
 
           # In order to create a global replication group, we must be creating a
           # local replication group as well. Global is secondary.
-          primaryGlobalRID = get(_oxr, "spec.globalReplicationGroupId", "") if globalEnabled else ""
-          replicationGlobalRID = get(_oxr, "status.globalReplicationGroupId", "") if globalEnabled else get(_oxr, "spec.globalReplicationGroupId", "")
+          primaryGlobalRID = get(oxr, "spec.globalReplicationGroupId", "") if globalEnabled else ""
+          replicationGlobalRID = get(oxr, "status.globalReplicationGroupId", "") if globalEnabled else get(oxr, "spec.globalReplicationGroupId", "")
 
           parameterGroup = [
               {
@@ -320,26 +342,26 @@ spec:
                       "deletionPolicy": dp
                       "forProvider": {
                           "description": appName + " Parameter Group"
-                          "family": get(_oxr, "spec.parameterGroupFamily", "redis6.x")
+                          "family": get(oxr, "spec.parameterGroupFamily", "redis6.x")
                           "name": appName + "-parameter-group"
-                          if get(_oxr, "spec.parameters", False):
+                          if get(oxr, "spec.parameters", False):
                               "parameter" = [
                                   {
                                       name: k,
                                       value: v,
                                   }
-                                  for k, v in get(_oxr, "spec.parameterGroupConfiguration.parameters", {})
+                                  for k, v in get(oxr, "spec.parameterGroupConfiguration.parameters", {})
                               ]
                           "region" = region
                           "tags" = tags | {
                               "Name": "${appName}-${region}"
-                          } | get(_oxr, "spec.parameterGroupConfiguration.tags", {})
+                          } | get(oxr, "spec.parameterGroupConfiguration.tags", {})
                       }
                       "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
               }
-          ] if get(_oxr, "spec.parameterGroupConfiguration", False) else []
+          ] if get(oxr, "spec.parameterGroupConfiguration", False) else []
 
           globalReplicationGroup = [{
               "apiVersion": "elasticache.aws.upbound.io/v1beta1"
@@ -355,12 +377,12 @@ spec:
               "spec": {
                   "deletionPolicy": dp
                   "forProvider": {
-                      "automaticFailoverEnabled": get(_oxr, "spec.globalReplicationGroup.automaticFailoverEnabled", False)
-                      "cacheNodeType": get(_oxr, "spec.globalReplicationGroup.cacheNodeType", "cache.t3.micro")
-                      "globalReplicationGroupIdSuffix": get(_oxr, "spec.globalReplicationGroup.suffix", "")
+                      "automaticFailoverEnabled": get(oxr, "spec.globalReplicationGroup.automaticFailoverEnabled", False)
+                      "cacheNodeType": get(oxr, "spec.globalReplicationGroup.cacheNodeType", "cache.t3.micro")
+                      "globalReplicationGroupIdSuffix": get(oxr, "spec.globalReplicationGroup.suffix", "")
                       "globalReplicationGroupDescription": appName + " Global Replication Group"
-                      if get(_oxr, "spec.globalReplicationGroup.numNodeGroups", False):
-                          "numNodeGroups": get(_oxr, "spec.globalReplicationGroup.numNodeGroups", 1)
+                      if get(oxr, "spec.globalReplicationGroup.numNodeGroups", False):
+                          "numNodeGroups": get(oxr, "spec.globalReplicationGroup.numNodeGroups", 1)
 
                       if primaryGlobalRID:
                           "primaryReplicationGroupId": primaryGlobalRID
@@ -404,33 +426,33 @@ spec:
                   "spec": {
                       "deletionPolicy": dp
                       "initProvider": {
-                          if get(_oxr, "spec.autoMinorVersionUpgrade", False):
-                              if get(_oxr, "spec.engineVersion", False):
-                                  "engineVersion": get(_oxr, "spec.engineVersion", "")
+                          if get(oxr, "spec.autoMinorVersionUpgrade", False):
+                              if get(oxr, "spec.engineVersion", False):
+                                  "engineVersion": get(oxr, "spec.engineVersion", "")
                       }
                       "forProvider": {
-                          if get(_oxr, "spec.applyImmediately", None) != None:
-                              "applyImmediately": get(_oxr, "spec.applyImmediately", True)
+                          if get(oxr, "spec.applyImmediately", None) != None:
+                              "applyImmediately": get(oxr, "spec.applyImmediately", True)
 
-                          "atRestEncryptionEnabled" = get(_oxr, "spec.atRestEncryptionEnabled", True)
+                          "atRestEncryptionEnabled" = get(oxr, "spec.atRestEncryptionEnabled", True)
 
-                          if get(_oxr, "spec.transitEncryptionEnabled", False):
+                          if get(oxr, "spec.transitEncryptionEnabled", False):
                               "autoGenerateAuthToken": True
                               "authTokenSecretRef": {
                                   "key": "token"
                                   "name": "${appName}-elasticache-auth-token"
-                                  "namespace": get(_oxr, "spec.claimRef.namespace", "default")
+                                  "namespace": get(oxr, "spec.claimRef.namespace", "default")
                               }
-                              "transitEncryptionEnabled": get(_oxr, "spec.transitEncryptionEnabled", True)
+                              "transitEncryptionEnabled": get(oxr, "spec.transitEncryptionEnabled", True)
 
-                          if get(_oxr, "spec.authTokenUpdateStrategy", False):
-                              "authTokenUpdateStrategy": get(_oxr, "spec.authTokenUpdateStrategy", "ROTATE")
-                          if get(_oxr, "spec.autoMinorVersionUpgrade", None) != None:
-                              "autoMinorVersionUpgrade": get(_oxr, "spec.autoMinorVersionUpgrade", True)
-                          if get(_oxr, "spec.automaticFailoverEnabled", None) != None:
-                              "automaticFailoverEnabled": get(_oxr, "spec.automaticFailoverEnabled", False)
-                          if get(_oxr, "spec.dataTieringEnabled", False):
-                              "dataTieringEnabled": get(_oxr, "spec.dataTieringEnabled", False)
+                          if get(oxr, "spec.authTokenUpdateStrategy", False):
+                              "authTokenUpdateStrategy": get(oxr, "spec.authTokenUpdateStrategy", "ROTATE")
+                          if get(oxr, "spec.autoMinorVersionUpgrade", None) != None:
+                              "autoMinorVersionUpgrade": get(oxr, "spec.autoMinorVersionUpgrade", True)
+                          if get(oxr, "spec.automaticFailoverEnabled", None) != None:
+                              "automaticFailoverEnabled": get(oxr, "spec.automaticFailoverEnabled", False)
+                          if get(oxr, "spec.dataTieringEnabled", False):
+                              "dataTieringEnabled": get(oxr, "spec.dataTieringEnabled", False)
 
                           if i == "global":
                               "description": appName + " Replication Group ${region} (Global)"
@@ -438,69 +460,69 @@ spec:
                           if i == "local":
                               "description": appName + " Replication Group ${region} (Local)"
 
-                          if get(_oxr, "spec.engine", False):
-                              "engine": get(_oxr, "spec.engine", "redis")
+                          if get(oxr, "spec.engine", False):
+                              "engine": get(oxr, "spec.engine", "redis")
 
-                          if not get(_oxr, "spec.autoMinorVersionUpgrade", False):
-                              if get(_oxr, "spec.engineVersion", False):
-                                  "engineVersion": get(_oxr, "spec.engineVersion", "7.x")
+                          if not get(oxr, "spec.autoMinorVersionUpgrade", False):
+                              if get(oxr, "spec.engineVersion", False):
+                                  "engineVersion": get(oxr, "spec.engineVersion", "7.x")
 
-                          if get(_oxr, "spec.finalSnapshotIdentifier", False):
-                              "finalSnapshotIdentifier": get(_oxr, "spec.finalSnapshotIdentifier", "")
+                          if get(oxr, "spec.finalSnapshotIdentifier", False):
+                              "finalSnapshotIdentifier": get(oxr, "spec.finalSnapshotIdentifier", "")
 
                           if replicationGlobalRID:
                               "globalReplicationGroupId": replicationGlobalRID
 
-                          if get(_oxr, "spec.ipDiscovery", False):
-                              "ipDiscovery": get(_oxr, "spec.ipDiscovery", "ipv4")
+                          if get(oxr, "spec.ipDiscovery", False):
+                              "ipDiscovery": get(oxr, "spec.ipDiscovery", "ipv4")
 
                           "kmsKeyId": keyId
 
-                          if get(_oxr, "spec.maintenanceWindow", False):
-                              "maintenanceWindow": get(_oxr, "spec.maintenanceWindow", "")
-                          if get(_oxr, "spec.multiAzEnabled", None) != None:
-                              "multiAzEnabled": get(_oxr, "spec.multiAzEnabled", True)
-                          if get(_oxr, "spec.networkType", False):
-                              "networkType": get(_oxr, "spec.networkType", "ipv4")
+                          if get(oxr, "spec.maintenanceWindow", False):
+                              "maintenanceWindow": get(oxr, "spec.maintenanceWindow", "")
+                          if get(oxr, "spec.multiAzEnabled", None) != None:
+                              "multiAzEnabled": get(oxr, "spec.multiAzEnabled", True)
+                          if get(oxr, "spec.networkType", False):
+                              "networkType": get(oxr, "spec.networkType", "ipv4")
 
-                          if get(_oxr, "spec.notificationTopicArn", False):
-                              "notificationTopicArn": get(_oxr, "spec.notificationTopicArn", "")
+                          if get(oxr, "spec.notificationTopicArn", False):
+                              "notificationTopicArn": get(oxr, "spec.notificationTopicArn", "")
 
                           if all_true([
-                              get(_oxr, "spec.numCacheClusters", False),
-                              not get(_oxr, "spec.numNodeGroups", False),
+                              get(oxr, "spec.numCacheClusters", False),
+                              not get(oxr, "spec.numNodeGroups", False),
                               not clusterModeEnabled
                           ]):
-                              "numCacheClusters": get(_oxr, "spec.numCacheClusters", 1)
+                              "numCacheClusters": get(oxr, "spec.numCacheClusters", 1)
 
                           # numNodeGroups cannot be set if global replication group id is set
                           if any_true([
-                              get(_oxr, "spec.globalReplicationGroupId", False),
+                              get(oxr, "spec.globalReplicationGroupId", False),
                               i == "global"
                               all_true([
-                                  not get(_oxr, "spec.globalReplicationGroup.enabled", False),
-                                  not get(_oxr, "spec.globalReplicationGroupId", False),
+                                  not get(oxr, "spec.globalReplicationGroup.enabled", False),
+                                  not get(oxr, "spec.globalReplicationGroupId", False),
                                   i == "local"
                               ])
                           ]):
-                              if get(_oxr, "spec.nodeType", False):
-                                  "nodeType": get(_oxr, "spec.nodeType", "cache.t3.micro")
+                              if get(oxr, "spec.nodeType", False):
+                                  "nodeType": get(oxr, "spec.nodeType", "cache.t3.micro")
                               if all_true([
                                   clusterModeEnabled,
-                                  get(_oxr, "spec.numNodeGroups", False)
+                                  get(oxr, "spec.numNodeGroups", False)
                               ]):
-                                  "numNodeGroups": get(_oxr, "spec.numNodeGroups", 1)
+                                  "numNodeGroups": get(oxr, "spec.numNodeGroups", 1)
                           if ipgn:
                               "parameterGroupName": ipgn
 
-                          if get(_oxr, "spec.port", False):
-                              "port": get(_oxr, "spec.port", 6379)
+                          if get(oxr, "spec.port", False):
+                              "port": get(oxr, "spec.port", 6379)
 
                           if azs:
                               "preferredCacheClusterAzs": azs
 
-                          if get(_oxr, "spec.replicasPerNodeGroup", None) != None:
-                              "replicasPerNodeGroup": get(_oxr, "spec.replicasPerNodeGroup", 0)
+                          if get(oxr, "spec.replicasPerNodeGroup", None) != None:
+                              "replicasPerNodeGroup": get(oxr, "spec.replicasPerNodeGroup", 0)
 
                           "region": region
 
@@ -510,23 +532,23 @@ spec:
                           if any_true([
                               all_true([
                                   i == "global",
-                                  get(_oxr, "status.subnetGroupName", False),
+                                  get(oxr, "status.subnetGroupName", False),
                               ]),
                               all_true([
-                                  not get(_oxr, "spec.globalReplicationGroup.enabled", False),
+                                  not get(oxr, "spec.globalReplicationGroup.enabled", False),
                                   i == "local",
-                                  get(_oxr, "status.subnetGroupName", False),
+                                  get(oxr, "status.subnetGroupName", False),
                               ])
                           ]):
                               "subnetGroupName": subnetGroup
 
-                          if get(_oxr, "spec.snapshotRetentionLimit", False):
-                              "snapshotRetentionLimit": get(_oxr, "spec.snapshotRetentionLimit", 1)
-                          if get(_oxr, "spec.snapshotWindow", False):
-                              "snapshotWindow": get(_oxr, "spec.snapshotWindow", "00:00-01:00")
-                          if get(_oxr, "spec.userGroupIds", False):
+                          if get(oxr, "spec.snapshotRetentionLimit", False):
+                              "snapshotRetentionLimit": get(oxr, "spec.snapshotRetentionLimit", 1)
+                          if get(oxr, "spec.snapshotWindow", False):
+                              "snapshotWindow": get(oxr, "spec.snapshotWindow", "00:00-01:00")
+                          if get(oxr, "spec.userGroupIds", False):
                               "userGroupIds": [
-                                  get(_oxr, "status.userGroupId", "")
+                                  get(oxr, "status.userGroupId", "")
                               ]
 
                           "tags": tags | {
@@ -538,19 +560,19 @@ spec:
 
                       "writeConnectionSecretToRef": {
                           "name": "${appName}-elasticache-${i}"
-                          "namespace": get(_oxr, "spec.claimRef.namespace", "default")
+                          "namespace": get(oxr, "spec.claimRef.namespace", "default")
                       }
                   }
               } for _, i in enabledReplicationGroups if all_true([
                   createReplicationGroup, keyId, i,
-                  get(_oxr, "spec.engine", "redis") == "redis",
+                  get(oxr, "spec.engine", "redis") == "redis",
                   any_true([
                       i == "global",
                       all_true([i == "local", not globalEnabled]),
                       all_true([i == "local", globalEnabled, replicationGlobalRID]),
                   ]),
-                  get(_oxr, "status.subnetGroupName", False)
-                  get(_oxr, "status.securityGroupId", False)
+                  get(oxr, "status.subnetGroupName", False)
+                  get(oxr, "status.securityGroupId", False)
               ])
           ]
 
@@ -575,10 +597,8 @@ spec:
         source: |-
           import regex
 
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocds = option("params").ocds
-          _dcds = option("params").dcds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -610,28 +630,28 @@ spec:
               """
               Get an item from the spec of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.spec.${y}", d)
+              get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
           ocdsstatus = lambda x: str, y: str, d: any -> any {
               """
               Get an item from the status of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
               """
-              x in list(_ocds)
+              x in list(ocds)
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
                   exists(x),
                   all_true([
@@ -647,38 +667,63 @@ spec:
               "True" if ready(x) else "False"
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          keyId = get(_oxr, "status.kmsKeyId", False)
-          namespace = get(_oxr, "spec.claimRef.namespace", "default")
-          region = get(_oxr, "spec.region", "eu-central-1")
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
+          appName = get(oxr, "spec.claimRef.name", "")
+          createReplicationGroup = get(oxr, "spec.createReplicationGroup", True)
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          keyId = get(oxr, "status.kmsKeyId", False)
+          namespace = get(oxr, "spec.claimRef.namespace", "default")
+          region = get(oxr, "spec.region", "eu-central-1")
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
           azs = [
               "${region}${az}"
-              for az in get(_oxr, "spec.availabilityZones", [])
+              for az in get(oxr, "spec.availabilityZones", [])
           ]
-          labels = get(_oxr, "metadata.labels", {}) | {"region": region}
+          labels = get(oxr, "metadata.labels", {}) | {"region": region}
 
-          tags = labels | get(_oxr, "spec.tags", {})
+          tags = labels | get(oxr, "spec.tags", {})
 
           globalEnabled = all_true([
               False,
               createReplicationGroup,
-              get(_oxr, "spec.globalReplicationGroup.enabled", False)
+              get(oxr, "spec.globalReplicationGroup.enabled", False)
           ])
 
-          userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
-          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
-          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+          userNames = get(oxr, "spec.userNames", []) + [appName, "default"]
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+
+
+          globalEndpoint = ocdsstatus("elasticache-replication-group-global", "primaryEndpointAddress", "") if globalEnabled else ""
+          globalROEndpoint = ocdsstatus("elasticache-replication-group-global", "readerEndpointAddress", "") if globalEnabled else ""
+
+          cc = get(oxr, "spec.cacheClusters", [])
+          rclen = len(cc) if cc else get(oxr, "spec.numCacheClusters", 1)
+          clusterEndpoints = [
+              e for e in [
+                  ocdsstatus("elasticache-cluster-${i}", "clusterAddress", "")
+                  for i in range(rclen)
+              ]
+              if e
+          ]
+
+          endpoint = ocdsstatus("elasticache-replication-group-local", "primaryEndpointAddress", "") if createReplicationGroup else clusterEndpoints[0] if clusterEndpoints else ""
+          readerep = ocdsstatus("elasticache-replication-group-local", "readerEndpointAddress", "") if createReplicationGroup else endpoint
+
+          _port = 0
+          if globalEnabled:
+              _port = ocdsstatus("elasticache-replication-group-global", "port", False)
+          elif createReplicationGroup:
+              _port = ocdsstatus("elasticache-replication-group-local", "port", False)
+          else:
+              _port = ocdsstatus("elasticache-cluster-0", "port", False)
 
           # If we are not creating a replication group, check how many cache clusters have
           # been requested and default a list of empty dictionaries as being the cache
           # cluster template.
-          requiredClusters = get(_oxr, "spec.cacheClusters", []) if get(_oxr, "spec.cacheClusters", False) else [
+          requiredClusters = get(oxr, "spec.cacheClusters", []) if get(oxr, "spec.cacheClusters", False) else [
               {}
-              for i in range(get(_oxr, "spec.numCacheClusters", 1))
-              if not get(_oxr, "spec.createReplicationGroup", False)
+              for i in range(get(oxr, "spec.numCacheClusters", 1))
+              if not get(oxr, "spec.createReplicationGroup", False)
           ]
 
           clusters = [
@@ -694,19 +739,19 @@ spec:
                       "labels": labels
                   }
                   "spec": {
-                      "deletionPolicy": get(_oxr, "spec.deletionPolicy", "Delete"),
+                      "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
                       "initProvider": {
-                          if get(_oxr, "spec.autoMinorVersionUpgrade", False):
-                              if get(_oxr, "spec.engineVersion", False):
-                                  "engineVersion": get(_oxr, "spec.engineVersion", "7.x")
+                          if get(oxr, "spec.autoMinorVersionUpgrade", False):
+                              if get(oxr, "spec.engineVersion", False):
+                                  "engineVersion": get(oxr, "spec.engineVersion", "7.x")
                       }
 
                       "forProvider": {
-                          _v = getwparent(cluster, _oxr, "applyImmediately",False)
+                          _v = getwparent(cluster, oxr, "applyImmediately",False)
                           if _v:
                               "applyImmediately": _v
 
-                          _v = getwparent(cluster, _oxr, "autoMinorVersionUpgrade", False)
+                          _v = getwparent(cluster, oxr, "autoMinorVersionUpgrade", False)
                           if _v:
                               "autoMinorVersionUpgrade": _v
 
@@ -715,34 +760,34 @@ spec:
                               "availabilityZone": _az
 
                           if all_true([
-                              getwparent(cluster, _oxr, "azMode", False),
-                              getwparent(cluster, _oxr "engine", False) == "memcached",
+                              getwparent(cluster, oxr, "azMode", False),
+                              getwparent(cluster, oxr "engine", False) == "memcached",
                           ]):
-                              "azMode": getwparent(cluster, _oxr, "azMode", "cross-az"),
-                              "numCacheNodes" = getwparent(cluster, _oxr, "numCacheNodes", len(azs)),
+                              "azMode": getwparent(cluster, oxr, "azMode", "cross-az"),
+                              "numCacheNodes" = getwparent(cluster, oxr, "numCacheNodes", len(azs)),
 
-                          _v = getwparent(cluster, _oxr, "engine", False)
+                          _v = getwparent(cluster, oxr, "engine", False)
                           if _v:
                               "engine" = _v
 
-                          if not get(_oxr, "spec.autoMinorVersionUpgrade", False):
-                              _v = getwparent(cluster, _oxr, "engineVersion", False)
+                          if not get(oxr, "spec.autoMinorVersionUpgrade", False):
+                              _v = getwparent(cluster, oxr, "engineVersion", False)
                               if _v:
                                   "engineVersion" = _v
 
-                          _v = getwparent(cluster, _oxr, "finalSnapshotIdentifier", False)
+                          _v = getwparent(cluster, oxr, "finalSnapshotIdentifier", False)
                           if _v:
                               "finalSnapshotIdentifier" = _v
 
-                          _v = getwparent(cluster, _oxr, "ipDiscovery", False)
+                          _v = getwparent(cluster, oxr, "ipDiscovery", False)
                           if _v:
                               "ipDiscovery" = _v
 
                           if all_true([
-                              getwparent(cluster, _oxr, "engine", "redis") == "redis",
-                              getwparent(cluster, _oxr, "logDeliveryConfiguration", False),
+                              getwparent(cluster, oxr, "engine", "redis") == "redis",
+                              getwparent(cluster, oxr, "logDeliveryConfiguration", False),
                           ]):
-                              _config = getwparent(cluster, _oxr, "logDeliveryConfiguration", [])
+                              _config = getwparent(cluster, oxr, "logDeliveryConfiguration", [])
                               "logDeliveryConfiguration" = [{
                                   if get(c, "destination", False):
                                       "destination": get(c, "destination", ""),
@@ -754,33 +799,33 @@ spec:
                                       "logType" = c.logType,
                               } for c in _config],
 
-                          _v = getwparent(cluster, _oxr, "maintenanceWindow", False)
+                          _v = getwparent(cluster, oxr, "maintenanceWindow", False)
                           if _v:
                               "maintenanceWindow" = _v
 
-                          _v = getwparent(cluster, _oxr, "networkType", False)
+                          _v = getwparent(cluster, oxr, "networkType", False)
                           if _v:
                               "networkType" = _v
 
-                          _v = getwparent(cluster, _oxr, "nodeType", False)
+                          _v = getwparent(cluster, oxr, "nodeType", False)
                           if _v:
                               "nodeType" = _v
 
-                          _v = getwparent(cluster, _oxr, "notificationTopicArn", False)
+                          _v = getwparent(cluster, oxr, "notificationTopicArn", False)
                           if _v:
                               "notificationTopicArn" = _v
 
-                          _om = getwparent(cluster, _oxr, "outpostMode", False)
-                          _poa = getwparent(cluster, _oxr, "preferredOutpostArn", False)
+                          _om = getwparent(cluster, oxr, "outpostMode", False)
+                          _poa = getwparent(cluster, oxr, "preferredOutpostArn", False)
                           if all_true([_om, _poa]):
                               "outpostMode" = _om,
                               "preferredOutpostArn" = _poa
 
-                          _v = get(_oxr, "status.parameterGroupName", False)
+                          _v = get(oxr, "status.parameterGroupName", False)
                           if _v:
                               "parameterGroupName" = _v
 
-                          _v = getwparent(cluster, _oxr, "port", False)
+                          _v = getwparent(cluster, oxr, "port", False)
                               "port" = _v
 
                           if not get(cluster, "availabilityZone", False):
@@ -789,45 +834,45 @@ spec:
                           "region" = region
 
                           if all_true([
-                              get(_oxr, "spec.createReplicationGroup", False),
-                              get(_oxr, "status.localReplicationGroupId", False),
+                              get(oxr, "spec.createReplicationGroup", False),
+                              get(oxr, "status.localReplicationGroupId", False),
                           ]):
-                              "replicationGroupId" = get(_oxr, "status.localReplicationGroupId", "")
+                              "replicationGroupId" = get(oxr, "status.localReplicationGroupId", "")
 
-                          if get(_oxr, "status.securityGroupId", False):
+                          if get(oxr, "status.securityGroupId", False):
                               "securityGroupIds" = [
-                                  get(_oxr, "status.securityGroupId", None),
-                              ] + getwparent(cluster, _oxr, "securityGroupIds", [])
+                                  get(oxr, "status.securityGroupId", None),
+                              ] + getwparent(cluster, oxr, "securityGroupIds", [])
 
-                          _v = getwparent(cluster, _oxr, "snapshotArns", False)
+                          _v = getwparent(cluster, oxr, "snapshotArns", False)
                           if _v:
                               "snapshotArns" = _v
 
-                          _v = getwparent(cluster, _oxr, "snapshotName", False)
+                          _v = getwparent(cluster, oxr, "snapshotName", False)
                           if _v:
                               "snapshotName" = _v
 
-                          _v = getwparent(cluster, _oxr, "snapshotRetentionLimit", False)
+                          _v = getwparent(cluster, oxr, "snapshotRetentionLimit", False)
                           if _v:
                               "snapshotRetentionLimit" = _v
 
-                          _v = getwparent(cluster, _oxr, "snapshotWindow", False)
+                          _v = getwparent(cluster, oxr, "snapshotWindow", False)
                           if _v:
                               "snapshotWindow" = _v
 
                           # Only assign subnetGroup if we are not creating a replication group
                           if all_true([
-                              get(_oxr, "status.subnetGroupName", False),
-                              not getwparent(cluster, _oxr, "createReplicationGroup", False),
+                              get(oxr, "status.subnetGroupName", False),
+                              not getwparent(cluster, oxr, "createReplicationGroup", False),
                           ]):
-                              _sgn = getwparent(cluster, _oxr, "subnetGroupName", "")
-                              "subnetGroupName" = get(_oxr, "status.subnetGroupName", _sgn)
+                              _sgn = getwparent(cluster, oxr, "subnetGroupName", "")
+                              "subnetGroupName" = get(oxr, "status.subnetGroupName", _sgn)
 
                           "tags" = tags | get(cluster, "tags", {}) | {
                               "Name": "${appName}-${region}-${_az}"
                           },
 
-                          _v = getwparent(cluster, _oxr, "transitEncryptionEnabled", False)
+                          _v = getwparent(cluster, oxr, "transitEncryptionEnabled", False)
                           if _v:
                               "transitEncryptionEnabled" = _v
                       }
@@ -837,12 +882,12 @@ spec:
               }
               for i, cluster in requiredClusters
               if all_true([
-                  get(_oxr, "status.subnetGroupName", False)
-                  get(_oxr, "status.securityGroupId", False)
+                  get(oxr, "status.subnetGroupName", False)
+                  get(oxr, "status.securityGroupId", False)
               ])
           ]
 
-          port = get(_oxr, "status.port", False)
+          port = get(oxr, "status.port", False)
           securityGroupRules = [
               {
                   "apiVersion": "ec2.aws.upbound.io/v1beta1"
@@ -855,23 +900,23 @@ spec:
                       }
                   }
                   "spec": {
-                      "deletionPolicy": _oxr.spec.deletionPolicy
+                      "deletionPolicy": oxr.spec.deletionPolicy
                       "forProvider": {
                           "cidrBlocks": [cidr],
                           "fromPort": port,
                           "protocol": "tcp",
                           "region": region,
-                          "securityGroupId": get(_oxr, "status.securityGroupId", ""),
+                          "securityGroupId": get(oxr, "status.securityGroupId", ""),
                           "toPort": port,
                           "type": "ingress",
                       }
                       "managementPolicies": mgmtPolicy,
-                      "providerConfigRef": get(_oxr, "spec.providerConfigRef", {"name": "default"})
+                      "providerConfigRef": get(oxr, "spec.providerConfigRef", {"name": "default"})
                   }
               }
-              for i, cidr in get(_oxr, "spec.cidrBlocks", [])
+              for i, cidr in get(oxr, "spec.cidrBlocks", [])
               if all_true([
-                  get(_oxr, "status.securityGroupId", False),
+                  get(oxr, "status.securityGroupId", False),
                   port, cidr,
               ])
           ]
@@ -895,10 +940,8 @@ spec:
         source: |-
           import regex
 
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocds = option("params").ocds
-          _dcds = option("params").dcds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -930,28 +973,28 @@ spec:
               """
               Get an item from the spec of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.spec.${y}", d)
+              get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
           ocdsstatus = lambda x: str, y: str, d: any -> any {
               """
               Get an item from the status of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
               """
-              x in list(_ocds)
+              x in list(ocds)
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
                   exists(x),
                   all_true([
@@ -967,30 +1010,55 @@ spec:
               "True" if ready(x) else "False"
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          keyId = get(_oxr, "status.kmsKeyId", False)
-          namespace = get(_oxr, "spec.claimRef.namespace", "default")
-          region = get(_oxr, "spec.region", "eu-central-1")
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
+          appName = get(oxr, "spec.claimRef.name", "")
+          createReplicationGroup = get(oxr, "spec.createReplicationGroup", True)
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          keyId = get(oxr, "status.kmsKeyId", False)
+          namespace = get(oxr, "spec.claimRef.namespace", "default")
+          region = get(oxr, "spec.region", "eu-central-1")
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
           azs = [
               "${region}${az}"
-              for az in get(_oxr, "spec.availabilityZones", [])
+              for az in get(oxr, "spec.availabilityZones", [])
           ]
-          labels = get(_oxr, "metadata.labels", {}) | {"region": region}
+          labels = get(oxr, "metadata.labels", {}) | {"region": region}
 
-          tags = labels | get(_oxr, "spec.tags", {})
+          tags = labels | get(oxr, "spec.tags", {})
 
           globalEnabled = all_true([
               False,
               createReplicationGroup,
-              get(_oxr, "spec.globalReplicationGroup.enabled", False)
+              get(oxr, "spec.globalReplicationGroup.enabled", False)
           ])
 
-          userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
-          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
-          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+          userNames = get(oxr, "spec.userNames", []) + [appName, "default"]
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+
+
+          globalEndpoint = ocdsstatus("elasticache-replication-group-global", "primaryEndpointAddress", "") if globalEnabled else ""
+          globalROEndpoint = ocdsstatus("elasticache-replication-group-global", "readerEndpointAddress", "") if globalEnabled else ""
+
+          cc = get(oxr, "spec.cacheClusters", [])
+          rclen = len(cc) if cc else get(oxr, "spec.numCacheClusters", 1)
+          clusterEndpoints = [
+              e for e in [
+                  ocdsstatus("elasticache-cluster-${i}", "clusterAddress", "")
+                  for i in range(rclen)
+              ]
+              if e
+          ]
+
+          endpoint = ocdsstatus("elasticache-replication-group-local", "primaryEndpointAddress", "") if createReplicationGroup else clusterEndpoints[0] if clusterEndpoints else ""
+          readerep = ocdsstatus("elasticache-replication-group-local", "readerEndpointAddress", "") if createReplicationGroup else endpoint
+
+          _port = 0
+          if globalEnabled:
+              _port = ocdsstatus("elasticache-replication-group-global", "port", False)
+          elif createReplicationGroup:
+              _port = ocdsstatus("elasticache-replication-group-local", "port", False)
+          else:
+              _port = ocdsstatus("elasticache-cluster-0", "port", False)
 
           users = [
               {
@@ -1030,7 +1098,7 @@ spec:
                                       "type": "password"
                                   }
                               ]
-                          "engine": get(_oxr, "spec.engine", "redis")
+                          "engine": get(oxr, "spec.engine", "redis")
                           "region": region
                           "tags" = tags | {
                               "Name": "${appName}-${region}-${name}"
@@ -1043,14 +1111,14 @@ spec:
               }
               for name in userNames
           ] if all_true([
-              get(_oxr, "spec.engine", "redis") == "redis",
-              get(_oxr, "spec.createReplicationGroup", True),
+              get(oxr, "spec.engine", "redis") == "redis",
+              get(oxr, "spec.createReplicationGroup", True),
           ]) else []
 
           userIds = [
               i for i in [
                   get(item, "Resource.status.atProvider.id", "")
-                  for _, item in _ocds
+                  for _, item in ocds
                   if all_true([
                       get(item, "Resource.kind", "") == "User",
                       get(item, "Resource.apiVersion", "") == "elasticache.aws.upbound.io/v1beta1",
@@ -1072,7 +1140,7 @@ spec:
               "spec": {
                   "deletionPolicy": dp
                   "forProvider": {
-                      "engine": get(_oxr, "spec.engine", "redis")
+                      "engine": get(oxr, "spec.engine", "redis")
                       "region": region
                       "tags": tags | {
                           "Name": "${appName}-${region}"
@@ -1084,8 +1152,8 @@ spec:
               }
           }] if all_true([
               userIds,
-              get(_oxr, "spec.engine", "redis") == "redis",
-              get(_oxr, "spec.createReplicationGroup", True),
+              get(oxr, "spec.engine", "redis") == "redis",
+              get(oxr, "spec.createReplicationGroup", True),
           ]) else []
 
           _items = users + userGroup
@@ -1104,10 +1172,8 @@ spec:
         source: |-
           import regex
 
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocds = option("params").ocds
-          _dcds = option("params").dcds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -1139,28 +1205,28 @@ spec:
               """
               Get an item from the spec of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.spec.${y}", d)
+              get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
           ocdsstatus = lambda x: str, y: str, d: any -> any {
               """
               Get an item from the status of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
               """
-              x in list(_ocds)
+              x in list(ocds)
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
                   exists(x),
                   all_true([
@@ -1176,41 +1242,68 @@ spec:
               "True" if ready(x) else "False"
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          keyId = get(_oxr, "status.kmsKeyId", False)
-          namespace = get(_oxr, "spec.claimRef.namespace", "default")
-          region = get(_oxr, "spec.region", "eu-central-1")
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
+          appName = get(oxr, "spec.claimRef.name", "")
+          createReplicationGroup = get(oxr, "spec.createReplicationGroup", True)
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          keyId = get(oxr, "status.kmsKeyId", False)
+          namespace = get(oxr, "spec.claimRef.namespace", "default")
+          region = get(oxr, "spec.region", "eu-central-1")
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
           azs = [
               "${region}${az}"
-              for az in get(_oxr, "spec.availabilityZones", [])
+              for az in get(oxr, "spec.availabilityZones", [])
           ]
-          labels = get(_oxr, "metadata.labels", {}) | {"region": region}
+          labels = get(oxr, "metadata.labels", {}) | {"region": region}
 
-          tags = labels | get(_oxr, "spec.tags", {})
+          tags = labels | get(oxr, "spec.tags", {})
 
           globalEnabled = all_true([
               False,
               createReplicationGroup,
-              get(_oxr, "spec.globalReplicationGroup.enabled", False)
+              get(oxr, "spec.globalReplicationGroup.enabled", False)
           ])
 
-          userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
-          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
-          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+          userNames = get(oxr, "spec.userNames", []) + [appName, "default"]
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 
-          esoEnabled = get(_oxr, "spec.eso.enabled", False)
-          engine = get(_oxr, "spec.engine", "redis")
-          kubernetesPcr = get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+
+          globalEndpoint = ocdsstatus("elasticache-replication-group-global", "primaryEndpointAddress", "") if globalEnabled else ""
+          globalROEndpoint = ocdsstatus("elasticache-replication-group-global", "readerEndpointAddress", "") if globalEnabled else ""
+
+          cc = get(oxr, "spec.cacheClusters", [])
+          rclen = len(cc) if cc else get(oxr, "spec.numCacheClusters", 1)
+          clusterEndpoints = [
+              e for e in [
+                  ocdsstatus("elasticache-cluster-${i}", "clusterAddress", "")
+                  for i in range(rclen)
+              ]
+              if e
+          ]
+
+          endpoint = ocdsstatus("elasticache-replication-group-local", "primaryEndpointAddress", "") if createReplicationGroup else clusterEndpoints[0] if clusterEndpoints else ""
+          readerep = ocdsstatus("elasticache-replication-group-local", "readerEndpointAddress", "") if createReplicationGroup else endpoint
+
+          _port = 0
+          if globalEnabled:
+              _port = ocdsstatus("elasticache-replication-group-global", "port", False)
+          elif createReplicationGroup:
+              _port = ocdsstatus("elasticache-replication-group-local", "port", False)
+          else:
+              _port = ocdsstatus("elasticache-cluster-0", "port", False)
+
+          esoEnabled = get(oxr, "spec.eso.enabled", False)
+          engine = get(oxr, "spec.engine", "redis")
+          kubernetesPcr = get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
 
           has = all_true([
               engine == "redis",
               esoEnabled,
               kubernetesPcr,
           ])
-          assert has != False, "Missing required kubernetes ProviderConfig and SecretStore fields for password generation"
+
+          assert engine == "redis" and esoEnabled, "External Secrets (eso) must be enabled for Redis engine"
+          assert has, "Missing required kubernetes ProviderConfig and SecretStore fields for password generation"
 
           passwordGenerator = {
               "apiVersion": "kubernetes.crossplane.io/v1alpha2"
@@ -1242,7 +1335,7 @@ spec:
                       }
                   }
                   "managementPolicies": mgmtPolicy,
-                  "providerConfigRef": get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+                  "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
               }
           }
 
@@ -1289,20 +1382,82 @@ spec:
                           }
                       }
                       "managementPolicies": mgmtPolicy,
-                      "providerConfigRef": get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+                      "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
                   }
               }
               for _, user in userNames
               if all_true([
-                  get(_oxr, "spec.engine", "redis") == "redis",
-                  get(_oxr, "spec.createReplicationGroup", True),
+                  get(oxr, "spec.engine", "redis") == "redis",
+                  get(oxr, "spec.createReplicationGroup", True),
                   # don't create a password for the default user
                   # as this will be disabled
                   user != "default"
               ])
           ]
 
-          _items = passwords + [passwordGenerator]
+          esoConnectionSecret = {
+              "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+              "kind": "Object"
+              "metadata": {
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name": "${appName}-connection-secret"
+                      "krm.kcl.dev/ready": readystr("${appName}-connection-secret")
+                  }
+              }
+              "spec": {
+                  "deletionPolicy": dp
+                  "forProvider": {
+                      "manifest": {
+                          "apiVersion": "external-secrets.io/v1beta1"
+                          "kind": "ExternalSecret"
+                          "metadata": {
+                              "name": "${appName}-cache-connection-secret"
+                              "namespace": namespace
+                          }
+                          "spec": {
+                              "refreshInterval": "1h"
+                              "secretStoreRef": {
+                                  "kind": "SecretStore",
+                                  "name": get(oxr, "spec.eso.secretStoreRef.name", ""),
+                              },
+                              _endpoint = globalEndpoint if globalEnabled else endpoint
+                              "target": {
+                                  "name": "${appName}-cache-connection-details"
+                                  "template": {
+                                      "engineVersion": "v2"
+                                      "mergePolicy": "Merge"
+                                      "templateFrom": [
+                                          {
+                                              "target": "Data",
+                                              "literal": """
+                                                  host: ${_endpoint}
+                                                  port: ${_port}
+                                                  username: {{ index . "username" }}
+                                                  password:  {{ index . "password" }}
+                                              """
+                                          }
+                                      ],
+                                      "dataFrom": [
+                                          {
+                                              "extract": {
+                                                  "key": "${appName}-externalsecret-${user}",
+                                              }
+                                          }
+                                      ],
+                                  },
+                              },
+                          }
+                      }
+                  }
+                  "managementPolicies": mgmtPolicy,
+                  "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+              }
+          }
+
+          _items = [
+              c for c in passwords + [passwordGenerator, esoConnectionSecret]
+              if esoEnabled
+          ]
 
           items = _items
         target: ""
@@ -1318,10 +1473,8 @@ spec:
         source: |-
           import regex
 
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocds = option("params").ocds
-          _dcds = option("params").dcds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -1353,28 +1506,28 @@ spec:
               """
               Get an item from the spec of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.spec.${y}", d)
+              get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
           ocdsstatus = lambda x: str, y: str, d: any -> any {
               """
               Get an item from the status of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
               """
-              x in list(_ocds)
+              x in list(ocds)
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
                   exists(x),
                   all_true([
@@ -1390,36 +1543,47 @@ spec:
               "True" if ready(x) else "False"
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          createReplicationGroup = get(_oxr, "spec.createReplicationGroup", True)
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          keyId = get(_oxr, "status.kmsKeyId", False)
-          namespace = get(_oxr, "spec.claimRef.namespace", "default")
-          region = get(_oxr, "spec.region", "eu-central-1")
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
+          appName = get(oxr, "spec.claimRef.name", "")
+          createReplicationGroup = get(oxr, "spec.createReplicationGroup", True)
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          keyId = get(oxr, "status.kmsKeyId", False)
+          namespace = get(oxr, "spec.claimRef.namespace", "default")
+          region = get(oxr, "spec.region", "eu-central-1")
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
           azs = [
               "${region}${az}"
-              for az in get(_oxr, "spec.availabilityZones", [])
+              for az in get(oxr, "spec.availabilityZones", [])
           ]
-          labels = get(_oxr, "metadata.labels", {}) | {"region": region}
+          labels = get(oxr, "metadata.labels", {}) | {"region": region}
 
-          tags = labels | get(_oxr, "spec.tags", {})
+          tags = labels | get(oxr, "spec.tags", {})
 
           globalEnabled = all_true([
               False,
               createReplicationGroup,
-              get(_oxr, "spec.globalReplicationGroup.enabled", False)
+              get(oxr, "spec.globalReplicationGroup.enabled", False)
           ])
 
-          userNames = get(_oxr, "spec.userNames", []) + [appName, "default"]
-          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
-          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+          userNames = get(oxr, "spec.userNames", []) + [appName, "default"]
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+
 
           globalEndpoint = ocdsstatus("elasticache-replication-group-global", "primaryEndpointAddress", "") if globalEnabled else ""
           globalROEndpoint = ocdsstatus("elasticache-replication-group-global", "readerEndpointAddress", "") if globalEnabled else ""
 
-          endpoint = ocdsstatus("elasticache-replication-group-local", "primaryEndpointAddress", "") if createReplicationGroup else ""
-          readerep = ocdsstatus("elasticache-replication-group-local", "readerEndpointAddress", "") if createReplicationGroup else ""
+          cc = get(oxr, "spec.cacheClusters", [])
+          rclen = len(cc) if cc else get(oxr, "spec.numCacheClusters", 1)
+          clusterEndpoints = [
+              e for e in [
+                  ocdsstatus("elasticache-cluster-${i}", "clusterAddress", "")
+                  for i in range(rclen)
+              ]
+              if e
+          ]
+
+          endpoint = ocdsstatus("elasticache-replication-group-local", "primaryEndpointAddress", "") if createReplicationGroup else clusterEndpoints[0] if clusterEndpoints else ""
+          readerep = ocdsstatus("elasticache-replication-group-local", "readerEndpointAddress", "") if createReplicationGroup else endpoint
 
           _port = 0
           if globalEnabled:
@@ -1439,28 +1603,17 @@ spec:
           if ready(globalClusterName):
               _globalConnectionSecretName = ocdsspec(globalClusterName, "writeConnectionSecretToRef.name", "")
 
-
-          cc = get(_oxr, "spec.cacheClusters", [])
-          rclen = len(cc) if cc else get(_oxr, "spec.numCacheClusters", 1)
-          clusterEndpoints = [
-              e for e in [
-                  ocdsstatus("elasticache-cluster-${i}", "clusterAddress", "")
-                  for i in range(rclen)
-              ]
-              if e
-          ]
-
           _globalReplicationId = ocdsstatus("elasticache-replication-group-global", "id", "")
           _localReplicationId = ocdsstatus("elasticache-replication-group-local", "id", "")
 
-          _ipgn = get(_oxr, "spec.parameterGroupName", "")
-          if get(_oxr, "spec.parameterGroupConfiguration", False):
-              _ipgn = get(_oxr, "spec.parameterGroupConfiguration.name", "")
+          _ipgn = get(oxr, "spec.parameterGroupName", "")
+          if get(oxr, "spec.parameterGroupConfiguration", False):
+              _ipgn = get(oxr, "spec.parameterGroupConfiguration.name", "")
 
           _ugId = ocdsstatus("elasticache-user-group", "id", "")
 
-          dxr = {
-              **_oxr,
+          newdxr = {
+              **oxr,
               **{
                   "status": {
                       if _connectionSecretName:
@@ -1502,7 +1655,7 @@ spec:
               }
           }
 
-          _items = [dxr]
+          _items = [newdxr]
 
           items = _items
         target: ""

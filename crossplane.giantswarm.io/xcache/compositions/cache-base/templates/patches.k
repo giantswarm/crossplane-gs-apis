@@ -1,17 +1,3 @@
-globalEndpoint = ocdsstatus("elasticache-replication-group-global", "primaryEndpointAddress", "") if globalEnabled else ""
-globalROEndpoint = ocdsstatus("elasticache-replication-group-global", "readerEndpointAddress", "") if globalEnabled else ""
-
-endpoint = ocdsstatus("elasticache-replication-group-local", "primaryEndpointAddress", "") if createReplicationGroup else ""
-readerep = ocdsstatus("elasticache-replication-group-local", "readerEndpointAddress", "") if createReplicationGroup else ""
-
-_port = 0
-if globalEnabled:
-    _port = ocdsstatus("elasticache-replication-group-global", "port", False)
-elif createReplicationGroup:
-    _port = ocdsstatus("elasticache-replication-group-local", "port", False)
-else:
-    _port = ocdsstatus("elasticache-cluster-0", "port", False)
-
 localClusterName = "elasticache-replication-group-local"
 _connectionSecretName = ""
 if ready(localClusterName):
@@ -21,17 +7,6 @@ globalClusterName = "elasticache-replication-group-global"
 _globalConnectionSecretName = ""
 if ready(globalClusterName):
     _globalConnectionSecretName = ocdsspec(globalClusterName, "writeConnectionSecretToRef.name", "")
-
-
-cc = get(oxr, "spec.cacheClusters", [])
-rclen = len(cc) if cc else get(oxr, "spec.numCacheClusters", 1)
-clusterEndpoints = [
-    e for e in [
-        ocdsstatus("elasticache-cluster-${i}", "clusterAddress", "")
-        for i in range(rclen)
-    ]
-    if e
-]
 
 _globalReplicationId = ocdsstatus("elasticache-replication-group-global", "id", "")
 _localReplicationId = ocdsstatus("elasticache-replication-group-local", "id", "")

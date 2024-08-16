@@ -24,10 +24,8 @@ spec:
         source: |-
           import regex
 
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocds = option("params").ocds
-          _dcds = option("params").dcds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -44,14 +42,14 @@ spec:
               """
               Check if a value exists.
               """
-              x in list(_ocds)
+              x in list(ocds)
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
                   exists(x),
                   all_true([
@@ -67,10 +65,10 @@ spec:
               "True" if ready(x) else "False"
           }
 
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
 
-          e = get(_oxr, "spec.engine", False)
+          e = get(oxr, "spec.engine", False)
           _engine = ""
 
           if e and e in ["mysql", "aurora-mysql", "mariadb"]:
@@ -80,12 +78,12 @@ spec:
           else:
               assert False, "Unsupported engine: ${e}"
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          connectionSecret = get(_oxr, "spec.connectionSecretName", "")
+          appName = get(oxr, "spec.claimRef.name", "")
+          connectionSecret = get(oxr, "spec.connectionSecretName", "")
           _requiredDatabases = {}
 
           if _engine == "mysql":
-              _requiredDatabases = get(_oxr, "spec.databases", {}) | {
+              _requiredDatabases = get(oxr, "spec.databases", {}) | {
                   "${appName}": {
                       "name": appName,
                       "users": [
@@ -104,7 +102,7 @@ spec:
               }
 
           if _engine == "postgresql":
-              _requiredDatabases = get(_oxr, "spec.databases", {}) | {
+              _requiredDatabases = get(oxr, "spec.databases", {}) | {
                   "${appName}": {
                       "name": appName,
                       "users": [
@@ -144,7 +142,7 @@ spec:
                   "spec": {
                       "deletionPolicy": dp
                       "providerConfigRef": {
-                          "name": get(_oxr, "spec.kubernetesProviderConfig.name", "")
+                          "name": get(oxr, "spec.kubernetesProviderConfig.name", "")
                       }
                       "forProvider": {
                           "manifest": {
@@ -157,7 +155,7 @@ spec:
                                   "credentials": {
                                       "connectionSecretRef": {
                                           "name": connectionSecret
-                                          "namespace": get(_oxr, "spec.claimRef.namespace", "")
+                                          "namespace": get(oxr, "spec.claimRef.namespace", "")
                                       }
                                       "source": "MySQLConnectionSecret" if _engine == "mysql" else "PostgreSQLConnectionSecret"
                                   }
@@ -174,7 +172,7 @@ spec:
               connectionSecret, _requiredDatabases,
           ]) else []
 
-          _providerConfigName = get(_oxr, "spec.providerConfigRef.name", "")
+          _providerConfigName = get(oxr, "spec.providerConfigRef.name", "")
           providerConfigName = newPcrName if connectionSecret else _providerConfigName
           # Create each required database
           databases = [
@@ -297,7 +295,7 @@ spec:
               ])
           ]
 
-          provisionSql = get(_oxr, "spec.provisionSql", True)
+          provisionSql = get(oxr, "spec.provisionSql", True)
           _items = [
               i for r in [
                   providerConnectionSecret, databases,

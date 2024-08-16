@@ -51,7 +51,7 @@ readystr = lambda x: str -> str {
 
 
 # AppName here must be all lowercase with all symbols removed
-appName = regex.replace(get(_oxr, "spec.claimRef.name", ""), "[-_\.]", "").lower()
+appName = regex.replace(get(_oxr, "spec.claimRef.name", ""), "[-_\.]", "_").lower()
 dp = get(_oxr, "spec.deletionPolicy", "Delete")
 mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
 namespace = get(_oxr, "spec.claimRef.namespace", "default")

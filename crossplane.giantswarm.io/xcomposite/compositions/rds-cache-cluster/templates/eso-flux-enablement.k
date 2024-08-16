@@ -48,9 +48,10 @@ _items = [
                         },
                         "dataFrom": [
                             {
-                                "extract": {
-                                    "key": ssasecret,
-                                    "version": "v1",
+                                "find": {
+                                    "name": {
+                                        "regexp": "^${ssasecret}$",
+                                    },
                                 },
                             },
                         ],

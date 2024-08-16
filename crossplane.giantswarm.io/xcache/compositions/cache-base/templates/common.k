@@ -94,3 +94,29 @@ globalEnabled = all_true([
 userNames = get(oxr, "spec.userNames", []) + [appName, "default"]
 mgmtPolicy = get(oxr, "spec.managementPolicies", [])
 publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+
+
+globalEndpoint = ocdsstatus("elasticache-replication-group-global", "primaryEndpointAddress", "") if globalEnabled else ""
+globalROEndpoint = ocdsstatus("elasticache-replication-group-global", "readerEndpointAddress", "") if globalEnabled else ""
+
+cc = get(oxr, "spec.cacheClusters", [])
+rclen = len(cc) if cc else get(oxr, "spec.numCacheClusters", 1)
+clusterEndpoints = [
+    e for e in [
+        ocdsstatus("elasticache-cluster-${i}", "clusterAddress", "")
+        for i in range(rclen)
+    ]
+    if e
+]
+
+endpoint = ocdsstatus("elasticache-replication-group-local", "primaryEndpointAddress", "") if createReplicationGroup else clusterEndpoints[0] if clusterEndpoints else ""
+readerep = ocdsstatus("elasticache-replication-group-local", "readerEndpointAddress", "") if createReplicationGroup else endpoint
+
+_port = 0
+if globalEnabled:
+    _port = ocdsstatus("elasticache-replication-group-global", "port", False)
+elif createReplicationGroup:
+    _port = ocdsstatus("elasticache-replication-group-local", "port", False)
+else:
+    _port = ocdsstatus("elasticache-cluster-0", "port", False)
+

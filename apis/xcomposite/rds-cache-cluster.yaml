@@ -309,7 +309,7 @@ spec:
 
 
           # AppName here must be all lowercase with all symbols removed
-          appName = regex.replace(get(_oxr, "spec.claimRef.name", ""), "[-_\.]", "").lower()
+          appName = regex.replace(get(_oxr, "spec.claimRef.name", ""), "[-_\.]", "_").lower()
           dp = get(_oxr, "spec.deletionPolicy", "Delete")
           mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
           namespace = get(_oxr, "spec.claimRef.namespace", "default")
@@ -364,9 +364,10 @@ spec:
                                   },
                                   "dataFrom": [
                                       {
-                                          "extract": {
-                                              "key": ssasecret,
-                                              "version": "v1",
+                                          "find": {
+                                              "name": {
+                                                  "regexp": "^${ssasecret}$",
+                                              },
                                           },
                                       },
                                   ],
@@ -465,7 +466,7 @@ spec:
 
 
           # AppName here must be all lowercase with all symbols removed
-          appName = regex.replace(get(_oxr, "spec.claimRef.name", ""), "[-_\.]", "").lower()
+          appName = regex.replace(get(_oxr, "spec.claimRef.name", ""), "[-_\.]", "_").lower()
           dp = get(_oxr, "spec.deletionPolicy", "Delete")
           mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
           namespace = get(_oxr, "spec.claimRef.namespace", "default")

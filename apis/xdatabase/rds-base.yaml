@@ -179,10 +179,8 @@ spec:
         source: |-
           import regex
 
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocds = option("params").ocds
-          _dcds = option("params").dcds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -210,28 +208,28 @@ spec:
               """
               Get an item from the spec of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.spec.${y}", d)
+              get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
           ocdsstatus = lambda x: str, y: str, d: any -> any {
               """
               Get an item from the status of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
               """
-              x in list(_ocds)
+              x in list(ocds)
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
                   all_true([
                       get(c, "status", "False") == "True" for c in conditions
@@ -246,35 +244,35 @@ spec:
               "True" if ready(x) else "False"
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          createCluster = get(_oxr, "spec.createCluster", True)
-          engine = get(_oxr, "spec.engine", "")
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          keyId = get(_oxr, "status.kmsKeyId", False)
-          namespace = get(_oxr, "spec.claimRef.namespace", "default")
-          region = get(_oxr, "spec.region", "eu-central-1")
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
-          labels = get(_oxr, "metadata.labels", {}) | {"region": region}
-          tags = labels | get(_oxr, "spec.tags", {})
+          appName = get(oxr, "spec.claimRef.name", "")
+          createCluster = get(oxr, "spec.createCluster", True)
+          engine = get(oxr, "spec.engine", "")
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          keyId = get(oxr, "status.kmsKeyId", False)
+          namespace = get(oxr, "spec.claimRef.namespace", "default")
+          region = get(oxr, "spec.region", "eu-central-1")
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          labels = get(oxr, "metadata.labels", {}) | {"region": region}
+          tags = labels | get(oxr, "spec.tags", {})
 
-          port = get(_oxr, "status.port", False)
+          port = get(oxr, "status.port", False)
           restoreToPointInTime = {
               if createCluster:
-                  "sourceDbClusterIdentifier": get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
-                  "restoreType": get(_oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
+                  "sourceDbClusterIdentifier": get(oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
+                  "restoreType": get(oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
               else:
-                  "sourceDbInstanceIdentifier" = get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None)
-                  "sourceDbInstanceAutomatedBackupsArn" = get(_oxr, "spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn", None)
-                  "sourceDbiResourceId" = get(_oxr, "spec.restoreToPointInTime.sourceDbiResourceId", None)
+                  "sourceDbInstanceIdentifier" = get(oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None)
+                  "sourceDbInstanceAutomatedBackupsArn" = get(oxr, "spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn", None)
+                  "sourceDbiResourceId" = get(oxr, "spec.restoreToPointInTime.sourceDbiResourceId", None)
 
-              _v = get(_oxr, "spec.restoreToPointInTime.restoreToTime", False)
+              _v = get(oxr, "spec.restoreToPointInTime.restoreToTime", False)
               if _v:
-                  "restoreToTime": get(_oxr, "spec.restoreToPointInTime.restoreToTime", None)
+                  "restoreToTime": get(oxr, "spec.restoreToPointInTime.restoreToTime", None)
               else:
-                  "useLatestRestorableTime": get(_oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True)
+                  "useLatestRestorableTime": get(oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True)
           }
 
-          s3import = get(_oxr, "spec.s3Import", False)
+          s3import = get(oxr, "spec.s3Import", False)
 
           masterInstance = ready("instance-0") and ocdsstatus("instance-0", "id", False)
           clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
@@ -282,8 +280,8 @@ spec:
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
-          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
-          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 
           _secretRef: bool|str = False
           if createCluster:
@@ -294,13 +292,13 @@ spec:
                   _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef.name", "")
           _connectionSecret = _secretRef
 
-          ipgn = get(_oxr, "spec.dbParameterGroup.name", "") if get(_oxr, "spec.allowMajorVersionUpgrade", False) else ""
-          provisioned = get(_oxr, "spec.engineMode", "provisioned") == "provisioned"
-          regionedAzs = ["${region}${az}" for az in get(_oxr, "spec.availabilityZones", ["a", "b", "c"])]
-          subnetGroup = get(_oxr, "status.dbSubnetGroupName", False)
-          serverless = get(_oxr, "spec.engineMode", "provisioned") == "serverless"
-          scalingConfiguration = get(_oxr, "spec.scalingConfiguration", False) if serverless else False
-          serverlessv2scaling = get(_oxr, "spec.serverlessv2scalingConfiguration", False) if provisioned else False
+          ipgn = get(oxr, "spec.dbParameterGroup.name", "") if get(oxr, "spec.allowMajorVersionUpgrade", False) else ""
+          provisioned = get(oxr, "spec.engineMode", "provisioned") == "provisioned"
+          regionedAzs = ["${region}${az}" for az in get(oxr, "spec.availabilityZones", ["a", "b", "c"])]
+          subnetGroup = get(oxr, "status.dbSubnetGroupName", False)
+          serverless = get(oxr, "spec.engineMode", "provisioned") == "serverless"
+          scalingConfiguration = get(oxr, "spec.scalingConfiguration", False) if serverless else False
+          serverlessv2scaling = get(oxr, "spec.serverlessv2scalingConfiguration", False) if provisioned else False
 
           cluster = {
               "apiVersion": "rds.aws.upbound.io/v1beta1"
@@ -316,23 +314,23 @@ spec:
               "spec": {
                   "deletionPolicy": dp
                   "initProvider": {
-                      if get(_oxr, "spec.allowMajorVersionUpgrade", True):
-                          if get(_oxr, "spec.engineVersion", False):
-                              "engineVersion": _oxr.spec.engineVersion
-                      if get(_oxr, "spec.globalClusterIdentifier", False):
-                          "globalClusterIdentifier": _oxr.spec.globalClusterIdentifier
-                      if get(_oxr, "spec.replicationSourceIdentifier", False):
-                          "replicationSourceIdentifier": _oxr.spec.replicationSourceIdentifier
+                      if get(oxr, "spec.allowMajorVersionUpgrade", True):
+                          if get(oxr, "spec.engineVersion", False):
+                              "engineVersion": oxr.spec.engineVersion
+                      if get(oxr, "spec.globalClusterIdentifier", False):
+                          "globalClusterIdentifier": oxr.spec.globalClusterIdentifier
+                      if get(oxr, "spec.replicationSourceIdentifier", False):
+                          "replicationSourceIdentifier": oxr.spec.replicationSourceIdentifier
                   }
 
                   "forProvider": {
                       _managedMasterUserPassword = False
-                      _autoGeneratePassword = get(_oxr, "spec.autoGeneratePassword", True),
+                      _autoGeneratePassword = get(oxr, "spec.autoGeneratePassword", True),
                       if _autoGeneratePassword and not _managedMasterUserPassword:
                           "autoGeneratePassword": _autoGeneratePassword,
                           "masterPasswordSecretRef": {
                               "key": "password",
-                              "namespace": get(_oxr, "spec.claimRef.namespace", "default"),
+                              "namespace": get(oxr, "spec.claimRef.namespace", "default"),
                               "name": "${appName}-${region}-rds-autogen-pass",
                           }
 
@@ -347,73 +345,73 @@ spec:
                           Name: "${appName}-${region}"
                       }
 
-                      if get(_oxr, "spec.allocatedStorage", False):
-                          "allocatedStorage": _oxr.spec.allocatedStorage
-                      if get(_oxr, "spec.allowMajorVersionUpgrade", None) != None:
-                          "allowMajorVersionUpgrade": _oxr.spec.allowMajorVersionUpgrade
-                      if get(_oxr, "spec.applyImmediately", None) != None:
-                          "applyImmediately": _oxr.spec.applyImmediately
-                      if get(_oxr, "spec.availabilityZones", False):
+                      if get(oxr, "spec.allocatedStorage", False):
+                          "allocatedStorage": oxr.spec.allocatedStorage
+                      if get(oxr, "spec.allowMajorVersionUpgrade", None) != None:
+                          "allowMajorVersionUpgrade": oxr.spec.allowMajorVersionUpgrade
+                      if get(oxr, "spec.applyImmediately", None) != None:
+                          "applyImmediately": oxr.spec.applyImmediately
+                      if get(oxr, "spec.availabilityZones", False):
                           "availabilityZones": regionedAzs
-                      if get(_oxr, "spec.backupRetentionPeriod", False):
-                          "backupRetentionPeriod": _oxr.spec.backupRetentionPeriod
-                      if get(_oxr, "spec.backtrackWindow", False):
-                          "backtrackWindow": _oxr.spec.backtrackWindow
-                      if get(_oxr, "spec.clusterMembers", False):
-                          "clusterMembers": _oxr.spec.clusterMembers
-                      if get(_oxr, "spec.databaseName", False):
-                          "databaseName": _oxr.spec.databaseName
-                      if get(_oxr, "spec.dbClusterInstanceClass", False):
-                          "dbClusterInstanceClass": _oxr.spec.dbClusterInstanceClass
-                      if get(_oxr, "spec.dbClusterParameterGroup.name", False):
-                          "dbClusterParameterGroupName": _oxr.spec.dbClusterParameterGroup.name
-                      if get(_oxr, "spec.dbInstanceParameterGroup.name", False):
-                          "dbInstanceParameterGroupName": _oxr.spec.dbInstanceParameterGroup.name
-                      if get(_oxr, "spec.deletionProtection", None) != None:
-                          "deletionProtection": _oxr.spec.deletionProtection
-                      if get(_oxr, "spec.deleteAutomatedBackups", None) != None:
-                          "deleteAutomatedBackups": _oxr.spec.deleteAutomatedBackups
-                      if get(_oxr, "spec.domain", False):
-                          "domain": _oxr.spec.domain
-                      if get(_oxr, "spec.domainIAMRoleName", False):
-                          "domainIAMRoleName": _oxr.spec.domainIAMRoleName
-                      if get(_oxr, "spec.enableHttpEndpoint", False):
-                          "enableHttpEndpoint": _oxr.spec.enableHttpEndpoint
-                      if get(_oxr, "spec.enableGlobalWriteForwarding", None) != None:
-                          "enableGlobalWriteForwarding": _oxr.spec.enableGlobalWriteForwarding
-                      if get(_oxr, "spec.enableLocalWriteForwarding", None) != None:
-                          "enableLocalWriteForwarding": _oxr.spec.enableLocalWriteForwarding
-                      if get(_oxr, "spec.enabledCloudwatchLogsExports", False):
-                          "enabledCloudwatchLogsExports": _oxr.spec.enabledCloudwatchLogsExports
-                      if get(_oxr, "spec.engine", False):
-                          "engine": _oxr.spec.engine
-                      if get(_oxr, "spec.engineMode", False):
-                          "engineMode": _oxr.spec.engineMode
+                      if get(oxr, "spec.backupRetentionPeriod", False):
+                          "backupRetentionPeriod": oxr.spec.backupRetentionPeriod
+                      if get(oxr, "spec.backtrackWindow", False):
+                          "backtrackWindow": oxr.spec.backtrackWindow
+                      if get(oxr, "spec.clusterMembers", False):
+                          "clusterMembers": oxr.spec.clusterMembers
+                      if get(oxr, "spec.databaseName", False):
+                          "databaseName": oxr.spec.databaseName
+                      if get(oxr, "spec.dbClusterInstanceClass", False):
+                          "dbClusterInstanceClass": oxr.spec.dbClusterInstanceClass
+                      if get(oxr, "spec.dbClusterParameterGroup.name", False):
+                          "dbClusterParameterGroupName": oxr.spec.dbClusterParameterGroup.name
+                      if get(oxr, "spec.dbInstanceParameterGroup.name", False):
+                          "dbInstanceParameterGroupName": oxr.spec.dbInstanceParameterGroup.name
+                      if get(oxr, "spec.deletionProtection", None) != None:
+                          "deletionProtection": oxr.spec.deletionProtection
+                      if get(oxr, "spec.deleteAutomatedBackups", None) != None:
+                          "deleteAutomatedBackups": oxr.spec.deleteAutomatedBackups
+                      if get(oxr, "spec.domain", False):
+                          "domain": oxr.spec.domain
+                      if get(oxr, "spec.domainIAMRoleName", False):
+                          "domainIAMRoleName": oxr.spec.domainIAMRoleName
+                      if get(oxr, "spec.enableHttpEndpoint", False):
+                          "enableHttpEndpoint": oxr.spec.enableHttpEndpoint
+                      if get(oxr, "spec.enableGlobalWriteForwarding", None) != None:
+                          "enableGlobalWriteForwarding": oxr.spec.enableGlobalWriteForwarding
+                      if get(oxr, "spec.enableLocalWriteForwarding", None) != None:
+                          "enableLocalWriteForwarding": oxr.spec.enableLocalWriteForwarding
+                      if get(oxr, "spec.enabledCloudwatchLogsExports", False):
+                          "enabledCloudwatchLogsExports": oxr.spec.enabledCloudwatchLogsExports
+                      if get(oxr, "spec.engine", False):
+                          "engine": oxr.spec.engine
+                      if get(oxr, "spec.engineMode", False):
+                          "engineMode": oxr.spec.engineMode
 
-                      if not get(_oxr, "spec.allowMajorVersionUpgrade", True):
-                          if get(_oxr, "spec.engineVersion", False):
-                              "engineVersion": get(_oxr, "spec.engineVersion", "")
+                      if not get(oxr, "spec.allowMajorVersionUpgrade", True):
+                          if get(oxr, "spec.engineVersion", False):
+                              "engineVersion": get(oxr, "spec.engineVersion", "")
 
-                      if get(_oxr, "spec.claimRef.name", False):
-                          "finalSnapshotIdentifier": _oxr.spec.claimRef.name
-                      if get(_oxr, "spec.iamDatabaseAuthenticationEnabled", None) != None:
-                          "iamDatabaseAuthenticationEnabled": _oxr.spec.iamDatabaseAuthenticationEnabled
-                      if get(_oxr, "spec.iops", False):
-                          "iops": _oxr.spec.iops
-                      if get(_oxr, "spec.masterUsername", False):
-                          "masterUsername": _oxr.spec.masterUsername
-                      if get(_oxr, "spec.preferredBackupWindow", False):
-                          "preferredBackupWindow": _oxr.spec.preferredBackupWindow
-                      if get(_oxr, "spec.preferredMaintenanceWindow", False):
-                          "preferredMaintenanceWindow": _oxr.spec.preferredMaintenanceWindow
-                      if get(_oxr, "spec.restoreToPointInTime", False):
+                      if get(oxr, "spec.claimRef.name", False):
+                          "finalSnapshotIdentifier": oxr.spec.claimRef.name
+                      if get(oxr, "spec.iamDatabaseAuthenticationEnabled", None) != None:
+                          "iamDatabaseAuthenticationEnabled": oxr.spec.iamDatabaseAuthenticationEnabled
+                      if get(oxr, "spec.iops", False):
+                          "iops": oxr.spec.iops
+                      if get(oxr, "spec.masterUsername", False):
+                          "masterUsername": oxr.spec.masterUsername
+                      if get(oxr, "spec.preferredBackupWindow", False):
+                          "preferredBackupWindow": oxr.spec.preferredBackupWindow
+                      if get(oxr, "spec.preferredMaintenanceWindow", False):
+                          "preferredMaintenanceWindow": oxr.spec.preferredMaintenanceWindow
+                      if get(oxr, "spec.restoreToPointInTime", False):
                           "restoreToPointInTime": [restoreToPointInTime]
-                      if get(_oxr, "status.securityGroupId", False):
-                          "vpcSecurityGroupIds": [_oxr.status.securityGroupId]
-                      if get(_oxr, "spec.storageType", False):
-                          "storageType": _oxr.spec.storageType
-                      if get(_oxr, "spec.sourceRegion", False):
-                          "sourceRegion": _oxr.spec.sourceRegion
+                      if get(oxr, "status.securityGroupId", False):
+                          "vpcSecurityGroupIds": [oxr.status.securityGroupId]
+                      if get(oxr, "spec.storageType", False):
+                          "storageType": oxr.spec.storageType
+                      if get(oxr, "spec.sourceRegion", False):
+                          "sourceRegion": oxr.spec.sourceRegion
 
                       if s3import:
                           "s3Import": [
@@ -435,7 +433,7 @@ spec:
                   "providerConfigRef": pcr,
                   "writeConnectionSecretToRef": {
                       "name": "${appName}-${region}-rds"
-                      "namespace": get(_oxr, "spec.claimRef.namespace", "default")
+                      "namespace": get(oxr, "spec.claimRef.namespace", "default")
                   }
               }
           } if keyId and subnetGroup else {}
@@ -459,10 +457,8 @@ spec:
         source: |-
           import regex
 
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocds = option("params").ocds
-          _dcds = option("params").dcds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -490,28 +486,28 @@ spec:
               """
               Get an item from the spec of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.spec.${y}", d)
+              get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
           ocdsstatus = lambda x: str, y: str, d: any -> any {
               """
               Get an item from the status of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
               """
-              x in list(_ocds)
+              x in list(ocds)
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
                   all_true([
                       get(c, "status", "False") == "True" for c in conditions
@@ -526,35 +522,35 @@ spec:
               "True" if ready(x) else "False"
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          createCluster = get(_oxr, "spec.createCluster", True)
-          engine = get(_oxr, "spec.engine", "")
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          keyId = get(_oxr, "status.kmsKeyId", False)
-          namespace = get(_oxr, "spec.claimRef.namespace", "default")
-          region = get(_oxr, "spec.region", "eu-central-1")
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
-          labels = get(_oxr, "metadata.labels", {}) | {"region": region}
-          tags = labels | get(_oxr, "spec.tags", {})
+          appName = get(oxr, "spec.claimRef.name", "")
+          createCluster = get(oxr, "spec.createCluster", True)
+          engine = get(oxr, "spec.engine", "")
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          keyId = get(oxr, "status.kmsKeyId", False)
+          namespace = get(oxr, "spec.claimRef.namespace", "default")
+          region = get(oxr, "spec.region", "eu-central-1")
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          labels = get(oxr, "metadata.labels", {}) | {"region": region}
+          tags = labels | get(oxr, "spec.tags", {})
 
-          port = get(_oxr, "status.port", False)
+          port = get(oxr, "status.port", False)
           restoreToPointInTime = {
               if createCluster:
-                  "sourceDbClusterIdentifier": get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
-                  "restoreType": get(_oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
+                  "sourceDbClusterIdentifier": get(oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
+                  "restoreType": get(oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
               else:
-                  "sourceDbInstanceIdentifier" = get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None)
-                  "sourceDbInstanceAutomatedBackupsArn" = get(_oxr, "spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn", None)
-                  "sourceDbiResourceId" = get(_oxr, "spec.restoreToPointInTime.sourceDbiResourceId", None)
+                  "sourceDbInstanceIdentifier" = get(oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None)
+                  "sourceDbInstanceAutomatedBackupsArn" = get(oxr, "spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn", None)
+                  "sourceDbiResourceId" = get(oxr, "spec.restoreToPointInTime.sourceDbiResourceId", None)
 
-              _v = get(_oxr, "spec.restoreToPointInTime.restoreToTime", False)
+              _v = get(oxr, "spec.restoreToPointInTime.restoreToTime", False)
               if _v:
-                  "restoreToTime": get(_oxr, "spec.restoreToPointInTime.restoreToTime", None)
+                  "restoreToTime": get(oxr, "spec.restoreToPointInTime.restoreToTime", None)
               else:
-                  "useLatestRestorableTime": get(_oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True)
+                  "useLatestRestorableTime": get(oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True)
           }
 
-          s3import = get(_oxr, "spec.s3Import", False)
+          s3import = get(oxr, "spec.s3Import", False)
 
           masterInstance = ready("instance-0") and ocdsstatus("instance-0", "id", False)
           clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
@@ -562,8 +558,8 @@ spec:
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
-          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
-          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 
           _secretRef: bool|str = False
           if createCluster:
@@ -576,20 +572,20 @@ spec:
 
           import json
 
-          clusterId = get(_oxr, "status.clusterIdentifier", None)
-          monitoringRoleArn = get(_oxr, "status.monitoringRoleArn", None)
-          dbSubnetGroupName = get(_oxr, "status.dbSubnetGroupName", None)
+          clusterId = get(oxr, "status.clusterIdentifier", None)
+          monitoringRoleArn = get(oxr, "status.monitoringRoleArn", None)
+          dbSubnetGroupName = get(oxr, "status.dbSubnetGroupName", None)
 
-          partition = get(_oxr, "spec.partition", "aws")
+          partition = get(oxr, "spec.partition", "aws")
 
           # Has the master instance been built?
           masterInstanceIdentifier = ocdsstatus("instance-0", "identifier", False)
           masterInstanceArn = ocdsstatus("instance-0", "arn", False)
 
-          _specInstances = get(_oxr, "spec.instances", [])
+          _specInstances = get(oxr, "spec.instances", [])
 
-          if not _specInstances and get(_oxr, "spec.instanceCount", 0) > 0:
-              _specInstances = [{} for i in range(get(_oxr, "spec.instanceCount", 0))]
+          if not _specInstances and get(oxr, "spec.instanceCount", 0) > 0:
+              _specInstances = [{} for i in range(get(oxr, "spec.instanceCount", 0))]
 
           # This will force the secondary (read) replicas to be built after the primary
           # instance has been built. This is to ensure that the primary instance is
@@ -613,7 +609,7 @@ spec:
           # common settings across all instances being built-
           instances = [
               {
-                  _availabilityZones = get(_oxr, "spec.availabilityZones", [])
+                  _availabilityZones = get(oxr, "spec.availabilityZones", [])
                   _az = get(item, "availabilityZone", False)
                   if not _az and len(_availabilityZones) > 0:
                       _az = _availabilityZones[i % len(_availabilityZones)]
@@ -622,10 +618,10 @@ spec:
                   _instanceRegion = get(item, "region", region)
                   _isCrossRegion = _instanceRegion != region
 
-                  _cacert = get(_oxr, "status.caCertIdentifier", False),
-                  _dbp = get(item, "parameterGroupName", get(_oxr, "spec.parameterGroup.name", False)),
+                  _cacert = get(oxr, "status.caCertIdentifier", False),
+                  _dbp = get(item, "parameterGroupName", get(oxr, "spec.parameterGroup.name", False)),
                   _isPrimaryInstance = i == 0
-                  _multiAz = getwparent(item, _oxr, "multiAz", False)
+                  _multiAz = getwparent(item, oxr, "multiAz", False)
                   _instanceUseAz = not createCluster and not _multiAz
                   _pt = get(item, "promotionTier", False)
 
@@ -649,77 +645,77 @@ spec:
                       "deletionPolicy": dp
                       "initProvider": {
                           if any_true([
-                              getwparent(item, _oxr, "allowMajorVersionUpgrade",  True),
-                              getwparent(item, _oxr, "autoMinorVersionUpgrade", True),
+                              getwparent(item, oxr, "allowMajorVersionUpgrade",  True),
+                              getwparent(item, oxr, "autoMinorVersionUpgrade", True),
                           ]):
-                              "engineVersion": getwparent(item, _oxr, "engineVersion", "14.0")
+                              "engineVersion": getwparent(item, oxr, "engineVersion", "14.0")
                       }
                       "forProvider": {
                           if not createCluster:
                               # These options are specific to the Instance kind
-                              "allowMajorVersionUpgrade": getwparent(item, _oxr, "allowMajorVersionUpgrade", True)
-                              "backupRetentionPeriod": getwparent(item, _oxr, "backupRetentionPeriod", 7)
-                              "backupWindow": getwparent(item, _oxr, "preferredBackupWindow", "03:00-04:00")
-                              "deleteAutomatedBackups": getwparent(item, _oxr, "deleteAutomatedBackups", True)
-                              "deletionProtection": getwparent(item, _oxr, "deletionProtection", False)
+                              "allowMajorVersionUpgrade": getwparent(item, oxr, "allowMajorVersionUpgrade", True)
+                              "backupRetentionPeriod": getwparent(item, oxr, "backupRetentionPeriod", 7)
+                              "backupWindow": getwparent(item, oxr, "preferredBackupWindow", "03:00-04:00")
+                              "deleteAutomatedBackups": getwparent(item, oxr, "deleteAutomatedBackups", True)
+                              "deletionProtection": getwparent(item, oxr, "deletionProtection", False)
 
-                              _v = getwparent(item, _oxr, "domainIamRoleName",  False)
+                              _v = getwparent(item, oxr, "domainIamRoleName",  False)
                               if _v:
                                   "domainIamRoleName": _v
 
-                              "enabledCloudwatchLogsExports": getwparent(item, _oxr, "enabledCloudwatchLogsExports", [])
+                              "enabledCloudwatchLogsExports": getwparent(item, oxr, "enabledCloudwatchLogsExports", [])
 
-                              _v = getwparent(item, _oxr, "spec.finalSnapshotIdentifier", False)
+                              _v = getwparent(item, oxr, "spec.finalSnapshotIdentifier", False)
                               if _v:
                                   "finalSnapshotIdentifier": _v,
 
-                              "iamDatabaseAuthenticationEnabled": getwparent(item, _oxr, "iamDatabaseAuthenticationEnabled", False)
-                              "iops": getwparent(item, _oxr, "iops", 0)
+                              "iamDatabaseAuthenticationEnabled": getwparent(item, oxr, "iamDatabaseAuthenticationEnabled", False)
+                              "iops": getwparent(item, oxr, "iops", 0)
                               "kmsKeyId": keyId,
 
-                              _v = getwparent(item, _oxr, "licenseModel", False)
+                              _v = getwparent(item, oxr, "licenseModel", False)
                               if _v:
                                   "licenseModel": _v
 
-                              "maintenanceWindow": getwparent(item, _oxr, "preferredMaintenanceWindow", "sun:05:00-sun:06:00"),
+                              "maintenanceWindow": getwparent(item, oxr, "preferredMaintenanceWindow", "sun:05:00-sun:06:00"),
                               "multiAz": _multiAz,
-                              "networkType": getwparent(item, _oxr, "networkType", "ipv4")
+                              "networkType": getwparent(item, oxr, "networkType", "ipv4")
 
                               "identifierPrefix": appName
                               # Option group is specific to non-postgresql instances but
                               # may be set for mysql and mssql instance types
-                              _v = getwparent(item, _oxr, "optionGroupName", False)
+                              _v = getwparent(item, oxr, "optionGroupName", False)
                               if _v:
                                   "optionGroupName": _v
 
-                              if restoreToPointInTime and get(_oxr, "spec.restoreToPointInTime.identifier", False):
+                              if restoreToPointInTime and get(oxr, "spec.restoreToPointInTime.identifier", False):
                                   "restoreToPointInTime": [
                                       restoreToPointInTime
                                   ],
 
-                              _skipFS = getwparent(item, _oxr, "skipFinalSnapshot", True)
+                              _skipFS = getwparent(item, oxr, "skipFinalSnapshot", True)
                               "skipFinalSnapshot": _skipFS
                               if not _skipFS:
-                                  "snapshotIdentifier": getwparent(item, _oxr, "snapshotIdentifier", appName)
+                                  "snapshotIdentifier": getwparent(item, oxr, "snapshotIdentifier", appName)
 
-                              "storageEncrypted": getwparent(item, _oxr, "storageEncrypted", True)
+                              "storageEncrypted": getwparent(item, oxr, "storageEncrypted", True)
 
-                              _storageType = getwparent(item, _oxr, "storageType", "gp2")
+                              _storageType = getwparent(item, oxr, "storageType", "gp2")
                               if _storageType == "gp3":
-                                  "storageThroughput": getwparent(item, _oxr, "spec.storageThroughput", 0)
+                                  "storageThroughput": getwparent(item, oxr, "spec.storageThroughput", 0)
                               "storageType": _storageType
                               "vpcSecurityGroupIds": [
-                                  get(_oxr, "status.securityGroupId", "")
+                                  get(oxr, "status.securityGroupId", "")
                                   for _ in [True]
-                                  if get(_oxr, "status.securityGroupId", False)
+                                  if get(oxr, "status.securityGroupId", False)
                               ],
 
                               # You cannot have read replicas with manage master user password
                               #
                               # This means that in the longer term, this will be removed as an option
                               # and instead, the password will be pushed to secretsmanager via ESO
-                              _managedMasterUserPassword = False # get(item, "manageMasterUserPassword", get(_oxr, "spec.manageMasterUserPassword", True)),
-                              _autoGeneratePassword = getwparent(item, _oxr, "autoGeneratePassword", True)
+                              _managedMasterUserPassword = False # get(item, "manageMasterUserPassword", get(oxr, "spec.manageMasterUserPassword", True)),
+                              _autoGeneratePassword = getwparent(item, oxr, "autoGeneratePassword", True)
 
                               # If this is the primary (non-cluster) instance, set
                               # the database name and master user password. Additionally,
@@ -733,15 +729,15 @@ spec:
                                           "name": "${appName}-${region}-rds-autogen-pass",
                                       }
 
-                                  "allocatedStorage": getwparent(item, _oxr, "allocatedStorage", 20)
+                                  "allocatedStorage": getwparent(item, oxr, "allocatedStorage", 20)
 
-                                  _dbName = getwparent(item, _oxr, "databaseName", False)
+                                  _dbName = getwparent(item, oxr, "databaseName", False)
                                   if _dbName:
                                       "dbName": _dbName,
                                   if _managedMasterUserPassword:
                                       "manageMasterUserPassword": _managedMasterUserPassword,
                                       # masterUserSecretKmsKeyId: _keyId,
-                                  "username": get(item, "username", get(_oxr, "spec.masterUsername", "")),
+                                  "username": get(item, "username", get(oxr, "spec.masterUsername", "")),
 
                                   if s3import:
                                       "s3import": s3import,
@@ -757,28 +753,28 @@ spec:
                               if _dbp:
                                   "parameterGroupName": _dbp
 
-                          "applyImmediately": getwparent(item, _oxr, "applyImmediately", True)
-                          "autoMinorVersionUpgrade": getwparent(item, _oxr, "autoMinorVersionUpgrade", True)
+                          "applyImmediately": getwparent(item, oxr, "applyImmediately", True)
+                          "autoMinorVersionUpgrade": getwparent(item, oxr, "autoMinorVersionUpgrade", True)
                           "dbSubnetGroupName": dbSubnetGroupName,
                           "engine": engine,
                           if any_true([
-                              not getwparent(item, _oxr, "allowMajorVersionUpgrade" True)
-                              not getwparent(item, _oxr, "autoMinorVersionUpgrade", True)
+                              not getwparent(item, oxr, "allowMajorVersionUpgrade" True)
+                              not getwparent(item, oxr, "autoMinorVersionUpgrade", True)
                           ]):
-                              "engineVersion": getwparent(item, _oxr, "engineVersion", "14.0"),
+                              "engineVersion": getwparent(item, oxr, "engineVersion", "14.0"),
 
                           # cannot use getwparent here as the parameter names differ
-                          "instanceClass": get(item, "instanceClass", get(_oxr, "spec.dbClusterInstanceClass", "db.t3.medium")),
-                          "monitoringInterval": get(item, "monitoringInterval", get(_oxr, "spec.enhancedMonitoring.monitoringInterval", 0)),
+                          "instanceClass": get(item, "instanceClass", get(oxr, "spec.dbClusterInstanceClass", "db.t3.medium")),
+                          "monitoringInterval": get(item, "monitoringInterval", get(oxr, "spec.enhancedMonitoring.monitoringInterval", 0)),
 
                           if monitoringRoleArn:
                               "monitoringRoleArn": monitoringRoleArn,
 
-                          _v = getwparent(item, _oxr, "performanceInsightsEnabled" False)
+                          _v = getwparent(item, oxr, "performanceInsightsEnabled" False)
                           if _v:
                               "performanceInsightsEnabled": _v
-                              "performanceInsightsKmsKeyId": getwparent(item, _oxr, "performanceInsightsKmsKeyId", keyId)
-                              "performanceInsightsRetentionPeriod": getwparent(item, _oxr, "performanceInsightsRetentionPeriod", 7)
+                              "performanceInsightsKmsKeyId": getwparent(item, oxr, "performanceInsightsKmsKeyId", keyId)
+                              "performanceInsightsRetentionPeriod": getwparent(item, oxr, "performanceInsightsRetentionPeriod", 7)
 
                           # Only set the availability zone if this is a cluster instance
                           # or if the instance is not multi-AZ and an availability zone is
@@ -796,8 +792,8 @@ spec:
                               if _dbp:
                                   "dbParameterGroupName": _dbp,
 
-                          "copyTagsToSnapshot": getwparent(item, _oxr, "copyTagsToSnapshot", True)
-                          "publiclyAccessible": getwparent(item, _oxr, "publiclyAccessible", False)
+                          "copyTagsToSnapshot": getwparent(item, oxr, "copyTagsToSnapshot", True)
+                          "publiclyAccessible": getwparent(item, oxr, "publiclyAccessible", False)
                           "region": region,
                           "tags": tags | {
                               "Name": _name
@@ -807,7 +803,7 @@ spec:
                       "providerConfigRef": pcr
                       if not createCluster and _isPrimaryInstance:
                           "writeConnectionSecretToRef": {
-                              "namespace": get(_oxr, "spec.claimRef.namespace", "default")
+                              "namespace": get(oxr, "spec.claimRef.namespace", "default")
                               "name": "${appName}-${region}-rds",
                           }
                   }
@@ -826,7 +822,7 @@ spec:
               not createCluster,
               ready("instance-0"),
           ]):
-              _secretRef = get(_ocds, "instance-0.Resource.spec.writeConnectionSecretToRef", "")
+              _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef", "")
 
           ##
           # OptionGroups may be specified for non-cluster, non-postgresql instances.
@@ -839,7 +835,7 @@ spec:
                       "annotations": {
                           "krm.kcl.dev/composition-resource-name" = "option-group"
                           "krm.kcl.dev/ready" = readystr("option-group")
-                          "crossplane.io/external-name" = get(_oxr, "spec.optionGroup.name", "")
+                          "crossplane.io/external-name" = get(oxr, "spec.optionGroup.name", "")
                       }
                       "labels": labels
                   }
@@ -847,7 +843,7 @@ spec:
                       "deletionPolicy": dp
                       "forProvider": {
                           "engineName": engine,
-                          "majorEngineVersion": get(_oxr, "spec.engineVersion", "14.0"),
+                          "majorEngineVersion": get(oxr, "spec.engineVersion", "14.0"),
                           "option": [
                               {
                                   if get(item, "dbSecurityGroupMemberships", False):
@@ -861,14 +857,14 @@ spec:
                                       for key, value in get(item, "optionSettings", [])
                                   ],
                               }
-                              for i, item in get(_oxr, "spec.optionGroup.options", {})
+                              for i, item in get(oxr, "spec.optionGroup.options", {})
                           ],
 
                           "region": region,
-                          if get(_oxr, "spec.optionGroup.version", False):
-                              "version": get(_oxr, "spec.optionGroup.version", ""),
+                          if get(oxr, "spec.optionGroup.version", False):
+                              "version": get(oxr, "spec.optionGroup.version", ""),
 
-                          "optionGroupDescription": get(_oxr, "spec.optionGroup.description", "${appName} Option group"),
+                          "optionGroupDescription": get(oxr, "spec.optionGroup.description", "${appName} Option group"),
 
                           "tags": tags | {
                               "Name": "${appName}-option-group"
@@ -877,7 +873,7 @@ spec:
                       "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
-              } if not createCluster and get(_oxr, "spec.optionGroup.create", False) else {}
+              } if not createCluster and get(oxr, "spec.optionGroup.create", False) else {}
           ]
 
           endpoints = [
@@ -910,7 +906,7 @@ spec:
                       "providerConfigRef": pcr
                   }
               }
-              for i, item in get(_oxr, "spec.endpoints", []) if all_true([
+              for i, item in get(oxr, "spec.endpoints", []) if all_true([
                   createCluster, clusterId != None
               ])
           ]
@@ -958,12 +954,12 @@ spec:
                       "providerConfigRef": pcr
                   }
               }
-              for i, item in get(_oxr, "spec.iamRoles", [])
+              for i, item in get(oxr, "spec.iamRoles", [])
           ]
 
           createMonitoringRole = all_true([
-              get(_oxr, "spec.enhancedMonitoring.enabled", False),
-              get(_oxr, "spec.enhancedMonitoring.monitoringInterval", 0) > 0,
+              get(oxr, "spec.enhancedMonitoring.enabled", False),
+              get(oxr, "spec.enhancedMonitoring.monitoringInterval", 0) > 0,
           ])
 
           monitoringRole = [
@@ -994,14 +990,14 @@ spec:
                               ]
                           }, ignore_private=True),
 
-                          "description": get(_oxr, "spec.enhancedMonitoring.description", "Role for RDS monitoring"),
-                          "managedPolicyArns": get(_oxr, "spec.enhancedMonitoring.managedPolicyArns", None),
-                          "permissionsBoundary": get(_oxr, "spec.enhancedMonitoring.permissionsBoundary", None),
-                          "forceDetachPolicies": get(_oxr, "spec.enhancedMonitoring.forceDetachPolicies", False),
-                          "maxSessionDuration": get(_oxr, "spec.enhancedMonitoring.maxSessionDuration", None),
-                          "path": get(_oxr, "spec.enhancedMonitoring.path", "/"),
+                          "description": get(oxr, "spec.enhancedMonitoring.description", "Role for RDS monitoring"),
+                          "managedPolicyArns": get(oxr, "spec.enhancedMonitoring.managedPolicyArns", None),
+                          "permissionsBoundary": get(oxr, "spec.enhancedMonitoring.permissionsBoundary", None),
+                          "forceDetachPolicies": get(oxr, "spec.enhancedMonitoring.forceDetachPolicies", False),
+                          "maxSessionDuration": get(oxr, "spec.enhancedMonitoring.maxSessionDuration", None),
+                          "path": get(oxr, "spec.enhancedMonitoring.path", "/"),
                           "name": "rds-monitoring-role",
-                          "tags": tags | get(_oxr, "spec.enhancedMonitoring.tags", {}) | {
+                          "tags": tags | get(oxr, "spec.enhancedMonitoring.tags", {}) | {
                               "Name": "${appName}-monitoring-role"
                           }
                       }
@@ -1022,7 +1018,7 @@ spec:
                       "labels": labels
                   }
                   "spec": {
-                      "deletionPolicy": get(_oxr, "spec.deletionPolicy", "Delete"),
+                      "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
                       "forProvider": {
                           "policyArn": "arn:${partition}:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole",
                           "role": "rds-monitoring-role",
@@ -1036,7 +1032,7 @@ spec:
               } if createMonitoringRole else {}
           ]
 
-          instanceCreated = get(_ocds, "instance-0.Resource.status.atProvider.id", False) and createCluster
+          instanceCreated = ocdsstatus("instance-0", "id", False) and createCluster
 
           # Define autoscaling if this is the required scaling mode for RDS Cluster builds
           autoscalingTarget = [
@@ -1054,13 +1050,13 @@ spec:
                   "spec": {
                       "deletionPolicy": dp
                       "forProvider": {
-                          "maxCapacity": get(_oxr, "spec.autoscaling.maxCapacity", 2),
-                          "minCapacity": get(_oxr, "spec.autoscaling.minCapacity", 2),
+                          "maxCapacity": get(oxr, "spec.autoscaling.maxCapacity", 2),
+                          "minCapacity": get(oxr, "spec.autoscaling.minCapacity", 2),
                           "resourceId": "cluster:${clusterId}",
                           "region": region,
                           "scalableDimension": "rds:cluster:ReadReplicaCount",
                           "serviceNamespace": "rds",
-                          "tags": tags | get(_oxr, "spec.autoscaling.tags", {}) | {
+                          "tags": tags | get(oxr, "spec.autoscaling.tags", {}) | {
                               "Name": "${appName}-autoscaling"
                           }
                       }
@@ -1069,17 +1065,17 @@ spec:
                   }
               } if all_true([
                   instanceCreated,
-                  get(_oxr, "spec.autoscaling.enabled", False),
+                  get(oxr, "spec.autoscaling.enabled", False),
                   createCluster,
                ]) else {}
           ]
 
           _metricTypes = {
-              "RDSReaderAverageCPUUtilization": get(_oxr, "spec.autoscaling.targetCPU", 70),
-              "RDSReaderAverageDatabaseConnections": get(_oxr, "spec.autoscaling.targetConnections", 700),
+              "RDSReaderAverageCPUUtilization": get(oxr, "spec.autoscaling.targetCPU", 70),
+              "RDSReaderAverageDatabaseConnections": get(oxr, "spec.autoscaling.targetConnections", 700),
           }
 
-          tc = get(_oxr, "spec.autoscaling.metricType", "RDSReaderAverageCPUUtilization")
+          tc = get(oxr, "spec.autoscaling.metricType", "RDSReaderAverageCPUUtilization")
           tv =  _metricTypes[tc]
 
           autoscalingTargetCreated = ocdsstatus("autoscaling-target", "id", False)
@@ -1109,9 +1105,9 @@ spec:
                                           "predefinedMetricType": tc,
                                       },
                                   ],
-                                  "disableScaleIn": get(_oxr, "spec.autoscaling.disableScaleIn", False),
-                                  "scaleInCooldown": get(_oxr, "spec.autoscaling.scaleInCooldown", 60),
-                                  "scaleOutCooldown": get(_oxr, "spec.autoscaling.scaleOutCooldown", 60),
+                                  "disableScaleIn": get(oxr, "spec.autoscaling.disableScaleIn", False),
+                                  "scaleInCooldown": get(oxr, "spec.autoscaling.scaleInCooldown", 60),
+                                  "scaleOutCooldown": get(oxr, "spec.autoscaling.scaleOutCooldown", 60),
                                   "targetValue": tv
                               },
                           ],
@@ -1122,14 +1118,14 @@ spec:
                   }
               } if all_true([
                   autoscalingTargetCreated,
-                  get(_oxr, "spec.autoscaling.enabled", False),
+                  get(oxr, "spec.autoscaling.enabled", False),
                   createCluster,
                ]) else {}
           ]
 
           autoscaling = autoscalingTarget + autoscalingPolicy
 
-          optionGroupPort = get(_oxr, "spec.optionGroup.port", False)
+          optionGroupPort = get(oxr, "spec.optionGroup.port", False)
 
           # Create security group rules for the cluster
           securityGroupRules = [
@@ -1146,7 +1142,7 @@ spec:
                   "spec": {
                       "deletionPolicy": dp
                       "forProvider": {
-                          "securityGroupId": get(_oxr, "status.securityGroupId", ""),
+                          "securityGroupId": get(oxr, "status.securityGroupId", ""),
                           "cidrBlocks": [cidr],
                           "fromPort": port,
                           "protocol": "tcp",
@@ -1158,9 +1154,9 @@ spec:
                       "providerConfigRef": pcr
                   }
               }
-              for i, cidr in get(_oxr, "spec.cidrBlocks", []) if all_true([
+              for i, cidr in get(oxr, "spec.cidrBlocks", []) if all_true([
                   port, cidr,
-                  get(_oxr, "status.securityGroupId", False),
+                  get(oxr, "status.securityGroupId", False),
               ])
           ] + [
               {
@@ -1177,7 +1173,7 @@ spec:
                   "spec": {
                       "deletionPolicy": dp
                       "forProvider": {
-                          "securityGroupId": get(_oxr, "status.securityGroupId", ""),
+                          "securityGroupId": get(oxr, "status.securityGroupId", ""),
                           "cidrBlocks": [cidr],
                           "fromPort": optionGroupPort,
                           "protocol": "tcp",
@@ -1189,9 +1185,9 @@ spec:
                       "providerConfigRef": pcr
                   }
               }
-              for i, cidr in get(_oxr, "spec.cidrBlocks", []) if all_true([
-                  get(_oxr, "spec.optionGroup.enabled", False),
-                  get(_oxr, "status.securityGroupId", False),
+              for i, cidr in get(oxr, "spec.cidrBlocks", []) if all_true([
+                  get(oxr, "spec.optionGroup.enabled", False),
+                  get(oxr, "status.securityGroupId", False),
                   optionGroupPort, port,
                   optionGroupPort != port,
                   cidr
@@ -1207,16 +1203,16 @@ spec:
                       "annotations": {
                           "krm.kcl.dev/composition-resource-name" = "cluster-parameter-group"
                           "krm.kcl.dev/ready" = readystr("cluster-parameter-group")
-                          "crossplane.io/external-name" = get(_oxr, "spec.dbClusterParameterGroup.name", "")
+                          "crossplane.io/external-name" = get(oxr, "spec.dbClusterParameterGroup.name", "")
                       }
                       "labels": labels
                   }
                   "spec": {
                       "deletionPolicy": dp
                       "forProvider": {
-                          "description": get(_oxr, "spec.parameterGroup.description", "Cluster parameter group"),
-                          "family": get(_oxr, "spec.parameterGroup.family", "aurora-postgresql11"),
-                          "parameter": get(_oxr, "spec.parameterGroup.parameters", {}),
+                          "description": get(oxr, "spec.parameterGroup.description", "Cluster parameter group"),
+                          "family": get(oxr, "spec.parameterGroup.family", "aurora-postgresql11"),
+                          "parameter": get(oxr, "spec.parameterGroup.parameters", {}),
                           "region": region,
                           "tags": tags | {
                               "Name": "${appName}-cluster-parameter-group"
@@ -1225,7 +1221,7 @@ spec:
                       "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
-              } if get(_oxr, "spec.dbClusterParameterGroup.create", False) and createCluster else {}
+              } if get(oxr, "spec.dbClusterParameterGroup.create", False) and createCluster else {}
           ]
 
           # If the db parameter group is requested create it
@@ -1237,16 +1233,16 @@ spec:
                       "annotations": {
                           "krm.kcl.dev/composition-resource-name" = "db-parameter-group"
                           "krm.kcl.dev/ready" = readystr("db-parameter-group")
-                          "crossplane.io/external-name" = get(_oxr, "spec.dbParameterGroup.name", "")
+                          "crossplane.io/external-name" = get(oxr, "spec.dbParameterGroup.name", "")
                       }
                       "labels": labels
                   }
                   "spec": {
-                      "deletionPolicy": get(_oxr, "spec.deletionPolicy", "Delete"),
+                      "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
                       "forProvider": {
-                          "description": get(_oxr, "spec.parameterGroup.description", "DB parameter group"),
-                          "family": get(_oxr, "spec.parameterGroup.family", "aurora-postgresql11"),
-                          "parameter": get(_oxr, "spec.parameterGroup.parameters", {}),
+                          "description": get(oxr, "spec.parameterGroup.description", "DB parameter group"),
+                          "family": get(oxr, "spec.parameterGroup.family", "aurora-postgresql11"),
+                          "parameter": get(oxr, "spec.parameterGroup.parameters", {}),
                           "region": region,
                           "tags": tags | {
                               "Name": "${appName}-db-parameter-group"
@@ -1255,12 +1251,12 @@ spec:
                       "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
-              } if get(_oxr, "spec.dbParameterGroup.create", False) else {}
+              } if get(oxr, "spec.dbParameterGroup.create", False) else {}
           ]
 
           # Cloudwatch log groups
-          logGroups = get(_oxr, "spec.enabledCloudwatchLogsExports", [])
-          lgEnabled = get(_oxr, "spec.cloudwatchLogGroupParameters.create", False) and len(logGroups) > 0
+          logGroups = get(oxr, "spec.enabledCloudwatchLogsExports", [])
+          lgEnabled = get(oxr, "spec.cloudwatchLogGroupParameters.create", False) and len(logGroups) > 0
           cloudwatchLogGroups = [
               {
                   "apiVersion": "cloudwatchlogs.aws.upbound.io/v1beta1"
@@ -1308,10 +1304,10 @@ spec:
                   "spec": {
                       "deletionPolicy": dp
                       "forProvider": {
-                          "applyImmediately": get(_oxr, "spec.activityStream.applyImmediately", True),
-                          "enabled": get(_oxr, "spec.activityStream.enabled", False),
-                          "kmsKeyId": get(_oxr, "status.kmsKeyId", None),
-                          "mode": get(_oxr, "spec.activityStream.mode", "sync"),
+                          "applyImmediately": get(oxr, "spec.activityStream.applyImmediately", True),
+                          "enabled": get(oxr, "spec.activityStream.enabled", False),
+                          "kmsKeyId": get(oxr, "status.kmsKeyId", None),
+                          "mode": get(oxr, "spec.activityStream.mode", "sync"),
                           "region": region,
                           "tags": tags | {
                               "Name": "${appName}-activity-stream"
@@ -1320,7 +1316,7 @@ spec:
                       "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
-              } if get(_oxr, "spec.activityStream.enabled", False) and createCluster else {}
+              } if get(oxr, "spec.activityStream.enabled", False) and createCluster else {}
           ]
 
           # If secret rotation is enabled, create the secret rotation resource
@@ -1339,23 +1335,23 @@ spec:
                   "spec": {
                       "deletionPolicy": dp
                       "forProvider": {
-                          "secretId": get(_oxr, "status.secretId", ""),
+                          "secretId": get(oxr, "status.secretId", ""),
                           "region": region,
-                          "rotateImmediately": get(_oxr, "spec.secretRotation.rotateImmediately", False),
+                          "rotateImmediately": get(oxr, "spec.secretRotation.rotateImmediately", False),
                           "rotationRules": [
                               {
-                                  "duration": get(_oxr, "spec.secretRotation.duration", 0),
+                                  "duration": get(oxr, "spec.secretRotation.duration", 0),
                               } | {
-                                  "automaticallyAfterDays": get(_oxr, "spec.secretRotation.afterDays", 30),
-                              } if get(_oxr, "spec.secretRotation.afterDays", False) != False else {
-                                  "scheduleExpression": get(_oxr, "spec.secretRotation.scheduleExpression", "")
+                                  "automaticallyAfterDays": get(oxr, "spec.secretRotation.afterDays", 30),
+                              } if get(oxr, "spec.secretRotation.afterDays", False) != False else {
+                                  "scheduleExpression": get(oxr, "spec.secretRotation.scheduleExpression", "")
                               }
                           ],
                       }
                       "managementPolicies": mgmtPolicy,
                       "providerConfigRef": pcr
                   }
-              } if get(_oxr, "spec.secretRotation.enabled", False) else {}
+              } if get(oxr, "spec.secretRotation.enabled", False) else {}
           ]
 
           # Merge all resources into a single flat list
@@ -1383,10 +1379,8 @@ spec:
         source: |-
           import regex
 
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocds = option("params").ocds
-          _dcds = option("params").dcds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -1414,28 +1408,28 @@ spec:
               """
               Get an item from the spec of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.spec.${y}", d)
+              get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
           ocdsstatus = lambda x: str, y: str, d: any -> any {
               """
               Get an item from the status of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
               """
-              x in list(_ocds)
+              x in list(ocds)
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
                   all_true([
                       get(c, "status", "False") == "True" for c in conditions
@@ -1450,35 +1444,35 @@ spec:
               "True" if ready(x) else "False"
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          createCluster = get(_oxr, "spec.createCluster", True)
-          engine = get(_oxr, "spec.engine", "")
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          keyId = get(_oxr, "status.kmsKeyId", False)
-          namespace = get(_oxr, "spec.claimRef.namespace", "default")
-          region = get(_oxr, "spec.region", "eu-central-1")
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
-          labels = get(_oxr, "metadata.labels", {}) | {"region": region}
-          tags = labels | get(_oxr, "spec.tags", {})
+          appName = get(oxr, "spec.claimRef.name", "")
+          createCluster = get(oxr, "spec.createCluster", True)
+          engine = get(oxr, "spec.engine", "")
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          keyId = get(oxr, "status.kmsKeyId", False)
+          namespace = get(oxr, "spec.claimRef.namespace", "default")
+          region = get(oxr, "spec.region", "eu-central-1")
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          labels = get(oxr, "metadata.labels", {}) | {"region": region}
+          tags = labels | get(oxr, "spec.tags", {})
 
-          port = get(_oxr, "status.port", False)
+          port = get(oxr, "status.port", False)
           restoreToPointInTime = {
               if createCluster:
-                  "sourceDbClusterIdentifier": get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
-                  "restoreType": get(_oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
+                  "sourceDbClusterIdentifier": get(oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
+                  "restoreType": get(oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
               else:
-                  "sourceDbInstanceIdentifier" = get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None)
-                  "sourceDbInstanceAutomatedBackupsArn" = get(_oxr, "spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn", None)
-                  "sourceDbiResourceId" = get(_oxr, "spec.restoreToPointInTime.sourceDbiResourceId", None)
+                  "sourceDbInstanceIdentifier" = get(oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None)
+                  "sourceDbInstanceAutomatedBackupsArn" = get(oxr, "spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn", None)
+                  "sourceDbiResourceId" = get(oxr, "spec.restoreToPointInTime.sourceDbiResourceId", None)
 
-              _v = get(_oxr, "spec.restoreToPointInTime.restoreToTime", False)
+              _v = get(oxr, "spec.restoreToPointInTime.restoreToTime", False)
               if _v:
-                  "restoreToTime": get(_oxr, "spec.restoreToPointInTime.restoreToTime", None)
+                  "restoreToTime": get(oxr, "spec.restoreToPointInTime.restoreToTime", None)
               else:
-                  "useLatestRestorableTime": get(_oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True)
+                  "useLatestRestorableTime": get(oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True)
           }
 
-          s3import = get(_oxr, "spec.s3Import", False)
+          s3import = get(oxr, "spec.s3Import", False)
 
           masterInstance = ready("instance-0") and ocdsstatus("instance-0", "id", False)
           clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
@@ -1486,8 +1480,8 @@ spec:
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
-          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
-          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 
           _secretRef: bool|str = False
           if createCluster:
@@ -1501,10 +1495,10 @@ spec:
           clusterCreated: bool = ready("rds-cluster")
 
           newdxr = {
-              **_oxr,
+              **oxr,
               **{
                   "status": {
-                      if get(_oxr, "spec.eso.enabled", True) and _connectionSecret:
+                      if get(oxr, "spec.eso.enabled", True) and _connectionSecret:
                           "esoConnectionSecret" = "${appName}-rds-master"
                       if not createCluster and masterInstance:
                           "endpoint" = ocdsstatus("instance-0", "address", ""),
@@ -1545,10 +1539,8 @@ spec:
         source: |-
           import regex
 
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocds = option("params").ocds
-          _dcds = option("params").dcds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -1576,28 +1568,28 @@ spec:
               """
               Get an item from the spec of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.spec.${y}", d)
+              get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
           ocdsstatus = lambda x: str, y: str, d: any -> any {
               """
               Get an item from the status of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
               """
-              x in list(_ocds)
+              x in list(ocds)
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
                   all_true([
                       get(c, "status", "False") == "True" for c in conditions
@@ -1612,35 +1604,35 @@ spec:
               "True" if ready(x) else "False"
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          createCluster = get(_oxr, "spec.createCluster", True)
-          engine = get(_oxr, "spec.engine", "")
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          keyId = get(_oxr, "status.kmsKeyId", False)
-          namespace = get(_oxr, "spec.claimRef.namespace", "default")
-          region = get(_oxr, "spec.region", "eu-central-1")
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
-          labels = get(_oxr, "metadata.labels", {}) | {"region": region}
-          tags = labels | get(_oxr, "spec.tags", {})
+          appName = get(oxr, "spec.claimRef.name", "")
+          createCluster = get(oxr, "spec.createCluster", True)
+          engine = get(oxr, "spec.engine", "")
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          keyId = get(oxr, "status.kmsKeyId", False)
+          namespace = get(oxr, "spec.claimRef.namespace", "default")
+          region = get(oxr, "spec.region", "eu-central-1")
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          labels = get(oxr, "metadata.labels", {}) | {"region": region}
+          tags = labels | get(oxr, "spec.tags", {})
 
-          port = get(_oxr, "status.port", False)
+          port = get(oxr, "status.port", False)
           restoreToPointInTime = {
               if createCluster:
-                  "sourceDbClusterIdentifier": get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
-                  "restoreType": get(_oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
+                  "sourceDbClusterIdentifier": get(oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
+                  "restoreType": get(oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
               else:
-                  "sourceDbInstanceIdentifier" = get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None)
-                  "sourceDbInstanceAutomatedBackupsArn" = get(_oxr, "spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn", None)
-                  "sourceDbiResourceId" = get(_oxr, "spec.restoreToPointInTime.sourceDbiResourceId", None)
+                  "sourceDbInstanceIdentifier" = get(oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None)
+                  "sourceDbInstanceAutomatedBackupsArn" = get(oxr, "spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn", None)
+                  "sourceDbiResourceId" = get(oxr, "spec.restoreToPointInTime.sourceDbiResourceId", None)
 
-              _v = get(_oxr, "spec.restoreToPointInTime.restoreToTime", False)
+              _v = get(oxr, "spec.restoreToPointInTime.restoreToTime", False)
               if _v:
-                  "restoreToTime": get(_oxr, "spec.restoreToPointInTime.restoreToTime", None)
+                  "restoreToTime": get(oxr, "spec.restoreToPointInTime.restoreToTime", None)
               else:
-                  "useLatestRestorableTime": get(_oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True)
+                  "useLatestRestorableTime": get(oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True)
           }
 
-          s3import = get(_oxr, "spec.s3Import", False)
+          s3import = get(oxr, "spec.s3Import", False)
 
           masterInstance = ready("instance-0") and ocdsstatus("instance-0", "id", False)
           clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
@@ -1648,8 +1640,8 @@ spec:
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
-          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
-          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 
           _secretRef: bool|str = False
           if createCluster:
@@ -1662,7 +1654,7 @@ spec:
 
           externalSecretStores = [
               {
-                  "name": get(_oxr, "spec.eso.kubernetesSecretStore", "default"),
+                  "name": get(oxr, "spec.eso.kubernetesSecretStore", "default"),
                   "clusterScoped": False,
               }
           ]
@@ -1672,8 +1664,8 @@ spec:
                   "name": store.secretStore,
                   "clusterScoped": True,
               }
-              for _, store in get(_oxr, "spec.eso.stores", [])
-              if get(_oxr, "spec.eso.enabled", True) and store.enabled
+              for _, store in get(oxr, "spec.eso.stores", [])
+              if get(oxr, "spec.eso.enabled", True) and store.enabled
           ]
           usernameField = "username" if not createCluster else "master_username"
           passwordField = "password" if not createCluster else "attribute.master_password"
@@ -1710,7 +1702,7 @@ spec:
                       "deletionPolicy": dp,
                       "forProvider": {
                           manifest: {
-                              "apiVersion": "external-secrets.io/v1alpha1"
+                              "apiVersion": "external-secrets.io/v1beta1"
                               "kind": "ExternalSecret"
                               "metadata": {
                                   "namespace": namespace
@@ -1745,12 +1737,12 @@ spec:
                       }
                       "managementPolicies": mgmtPolicy,
                       "providerConfigRef": {
-                          "name": get(_oxr, "spec.kubernetesProviderConfig.name", "")
+                          "name": get(oxr, "spec.kubernetesProviderConfig.name", "")
                       }
                   }
               }
               for _, value in externalSecretStores
-              if _connectionSecret and get(_oxr, "spec.eso.enabled", True)
+              if _connectionSecret and get(oxr, "spec.eso.enabled", True)
           ]
 
           pushSecret = [
@@ -1770,7 +1762,7 @@ spec:
                               "apiVersion": "external-secrets.io/v1alpha1"
                               "kind": "PushSecret"
                               "metadata": {
-                                  "namespace": get(_oxr, "spec.claimRef.namespace", "default")
+                                  "namespace": get(oxr, "spec.claimRef.namespace", "default")
                               }
                               "spec": {
                                   "refreshInterval": "10s"
@@ -1794,10 +1786,10 @@ spec:
                       }
                       "managementPolicies": mgmtPolicy,
                       "providerConfigRef": {
-                          name: get(_oxr, "spec.kubernetesProviderConfig.name", "")
+                          name: get(oxr, "spec.kubernetesProviderConfig.name", "")
                       }
                   }
-              } for _ in [True] if pushSecretStores and get(_oxr, "spec.eso.enabled", True)
+              } for _ in [True] if pushSecretStores and get(oxr, "spec.eso.enabled", True)
           ]
 
           _items = [
@@ -1819,10 +1811,8 @@ spec:
         source: |-
           import regex
 
-          _oxr = option("params").oxr
-          _dxr = option("params").dxr
-          _ocds = option("params").ocds
-          _dcds = option("params").dcds
+          oxr = option("params").oxr
+          ocds = option("params").ocds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -1850,28 +1840,28 @@ spec:
               """
               Get an item from the spec of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.spec.${y}", d)
+              get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
           ocdsstatus = lambda x: str, y: str, d: any -> any {
               """
               Get an item from the status of an ocds resource.
               """
-              get(_ocds, "${x}.Resource.status.atProvider.${y}", d)
+              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
           }
 
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
               """
-              x in list(_ocds)
+              x in list(ocds)
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(_ocds, "${x}.Resource.status.conditions", [])
+              conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
                   all_true([
                       get(c, "status", "False") == "True" for c in conditions
@@ -1886,35 +1876,35 @@ spec:
               "True" if ready(x) else "False"
           }
 
-          appName = get(_oxr, "spec.claimRef.name", "")
-          createCluster = get(_oxr, "spec.createCluster", True)
-          engine = get(_oxr, "spec.engine", "")
-          dp = get(_oxr, "spec.deletionPolicy", "Delete")
-          keyId = get(_oxr, "status.kmsKeyId", False)
-          namespace = get(_oxr, "spec.claimRef.namespace", "default")
-          region = get(_oxr, "spec.region", "eu-central-1")
-          pcr = get(_oxr, "spec.providerConfigRef", {"name": "default"})
-          labels = get(_oxr, "metadata.labels", {}) | {"region": region}
-          tags = labels | get(_oxr, "spec.tags", {})
+          appName = get(oxr, "spec.claimRef.name", "")
+          createCluster = get(oxr, "spec.createCluster", True)
+          engine = get(oxr, "spec.engine", "")
+          dp = get(oxr, "spec.deletionPolicy", "Delete")
+          keyId = get(oxr, "status.kmsKeyId", False)
+          namespace = get(oxr, "spec.claimRef.namespace", "default")
+          region = get(oxr, "spec.region", "eu-central-1")
+          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+          labels = get(oxr, "metadata.labels", {}) | {"region": region}
+          tags = labels | get(oxr, "spec.tags", {})
 
-          port = get(_oxr, "status.port", False)
+          port = get(oxr, "status.port", False)
           restoreToPointInTime = {
               if createCluster:
-                  "sourceDbClusterIdentifier": get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
-                  "restoreType": get(_oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
+                  "sourceDbClusterIdentifier": get(oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None),
+                  "restoreType": get(oxr, "spec.restoreToPointInTime.restoreType", "full-copy"),
               else:
-                  "sourceDbInstanceIdentifier" = get(_oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None)
-                  "sourceDbInstanceAutomatedBackupsArn" = get(_oxr, "spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn", None)
-                  "sourceDbiResourceId" = get(_oxr, "spec.restoreToPointInTime.sourceDbiResourceId", None)
+                  "sourceDbInstanceIdentifier" = get(oxr, "spec.restoreToPointInTime.sourceDbClusterIdentifier", None)
+                  "sourceDbInstanceAutomatedBackupsArn" = get(oxr, "spec.restoreToPointInTime.sourceDbInstanceAutomatedBackupsArn", None)
+                  "sourceDbiResourceId" = get(oxr, "spec.restoreToPointInTime.sourceDbiResourceId", None)
 
-              _v = get(_oxr, "spec.restoreToPointInTime.restoreToTime", False)
+              _v = get(oxr, "spec.restoreToPointInTime.restoreToTime", False)
               if _v:
-                  "restoreToTime": get(_oxr, "spec.restoreToPointInTime.restoreToTime", None)
+                  "restoreToTime": get(oxr, "spec.restoreToPointInTime.restoreToTime", None)
               else:
-                  "useLatestRestorableTime": get(_oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True)
+                  "useLatestRestorableTime": get(oxr, "spec.restoreToPointInTime.useLatestRestorableTime", True)
           }
 
-          s3import = get(_oxr, "spec.s3Import", False)
+          s3import = get(oxr, "spec.s3Import", False)
 
           masterInstance = ready("instance-0") and ocdsstatus("instance-0", "id", False)
           clusterIdentifier = ocdsstatus("rds-cluster", "id", "")
@@ -1922,8 +1912,8 @@ spec:
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
-          mgmtPolicy = get(_oxr, "spec.managementPolicies", [])
-          publishConnection = get(_oxr, "spec.publishConnectionDetailsTo", {})
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 
           _secretRef: bool|str = False
           if createCluster:
@@ -1934,9 +1924,9 @@ spec:
                   _secretRef = ocdsspec("instance-0", "writeConnectionSecretToRef.name", "")
           _connectionSecret = _secretRef
 
-          esoEnabled = get(_oxr, "spec.eso.enabled", False)
-          esoConnectionSecret = get(_oxr, "status.esoConnectionSecret", False)
-          sqlEnabled = get(_oxr, "spec.provisionSql.enabled", True)
+          esoEnabled = get(oxr, "spec.eso.enabled", False)
+          esoConnectionSecret = get(oxr, "status.esoConnectionSecret", False)
+          sqlEnabled = get(oxr, "spec.provisionSql.enabled", True)
 
           if createCluster and sqlEnabled:
               assert esoEnabled != False, "ESO must be enabled when creating a cluster with SQL provisioning enabled."
@@ -1955,16 +1945,16 @@ spec:
                   }
                   spec: {
                       "deletionPolicy": dp,
-                      "engine": get(_oxr, "spec.engine", "postgres")
-                      "claimRef": get(_oxr, "spec.claimRef", {})
+                      "engine": get(oxr, "spec.engine", "postgres")
+                      "claimRef": get(oxr, "spec.claimRef", {})
                       "connectionSecretName": useConnectionSecret
-                      "databases": get(_oxr, "spec.databases", {})
-                      "kubernetesProviderConfig": get(_oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+                      "databases": get(oxr, "spec.databases", {})
+                      "kubernetesProviderConfig": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
                       "managementPolicies": mgmtPolicy,
                   }
               }
               for _ in [True]
-              if get(_oxr, "spec.provisionSql.enabled", True) and useConnectionSecret
+              if get(oxr, "spec.provisionSql.enabled", True) and useConnectionSecret
           ]
 
           items = _items
