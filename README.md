@@ -56,7 +56,11 @@ In this example we will use [xnetworks](./crossplane.giantswarm.io/xnetworks/).
 `cd` to this location and execute the following command
 
 ```bash
-docker run -v $(pwd):/crossbuilder/apis:rw xrdtools
+dir="$(basename $(pwd))"; apidir="$(pwd)/../../apis/$dir"; \
+    [ ! -d $apidir ] && mkdir $apidir; \
+    docker run -itv $(pwd):/crossbuilder/apis:rw -v \
+        $apidir:/crossbuilder/apis/package/xrds:rw -v \
+        $apidir:/crossbuilder/apis/package/compositions:rw xrdtools
 ```
 
 You do not need to give a command to docker, just the name of the container.
@@ -72,7 +76,12 @@ Output from this command is written to the `package` folder.
 
 ```nohighlight
 $ cd crossplane.giantswarm.io/xnetworks/
-$ docker run -v $(pwd):/crossbuilder/apis:rw xrdtools
+$ dir="$(basename $(pwd))"; apidir="$(pwd)/../../apis/$dir"; \
+    [ ! -d $apidir ] && mkdir $apidir; \
+    docker run -itv $(pwd):/crossbuilder/apis:rw -v \
+        $apidir:/crossbuilder/apis/package/xrds:rw -v \
+        $apidir:/crossbuilder/apis/package/compositions:rw xrdtools
+
 go: downloading sigs.k8s.io/controller-tools v0.15.0
 ... <TRUNCATED>
 copying go.mod and go.sum
