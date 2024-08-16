@@ -1,0 +1,31 @@
+resources:
+# AWS Miscellaneous
+- ../../xaws/resource-access-manager.yaml
+- ../../xaws/xaws.crossplane.giantswarm.io_resourceaccessmanagers.yaml
+# Cache
+- ../../xcache/cache-base.yaml
+- ../../xcache/xcache.crossplane.giantswarm.io_cachebases.yaml
+# Composites
+- ../../xcomposite/rcc-with-region-lookup.yaml
+- ../../xcomposite/rds-cache-cluster.yaml
+- ../../xcomposite/xcomposite.crossplane.giantswarm.io_rdscacheclusters.yaml
+- ../../xcomposite/xcomposite.crossplane.giantswarm.io_rccwithregionlookups.yaml
+# Databases
+- ../../xdatabase/rds-provisioning.yaml
+- ../../xdatabase/xdatabase.crossplane.giantswarm.io_rdsbases.yaml
+- ../../xdatabase/rds-base.yaml
+- ../../xdatabase/xdatabase.crossplane.giantswarm.io_rdsprovisionings.yaml
+# Networks
+- ../../xnetworks/xnetworks.crossplane.giantswarm.io_discoveries.yaml
+- ../../xnetworks/peered-vpc-network.yaml
+- ../../xnetworks/network-discovery.yaml
+- ../../xnetworks/managed-prefix-list.yaml
+- ../../xnetworks/xnetworks.crossplane.giantswarm.io_vpcnetworks.yaml
+- ../../xnetworks/xnetworks.crossplane.giantswarm.io_managedprefixlists.yaml
+- ../../xnetworks/xnetworks.crossplane.giantswarm.io_subnetsets.yaml
+- ../../xnetworks/subnetset.yaml
+- ../../xnetworks/transitgateway.yaml
+- ../../xnetworks/xnetworks.crossplane.giantswarm.io_peeredvpcnetworks.yaml
+- ../../xnetworks/xnetworks.crossplane.giantswarm.io_peerings.yaml
+- ../../xnetworks/vpcpeering.yaml
+- ../../xnetworks/xnetworks.crossplane.giantswarm.io_transitgateways.yaml
