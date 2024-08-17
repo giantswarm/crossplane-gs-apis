@@ -31,6 +31,7 @@ _items = [
     if all_true([
         get(oxr, "spec.provisionSql.enabled", True),
         useConnectionSecret,
-        ready("instance-0")
+        exists("instance-0"),
+        ready("instance-0"),
     ])
 ]

@@ -241,6 +241,7 @@ spec:
               """
               conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
+                  exists(x),
                   all_true([
                       get(c, "status", "False") == "True" for c in conditions
                   ])
@@ -521,6 +522,7 @@ spec:
               """
               conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
+                  exists(x),
                   all_true([
                       get(c, "status", "False") == "True" for c in conditions
                   ])
@@ -1452,6 +1454,7 @@ spec:
               """
               conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
+                  exists(x),
                   all_true([
                       get(c, "status", "False") == "True" for c in conditions
                   ])
@@ -1613,6 +1616,7 @@ spec:
               """
               conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
+                  exists(x),
                   all_true([
                       get(c, "status", "False") == "True" for c in conditions
                   ])
@@ -1889,6 +1893,7 @@ spec:
               """
               conditions = get(ocds, "${x}.Resource.status.conditions", [])
               any_true([
+                  exists(x),
                   all_true([
                       get(c, "status", "False") == "True" for c in conditions
                   ])
@@ -1985,7 +1990,8 @@ spec:
               if all_true([
                   get(oxr, "spec.provisionSql.enabled", True),
                   useConnectionSecret,
-                  ready("instance-0")
+                  exists("instance-0"),
+                  ready("instance-0"),
               ])
           ]
 

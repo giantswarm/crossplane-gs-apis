@@ -68,7 +68,6 @@ spec:
           dp = get(oxr, "spec.deletionPolicy", "Delete")
           pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
 
-          import yaml
           e = get(oxr, "spec.engine", False)
           _engine = ""
 
@@ -308,10 +307,6 @@ spec:
                   get(user, "privileges", False),
               ])
           ]
-          print(_engine)
-          print(yaml.encode(_requiredDatabases))
-          print(yaml.encode(grants))
-
 
           provisionSql = get(oxr, "spec.provisionSql", True)
           _items = [

@@ -52,6 +52,7 @@ ready = lambda x: str -> bool {
     """
     conditions = get(ocds, "${x}.Resource.status.conditions", [])
     any_true([
+        exists(x),
         all_true([
             get(c, "status", "False") == "True" for c in conditions
         ])

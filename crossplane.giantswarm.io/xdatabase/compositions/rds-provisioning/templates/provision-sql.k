@@ -1,4 +1,3 @@
-import yaml
 e = get(oxr, "spec.engine", False)
 _engine = ""
 
@@ -238,10 +237,6 @@ grants = [
         get(user, "privileges", False),
     ])
 ]
-print(_engine)
-print(yaml.encode(_requiredDatabases))
-print(yaml.encode(grants))
-
 
 provisionSql = get(oxr, "spec.provisionSql", True)
 _items = [
