@@ -1,0 +1,84 @@
+---
+apiVersion: xcomposite.crossplane.giantswarm.io/v1alpha1
+kind: RCCWithRegionLookupClaim
+metadata:
+  name: cloudtest-rds-mariadb
+  namespace: org-presales-lutz
+  labels:
+    owner: honeybadger
+    provider: aws
+    app.kubernetes.io/name: myapp
+    app.kubernetes.io/instance: myapp-elasticache-aurora-cluster
+    app.kubernetes.io/part-of: myapp
+    app.kubernetes.io/managed-by: crossplane
+spec:
+  deletionPolicy: Delete
+
+  providerConfigRef:
+    name: aws-golem
+
+  kubernetesProviderConfig:
+    name: default
+
+  clusterDiscovery:
+    name: "lutz-cluster"
+    namespace: "org-presales-lutz"
+
+  rdsCacheClusterParameters:
+    eso:
+      enabled: true
+      kubernetesSecretStore: default
+
+    cache:
+      createReplicationGroup: true
+      engine: redis
+      engineVersion: "7.1"
+      nodeType: cache.t3.micro
+      numCacheClusters: 3
+
+    database:
+      allocatedStorage: 100
+      createCluster: false
+      enabledCloudwatchLogsExports:
+      - audit
+      - error
+      - general
+      - slowquery
+      cloudwatchLogGroupParameters:
+        retentionInDays: 7
+        class: standard
+        create: false
+      engine: mariadb
+      engineVersion: "10.11.8"
+      instanceCount: 1
+      masterUsername: giantswarm
+      multiAz: false
+      storageType: gp3
+
+    subnetGroupIndexes:
+      cache: 0
+      database: 1
+
+    vpc:
+      peering:
+        enabled: false
+      transitGateway:
+        enabled: true
+        remoteVpcs:
+        - name: golem-vpc
+          region: eu-west-2
+          allowPublic: true
+      subnetsets:
+        cidrs:
+        - prefix: '10.120.0.0/24'
+          public:
+            mask: ""
+            count: 0
+          private:
+            mask: /28
+            count: 2
+      tags:
+        common:
+          giantswarm.io/owner: honeybadger
+          giantswarm.io/managed-by: crossplane
+          giantswarm.io/part-of: myapp
