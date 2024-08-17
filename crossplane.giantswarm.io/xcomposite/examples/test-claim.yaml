@@ -2,7 +2,7 @@
 apiVersion: xcomposite.crossplane.giantswarm.io/v1alpha1
 kind: RCCWithRegionLookupClaim
 metadata:
-  name: cloudtest-cluster-tgw
+  name: cloudtest-cluster-peering
   namespace: org-presales-lutz
   labels:
     owner: honeybadger
@@ -64,13 +64,13 @@ spec:
 
     vpc:
       peering:
-        enabled: false
-      transitGateway:
-        enabled: false
+        enabled: true
         remoteVpcs:
         - name: golem-vpc
           region: eu-west-2
           allowPublic: true
+      transitGateway:
+        enabled: false
       subnetsets:
         cidrs:
         - prefix: '10.16.0.0/24'
