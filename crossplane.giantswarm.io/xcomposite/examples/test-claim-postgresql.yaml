@@ -1,0 +1,86 @@
+---
+apiVersion: xcomposite.crossplane.giantswarm.io/v1alpha1
+kind: RCCWithRegionLookupClaim
+metadata:
+  name: cloudtest-rds-postgresql
+  namespace: org-presales-lutz
+  labels:
+    owner: honeybadger
+    provider: aws
+    app.kubernetes.io/name: myapp
+    app.kubernetes.io/instance: myapp-elasticache-aurora-cluster
+    app.kubernetes.io/part-of: myapp
+    app.kubernetes.io/managed-by: crossplane
+spec:
+  deletionPolicy: Delete
+
+  providerConfigRef:
+    name: aws-golem
+
+  kubernetesProviderConfig:
+    name: default
+
+  clusterDiscovery:
+    name: "lutz-cluster"
+    namespace: "org-presales-lutz"
+
+  rdsCacheClusterParameters:
+    eso:
+      enabled: true
+      kubernetesSecretStore: default
+
+    cache:
+      createReplicationGroup: false
+      engine: memcached
+      engineVersion: "1.6.22"
+      nodeType: cache.t3.micro
+      azMode: cross-az
+      numCacheClusters: 1
+      numCacheNodes: 3
+      transitEncryptionEnabled: true
+
+    database:
+      allocatedStorage: 100
+      createCluster: false
+      enabledCloudwatchLogsExports:
+      - postgresql
+      cloudwatchLogGroupParameters:
+        retentionInDays: 7
+        class: standard
+        create: false
+      engine: postgres
+      engineVersion: "15.6"
+      dbClusterInstanceClass: db.t3.medium
+      iops: 1000
+      instanceCount: 3
+      masterUsername: giantswarm
+      multiAz: true
+      storageType: io1
+
+    subnetGroupIndexes:
+      cache: 0
+      database: 1
+
+    vpc:
+      peering:
+        enabled: true
+        remoteVpcs:
+        - name: golem-vpc
+          region: eu-west-2
+          allowPublic: true
+      transitGateway:
+        enabled: false
+      subnetsets:
+        cidrs:
+        - prefix: '10.16.0.0/24'
+          public:
+            mask: ""
+            count: 0
+          private:
+            mask: /28
+            count: 2
+      tags:
+        common:
+          giantswarm.io/owner: honeybadger
+          giantswarm.io/managed-by: crossplane
+          giantswarm.io/part-of: myapp

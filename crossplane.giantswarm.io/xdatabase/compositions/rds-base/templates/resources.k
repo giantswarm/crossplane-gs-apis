@@ -186,9 +186,8 @@ instances = [
 
                 # This needs verifying for postgres - it previously worked
                 # when building posgtres instances
-                if _isPrimaryInstance or engine not in ["mysql", "mariadb"]:
+                if _isPrimaryInstance:
                     "dbSubnetGroupName": dbSubnetGroupName,
-
 
                 "engine": engine,
                 if any_true([
