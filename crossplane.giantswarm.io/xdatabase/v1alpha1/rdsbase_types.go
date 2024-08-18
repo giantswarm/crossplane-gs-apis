@@ -863,6 +863,15 @@ type ClusterParameters struct {
 	// +optional
 	ServerlessV2ScalingConfiguration *ServerlessV2ScalingConfiguration `json:"serverlessV2ScalingConfiguration,omitempty"`
 
+	// StorageThroughput is the amount of storage throughput. Only applicable if
+	// `storageType` is `gp3`
+	//
+	// Only applicable if not running in cluster mode
+	//
+	// +optional
+	// +nullable
+	StorageThroughput *int64 `json:"storageThroughput,omitempty"`
+
 	// StorageType specifies the storage type to be associated with the cluster
 	//
 	// +optional

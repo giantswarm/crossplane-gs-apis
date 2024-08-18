@@ -37,7 +37,7 @@ spec:
       numCacheClusters: 3
 
     database:
-      allocatedStorage: 100
+      allocatedStorage: 500
       createCluster: false
       enabledCloudwatchLogsExports:
       - audit
@@ -51,6 +51,8 @@ spec:
       engine: mariadb
       engineVersion: "10.11.8"
       instanceCount: 1
+      iops: 12000
+      storageThroughput: 500
       masterUsername: giantswarm
       multiAz: false
       storageType: gp3

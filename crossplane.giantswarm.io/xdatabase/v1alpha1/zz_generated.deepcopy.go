@@ -676,6 +676,11 @@ func (in *ClusterParameters) DeepCopyInto(out *ClusterParameters) {
 		*out = new(ServerlessV2ScalingConfiguration)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.StorageThroughput != nil {
+		in, out := &in.StorageThroughput, &out.StorageThroughput
+		*out = new(int64)
+		**out = **in
+	}
 	if in.StorageType != nil {
 		in, out := &in.StorageType, &out.StorageType
 		*out = new(string)
