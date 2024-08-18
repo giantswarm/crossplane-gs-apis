@@ -1813,6 +1813,16 @@ spec:
                             format: int64
                             type: integer
                         type: object
+                      storageThroughput:
+                        description: |-
+                          StorageThroughput is the amount of storage throughput. Only applicable if
+                          `storageType` is `gp3`
+
+
+                          Only applicable if not running in cluster mode
+                        format: int64
+                        nullable: true
+                        type: integer
                       storageType:
                         description: StorageType specifies the storage type to be
                           associated with the cluster
