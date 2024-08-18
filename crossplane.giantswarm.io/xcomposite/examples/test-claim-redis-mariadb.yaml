@@ -28,6 +28,7 @@ spec:
     eso:
       enabled: true
       kubernetesSecretStore: default
+      fluxSSASecretName: fluxssa
 
     cache:
       createReplicationGroup: true

@@ -36,7 +36,7 @@ newdxr = {
                 if _port:
                     "port" = _port
 
-                "ready" = readyState
+            "ready" = readyState
         }
     }
 }
