@@ -99,7 +99,7 @@ instances = [
 
                     "iamDatabaseAuthenticationEnabled": getwparent(item, oxr, "iamDatabaseAuthenticationEnabled", False)
 
-                    _v = getwparent(item, oxr, "iops", False):
+                    _v = getwparent(item, oxr, "iops", False)
                     if _v:
                         "iops": getwparent(item, oxr, "iops", 0)
 
