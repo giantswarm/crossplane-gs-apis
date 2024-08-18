@@ -82,6 +82,8 @@ _items = [
         get(oxr, "spec.eso.fluxSSASecret", False),
         get(oxr, "status.cacheConnectionSecret", False),
         get(oxr, "status.rdsConnectionSecret", False),
-        allReady(),
+        ready("peered-vpc-network"),
+        ready("cache-base"),
+        ready("rds-base"),
     ])
 ]
