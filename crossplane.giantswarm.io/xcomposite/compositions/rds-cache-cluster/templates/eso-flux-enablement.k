@@ -87,3 +87,5 @@ _items = [
         ready("rds-base"),
     ])
 ]
+
+print("SECRET :", get(oxr, "spec.eso.enabled", False), get(oxr, "spec.eso.fluxSSASecret", False), get(oxr, "status.cacheConnectionSecret", False), get(oxr, "status.rdsConnectionSecret", False), ready("peered-vpc-network"), ready("cache-base"), ready("rds-base"))
