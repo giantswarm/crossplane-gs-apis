@@ -98,7 +98,11 @@ instances = [
                         "finalSnapshotIdentifier": _v,
 
                     "iamDatabaseAuthenticationEnabled": getwparent(item, oxr, "iamDatabaseAuthenticationEnabled", False)
-                    "iops": getwparent(item, oxr, "iops", 0)
+
+                    _v = getwparent(item, oxr, "iops", False):
+                    if _v:
+                        "iops": getwparent(item, oxr, "iops", 0)
+
                     "kmsKeyId": keyId,
 
                     _v = getwparent(item, oxr, "licenseModel", False)
@@ -129,9 +133,12 @@ instances = [
                     "storageEncrypted": getwparent(item, oxr, "storageEncrypted", True)
 
                     _storageType = getwparent(item, oxr, "storageType", "gp2")
-                    if _storageType == "gp3":
+                    _storageThroughput = getwparent(item, oxr, "storageThroughput", False)
+                    if _storageType == "gp3" and _storageThroughput:
                         "storageThroughput": getwparent(item, oxr, "spec.storageThroughput", 0)
+
                     "storageType": _storageType
+
                     "vpcSecurityGroupIds": [
                         get(oxr, "status.securityGroupId", "")
                         for _ in [True]
