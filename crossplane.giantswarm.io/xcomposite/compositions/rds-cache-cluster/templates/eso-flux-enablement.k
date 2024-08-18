@@ -43,7 +43,7 @@ _items = [
                     "spec": {
                         "refreshInterval": "1h",
                         "secretStoreRef": {
-                            "name": get(oxr, "spec.eso.secretStoreRef.name", ""),
+                            "name": get(oxr, "spec.eso.kubernetesSecretStore", ""),
                             "kind": "SecretStore",
                         },
                         "dataFrom": [
