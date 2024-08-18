@@ -96,7 +96,7 @@ managedPrefixList = [
             "deletionPolicy": dp
             "forProvider": {
                 "addressFamily": get(oxr, "spec.addressFamily", "IPv4"),
-                "maxEntries": get(oxr, "spec.maxEntries", 20),
+                "maxEntries": get(oxr, "spec.maxEntries", len(get(oxr, "spec.entries", []))),
                 "name": get(oxr, "spec.name", ""),
                 "region": region,
                 "tags": tags,
