@@ -41,7 +41,7 @@ _items = [
                         "namespace": namespace,
                     },
                     "spec": {
-                        "refreshInterval": "1d",
+                        "refreshInterval": "1h",
                         "secretStoreRef": {
                             "name": get(oxr, "spec.eso.secretStoreRef.name", ""),
                             "kind": "SecretStore",
