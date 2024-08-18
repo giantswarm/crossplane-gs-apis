@@ -1,5 +1,5 @@
 
-ssasecret = get(oxr, "spec.eso.fluxSSASecret", "")
+ssasecret = get(oxr, "spec.eso.fluxSSASecretName", "")
 # The resource created here is to enable switching Flux SSA from `Ignore` to
 # `Merge`.
 #
