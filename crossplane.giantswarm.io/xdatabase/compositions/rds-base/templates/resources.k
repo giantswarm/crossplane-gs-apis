@@ -128,11 +128,11 @@ instances = [
                     "storageEncrypted": getwparent(item, oxr, "storageEncrypted", True)
 
                     _storageType = getwparent(item, oxr, "storageType", "gp2")
+                    "storageType": _storageType
+
                     _storageThroughput = getwparent(item, oxr, "storageThroughput", False)
                     if _storageType == "gp3" and _storageThroughput:
-                        "storageThroughput": getwparent(item, oxr, "spec.storageThroughput", 0)
-
-                    "storageType": _storageType
+                        "storageThroughput": _storageThroughput
 
                     "vpcSecurityGroupIds": [
                         get(oxr, "status.securityGroupId", "")
