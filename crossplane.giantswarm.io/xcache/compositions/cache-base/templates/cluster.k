@@ -1,12 +1,3 @@
-# If we are not creating a replication group, check how many cache clusters have
-# been requested and default a list of empty dictionaries as being the cache
-# cluster template.
-requiredClusters = get(oxr, "spec.cacheClusters", []) if get(oxr, "spec.cacheClusters", False) else [
-    {}
-    for i in range(get(oxr, "spec.numCacheClusters", 1))
-    if not get(oxr, "spec.createReplicationGroup", False)
-]
-
 clusters = [
     {
         "apiVersion": "elasticache.aws.upbound.io/v1beta1"

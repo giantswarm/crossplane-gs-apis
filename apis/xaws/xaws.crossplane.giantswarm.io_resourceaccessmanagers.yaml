@@ -157,6 +157,9 @@ spec:
               id:
                 description: The ID of the resource access manager.
                 type: string
+              ready:
+                description: Is the resource access manager ready
+                type: boolean
             type: object
         required:
         - spec

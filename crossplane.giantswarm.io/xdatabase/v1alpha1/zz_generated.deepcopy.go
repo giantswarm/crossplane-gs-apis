@@ -1190,6 +1190,11 @@ func (in *RdsBaseStatus) DeepCopyInto(out *RdsBaseStatus) {
 		*out = new(int64)
 		**out = **in
 	}
+	if in.Ready != nil {
+		in, out := &in.Ready, &out.Ready
+		*out = new(bool)
+		**out = **in
+	}
 	if in.SecurityGroupId != nil {
 		in, out := &in.SecurityGroupId, &out.SecurityGroupId
 		*out = new(string)

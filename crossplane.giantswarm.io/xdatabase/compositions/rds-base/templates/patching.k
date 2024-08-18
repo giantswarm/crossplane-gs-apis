@@ -1,12 +1,24 @@
+instancesCreated = [
+    i
+    for i in ocds if i.startswith("instance-")
+]
+
+readyState = all_true([
+    allReady(),
+    len(instancesCreated) == len(_specInstances),
+])
+
 newdxr = {
-    **oxr,
+    **dxr,
     **{
         "status": {
             if get(oxr, "spec.eso.enabled", True) and _connectionSecret:
                 "esoConnectionSecret" = "${appName}-rds-master"
+
             if not createCluster and masterInstance:
                 "endpoint" = ocdsstatus("instance-0", "address", ""),
                 "port" = ocdsstatus("instance-0", "port", 0),
+
             if _secretRef:
                 "connectionSecret" = _secretRef
 
@@ -24,6 +36,7 @@ newdxr = {
                 if _port:
                     "port" = _port
 
+                "ready" = readyState
         }
     }
 }

@@ -1,7 +1,9 @@
 import regex
 
 oxr = option("params").oxr
+dxr = option("params").dxr
 ocds = option("params").ocds
+dcds = option("params").dcds
 
 get = lambda x: {:}, y: str, d: any -> any {
     """
@@ -21,18 +23,43 @@ exists = lambda x: any -> bool {
     x in list(ocds)
 }
 
+ocdsstatus = lambda x: str, y: str, d: any -> any {
+    """
+    Get an item from the status of an ocds resource.
+    """
+    _x = None
+    if get(ocds, "${x}.Resource.status.atProvider", False):
+        _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+    else:
+        _x = get(ocds, "${x}.Resource.status.${y}", d)
+    _x if _x else d
+}
+
+# Unlike other compositions in this series,
+# provisioning does not always have `atProvider` status.
+#
+# This means we can only rely on the conditions of resources
+# and not add a confirmation step to the validation.
 ready = lambda x: str -> bool {
     """
     Check if a value is ready.
     """
-    conditions = get(ocds, "${x}.Resource.status.conditions", [])
-    any_true([
-        exists(x),
-        all_true([
-            get(c, "status", "False") == "True" for c in conditions
-        ])
+    conditionsReady = all_true([
+        get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+    ])
+    any_true([exists(x), conditionsReady])
+}
+
+allReady = lambda -> bool {
+    """
+    Check if all managed resources are ready.
+    """
+    all_true([
+        ready(x)
+        for x in list(ocds)
     ])
 }
+
 
 readystr = lambda x: str -> str {
     """

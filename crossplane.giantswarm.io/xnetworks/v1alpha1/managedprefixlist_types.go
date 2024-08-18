@@ -57,6 +57,11 @@ type ManagedPrefixListStatus struct {
 	//
 	// +optional
 	ID *string `json:"id,omitempty"`
+
+	// Is the prefix list ready
+	//
+	// +optional
+	Ready bool `json:"ready,omitempty"`
 }
 
 type ManagedPrefixListParameters struct {

@@ -94,6 +94,11 @@ type ResourceAccessManagerStatus struct {
 	//
 	// +optional
 	Id string `json:"id,omitempty"`
+
+	// Is the resource access manager ready
+	//
+	// +optional
+	Ready bool `json:"ready,omitempty"`
 }
 
 type Principal struct {

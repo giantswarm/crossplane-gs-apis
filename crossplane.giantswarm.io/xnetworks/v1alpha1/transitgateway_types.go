@@ -164,6 +164,11 @@ type TransitGatewayStatus struct {
 	// +optional
 	LocalAttachmentIds map[string]string `json:"localAttachmentIds,omitempty"`
 
+	// Is the transit gateway ready
+	//
+	// +optional
+	Ready bool `json:"ready,omitempty"`
+
 	// map of remote attachments
 	//
 	// +optional

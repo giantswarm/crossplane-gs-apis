@@ -190,7 +190,16 @@ spec:
           import regex
 
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -229,26 +238,31 @@ spec:
               """
               Get an item from the status of an ocds resource.
               """
-              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
-          }
-
-          exists = lambda x: any -> bool {
-              """
-              Check if a value exists.
-              """
-              x in list(ocds)
+              _x = None
+              if get(ocds, "${x}.Resource.status.atProvider", False):
+                  _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+              else:
+                  _x = get(ocds, "${x}.Resource.status.${y}", d)
+              _x if _x else d
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -257,6 +271,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -308,6 +332,15 @@ spec:
               _port = ocdsstatus("elasticache-replication-group-local", "port", False)
           else:
               _port = ocdsstatus("elasticache-cluster-0", "port", False)
+
+          # If we are not creating a replication group, check how many cache clusters have
+          # been requested and default a list of empty dictionaries as being the cache
+          # cluster template.
+          requiredClusters = get(oxr, "spec.cacheClusters", []) if get(oxr, "spec.cacheClusters", False) else [
+              {}
+              for i in range(get(oxr, "spec.numCacheClusters", 1))
+              if not get(oxr, "spec.createReplicationGroup", False)
+          ]
 
           if get(oxr, "spec.createReplicationGroup", False):
               assert get(oxr, "spec.engine", "redis") == "redis", "engine must be redis when createReplicationGroup is true"
@@ -608,7 +641,16 @@ spec:
           import regex
 
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -647,26 +689,31 @@ spec:
               """
               Get an item from the status of an ocds resource.
               """
-              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
-          }
-
-          exists = lambda x: any -> bool {
-              """
-              Check if a value exists.
-              """
-              x in list(ocds)
+              _x = None
+              if get(ocds, "${x}.Resource.status.atProvider", False):
+                  _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+              else:
+                  _x = get(ocds, "${x}.Resource.status.${y}", d)
+              _x if _x else d
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -675,6 +722,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -954,7 +1011,16 @@ spec:
           import regex
 
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -993,26 +1059,31 @@ spec:
               """
               Get an item from the status of an ocds resource.
               """
-              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
-          }
-
-          exists = lambda x: any -> bool {
-              """
-              Check if a value exists.
-              """
-              x in list(ocds)
+              _x = None
+              if get(ocds, "${x}.Resource.status.atProvider", False):
+                  _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+              else:
+                  _x = get(ocds, "${x}.Resource.status.${y}", d)
+              _x if _x else d
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -1021,6 +1092,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -1072,6 +1153,15 @@ spec:
               _port = ocdsstatus("elasticache-replication-group-local", "port", False)
           else:
               _port = ocdsstatus("elasticache-cluster-0", "port", False)
+
+          # If we are not creating a replication group, check how many cache clusters have
+          # been requested and default a list of empty dictionaries as being the cache
+          # cluster template.
+          requiredClusters = get(oxr, "spec.cacheClusters", []) if get(oxr, "spec.cacheClusters", False) else [
+              {}
+              for i in range(get(oxr, "spec.numCacheClusters", 1))
+              if not get(oxr, "spec.createReplicationGroup", False)
+          ]
 
           users = [
               {
@@ -1186,7 +1276,16 @@ spec:
           import regex
 
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -1225,26 +1324,31 @@ spec:
               """
               Get an item from the status of an ocds resource.
               """
-              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
-          }
-
-          exists = lambda x: any -> bool {
-              """
-              Check if a value exists.
-              """
-              x in list(ocds)
+              _x = None
+              if get(ocds, "${x}.Resource.status.atProvider", False):
+                  _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+              else:
+                  _x = get(ocds, "${x}.Resource.status.${y}", d)
+              _x if _x else d
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -1253,6 +1357,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -1304,6 +1418,15 @@ spec:
               _port = ocdsstatus("elasticache-replication-group-local", "port", False)
           else:
               _port = ocdsstatus("elasticache-cluster-0", "port", False)
+
+          # If we are not creating a replication group, check how many cache clusters have
+          # been requested and default a list of empty dictionaries as being the cache
+          # cluster template.
+          requiredClusters = get(oxr, "spec.cacheClusters", []) if get(oxr, "spec.cacheClusters", False) else [
+              {}
+              for i in range(get(oxr, "spec.numCacheClusters", 1))
+              if not get(oxr, "spec.createReplicationGroup", False)
+          ]
 
           esoEnabled = get(oxr, "spec.eso.enabled", False)
           engine = get(oxr, "spec.engine", "redis")
@@ -1487,7 +1610,16 @@ spec:
           import regex
 
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -1526,26 +1658,31 @@ spec:
               """
               Get an item from the status of an ocds resource.
               """
-              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
-          }
-
-          exists = lambda x: any -> bool {
-              """
-              Check if a value exists.
-              """
-              x in list(ocds)
+              _x = None
+              if get(ocds, "${x}.Resource.status.atProvider", False):
+                  _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+              else:
+                  _x = get(ocds, "${x}.Resource.status.${y}", d)
+              _x if _x else d
           }
 
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -1554,6 +1691,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -1606,6 +1753,15 @@ spec:
           else:
               _port = ocdsstatus("elasticache-cluster-0", "port", False)
 
+          # If we are not creating a replication group, check how many cache clusters have
+          # been requested and default a list of empty dictionaries as being the cache
+          # cluster template.
+          requiredClusters = get(oxr, "spec.cacheClusters", []) if get(oxr, "spec.cacheClusters", False) else [
+              {}
+              for i in range(get(oxr, "spec.numCacheClusters", 1))
+              if not get(oxr, "spec.createReplicationGroup", False)
+          ]
+
           localClusterName = "elasticache-replication-group-local"
           _connectionSecretName = ""
           if ready(localClusterName):
@@ -1625,8 +1781,21 @@ spec:
 
           _ugId = ocdsstatus("elasticache-user-group", "id", "")
 
+          instancesCreated = [
+              i
+              for i in ocds if i.startswith("elasticache-cluster-")
+          ]
+
+          readyState = all_true([
+              allReady(),
+              any_true([
+                  ready("elasticache-replication-group-local"),
+                  len(instancesCreated) == len(requiredClusters),
+              ])
+          ])
+
           newdxr = {
-              **oxr,
+              **dxr,
               **{
                   "status": {
                       if _connectionSecretName:
@@ -1664,6 +1833,8 @@ spec:
 
                       if _ugId:
                           "userGroupId" = _ugId,
+
+                      "ready" = readyState,
                   },
               }
           }

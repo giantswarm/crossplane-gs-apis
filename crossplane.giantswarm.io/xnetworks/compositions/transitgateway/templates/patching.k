@@ -4,23 +4,25 @@ ramShareId = ocdsstatus("ram-${appName}-${region}", "id", False)
 
 _items = [
     {
-        **oxr,
+        **dxr,
         **{
             "status": {
                 if tgwId:
-                    "tgwId": tgwId,
+                    "tgwId" = tgwId,
                 if tgwArn:
-                    "tgwArn": tgwArn,
+                    "tgwArn" = tgwArn,
                 if tgwRouteTableId:
-                    "tgwRouteTableId": tgwRouteTableId,
+                    "tgwRouteTableId" = tgwRouteTableId,
                 if localAttachmentIds:
-                    "localAttachmentIds": localAttachmentIds,
+                    "localAttachmentIds" = localAttachmentIds,
                 if remoteAttachementIds:
-                    "remoteAttachmentIds": remoteAttachementIds,
+                    "remoteAttachmentIds" = remoteAttachementIds,
                 if ramShareId:
-                    "ramShareId": ramShareId,
+                    "ramShareId" = ramShareId,
                 if ramShareArn:
-                    "ramShareArn": ramShareArn,
+                    "ramShareArn" = ramShareArn,
+
+                "ready" = allReady(),
             }
         }
     }

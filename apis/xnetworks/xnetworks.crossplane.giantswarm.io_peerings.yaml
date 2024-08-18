@@ -417,6 +417,9 @@ spec:
               peeringConnectionId:
                 description: The ID of the VPC peering connection.
                 type: string
+              ready:
+                description: Is the peering connection ready
+                type: boolean
             type: object
         required:
         - spec

@@ -17,8 +17,21 @@ if get(oxr, "spec.parameterGroupConfiguration", False):
 
 _ugId = ocdsstatus("elasticache-user-group", "id", "")
 
+instancesCreated = [
+    i
+    for i in ocds if i.startswith("elasticache-cluster-")
+]
+
+readyState = all_true([
+    allReady(),
+    any_true([
+        ready("elasticache-replication-group-local"),
+        len(instancesCreated) == len(requiredClusters),
+    ])
+])
+
 newdxr = {
-    **oxr,
+    **dxr,
     **{
         "status": {
             if _connectionSecretName:
@@ -56,6 +69,8 @@ newdxr = {
 
             if _ugId:
                 "userGroupId" = _ugId,
+
+            "ready" = readyState,
         },
     }
 }

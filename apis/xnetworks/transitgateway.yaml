@@ -24,7 +24,9 @@ spec:
         source: |-
           import regex
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
 
           exists = lambda x: any -> bool {
               """
@@ -71,12 +73,19 @@ spec:
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -85,6 +94,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -570,7 +589,9 @@ spec:
         source: |-
           import regex
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
 
           exists = lambda x: any -> bool {
               """
@@ -617,12 +638,19 @@ spec:
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -631,6 +659,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -1177,7 +1215,9 @@ spec:
         source: |-
           import regex
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
 
           exists = lambda x: any -> bool {
               """
@@ -1224,12 +1264,19 @@ spec:
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -1238,6 +1285,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -1561,23 +1618,25 @@ spec:
 
           _items = [
               {
-                  **oxr,
+                  **dxr,
                   **{
                       "status": {
                           if tgwId:
-                              "tgwId": tgwId,
+                              "tgwId" = tgwId,
                           if tgwArn:
-                              "tgwArn": tgwArn,
+                              "tgwArn" = tgwArn,
                           if tgwRouteTableId:
-                              "tgwRouteTableId": tgwRouteTableId,
+                              "tgwRouteTableId" = tgwRouteTableId,
                           if localAttachmentIds:
-                              "localAttachmentIds": localAttachmentIds,
+                              "localAttachmentIds" = localAttachmentIds,
                           if remoteAttachementIds:
-                              "remoteAttachmentIds": remoteAttachementIds,
+                              "remoteAttachmentIds" = remoteAttachementIds,
                           if ramShareId:
-                              "ramShareId": ramShareId,
+                              "ramShareId" = ramShareId,
                           if ramShareArn:
-                              "ramShareArn": ramShareArn,
+                              "ramShareArn" = ramShareArn,
+
+                          "ready" = allReady(),
                       }
                   }
               }
@@ -1597,7 +1656,9 @@ spec:
         source: |-
           import regex
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
 
           exists = lambda x: any -> bool {
               """
@@ -1644,12 +1705,19 @@ spec:
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -1658,6 +1726,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -2159,7 +2237,9 @@ spec:
         source: |-
           import regex
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
 
           exists = lambda x: any -> bool {
               """
@@ -2206,12 +2286,19 @@ spec:
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -2220,6 +2307,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -2594,7 +2691,9 @@ spec:
         source: |-
           import regex
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
 
           exists = lambda x: any -> bool {
               """
@@ -2641,12 +2740,19 @@ spec:
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -2655,6 +2761,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -3140,7 +3256,9 @@ spec:
         source: |-
           import regex
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
 
           exists = lambda x: any -> bool {
               """
@@ -3187,12 +3305,19 @@ spec:
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -3201,6 +3326,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")

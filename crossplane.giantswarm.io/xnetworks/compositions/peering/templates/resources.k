@@ -215,12 +215,14 @@ owner = ocdsstatus("peering-${remoteVpcName}", "peerOwnerId", "")
 arn = "arn:aws:ec2:${region}:${owner}:vpc-peering-connection/${peeringId}"
 
 newdxr = {
-    **oxr,
+    **dxr,
     **{
         "status": {
             if peeringCreated:
-                "peeringConnectionId" = peeringId
-                "peeringConnectionArn" = arn
+                "peeringConnectionId" = peeringId,
+                "peeringConnectionArn" = arn,
+
+            "ready" = allReady(),
         }
     }
 }

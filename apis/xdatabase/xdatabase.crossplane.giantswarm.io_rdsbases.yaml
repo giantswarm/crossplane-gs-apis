@@ -1289,6 +1289,9 @@ spec:
                 description: port is the port of the database.
                 format: int64
                 type: integer
+              ready:
+                description: Ready is whether all children are ready.
+                type: boolean
               securityGroupId:
                 description: SecurityGroupId The security group ID of the DB cluster.
                 type: string

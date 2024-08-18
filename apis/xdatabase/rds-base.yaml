@@ -190,7 +190,9 @@ spec:
           import regex
 
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -221,13 +223,6 @@ spec:
               get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
-          ocdsstatus = lambda x: str, y: str, d: any -> any {
-              """
-              Get an item from the status of an ocds resource.
-              """
-              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
-          }
-
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
@@ -235,16 +230,35 @@ spec:
               x in list(ocds)
           }
 
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              _x = None
+              if get(ocds, "${x}.Resource.status.atProvider", False):
+                  _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+              else:
+                  _x = get(ocds, "${x}.Resource.status.${y}", d)
+              _x if _x else d
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -253,6 +267,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -304,6 +328,10 @@ spec:
           _connectionSecret = _secretRef
 
           clusterCreated: bool = ready("rds-cluster")
+          _specInstances = get(oxr, "spec.instances", [])
+
+          if not _specInstances and get(oxr, "spec.instanceCount", 0) > 0:
+              _specInstances = [{} for i in range(get(oxr, "spec.instanceCount", 0))]
 
           ipgn = get(oxr, "spec.dbParameterGroup.name", "") if get(oxr, "spec.allowMajorVersionUpgrade", False) else ""
           provisioned = get(oxr, "spec.engineMode", "provisioned") == "provisioned"
@@ -471,7 +499,9 @@ spec:
           import regex
 
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -502,13 +532,6 @@ spec:
               get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
-          ocdsstatus = lambda x: str, y: str, d: any -> any {
-              """
-              Get an item from the status of an ocds resource.
-              """
-              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
-          }
-
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
@@ -516,16 +539,35 @@ spec:
               x in list(ocds)
           }
 
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              _x = None
+              if get(ocds, "${x}.Resource.status.atProvider", False):
+                  _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+              else:
+                  _x = get(ocds, "${x}.Resource.status.${y}", d)
+              _x if _x else d
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -534,6 +576,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -585,6 +637,10 @@ spec:
           _connectionSecret = _secretRef
 
           clusterCreated: bool = ready("rds-cluster")
+          _specInstances = get(oxr, "spec.instances", [])
+
+          if not _specInstances and get(oxr, "spec.instanceCount", 0) > 0:
+              _specInstances = [{} for i in range(get(oxr, "spec.instanceCount", 0))]
 
           import json
 
@@ -597,11 +653,6 @@ spec:
           # Has the master instance been built?
           masterInstanceIdentifier = ocdsstatus("instance-0", "identifier", False)
           masterInstanceArn = ocdsstatus("instance-0", "arn", False)
-
-          _specInstances = get(oxr, "spec.instances", [])
-
-          if not _specInstances and get(oxr, "spec.instanceCount", 0) > 0:
-              _specInstances = [{} for i in range(get(oxr, "spec.instanceCount", 0))]
 
           # This will force the secondary (read) replicas to be built after the primary
           # instance has been built. This is to ensure that the primary instance is
@@ -1410,7 +1461,9 @@ spec:
           import regex
 
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -1441,13 +1494,6 @@ spec:
               get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
-          ocdsstatus = lambda x: str, y: str, d: any -> any {
-              """
-              Get an item from the status of an ocds resource.
-              """
-              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
-          }
-
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
@@ -1455,16 +1501,35 @@ spec:
               x in list(ocds)
           }
 
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              _x = None
+              if get(ocds, "${x}.Resource.status.atProvider", False):
+                  _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+              else:
+                  _x = get(ocds, "${x}.Resource.status.${y}", d)
+              _x if _x else d
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -1473,6 +1538,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -1524,16 +1599,32 @@ spec:
           _connectionSecret = _secretRef
 
           clusterCreated: bool = ready("rds-cluster")
+          _specInstances = get(oxr, "spec.instances", [])
+
+          if not _specInstances and get(oxr, "spec.instanceCount", 0) > 0:
+              _specInstances = [{} for i in range(get(oxr, "spec.instanceCount", 0))]
+
+          instancesCreated = [
+              i
+              for i in ocds if i.startswith("instance-")
+          ]
+
+          readyState = all_true([
+              allReady(),
+              len(instancesCreated) == len(_specInstances),
+          ])
 
           newdxr = {
-              **oxr,
+              **dxr,
               **{
                   "status": {
                       if get(oxr, "spec.eso.enabled", True) and _connectionSecret:
                           "esoConnectionSecret" = "${appName}-rds-master"
+
                       if not createCluster and masterInstance:
                           "endpoint" = ocdsstatus("instance-0", "address", ""),
                           "port" = ocdsstatus("instance-0", "port", 0),
+
                       if _secretRef:
                           "connectionSecret" = _secretRef
 
@@ -1551,6 +1642,7 @@ spec:
                           if _port:
                               "port" = _port
 
+                          "ready" = readyState
                   }
               }
           }
@@ -1572,7 +1664,9 @@ spec:
           import regex
 
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -1603,13 +1697,6 @@ spec:
               get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
-          ocdsstatus = lambda x: str, y: str, d: any -> any {
-              """
-              Get an item from the status of an ocds resource.
-              """
-              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
-          }
-
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
@@ -1617,16 +1704,35 @@ spec:
               x in list(ocds)
           }
 
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              _x = None
+              if get(ocds, "${x}.Resource.status.atProvider", False):
+                  _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+              else:
+                  _x = get(ocds, "${x}.Resource.status.${y}", d)
+              _x if _x else d
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -1635,6 +1741,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -1686,6 +1802,10 @@ spec:
           _connectionSecret = _secretRef
 
           clusterCreated: bool = ready("rds-cluster")
+          _specInstances = get(oxr, "spec.instances", [])
+
+          if not _specInstances and get(oxr, "spec.instanceCount", 0) > 0:
+              _specInstances = [{} for i in range(get(oxr, "spec.instanceCount", 0))]
 
           externalSecretStores = [
               {
@@ -1702,6 +1822,7 @@ spec:
               for _, store in get(oxr, "spec.eso.stores", [])
               if get(oxr, "spec.eso.enabled", True) and store.enabled
           ]
+
           usernameField = "username" if not createCluster else "master_username"
           passwordField = "password" if not createCluster else "attribute.master_password"
 
@@ -1849,7 +1970,9 @@ spec:
           import regex
 
           oxr = option("params").oxr
+          dxr = option("params").dxr
           ocds = option("params").ocds
+          dcds = option("params").dcds
 
           get = lambda x: {:}, y: str, d: any -> any {
               """
@@ -1880,13 +2003,6 @@ spec:
               get(ocds, "${x}.Resource.spec.${y}", d)
           }
 
-          ocdsstatus = lambda x: str, y: str, d: any -> any {
-              """
-              Get an item from the status of an ocds resource.
-              """
-              get(ocds, "${x}.Resource.status.atProvider.${y}", d)
-          }
-
           exists = lambda x: any -> bool {
               """
               Check if a value exists.
@@ -1894,16 +2010,35 @@ spec:
               x in list(ocds)
           }
 
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              _x = None
+              if get(ocds, "${x}.Resource.status.atProvider", False):
+                  _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+              else:
+                  _x = get(ocds, "${x}.Resource.status.${y}", d)
+              _x if _x else d
+          }
+
           ready = lambda x: str -> bool {
               """
               Check if a value is ready.
               """
-              conditions = get(ocds, "${x}.Resource.status.conditions", [])
-              any_true([
-                  exists(x),
-                  all_true([
-                      get(c, "status", "False") == "True" for c in conditions
-                  ])
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+
+              ap = get(ocds, "${x}.Resource.status.atProvider", {})
+              objectReady = any_true([
+                  ocdsstatus(x, "ready", False),
+                  len(list(ap)) > 0,
+              ])
+
+              all_true([
+                  any_true([exists(x), conditionsReady]),
+                  objectReady,
               ])
           }
 
@@ -1912,6 +2047,16 @@ spec:
               Check if a value is ready.
               """
               "True" if ready(x) else "False"
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
           }
 
           appName = get(oxr, "spec.claimRef.name", "")
@@ -1963,6 +2108,10 @@ spec:
           _connectionSecret = _secretRef
 
           clusterCreated: bool = ready("rds-cluster")
+          _specInstances = get(oxr, "spec.instances", [])
+
+          if not _specInstances and get(oxr, "spec.instanceCount", 0) > 0:
+              _specInstances = [{} for i in range(get(oxr, "spec.instanceCount", 0))]
 
           esoEnabled = get(oxr, "spec.eso.enabled", False)
           esoConnectionSecret = get(oxr, "status.esoConnectionSecret", False)

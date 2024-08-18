@@ -83,6 +83,11 @@ type SubnetSetStatus struct {
 	// +structType=atomic
 	Subnets map[AvailabilityZone]*SubnetId `json:"subnets,omitempty"`
 
+	// Is the subnetset ready
+	//
+	// +optional
+	Ready bool `json:"ready,omitempty"`
+
 	// RouteTables is a map of route tables discovered by the composite.
 	//
 	// +optional

@@ -1062,6 +1062,9 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              ready:
+                description: Is the network ready
+                type: boolean
               subnetBits:
                 description: Contains the subnet bits output by function-kcl-subnet-bits
                 items:

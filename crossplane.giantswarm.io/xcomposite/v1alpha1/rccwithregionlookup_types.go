@@ -126,6 +126,11 @@ type RCCWithRegionLookupStatus struct {
 	// +optional
 	CacheSubnets []string `json:"cacheSubnets,omitempty"`
 
+	// Is the composition complete
+	//
+	// +optional
+	Ready bool `json:"ready,omitempty"`
+
 	// Region is the region in which the resources are created
 	//
 	// +optional

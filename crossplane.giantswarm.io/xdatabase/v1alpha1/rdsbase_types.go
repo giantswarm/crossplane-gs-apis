@@ -146,6 +146,11 @@ type RdsBaseStatus struct {
 	// +optional
 	Port *int64 `json:"port,omitempty"`
 
+	// Ready is whether all children are ready.
+	//
+	// +optional
+	Ready *bool `json:"ready,omitempty"`
+
 	// SecurityGroupId The security group ID of the DB cluster.
 	//
 	// +optional

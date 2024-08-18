@@ -1067,6 +1067,10 @@ spec:
                 description: ReaderEndpoint is the DNS name of the reader endpoint
                   for the cluster.
                 type: string
+              ready:
+                description: Ready is a flag that indicates whether the cluster is
+                  ready.
+                type: boolean
               replicationGroupId:
                 description: ReplicationGroupId is the ID of the replication group.
                 type: string

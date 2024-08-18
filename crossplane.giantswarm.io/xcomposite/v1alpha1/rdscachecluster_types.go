@@ -157,6 +157,11 @@ type RdsClusterStatus struct {
 	// +optional
 	CacheSubnets []string `json:"cacheSubnets,omitempty"`
 
+	// Is the composition complete
+	//
+	// +optional
+	Ready bool `json:"ready,omitempty"`
+
 	// RdsConnectionSecret is the secret containing the connection details
 	// for the database
 	//

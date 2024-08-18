@@ -238,11 +238,20 @@ grants = [
     ])
 ]
 
+newdxr = {
+    **dxr,
+    **{
+        "status": {
+            "ready" = allReady()
+        },
+    },
+}
+
 provisionSql = get(oxr, "spec.provisionSql", True)
 _items = [
     i for r in [
         providerConnectionSecret, databases,
-        users, grants
+        users, grants, [newdxr],
     ]
     for i in r if i and provisionSql
 ]

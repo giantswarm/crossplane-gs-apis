@@ -404,6 +404,11 @@ type PeeredVpcNetworkStatus struct {
 	// +mapType=atomic
 	CalculatedCidrs map[string][]string `json:"calculatedCidrs"`
 
+	// Is the network ready
+	//
+	// +optional
+	Ready bool `json:"ready"`
+
 	// Contains the subnet bits output by function-kcl-subnet-bits
 	//
 	// +listType=atomic

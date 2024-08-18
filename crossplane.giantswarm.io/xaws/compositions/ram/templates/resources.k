@@ -115,7 +115,7 @@ ramShareAccepters = [
 ]
 
 newdxr = {
-    **oxr,
+    **dxr,
     **{
 
         "status": {
@@ -123,6 +123,8 @@ newdxr = {
                 "id": ramShareId,
             if ramShareArn:
                 "arn": ramShareArn,
+
+            "ready" = allReady()
         }
     }
 }

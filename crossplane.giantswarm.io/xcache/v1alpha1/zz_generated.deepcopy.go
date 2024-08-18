@@ -204,6 +204,11 @@ func (in *CacheBaseStatus) DeepCopyInto(out *CacheBaseStatus) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Ready != nil {
+		in, out := &in.Ready, &out.Ready
+		*out = new(bool)
+		**out = **in
+	}
 	if in.ReplicationGroupId != nil {
 		in, out := &in.ReplicationGroupId, &out.ReplicationGroupId
 		*out = new(string)

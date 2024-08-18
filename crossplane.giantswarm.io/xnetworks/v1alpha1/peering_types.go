@@ -51,6 +51,11 @@ type PeeringStatus struct {
 	//
 	// +optional
 	PeeringConnectionId string `json:"peeringConnectionId,omitempty"`
+
+	// Is the peering connection ready
+	//
+	// +optional
+	Ready bool `json:"ready,omitempty"`
 }
 
 type PeeringParameters struct {

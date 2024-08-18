@@ -1,9 +1,9 @@
-_subnets = get(_oxr, "status.vpc.privateSubnets", [])
+_subnets = get(oxr, "status.vpc.privateSubnets", [])
 
-_dbsnindex = get(_oxr, "spec.subnetGroupIndexes.database", False)
+_dbsnindex = get(oxr, "spec.subnetGroupIndexes.database", False)
 _dbSnIds = [k.id for _, k in _subnets[_dbsnindex]] if _dbsnindex != False and _subnets else []
 
-_cachesnindex = get(_oxr, "spec.subnetGroupIndexes.cache", False)
+_cachesnindex = get(oxr, "spec.subnetGroupIndexes.cache", False)
 _cacheSnIds = [k.id for _, k in _subnets[_cachesnindex]] if _cachesnindex != False and _subnets else []
 
 
@@ -18,7 +18,7 @@ cidrBlocks = [
 ]
 
 _dbPatch = {
-    **get(_dcds, "rds-base.Resource", {}),
+    **get(dcds, "rds-base.Resource", {}),
     **{
         "metadata": {
             "annotations": {
@@ -32,12 +32,12 @@ _dbPatch = {
     }
 } if all_true([
     _dbSnIds,
-    get(_dcds, "rds-base.Resource", False),
-    get(_oxr, "status.vpc.id", False),
+    get(ocds, "rds-base.Resource", False),
+    get(oxr, "status.vpc.id", False),
 ]) else {}
 
 _cachePatch = {
-    **get(_dcds, "cache-base.Resource", {}),
+    **get(dcds, "cache-base.Resource", {}),
     **{
         "metadata": {
             "annotations": {
@@ -51,11 +51,20 @@ _cachePatch = {
     }
 } if all_true([
     _cacheSnIds,
-    get(_dcds, "cache-base.Resource", False),
-    get(_oxr, "spec.cache", False),
-    get(_oxr, "status.vpc.id", False),
+    get(ocds, "cache-base.Resource", False),
+    get(oxr, "spec.cache", False),
+    get(oxr, "status.vpc.id", False),
 ]) else {}
 
+newdxr = {
+    **dxr,
+    **{
+        "status" = {
+            "ready" = allReady()
+        },
+    },
+}
+
 items = [
-    k for _, k in [_dbPatch, _cachePatch] if k
+    k for _, k in [_dbPatch, _cachePatch, newdxr] if k
 ]

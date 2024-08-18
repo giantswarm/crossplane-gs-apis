@@ -679,6 +679,9 @@ spec:
                 description: If Resource Access Management is enabled, the ID of the
                   RAM share
                 type: string
+              ready:
+                description: Is the transit gateway ready
+                type: boolean
               remoteAttachmentIds:
                 additionalProperties:
                   type: string

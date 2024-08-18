@@ -10,11 +10,6 @@ partition = get(oxr, "spec.partition", "aws")
 masterInstanceIdentifier = ocdsstatus("instance-0", "identifier", False)
 masterInstanceArn = ocdsstatus("instance-0", "arn", False)
 
-_specInstances = get(oxr, "spec.instances", [])
-
-if not _specInstances and get(oxr, "spec.instanceCount", 0) > 0:
-    _specInstances = [{} for i in range(get(oxr, "spec.instanceCount", 0))]
-
 # This will force the secondary (read) replicas to be built after the primary
 # instance has been built. This is to ensure that the primary instance is
 # available for binding.

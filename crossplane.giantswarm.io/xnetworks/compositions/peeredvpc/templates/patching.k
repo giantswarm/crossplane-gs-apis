@@ -110,7 +110,7 @@ cb = lambda x: str, s: int, c: int -> [] {
 }
 
 newdxr = {
-    **oxr
+    **dxr
     **{
         "status" = {
             "subnetBits" = [
@@ -124,8 +124,8 @@ newdxr = {
                     "newBits": cb(s.public.mask, _x, s.public.count) + cb(s.private.mask, _x, s.private.count)
                 }
                 for s in get(oxr, "spec.subnetsets.cidrs", {}) if s
-            ]
-            "vpcLookup" = vpcLookup
+            ],
+            "vpcLookup" = vpcLookup,
             "vpcs" = {
                 "self": {
                     if len(cidrs) > 1:
@@ -186,7 +186,9 @@ newdxr = {
                         ])
                     }
                 }
-            }
+            },
+
+            "ready" = allReady(),
         }
     }
 }

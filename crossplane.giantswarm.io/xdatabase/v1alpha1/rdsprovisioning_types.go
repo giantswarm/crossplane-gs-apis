@@ -79,6 +79,11 @@ type RdsProvisioningParameters struct {
 // RdsProvisioningStatus defines the observed state of RdsProvisioning
 type RdsProvisioningStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
+
+	// Is the provisioning ready
+	//
+	// +optional
+	Ready bool `json:"ready,omitempty"`
 }
 
 // The name of the database to create

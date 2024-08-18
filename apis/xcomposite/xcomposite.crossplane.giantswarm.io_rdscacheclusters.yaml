@@ -2780,6 +2780,9 @@ spec:
                 items:
                   type: string
                 type: array
+              ready:
+                description: Is the composition complete
+                type: boolean
               vpc:
                 description: Vpc is a VPC configuration to bind the cluster to
                 properties:

@@ -2818,6 +2818,9 @@ spec:
                 items:
                   type: string
                 type: array
+              ready:
+                description: Is the composition complete
+                type: boolean
               region:
                 description: Region is the region in which the resources are created
                 type: string

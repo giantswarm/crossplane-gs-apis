@@ -1,7 +1,8 @@
 import regex
 oxr = option("params").oxr
-_dxr = option("params").dxr
+dxr = option("params").dxr
 ocds = option("params").ocds
+dcds = option("params").dcds
 
 get = lambda x: {:}, y: str, d: any -> any {
     """
@@ -21,18 +22,38 @@ exists = lambda x: any -> bool {
     x in list(ocds)
 }
 
+ocdsstatus = lambda x: str, y: str, d: any -> any {
+    """
+    Get an item from the status of an ocds resource.
+    """
+    _x = None
+    if get(ocds, "${x}.Resource.status.atProvider", False):
+        _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+    else:
+        _x = get(ocds, "${x}.Resource.status.${y}", d)
+    _x if _x else d
+}
+
 ready = lambda x: str -> bool {
     """
     Check if a value is ready.
     """
-    conditions = get(ocds, "${x}.Resource.status.conditions", [])
-    any_true([
-        exists(x),
-        all_true([
-            get(c, "status", "False") == "True" for c in conditions
-        ])
+    conditionsReady = all_true([
+        get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+    ])
+
+    ap = get(ocds, "${x}.Resource.status.atProvider", {})
+    objectReady = any_true([
+        ocdsstatus(x, "ready", False),
+        len(list(ap)) > 0,
+    ])
+
+    all_true([
+        any_true([exists(x), conditionsReady]),
+        objectReady,
     ])
 }
+
 
 readystr = lambda y: str -> str {
     """
@@ -41,6 +62,15 @@ readystr = lambda y: str -> str {
     "True" if ready(y) else "False"
 }
 
+allReady = lambda -> bool {
+    """
+    Check if all managed resources are ready.
+    """
+    all_true([
+        ready(x)
+        for x in list(ocds)
+    ])
+}
 
 appIndex = get(oxr, "spec.appIndex", "")
 appName = get(oxr, "spec.claimRef.name", "") + "-" + appIndex
@@ -173,19 +203,26 @@ routeTableIds = {
 }
 
 newdxr = {
-    **oxr,
+    **dxr,
     **{
         "status": {
-            "subnets": {
-                "${k}": "${v}"
-                for k, v in subnetIds if k and v
-            }
-            "routeTables": {
-                "${k}": "${v}"
-                for k, v in routeTableIds if k and v
-            }
-            "vpcId": vpcId
-        } if routeTableIds and subnetIds else {}
+            if subnetIds:
+                "subnets": {
+                    "${k}": "${v}"
+                    for k, v in subnetIds if k and v
+                },
+
+            if routeTableIds:
+                "routeTables": {
+                    "${k}": "${v}"
+                    for k, v in routeTableIds if k and v
+                },
+
+            if vpcId:
+                "vpcId": vpcId,
+
+            "ready" = allReady(),
+        }
     }
 }
 

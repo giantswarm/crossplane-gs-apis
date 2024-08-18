@@ -2,6 +2,7 @@ import regex
 oxr = option("params").oxr
 dxr = option("params").dxr
 ocds = option("params").ocds
+dcds = option("params").dcds
 
 get = lambda x: {:}, y: str, d: any -> any {
     """
@@ -21,16 +22,35 @@ exists = lambda x: any -> bool {
     x in list(ocds)
 }
 
+ocdsstatus = lambda x: str, y: str, d: any -> any {
+    """
+    Get an item from the status of an ocds resource.
+    """
+    _x = None
+    if get(ocds, "${x}.Resource.status.atProvider", False):
+        _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+    else:
+        _x = get(ocds, "${x}.Resource.status.${y}", d)
+    _x if _x else d
+}
+
 ready = lambda x: str -> bool {
     """
     Check if a value is ready.
     """
-    conditions = get(ocds, "${x}.Resource.status.conditions", [])
-    any_true([
-        exists(x),
-        all_true([
-            get(c, "status", "False") == "True" for c in conditions
-        ])
+    conditionsReady = all_true([
+        get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+    ])
+
+    ap = get(ocds, "${x}.Resource.status.atProvider", {})
+    objectReady = any_true([
+        ocdsstatus(x, "ready", False),
+        len(list(ap)) > 0,
+    ])
+
+    all_true([
+        any_true([exists(x), conditionsReady]),
+        objectReady,
     ])
 }
 
@@ -39,6 +59,16 @@ readystr = lambda x: str -> str {
     Check if a value is ready.
     """
     "True" if ready(x) else "False"
+}
+
+allReady = lambda -> bool {
+    """
+    Check if all managed resources are ready.
+    """
+    all_true([
+        ready(x)
+        for x in list(ocds)
+    ])
 }
 
 getwparentfb = lambda x: {:}, p: {:}, y: str, z: str, d: any -> any {
@@ -50,13 +80,6 @@ getwparentfb = lambda x: {:}, p: {:}, y: str, z: str, d: any -> any {
     If that fails, falls back to the default value provided.
     """
     get(x, y, get(p, "${z}", d))
-}
-
-ocdsstatus = lambda x: str, y: str, d: any -> any {
-    """
-    Get an item from the status of an ocds resource.
-    """
-    get(ocds, "${x}.Resource.status.atProvider.${y}", d)
 }
 
 appName = get(oxr, "spec.claimRef.name", "")

@@ -309,6 +309,9 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              ready:
+                description: Is the subnetset ready
+                type: boolean
               routeTables:
                 additionalProperties:
                   description: |-

@@ -1,5 +1,5 @@
 
-ssasecret = get(_oxr, "spec.eso.fluxSSASecret", "")
+ssasecret = get(oxr, "spec.eso.fluxSSASecret", "")
 # The resource created here is to enable switching Flux SSA from `Ignore` to
 # `Merge`.
 #
@@ -43,7 +43,7 @@ _items = [
                     "spec": {
                         "refreshInterval": "1d",
                         "secretStoreRef": {
-                            "name": get(_oxr, "spec.eso.secretStoreRef.name", ""),
+                            "name": get(oxr, "spec.eso.secretStoreRef.name", ""),
                             "kind": "SecretStore",
                         },
                         "dataFrom": [
@@ -72,15 +72,16 @@ _items = [
             }
             "managementPolicies": mgmtPolicy,
             "providerConfigRef": {
-                "name": get(_oxr, "spec.kubernetesProviderConfig.name", "")
+                "name": get(oxr, "spec.kubernetesProviderConfig.name", "")
             }
         }
     }
     for _ in [True]
     if all_true([
-        get(_oxr, "spec.eso.enabled", False),
-        get(_oxr, "spec.eso.fluxSSASecret", False),
-        get(_oxr, "status.cacheConnectionSecret", False),
-        get(_oxr, "status.rdsConnectionSecret", False),
+        get(oxr, "spec.eso.enabled", False),
+        get(oxr, "spec.eso.fluxSSASecret", False),
+        get(oxr, "status.cacheConnectionSecret", False),
+        get(oxr, "status.rdsConnectionSecret", False),
+        allReady(),
     ])
 ]

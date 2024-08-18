@@ -1,9 +1,9 @@
 import regex
 
-_oxr = option("params").oxr
-_dxr = option("params").dxr
-_ocds = option("params").ocds
-_dcds = option("params").dcds
+oxr = option("params").oxr
+dxr = option("params").dxr
+ocds = option("params").ocds
+dcds = option("params").dcds
 
 get = lambda x: {:}, y: str, d: any -> any {
     """
@@ -20,20 +20,38 @@ exists = lambda x: any -> bool {
     """
     Check if a value exists.
     """
-    x in list(_ocds)
+    x in list(ocds)
+}
+
+ocdsstatus = lambda x: str, y: str, d: any -> any {
+    """
+    Get an item from the status of an ocds resource.
+    """
+    _x = None
+    if get(ocds, "${x}.Resource.status.atProvider", False):
+        _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+    else:
+        _x = get(ocds, "${x}.Resource.status.${y}", d)
+    _x if _x else d
 }
 
 ready = lambda x: str -> bool {
     """
     Check if a value is ready.
     """
-    conditions = get(_ocds, "${x}.Resource.status.conditions", [])
-    any_true([
-        exists(x),
-        all_true([
-            get(c, "status", "False") == "True"
-            for c in conditions
-        ])
+    conditionsReady = all_true([
+        get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+    ])
+
+    ap = get(ocds, "${x}.Resource.status.atProvider", {})
+    objectReady = any_true([
+        ocdsstatus(x, "ready", False),
+        len(list(ap)) > 0,
+    ])
+
+    all_true([
+        any_true([exists(x), conditionsReady]),
+        objectReady,
     ])
 }
 
@@ -44,59 +62,68 @@ readystr = lambda y: str -> str {
     "True" if ready(y) else "False"
 }
 
-_clusterLookup = get(_ocds, "cluster-lookup.Resource", {})
+allReady = lambda -> bool {
+    """
+    Check if all managed resources are ready.
+    """
+    all_true([
+        ready(x)
+        for x in list(ocds)
+    ])
+}
 
-_apiVersion = get(_clusterLookup, "status.atProvider.manifest.spec.infrastructureRef.apiVersion", "")
-_kind = get(_clusterLookup, "status.atProvider.manifest.spec.infrastructureRef.kind", "")
-_name = get(_clusterLookup, "status.atProvider.manifest.metadata.name", "")
-_namespace = get(_clusterLookup, "status.atProvider.manifest.metadata.namespace", "")
+clusterLookup = get(ocds, "cluster-lookup.Resource", {})
 
-if _kind:
-    assert _kind in ["AWSCluster", "AWSManagedCluster"], "Unsupported kind: ${_kind}"
+apiVersion = get(clusterLookup, "status.atProvider.manifest.spec.infrastructureRef.apiVersion", "")
+kind = get(clusterLookup, "status.atProvider.manifest.spec.infrastructureRef.kind", "")
+name = get(clusterLookup, "status.atProvider.manifest.metadata.name", "")
+namespace = get(clusterLookup, "status.atProvider.manifest.metadata.namespace", "")
 
-_awsClusterObject = {} if not _clusterLookup else {
-    apiVersion: _apiVersion,
-    kind: _kind,
+if kind:
+    assert kind in ["AWSCluster", "AWSManagedCluster"], "Unsupported kind: ${kind}"
+
+awsClusterObject = {} if not clusterLookup else {
+    apiVersion: apiVersion,
+    kind: kind,
     metadata: {
-        name: _name,
-        namespace: _namespace,
+        "name": name,
+        "namespace": namespace,
     }
 }
 
-_kubernetesObject = {
-    apiVersion: "kubernetes.crossplane.io/v1alpha2",
-    kind: "Object"
-    metadata: {
-        annotations: {
+kubernetesObject = {
+    "apiVersion": "kubernetes.crossplane.io/v1alpha2",
+    "kind": "Object"
+    "metadata": {
+        "annotations": {
             "krm.kcl.dev/composition-resource-name" = "aws-cluster"
             "krm.kcl.dev/ready": readystr("aws-cluster")
         }
     }
-    spec: {
-        managementPolicies: ["Observe"],
-        forProvider: {
-            manifest: _awsClusterObject,
+    "spec": {
+        "managementPolicies": ["Observe"],
+        "forProvider": {
+            "manifest": awsClusterObject,
         }
-        providerConfigRef: get(_oxr, "spec.kubernetesProviderConfigRef", {"name": "default"}),
+        "providerConfigRef": get(oxr, "spec.kubernetesProviderConfigRef", {"name": "default"}),
     }
-} if _awsClusterObject else {}
+} if awsClusterObject else {}
 
-_region = get(_ocds, "aws-cluster.Resource.status.atProvider.manifest.spec.region", False)
-_availabilityZones = {} if not _region else {
-    regex.replace(k.availabilityZone, _region, "") = False
-    for k in get(_ocds, "aws-cluster.Resource.status.atProvider.manifest.spec.network.subnets", [])
+region = get(ocds, "aws-cluster.Resource.status.atProvider.manifest.spec.region", False)
+availabilityZones = {} if not region else {
+    regex.replace(k.availabilityZone, region, "") = False
+    for k in get(ocds, "aws-cluster.Resource.status.atProvider.manifest.spec.network.subnets", [])
 }
 
-print("OBJ REGION: ", _region)
-print("OBJ AZs: ", _availabilityZones)
-_dxr = {
-    **_oxr,
+newdxr = {
+    **dxr,
     **{
         "status": {
-                "region" = _region
-                "availabilityZones" = sorted([k for k, _ in _availabilityZones])
+            "region" = region
+            "availabilityZones" = sorted([k for k, _ in availabilityZones])
+            "ready" = allReady()
         }
     },
-} if _region and _availabilityZones else {}
+} if region and availabilityZones else {}
 
-items = [i for i in [_kubernetesObject, _dxr] if i]
+items = [i for i in [kubernetesObject, newdxr] if i]

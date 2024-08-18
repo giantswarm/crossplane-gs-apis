@@ -289,6 +289,9 @@ spec:
               id:
                 description: The ID of the prefix list.
                 type: string
+              ready:
+                description: Is the prefix list ready
+                type: boolean
             type: object
         required:
         - spec

@@ -13,6 +13,7 @@ pushSecretStores = [
     for _, store in get(oxr, "spec.eso.stores", [])
     if get(oxr, "spec.eso.enabled", True) and store.enabled
 ]
+
 usernameField = "username" if not createCluster else "master_username"
 passwordField = "password" if not createCluster else "attribute.master_password"
 

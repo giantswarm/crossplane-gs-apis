@@ -146,6 +146,11 @@ type CacheBaseStatus struct {
 	// +optional
 	ReaderEndpoint *string `json:"readerEndpoint,omitempty"`
 
+	// Ready is a flag that indicates whether the cluster is ready.
+	//
+	// +optional
+	Ready *bool `json:"ready,omitempty"`
+
 	// ReplicationGroupId is the ID of the replication group.
 	//
 	// +optional
