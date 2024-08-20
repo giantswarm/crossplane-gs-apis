@@ -63,17 +63,17 @@ vpcLookup = {
     ])
     "remoteVpcs": [
         {
-            "name": vpc.name
-            "providerConfigRef": get(vpc, "providerConfigRef.name", pcr.name)
-            "region": get(vpc, "region", region)
+            "name": vpc.name,
+            "providerConfigRef": get(vpc, "providerConfigRef", pcr)
+            "region": get(vpc, "region", region),
         }
         for _, vpc in get(oxr, "spec.transitGateway.remoteVpcs", [])
         if get(oxr, "spec.transitGateway.enabled", False)
     ] + [
         {
-            "name": vpc.name
-            "providerConfigRef": get(vpc, "providerConfigRef.name", pcr.name)
-            "region": get(vpc, "region", region)
+            "name": vpc.name,
+            "providerConfigRef": get(vpc, "providerConfigRef", pcr),
+            "region": get(vpc, "region", region),
         }
         for _, vpc in get(oxr, "spec.peering.remoteVpcs", [])
         if get(oxr, "spec.peering.enabled", False)

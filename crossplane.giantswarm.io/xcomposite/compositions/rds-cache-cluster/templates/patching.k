@@ -1,10 +1,25 @@
 _subnets = get(oxr, "status.vpc.privateSubnets", [])
 
 _dbsnindex = get(oxr, "spec.subnetGroupIndexes.database", False)
-_dbSnIds = [k.id for _, k in _subnets[_dbsnindex]] if _dbsnindex != False and _subnets else []
+
+_dbSnIds = [
+    k.id
+    for _, k in _subnets[_dbsnindex]
+] if all_true([
+    _dbsnindex != False,
+    _subnets,
+    len(_subnets) > _dbsnindex
+]) else []
 
 _cachesnindex = get(oxr, "spec.subnetGroupIndexes.cache", False)
-_cacheSnIds = [k.id for _, k in _subnets[_cachesnindex]] if _cachesnindex != False and _subnets else []
+_cacheSnIds = [
+    k.id
+    for _, k in _subnets[_cachesnindex]
+] if all_true([
+    _cachesnindex != False,
+    _subnets,
+    len(_subnets) > _cachesnindex
+]) else []
 
 
 vpcs = ocdsstatus("peered-vpc-network", "vpcs", {})
@@ -56,11 +71,21 @@ _cachePatch = {
     get(oxr, "status.vpc.id", False),
 ]) else {}
 
+# cb.ToPatch("status.cacheConnectionSecret", "status.connectionSecret"),
+# cb.ToPatch("status.rdsConnectionSecret", "status.connectionSecret"),
+
+cacheConnectionSecret = ocdsstatus("cache-base", "userSecrets.app", ocdsstatus("cache-base", "connectionSecret", ""))
+rdsConnectionSecret = ocdsstatus("rds-base", "provisionedSecrets.app", ocdsstatus("rds-base", "connectionSecret", ""))
+
 newdxr = {
     **dxr,
     **{
         "status" = {
-            "ready" = allReady()
+            "ready" = allReady(),
+
+            if allReady():
+                "cacheConnectionSecret" = cacheConnectionSecret,
+                "rdsConnectionSecret" = rdsConnectionSecret,
         },
     },
 }

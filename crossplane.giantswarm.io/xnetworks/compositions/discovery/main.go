@@ -49,7 +49,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					EnabledRef:        "spec.enabled",
 					GroupByRef:        "spec.groupBy",
 					ProviderType:      "aws",
-					ProviderConfigRef: "spec.providerConfigRef.name",
+					ProviderConfigRef: "spec.providerConfigRef",
 					RegionRef:         "spec.region",
 					VpcNameRef:        "spec.remoteVpcs",
 					PatchTo:           "status.vpcs",

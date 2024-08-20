@@ -48,6 +48,44 @@ spec:
           status:
             atProvider:
               manifest: null
+        name: mc-lookup
+        patches:
+        - fromFieldPath: spec.managementClusterDiscovery.name
+          toFieldPath: spec.forProvider.manifest.metadata.name
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.managementClusterDiscovery.namespace
+          toFieldPath: spec.forProvider.manifest.metadata.namespace
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.kubernetesProviderConfigRef
+          toFieldPath: spec.providerConfigRef
+          type: FromCompositeFieldPath
+      - base:
+          apiVersion: kubernetes.crossplane.io/v1alpha2
+          kind: Object
+          metadata:
+            creationTimestamp: null
+          spec:
+            forProvider:
+              manifest:
+                apiVersion: cluster.x-k8s.io/v1beta1
+                kind: Cluster
+                metadata:
+                  creationTimestamp: null
+                  name: test-cluster
+                  namespace: test-namespace
+                spec:
+                  controlPlaneEndpoint:
+                    host: ""
+                    port: 0
+                status:
+                  controlPlaneReady: false
+                  infrastructureReady: false
+            managementPolicies:
+            - Observe
+            readiness: {}
+          status:
+            atProvider:
+              manifest: null
         name: cluster-lookup
         patches:
         - fromFieldPath: spec.clusterDiscovery.name
@@ -84,21 +122,20 @@ spec:
                 enabled: false
                 groupBy: ""
                 remoteVpcs: null
+              ram:
+                enabled: false
               subnetsets:
                 cidrs: null
                 function: ""
               tags: {}
               transitGateway:
+                accountId: ""
                 allowPublic: false
                 cidrBlocks: null
                 enabled: false
                 peers: null
                 prefixList: null
                 prefixLists: null
-                ram:
-                  allowExternalPrincipals: false
-                  enabled: false
-                  principals: null
                 region: ""
                 remoteVpcs: null
                 routeTableIds: null
@@ -262,22 +299,37 @@ spec:
               ])
           }
 
-          clusterLookup = get(ocds, "cluster-lookup.Resource", {})
+          mcLookup = get(ocds, "mc-lookup.Resource", {})
+          mcApiVersion = ocdsstatus("mc-lookup", "manifest.spec.infrastructureRef.apiVersion", "")
+          mcKind = ocdsstatus("mc-lookup", "manifest.spec.infrastructureRef.kind", "")
+          mcName = ocdsstatus("mc-lookup", "manifest.metadata.name", "")
+          mcNamespace = ocdsstatus("mc-lookup", "manifest.metadata.namespace", "")
 
-          apiVersion = get(clusterLookup, "status.atProvider.manifest.spec.infrastructureRef.apiVersion", "")
-          kind = get(clusterLookup, "status.atProvider.manifest.spec.infrastructureRef.kind", "")
-          name = get(clusterLookup, "status.atProvider.manifest.metadata.name", "")
-          namespace = get(clusterLookup, "status.atProvider.manifest.metadata.namespace", "")
+
+          clusterLookup = get(ocds, "cluster-lookup.Resource", {})
+          apiVersion = ocdsstatus("cluster-lookup", "manifest.spec.infrastructureRef.apiVersion", "")
+          kind = ocdsstatus("cluster-lookup", "manifest.spec.infrastructureRef.kind", "")
+          name = ocdsstatus("cluster-lookup", "manifest.metadata.name", "")
+          namespace = ocdsstatus("cluster-lookup", "manifest.metadata.namespace", "")
 
           if kind:
               assert kind in ["AWSCluster", "AWSManagedCluster"], "Unsupported kind: ${kind}"
 
           awsClusterObject = {} if not clusterLookup else {
-              apiVersion: apiVersion,
-              kind: kind,
-              metadata: {
+              "apiVersion": apiVersion,
+              "kind": kind,
+              "metadata": {
                   "name": name,
                   "namespace": namespace,
+              }
+          }
+
+          awsMCClusterObject = {} if not mcLookup else {
+              "apiVersion": mcApiVersion,
+              "kind": mcKind,
+              "metadata": {
+                  "name": mcName,
+                  "namespace": mcNamespace,
               }
           }
 
@@ -299,24 +351,107 @@ spec:
               }
           } if awsClusterObject else {}
 
-          region = get(ocds, "aws-cluster.Resource.status.atProvider.manifest.spec.region", False)
+          kubernetesMCObject = {
+              "apiVersion": "kubernetes.crossplane.io/v1alpha2",
+              "kind": "Object"
+              "metadata": {
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name" = "aws-cluster-mc"
+                      "krm.kcl.dev/ready": readystr("aws-cluster")
+                  }
+              },
+              "spec": {
+                  "managementPolicies": ["Observe"],
+                  "forProvider": {
+                      "manifest": awsMCClusterObject,
+                  }
+                  "providerConfigRef": get(oxr, "spec.kubernetesProviderConfigRef", {"name": "default"}),
+              },
+          } if awsMCClusterObject else {}
+
+          mcRegion = ocdsstatus("aws-cluster-mc", "manifest.spec.region", False)
+
+          region = ocdsstatus("aws-cluster", "manifest.spec.region", False)
           availabilityZones = {} if not region else {
               regex.replace(k.availabilityZone, region, "") = False
-              for k in get(ocds, "aws-cluster.Resource.status.atProvider.manifest.spec.network.subnets", [])
+              for k in ocdsstatus("aws-cluster", "manifest.spec.network.subnets", [])
           }
+
+          rdsCacheCluster = get(dcds, "rds-cache-cluster.Resource", {})
+
+          newRdsCacheCluster = {
+              **rdsCacheCluster,
+              **{
+                  "metadata": {
+                      "annotations": {
+                          "krm.kcl.dev/composition-resource-name" = "rds-cache-cluster"
+                          "krm.kcl.dev/ready" = readystr("rds-cache-cluster")
+                      }
+                  },
+                  "spec": {
+                      "vpc": {
+                          "peering": {
+                              "remoteVpcs" = [
+                                  {
+                                      "name" = get(rvpc, "name", ""),
+                                      "region" = get(rvpc, "region", mcRegion if rvpc.name == mcName else region),
+
+                                      if get(rvpc, "providerConfigRef", False):
+                                          "providerConfigRef" = get(rvpc, "providerConfigRef", {"name": "default"}),
+                                  }
+                                  for _, rvpc in get(oxr, "spec.rdsCacheClusterParameters.vpc.peering.remoteVpcs", [])
+                              ]
+                          },
+                          "transitGateway": {
+                              "remoteVpcs" = [
+                                  {
+                                      "name" = get(rvpc, "name", ""),
+                                      "region" = get(rvpc, "region", mcRegion if rvpc.name == mcName else region),
+
+                                      if get(rvpc, "providerConfigRef", False):
+                                          "providerConfigRef" = get(rvpc, "providerConfigRef", {"name": "default"}),
+                                      if get(rvpc, "accountId", False):
+                                          "accountId" = get(rvpc, "accountId", ""),
+                                      if get(rvpc, "cidrBlocks", False):
+                                          "cidrBlocks" = get(rvpc, "cidrBlocks", []),
+                                      if get(rvpc, "prefixLists", False):
+                                          "prefixLists" = get(rvpc, "prefixLists", []),
+                                      if get(rvpc, "routeTableIds", False):
+                                          "routeTableId" = get(rvpc, "routeTableIds", []),
+                                      if get(rvpc, "subnetIds", False):
+                                          "subnetIds" = get(rvpc, "subnetIds", []),
+                                      if get(rvpc, "vpcId", False):
+                                          "vpcId" = get(rvpc, "vpcId", ""),
+                                  }
+                                  for _, rvpc in get(oxr, "spec.rdsCacheClusterParameters.vpc.transitGateway.remoteVpcs", [])
+                              ],
+                          },
+                      },
+                  },
+              },
+          } if all_true([
+              region,
+              mcRegion,
+              rdsCacheCluster,
+          ]) else {}
 
           newdxr = {
               **dxr,
               **{
                   "status": {
-                      "region" = region
-                      "availabilityZones" = sorted([k for k, _ in availabilityZones])
-                      "ready" = allReady()
-                  }
+                      "region" = region,
+                      "mcregion" = mcRegion,
+                      "availabilityZones" = sorted([k for k, _ in availabilityZones]),
+                      "ready" = allReady(),
+                  },
               },
-          } if region and availabilityZones else {}
+          } if all_true([
+              region,
+              mcRegion,
+              availabilityZones,
+          ]) else {}
 
-          items = [i for i in [kubernetesObject, newdxr] if i]
+          items = [i for i in [kubernetesObject, kubernetesMCObject, newdxr, newRdsCacheCluster] if i]
         target: ""
     step: function-kcl-resources
   - functionRef:

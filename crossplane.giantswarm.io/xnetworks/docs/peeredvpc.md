@@ -50,6 +50,17 @@ This composition relies on the following providers and functions:
 Configuration parameters are documented as part of the API documentation here:
 [apidocs/peeredvpcnetworks.xnetworks.crossplane.giantswarm.io](../../../apidocs/peeredvpcnetworks.xnetworks.crossplane.giantswarm.io.md)
 
+Overall, the VPC can be configured in multiple different ways and include various
+combinations of VPC peering and/or transit gateway depending on your requirements.
+
+You may also specify Resource Access Manager to be enabled which allows the
+transit gateway and associated remote managed prefix lists to be shared with a
+remote account.
+
+If, when using the Network Discovery function, any VPCs have a different owner
+than the current account, RAM will be automatically enabled if a transit gateway
+is enabled for the current VPC.
+
 ## Examples
 
 The following examples are provided as part of this composition.
@@ -110,7 +121,7 @@ For a YAML version of this file that can be applied to a cluster, see
 The `go` code version of the composition can be found at
 [../compositions/peeredvpc](../compositions/peeredvpc)
 
-The composition is made up of 7 segments:
+The composition is made up of multiple segments:
 
 - **Network discovery**. Find information about any VPCs requested for peering.
 - **Subnet bits** - KCL language script to calculate subnet bits from CIDR masks.

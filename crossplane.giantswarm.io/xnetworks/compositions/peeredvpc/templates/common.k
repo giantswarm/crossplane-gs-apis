@@ -95,3 +95,5 @@ tags = labels | get(oxr, "spec.tags.common", {}) | {
 
 mgmtPolicy = get(oxr, "spec.managementPolicies", [])
 publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
+
+tgwArn = ocdsstatus("transitgw", "tgwArn", "")

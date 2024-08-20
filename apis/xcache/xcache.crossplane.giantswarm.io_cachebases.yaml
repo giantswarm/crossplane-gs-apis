@@ -1085,6 +1085,20 @@ spec:
               userGroupId:
                 description: UserGroupId is the ID of the user group for the cluster.
                 type: string
+              userSecrets:
+                description: User secrets are the secrets provisioned for the app
+                  and users
+                properties:
+                  app:
+                    description: The name of the secret created specifically for the
+                      app
+                    type: string
+                  users:
+                    additionalProperties:
+                      type: string
+                    description: A map of secret names created for users
+                    type: object
+                type: object
             type: object
         required:
         - spec

@@ -170,6 +170,23 @@ type CacheBaseStatus struct {
 	//
 	// +optional
 	UserGroupId *string `json:"userGroupId,omitempty"`
+
+	// User secrets are the secrets provisioned for the app and users
+	//
+	// +optional
+	UserSecrets UserConnectionSecrets `json:"userSecrets,omitempty"`
+}
+
+type UserConnectionSecrets struct {
+	// The name of the secret created specifically for the app
+	//
+	// +optional
+	App string `json:"app,omitempty"`
+
+	// A map of secret names created for users
+	//
+	// +optional
+	Users map[string]string `json:"users,omitempty"`
 }
 
 type Cluster struct {

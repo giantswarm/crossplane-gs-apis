@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	ram "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xaws/v1alpha1"
 )
 
 // AvailabilityZone is a string type that represents the availability zone
@@ -77,4 +78,15 @@ type VpcDetails struct {
 	//
 	// +required
 	RouteTableIds []RouteTableId `json:"routeTableIds"`
+}
+
+// Resource Access Management (RAM)
+type RAM struct {
+	// Is RAM enabled
+	//
+	// +optional
+	// +default=false
+	Enabled bool `json:"enabled"`
+
+	ram.RamParameters `json:",inline"`
 }

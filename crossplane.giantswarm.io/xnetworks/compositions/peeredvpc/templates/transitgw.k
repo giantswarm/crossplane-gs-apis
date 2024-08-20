@@ -42,6 +42,7 @@ localSubnetIds = [
 ]
 
 localVpc = {
+    "accountId": get(oxr, "status.vpcs.self.owner", ""),
     "cidrBlocks": [
         c for _, c in [
             get(oxr, "status.vpcs.self.cidrBlock", "")
@@ -89,6 +90,7 @@ remoteVpcs = [
             for _, i in r
             if j == 0
         ]
+        "accountId": get(oxr, "status.vpcs.${vpc.name}.owner", ""),
         "cidrBlocks": [
             c for _, c in [
                 get(oxr, "status.vpcs.${vpc.name}.cidrBlock", "")
@@ -107,6 +109,9 @@ remoteVpcs = [
         ],
         "subnetIds": _subnetIds,
         "vpcId": get(oxr, "status.vpcs.${vpc.name}.id", ""),
+
+        if get(vpc, "providerConfigRef", False):
+            "providerConfigRef": get(vpc, "providerConfigRef", pcr),
     }
     for _, vpc in get(oxr, "spec.transitGateway.remoteVpcs", [])
     if get(oxr, "status.vpcs.${vpc.name}.id", False)
@@ -162,7 +167,9 @@ tgw = {
             "krm.kcl.dev/composition-resource-name": _resourceName,
             "krm.kcl.dev/ready": readystr(_resourceName),
         }
-        "labels": labels,
+        "labels": labels | {
+            "vpcName": appName,
+        }
     },
     "spec": {
         "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
@@ -192,8 +199,8 @@ tgw = {
         if get(oxr, "spec.prefixListSupport", False):
             "prefixListSupport": get(oxr, "spec.prefixListSupport", "disable"),
 
-        if get(_ram, "enabled", False):
-            "ram": _ram,
+        if get(_tgwRam, "enabled", False):
+            "ram": _tgwRam,
 
         "remoteVpcs": remoteVpcs,
 
@@ -206,7 +213,7 @@ tgw = {
 
         "peers": transitGatewayPeers,
 
-        "tags": get(oxr, "spec.tags.common", []),
+        "tags": tags,
 
         if get(oxr, "spec.vpnEcmpSupport", False):
             "vpnEcmpSupport": get(oxr, "spec.vpnEcmpSupport", "disable"),
@@ -214,13 +221,6 @@ tgw = {
         "providerConfigRef": get(oxr, "spec.providerConfigRef", {}),
     }
 }
-
-print("TGW VPC", localVpc)
-print("TGW RVPC", remoteVpcs)
-print("TGW LSNIDs", localSubnetIds)
-print("TGW LRTIDs", localRouteTableIds)
-print("TGW ENABLED", get(oxr, "spec.transitGateway.enabled", False))
-print("TGW LENs MATCH", len(remoteVpcs) == len(get(oxr, "spec.transitGateway.remoteVpcs", [])))
 
 _items = [
     tgw

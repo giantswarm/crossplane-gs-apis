@@ -65,22 +65,21 @@ spec:
               enabled: false
               groupBy: ""
               remoteVpcs: null
+            ram:
+              enabled: false
             region: ""
             subnetsets:
               cidrs: null
               function: ""
             tags: {}
             transitGateway:
+              accountId: ""
               allowPublic: false
               cidrBlocks: null
               enabled: false
               peers: null
               prefixList: null
               prefixLists: null
-              ram:
-                allowExternalPrincipals: false
-                enabled: false
-                principals: null
               region: ""
               remoteVpcs: null
               routeTableIds: null
@@ -88,6 +87,8 @@ spec:
               vpcId: ""
           status:
             calculatedCidrs: null
+            ready: false
+            sharedSubnets: null
             subnetBits: null
             vpcLookup:
               enabled: false
@@ -131,7 +132,8 @@ spec:
               name: null
             region: null
             vpcId: null
-          status: {}
+          status:
+            userSecrets: {}
         name: cache-base
         patches:
         - fromFieldPath: spec.cache
@@ -166,9 +168,6 @@ spec:
             fromFieldPath: Required
           toFieldPath: spec.vpcId
           type: FromCompositeFieldPath
-        - fromFieldPath: status.connectionSecret
-          toFieldPath: status.cacheConnectionSecret
-          type: ToCompositeFieldPath
         - fromFieldPath: status.clusterEndpoints
           toFieldPath: status.cacheClusterEndpoints
           type: ToCompositeFieldPath
@@ -201,7 +200,8 @@ spec:
             region: null
             subnetIds: null
             vpcId: null
-          status: {}
+          status:
+            provisionedSecrets: {}
         name: rds-base
         patches:
         - fromFieldPath: spec.database
@@ -236,9 +236,6 @@ spec:
             fromFieldPath: Required
           toFieldPath: spec.vpcId
           type: FromCompositeFieldPath
-        - fromFieldPath: status.connectionSecret
-          toFieldPath: status.rdsConnectionSecret
-          type: ToCompositeFieldPath
         - fromFieldPath: status.endpoint
           toFieldPath: status.rdsEndpoint
           type: ToCompositeFieldPath
@@ -425,8 +422,6 @@ spec:
               ])
           ]
 
-          print("SECRET :", get(oxr, "spec.eso.enabled", False), get(oxr, "spec.eso.fluxSSASecretName", False), get(oxr, "status.cacheConnectionSecret", False), get(oxr, "status.rdsConnectionSecret", False), ready("peered-vpc-network"), ready("cache-base"), ready("rds-base"))
-
           items = _items
         target: ""
     step: function-kcl-create-eso-secret
@@ -523,10 +518,25 @@ spec:
           _subnets = get(oxr, "status.vpc.privateSubnets", [])
 
           _dbsnindex = get(oxr, "spec.subnetGroupIndexes.database", False)
-          _dbSnIds = [k.id for _, k in _subnets[_dbsnindex]] if _dbsnindex != False and _subnets else []
+
+          _dbSnIds = [
+              k.id
+              for _, k in _subnets[_dbsnindex]
+          ] if all_true([
+              _dbsnindex != False,
+              _subnets,
+              len(_subnets) > _dbsnindex
+          ]) else []
 
           _cachesnindex = get(oxr, "spec.subnetGroupIndexes.cache", False)
-          _cacheSnIds = [k.id for _, k in _subnets[_cachesnindex]] if _cachesnindex != False and _subnets else []
+          _cacheSnIds = [
+              k.id
+              for _, k in _subnets[_cachesnindex]
+          ] if all_true([
+              _cachesnindex != False,
+              _subnets,
+              len(_subnets) > _cachesnindex
+          ]) else []
 
 
           vpcs = ocdsstatus("peered-vpc-network", "vpcs", {})
@@ -578,11 +588,21 @@ spec:
               get(oxr, "status.vpc.id", False),
           ]) else {}
 
+          # cb.ToPatch("status.cacheConnectionSecret", "status.connectionSecret"),
+          # cb.ToPatch("status.rdsConnectionSecret", "status.connectionSecret"),
+
+          cacheConnectionSecret = ocdsstatus("cache-base", "userSecrets.app", ocdsstatus("cache-base", "connectionSecret", ""))
+          rdsConnectionSecret = ocdsstatus("rds-base", "provisionedSecrets.app", ocdsstatus("rds-base", "connectionSecret", ""))
+
           newdxr = {
               **dxr,
               **{
                   "status" = {
-                      "ready" = allReady()
+                      "ready" = allReady(),
+
+                      if allReady():
+                          "cacheConnectionSecret" = cacheConnectionSecret,
+                          "rdsConnectionSecret" = rdsConnectionSecret,
                   },
               },
           }

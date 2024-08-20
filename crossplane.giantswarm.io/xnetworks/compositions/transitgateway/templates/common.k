@@ -88,8 +88,8 @@ labels = get(oxr, "metadata.labels", {})
 localVpc = get(oxr, "spec.localVpc", {})
 pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
 region = get(oxr, "spec.localVpc.region", "eu-central-1")
-tags = get(oxr, "spec.tags.common", {}) | {
-    region: region,
+tags = get(oxr, "spec.tags", {}) | {
+    "region": region,
 } | labels
 
 localAttachmentIds = {
@@ -330,7 +330,7 @@ mpl = lambda n : str, r: str, a: str, b: bool, isp: bool, e: [], p: {:} -> {:} {
                 "krm.kcl.dev/ready": readystr(_resourceName),
             },
             "labels": labels | {
-                "vpcName": n,
+                "vpcName" = n,
             },
         },
         "spec": {
@@ -376,9 +376,9 @@ plr = lambda n : str, r: str, pid: str, aid: str, rid: str, b: bool, isp: bool, 
                 "krm.kcl.dev/ready": readystr(_resourceName),
             },
             "labels": labels | {
-                "vpcName": n,
+                "vpcName" = n,
             } if not isp else {
-                "peerName": n,
+                "peerName" = n,
             },
         },
         "spec": {
@@ -397,3 +397,34 @@ plr = lambda n : str, r: str, pid: str, aid: str, rid: str, b: bool, isp: bool, 
         pid, aid, rid,
     ]) else {}
 }
+
+remotePrefixListIds = {
+    "${rVpc.name}": [
+        c for c in [
+            ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "id", "")
+            ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "id", "")
+        ] if c
+    ] + [
+        c for c in [
+            get(pl, "id", "")
+            for _, pl in get(rVpc, "prefixLists", [])
+            if all_true([
+                get(pl, "id", False),
+                get(pl, "outbound", True),
+            ])
+        ]
+    ]
+    for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+}
+
+sharedPrefixLists: [str] = [
+    c for r in [
+        [
+            ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "arn", ""),
+            ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "arn", ""),
+        ]
+        for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+        if rVpc.accountId != get(oxr, "spec.localVpc.accountId", "")
+    ]
+    for c in r if c
+]

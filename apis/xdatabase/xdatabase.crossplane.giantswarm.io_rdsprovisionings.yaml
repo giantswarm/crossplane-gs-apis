@@ -340,6 +340,19 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              connectionSecrets:
+                description: Connection secrets created for the databases
+                properties:
+                  app:
+                    description: The name of the secret created specifically for the
+                      app
+                    type: string
+                  users:
+                    additionalProperties:
+                      type: string
+                    description: A map of secret names created for users
+                    type: object
+                type: object
               ready:
                 description: Is the provisioning ready
                 type: boolean

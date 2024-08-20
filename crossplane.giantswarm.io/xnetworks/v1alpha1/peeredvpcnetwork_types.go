@@ -98,6 +98,11 @@ type PeeredVpcNetworkParameters struct {
 	// +required
 	PeeredSubnets PeeredSubnets `json:"subnetsets"`
 
+	// Resource Access Management (RAM)
+	//
+	// +optional
+	RAM RAM `json:"ram,omitempty"`
+
 	// Tags is a map of additional tags to assign to the VPC.
 	//
 	// +optional
@@ -231,7 +236,7 @@ type VpcPeer struct {
 	// connection.
 	//
 	// +optional
-	ProviderConfigRef string `json:"providerConfigRef"`
+	ProviderConfigRef xpv1.Reference `json:"providerConfigRef"`
 
 	// Region specifies the region the VPC is found in.
 	//
@@ -408,6 +413,12 @@ type PeeredVpcNetworkStatus struct {
 	//
 	// +optional
 	Ready bool `json:"ready"`
+
+	// SharedSubnets is a list of subnet ARNs that are to be shared via RAM
+	//
+	// +optional
+	// +listType=atomic
+	SharedSubnets []string `json:"sharedSubnets"`
 
 	// Contains the subnet bits output by function-kcl-subnet-bits
 	//

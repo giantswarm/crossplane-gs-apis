@@ -43,6 +43,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		kclCommon            string
 		kclResourcesTemplate string
 		kclPeeringTemplate   string
+		kclRamTemplate       string
 		kclTransitTemplate   string
 		kclPatchTemplate     string
 		kclFooter            string                 = "items = _items"
@@ -54,7 +55,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		panic(err)
 	}
 
-	kclResourcesTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/resources.k")
+	kclPatchTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/patching.k")
 	if err != nil {
 		panic(err)
 	}
@@ -64,12 +65,17 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		panic(err)
 	}
 
-	kclTransitTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/transitgw.k")
+	kclRamTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/ram.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclPatchTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/patching.k")
+	kclResourcesTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/resources.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclTransitTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/transitgw.k")
 	if err != nil {
 		panic(err)
 	}
@@ -88,7 +94,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					EnabledRef:        "status.vpcLookup.enabled",
 					GroupByRef:        "status.vpcLookup.groupBy",
 					ProviderType:      "aws",
-					ProviderConfigRef: "spec.providerConfigRef.name",
+					ProviderConfigRef: "spec.providerConfigRef",
 					RegionRef:         "spec.region",
 					VpcNameRef:        "status.vpcLookup.remoteVpcs",
 					PatchTo:           "status.vpcs",
@@ -140,6 +146,22 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 				Spec: xkcl.RunSpec{
 					Source: strings.Join([]string{kclCommon, kclPeeringTemplate, kclFooter}, "\n\n"),
+				},
+			},
+		})
+
+	c.NewPipelineStep("function-kcl-ram").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclCommon, kclRamTemplate, kclFooter}, "\n\n"),
 				},
 			},
 		})

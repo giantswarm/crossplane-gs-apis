@@ -12,7 +12,7 @@ ramShare = [
         "spec": {
             "deletionPolicy": dp
             "forProvider": {
-                "allowExternalPrincipals": get(oxr, "spec.ram.allowExternalPrincipals", True),
+                "allowExternalPrincipals": get(oxr, "spec.allowExternalPrincipals", True),
                 "name": "${appName}-${region}",
                 "region": region,
                 "tags": tags,
@@ -29,7 +29,8 @@ ramShareArn = ocdsstatus("ram-share-${appName}-${region}", "arn", False)
 
 ramAssociations = [
     {
-        _resourceName = "ram-r-assoc-${i}"
+        _id = regex.split(resource, "/")[-1]
+        _resourceName = "ram-r-assoc-${_id}"
         "apiVersion": "ram.aws.upbound.io/v1beta1"
         "kind": "ResourceAssociation"
         "metadata": {
@@ -41,9 +42,8 @@ ramAssociations = [
         "spec": {
             "deletionPolicy": dp
             "forProvider": {
-                "associationType": "resource",
                 "region": region,
-                "resourceArn": get(resource, "arn", ""),
+                "resourceArn": resource,
                 "resourceShareArn": ramShareArn,
             }
             "managementPolicies": mgmtPolicy,
@@ -53,33 +53,33 @@ ramAssociations = [
     for i, resource in get(oxr, "spec.resources", [])
     if all_true([
         get(oxr, "spec.resources", False),
-        ramShareArn, get(resource, "arn", False),
+        ramShareArn, resource,
     ])
 ]
 
 ramPrincipleAssociations = [
     {
         _resourceName = "ram-p-assoc-${i}"
-        "apiVersion": "ram.aws.upbound.io/v1beta1"
-        "kind": "PrincipalAssociation"
+        "apiVersion": "ram.aws.upbound.io/v1beta1",
+        "kind": "PrincipalAssociation",
         "metadata": {
             "annotations": {
-                "krm.kcl.dev/composition-resource-name": _resourceName
-                "krm.kcl.dev/ready" = readystr(_resourceName)
-            }
-        }
+                "krm.kcl.dev/composition-resource-name": _resourceName,
+                "krm.kcl.dev/ready" = readystr(_resourceName),
+            },
+        },
         "spec": {
-            "deletionPolicy": dp
+            "deletionPolicy": dp,
             "forProvider": {
-                "principal": id,
+                "principal": get(principal, "principal", ""),
                 "region": region,
                 "resourceShareArn": ramShareArn,
-            }
+            },
             "managementPolicies": mgmtPolicy,
-            "providerConfigRef": pcr
-        }
+            "providerConfigRef": pcr,
+        },
     }
-    for i, id in get(oxr, "spec.principals", [])
+    for i, principal in get(oxr, "spec.principals", [])
     if all_true([
         ramShareArn,
         get(oxr, "spec.principals", False),
@@ -98,7 +98,7 @@ ramShareAccepters = [
             }
         }
         "spec": {
-            "deletionPolicy": pcr
+            "deletionPolicy": dp,
             "forProvider": {
                 "region": region,
                 "shareArn": ramShareArn,
@@ -111,6 +111,8 @@ ramShareAccepters = [
     if all_true([
         ramShareArn,
         get(oxr, "spec.principals", False),
+        principal,
+        get(principal, "crossOrg", False),
     ])
 ]
 
@@ -131,7 +133,7 @@ newdxr = {
 
 _items = [
     i for r in [
-        ramShare, ramAssociations, newdxr,
+        ramShare, ramAssociations, [newdxr],
         ramPrincipleAssociations, ramShareAccepters
     ]
     for i in r if i

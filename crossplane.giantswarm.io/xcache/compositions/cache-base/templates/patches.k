@@ -30,6 +30,15 @@ readyState = all_true([
     ])
 ])
 
+connectionSecrets = {
+    "app" = "${appName}-elasticache-user"
+    "users" = {
+        user: "${appName}-elasticache-user-${user}"
+        for _, user in userNames
+        if user != appName and user != "default"
+    }
+}
+
 newdxr = {
     **dxr,
     **{
@@ -69,6 +78,13 @@ newdxr = {
 
             if _ugId:
                 "userGroupId" = _ugId,
+
+            if all_true([
+                get(oxr, "spec.engine", "redis") == "redis",
+                get(oxr, "spec.createReplicationGroup", True),
+                readyState,
+            ]):
+                "userSecrets" = connectionSecrets,
 
             "ready" = readyState,
         },

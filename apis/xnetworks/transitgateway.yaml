@@ -112,8 +112,8 @@ spec:
           localVpc = get(oxr, "spec.localVpc", {})
           pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
           region = get(oxr, "spec.localVpc.region", "eu-central-1")
-          tags = get(oxr, "spec.tags.common", {}) | {
-              region: region,
+          tags = get(oxr, "spec.tags", {}) | {
+              "region": region,
           } | labels
 
           localAttachmentIds = {
@@ -354,7 +354,7 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       },
                   },
                   "spec": {
@@ -400,9 +400,9 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       } if not isp else {
-                          "peerName": n,
+                          "peerName" = n,
                       },
                   },
                   "spec": {
@@ -422,6 +422,38 @@ spec:
               ]) else {}
           }
 
+          remotePrefixListIds = {
+              "${rVpc.name}": [
+                  c for c in [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "id", "")
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "id", "")
+                  ] if c
+              ] + [
+                  c for c in [
+                      get(pl, "id", "")
+                      for _, pl in get(rVpc, "prefixLists", [])
+                      if all_true([
+                          get(pl, "id", False),
+                          get(pl, "outbound", True),
+                      ])
+                  ]
+              ]
+              for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+          }
+
+          sharedPrefixLists: [str] = [
+              c for r in [
+                  [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "arn", ""),
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "arn", ""),
+                  ]
+                  for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+                  if rVpc.accountId != get(oxr, "spec.localVpc.accountId", "")
+              ]
+              for c in r if c
+          ]
+
+          import yaml
           # Create the attachment to the local VPC
           localAttachments = [
               {
@@ -484,6 +516,7 @@ spec:
                   pcr,
               ),
           ]
+          print(yaml.encode(localPrefixLists))
 
           prefixListIds = [
               c for c in [
@@ -563,7 +596,6 @@ spec:
               for _, id in localAttachmentIds
               if all_true([
                   tgwRouteTableId,
-                  localAttachmentIds,
               ])
           ]
 
@@ -677,8 +709,8 @@ spec:
           localVpc = get(oxr, "spec.localVpc", {})
           pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
           region = get(oxr, "spec.localVpc.region", "eu-central-1")
-          tags = get(oxr, "spec.tags.common", {}) | {
-              region: region,
+          tags = get(oxr, "spec.tags", {}) | {
+              "region": region,
           } | labels
 
           localAttachmentIds = {
@@ -919,7 +951,7 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       },
                   },
                   "spec": {
@@ -965,9 +997,9 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       } if not isp else {
-                          "peerName": n,
+                          "peerName" = n,
                       },
                   },
                   "spec": {
@@ -986,6 +1018,37 @@ spec:
                   pid, aid, rid,
               ]) else {}
           }
+
+          remotePrefixListIds = {
+              "${rVpc.name}": [
+                  c for c in [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "id", "")
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "id", "")
+                  ] if c
+              ] + [
+                  c for c in [
+                      get(pl, "id", "")
+                      for _, pl in get(rVpc, "prefixLists", [])
+                      if all_true([
+                          get(pl, "id", False),
+                          get(pl, "outbound", True),
+                      ])
+                  ]
+              ]
+              for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+          }
+
+          sharedPrefixLists: [str] = [
+              c for r in [
+                  [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "arn", ""),
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "arn", ""),
+                  ]
+                  for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+                  if rVpc.accountId != get(oxr, "spec.localVpc.accountId", "")
+              ]
+              for c in r if c
+          ]
 
           # ManagedPrefixLists
 
@@ -1303,8 +1366,8 @@ spec:
           localVpc = get(oxr, "spec.localVpc", {})
           pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
           region = get(oxr, "spec.localVpc.region", "eu-central-1")
-          tags = get(oxr, "spec.tags.common", {}) | {
-              region: region,
+          tags = get(oxr, "spec.tags", {}) | {
+              "region": region,
           } | labels
 
           localAttachmentIds = {
@@ -1545,7 +1608,7 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       },
                   },
                   "spec": {
@@ -1591,9 +1654,9 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       } if not isp else {
-                          "peerName": n,
+                          "peerName" = n,
                       },
                   },
                   "spec": {
@@ -1612,6 +1675,37 @@ spec:
                   pid, aid, rid,
               ]) else {}
           }
+
+          remotePrefixListIds = {
+              "${rVpc.name}": [
+                  c for c in [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "id", "")
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "id", "")
+                  ] if c
+              ] + [
+                  c for c in [
+                      get(pl, "id", "")
+                      for _, pl in get(rVpc, "prefixLists", [])
+                      if all_true([
+                          get(pl, "id", False),
+                          get(pl, "outbound", True),
+                      ])
+                  ]
+              ]
+              for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+          }
+
+          sharedPrefixLists: [str] = [
+              c for r in [
+                  [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "arn", ""),
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "arn", ""),
+                  ]
+                  for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+                  if rVpc.accountId != get(oxr, "spec.localVpc.accountId", "")
+              ]
+              for c in r if c
+          ]
 
           ramShareArn = ocdsstatus("ram-${appName}-${region}", "arn", False)
           ramShareId = ocdsstatus("ram-${appName}-${region}", "id", False)
@@ -1635,6 +1729,9 @@ spec:
                               "ramShareId" = ramShareId,
                           if ramShareArn:
                               "ramShareArn" = ramShareArn,
+
+                          if sharedPrefixLists:
+                              "sharedPrefixLists" = sharedPrefixLists,
 
                           "ready" = allReady(),
                       }
@@ -1744,8 +1841,8 @@ spec:
           localVpc = get(oxr, "spec.localVpc", {})
           pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
           region = get(oxr, "spec.localVpc.region", "eu-central-1")
-          tags = get(oxr, "spec.tags.common", {}) | {
-              region: region,
+          tags = get(oxr, "spec.tags", {}) | {
+              "region": region,
           } | labels
 
           localAttachmentIds = {
@@ -1986,7 +2083,7 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       },
                   },
                   "spec": {
@@ -2032,9 +2129,9 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       } if not isp else {
-                          "peerName": n,
+                          "peerName" = n,
                       },
                   },
                   "spec": {
@@ -2053,6 +2150,37 @@ spec:
                   pid, aid, rid,
               ]) else {}
           }
+
+          remotePrefixListIds = {
+              "${rVpc.name}": [
+                  c for c in [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "id", "")
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "id", "")
+                  ] if c
+              ] + [
+                  c for c in [
+                      get(pl, "id", "")
+                      for _, pl in get(rVpc, "prefixLists", [])
+                      if all_true([
+                          get(pl, "id", False),
+                          get(pl, "outbound", True),
+                      ])
+                  ]
+              ]
+              for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+          }
+
+          sharedPrefixLists: [str] = [
+              c for r in [
+                  [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "arn", ""),
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "arn", ""),
+                  ]
+                  for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+                  if rVpc.accountId != get(oxr, "spec.localVpc.accountId", "")
+              ]
+              for c in r if c
+          ]
 
           # Transit Gateway Peering
 
@@ -2325,8 +2453,8 @@ spec:
           localVpc = get(oxr, "spec.localVpc", {})
           pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
           region = get(oxr, "spec.localVpc.region", "eu-central-1")
-          tags = get(oxr, "spec.tags.common", {}) | {
-              region: region,
+          tags = get(oxr, "spec.tags", {}) | {
+              "region": region,
           } | labels
 
           localAttachmentIds = {
@@ -2567,7 +2695,7 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       },
                   },
                   "spec": {
@@ -2613,9 +2741,9 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       } if not isp else {
-                          "peerName": n,
+                          "peerName" = n,
                       },
                   },
                   "spec": {
@@ -2635,16 +2763,87 @@ spec:
               ]) else {}
           }
 
+          remotePrefixListIds = {
+              "${rVpc.name}": [
+                  c for c in [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "id", "")
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "id", "")
+                  ] if c
+              ] + [
+                  c for c in [
+                      get(pl, "id", "")
+                      for _, pl in get(rVpc, "prefixLists", [])
+                      if all_true([
+                          get(pl, "id", False),
+                          get(pl, "outbound", True),
+                      ])
+                  ]
+              ]
+              for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+          }
+
+          sharedPrefixLists: [str] = [
+              c for r in [
+                  [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "arn", ""),
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "arn", ""),
+                  ]
+                  for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+                  if rVpc.accountId != get(oxr, "spec.localVpc.accountId", "")
+              ]
+              for c in r if c
+          ]
+
           # Optional RAM
 
-          sharedMpl = get(oxr, "status.sharedMplArns", {})
+          # If we're building as part of the VPC, we should retrieve the prefix lists from
+          # the transit gateway resource.
+          #
+          # If this is enabled in the transit gateway, they need to come fdrom the OXR
+          sharedMpl = ocdsstatus("transitgw", "sharedPrefixLists", get(oxr, "status.sharedPrefixLists", []))
+
+          # shared subnets is a future extension - I've not figured out
+          # how best to specify this yet.
+          sharedSubnets = get(oxr, "status.sharedSubnets", [])
+
+          principals = [
+              {
+                  "principal": get(oxr, "status.vpcs.${rvpc.name}.owner", ""),
+                  "providerConfigRef": get(rvpc, "providerConfigRef", {"name": "default"}),
+              }
+              for _, rvpc in get(oxr, "spec.transitGateway.remoteVpcs", [])
+              if all_true([
+                  get(oxr, "status.vpcs.${rvpc.name}.owner", False) != get(oxr, "status.vpcs.self.owner", False),
+                  get(rvpc, "providerConfigRef", False),
+              ])
+          ] + [
+              p
+              for p in get(oxr, "spec.ram.principals", [])
+              if p
+          ]
+
+          # This block should be specific to the RAM when loaded
+          # as part of the VPC - it should not affect the RAM when
+          # loaded as part of the TransitGateway.
+          _forceRamEnabled = False
+          if all_true([
+              get(oxr, "spec.transitGateway.enabled", False),
+              any_true([
+                  get(oxr, "status.vpcs.${name}.owner", False) != get(oxr, "status.vpcs.self.owner", False)
+                  for name, _ in get(oxr, "status.vpcs", [])
+                  for _, vpc in get(oxr, "spec.transitGateway.remoteVpcs", [])
+                  if get(vpc, "name", "") == name
+              ]),
+          ]):
+              _forceRamEnabled = True
 
           resources = [
               c for r in [
                   [tgwArn],
                   sharedMpl,
+                  sharedSubnets,
               ]
-              for c in r
+              for c in r if c
           ] + get(oxr, "spec.ram.resources", [])
 
           _items = [
@@ -2664,17 +2863,22 @@ spec:
                   "spec": {
                       "allowExternalPrincipals": get(oxr, "spec.ram.allowExternalPrincipals", False),
                       "deletionPolicy": dp
+                      "claimRef": get(oxr, "spec.claimRef", {}),
                       "managementPolicies": mgmtPolicy,
                       "name": appName,
                       "permissions": get(oxr, "spec.ram.permissions", []),
-                      "principals": get(oxr, "spec.ram.principals", []),
+                      "principals": principals,
                       "resources": resources,
                       "providerConfigRef": pcr
                       "region": region,
+                      "tags": tags,
                   }
               }
               for _ in [True]
-              if get(oxr, "spec.ram.enabled", False)
+              if any_true([
+                  get(oxr, "spec.ram.enabled", False),
+                  _forceRamEnabled,
+              ])
           ]
 
           items = _items
@@ -2779,8 +2983,8 @@ spec:
           localVpc = get(oxr, "spec.localVpc", {})
           pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
           region = get(oxr, "spec.localVpc.region", "eu-central-1")
-          tags = get(oxr, "spec.tags.common", {}) | {
-              region: region,
+          tags = get(oxr, "spec.tags", {}) | {
+              "region": region,
           } | labels
 
           localAttachmentIds = {
@@ -3021,7 +3225,7 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       },
                   },
                   "spec": {
@@ -3067,9 +3271,9 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       } if not isp else {
-                          "peerName": n,
+                          "peerName" = n,
                       },
                   },
                   "spec": {
@@ -3088,6 +3292,37 @@ spec:
                   pid, aid, rid,
               ]) else {}
           }
+
+          remotePrefixListIds = {
+              "${rVpc.name}": [
+                  c for c in [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "id", "")
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "id", "")
+                  ] if c
+              ] + [
+                  c for c in [
+                      get(pl, "id", "")
+                      for _, pl in get(rVpc, "prefixLists", [])
+                      if all_true([
+                          get(pl, "id", False),
+                          get(pl, "outbound", True),
+                      ])
+                  ]
+              ]
+              for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+          }
+
+          sharedPrefixLists: [str] = [
+              c for r in [
+                  [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "arn", ""),
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "arn", ""),
+                  ]
+                  for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+                  if rVpc.accountId != get(oxr, "spec.localVpc.accountId", "")
+              ]
+              for c in r if c
+          ]
 
           # Create the main transit gateway
           # The Id of this transit gateway will be published to oxr.status.tgwId
@@ -3109,8 +3344,8 @@ spec:
                   "forProvider": {
                       "amazonSideAsn": get(oxr, "spec.amazonSideAsn", 64512),
                       "autoAcceptSharedAttachments": get(oxr, "spec.autoAcceptSharedAttachments", "enable"),
-                      "defaultRouteTableAssociation": "enable" if get(oxr, "spec.defaultRouteTableAssociation", True) else "disable",
-                      "defaultRouteTablePropagation": "enable" if get(oxr, "spec.defaultRouteTablePropagation", True) else "disable",
+                      "defaultRouteTableAssociation": "enable" if get(oxr, "spec.defaultRouteTableAssociation", False) else "disable",
+                      "defaultRouteTablePropagation": "enable" if get(oxr, "spec.defaultRouteTablePropagation", False) else "disable",
                       "description": "${appName} Transit Gateway in ${region}",
                       "dnsSupport": get(oxr, "spec.dnsSupport", "enable"),
                       "multicastSupport": get(oxr, "spec.multicastSupport", "disable"),
@@ -3215,21 +3450,18 @@ spec:
                       "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
                       "forProvider": {
                           "region": region,
-                          "replaceExistingAssociation": all_true([
-                              id == get(localAttachmentIds, appName, False),
-                              # Extension later
-                          ]),
+                          "replaceExistingAssociation": False,
                           "transitGatewayAttachmentId": id,
                           "transitGatewayRouteTableId": tgwRouteTableId,
                       }
                       "managementPolicies": mgmtPolicy,
-                      "providerConfigRef": get(oxr, "spec.providerConfigRef", {})
+                      "providerConfigRef": pcr
                   }
               }
               for _, id in localAttachmentIds | remoteAttachementIds
               if all_true([
-                  localAttachmentIds, remoteAttachementIds,
-                  tgwRouteTableId,
+                  localAttachmentIds, tgwRouteTableId,
+                  remoteAttachementIds,
               ])
           ]
 
@@ -3344,8 +3576,8 @@ spec:
           localVpc = get(oxr, "spec.localVpc", {})
           pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
           region = get(oxr, "spec.localVpc.region", "eu-central-1")
-          tags = get(oxr, "spec.tags.common", {}) | {
-              region: region,
+          tags = get(oxr, "spec.tags", {}) | {
+              "region": region,
           } | labels
 
           localAttachmentIds = {
@@ -3586,7 +3818,7 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       },
                   },
                   "spec": {
@@ -3632,9 +3864,9 @@ spec:
                           "krm.kcl.dev/ready": readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": n,
+                          "vpcName" = n,
                       } if not isp else {
-                          "peerName": n,
+                          "peerName" = n,
                       },
                   },
                   "spec": {
@@ -3654,6 +3886,37 @@ spec:
               ]) else {}
           }
 
+          remotePrefixListIds = {
+              "${rVpc.name}": [
+                  c for c in [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "id", "")
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "id", "")
+                  ] if c
+              ] + [
+                  c for c in [
+                      get(pl, "id", "")
+                      for _, pl in get(rVpc, "prefixLists", [])
+                      if all_true([
+                          get(pl, "id", False),
+                          get(pl, "outbound", True),
+                      ])
+                  ]
+              ]
+              for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+          }
+
+          sharedPrefixLists: [str] = [
+              c for r in [
+                  [
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "arn", ""),
+                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "arn", ""),
+                  ]
+                  for _, rVpc in get(oxr, "spec.remoteVpcs", [])
+                  if rVpc.accountId != get(oxr, "spec.localVpc.accountId", "")
+              ]
+              for c in r if c
+          ]
+
           remoteAttachments = [
               {
                   _resourceName = "tgwa-${appName}-${region}-${remoteVpc.name}"
@@ -3665,7 +3928,7 @@ spec:
                           "krm.kcl.dev/ready" = readystr(_resourceName)
                       }
                       "labels": labels | {
-                          "vpcName": remoteVpc.name
+                          "vpcName" = remoteVpc.name
                       }
                   }
                   "spec": {
@@ -3677,7 +3940,7 @@ spec:
                           "region": get(remoteVpc, "region", region),
                           "subnetIds": get(remoteVpc, "subnetIds", []),
                           "tags": tags | {
-                              Name: "${appName}-${region}-${remoteVpc.name}"
+                              "Name": "${appName}-${region}-${remoteVpc.name}"
                           }
                           "transitGatewayDefaultRouteTableAssociation": get(oxr, "spec.defaultRouteTableAssociation", False),
                           "transitGatewayDefaultRouteTablePropagation": get(oxr, "spec.defaultRouteTablePropagation", False),
@@ -3699,14 +3962,14 @@ spec:
               {
                   _resourceName = "tgwaa-${appName}-${region}-${remoteVpc.name}"
                   "apiVersion": "ec2.aws.upbound.io/v1beta1"
-                  "kind": "TransitGatewayVpcAttachmentAccepter"
+                  "kind": "TransitGatewayVPCAttachmentAccepter"
                   "metadata": {
                       "annotations": {
                           "krm.kcl.dev/composition-resource-name": _resourceName
                           "krm.kcl.dev/ready" = readystr(_resourceName)
                       }
                       "labels": labels | {
-                          "vpcName": remoteVpc.name
+                          "vpcName" = remoteVpc.name
                       }
                   }
                   "spec": {
@@ -3727,6 +3990,7 @@ spec:
                       gpcr(remoteVpc).name != get(oxr, "spec.providerConfigRef.name", ""),
                   ]),
                   get(remoteAttachementIds, remoteVpc.name, False),
+                  get(oxr, "spec.autoAcceptSharedAttachments", "enable") != "enable",
               ])
           ]
 
@@ -3740,7 +4004,7 @@ spec:
                           False,
                           False,
                           get(routingTables, "${remoteVpc.name}.vpc.open", {}),
-                          gpcr(remoteVpc),
+                          pcr,
                       ),
                       mpl(
                           remoteVpc.name,
@@ -3749,31 +4013,12 @@ spec:
                           True,
                           False,
                           get(routingTables, "${remoteVpc.name}.vpc.blackhole", {}),
-                          gpcr(remoteVpc),
+                          pcr,
                       ),
                   ]
                   for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
               ] for i in r
           ]
-
-          remotePrefixListIds = {
-              "${rVpc.name}": [
-                  c for c in [
-                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "id", "")
-                      ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "id", False)
-                  ] if c
-              ] + [
-                  c for c in [
-                      get(pl, "id", "")
-                      for _, pl in get(rVpc, "prefixLists", [])
-                      if all_true([
-                          get(pl, "id", False),
-                          get(pl, "outbound", True),
-                      ])
-                  ]
-              ]
-              for _, rVpc in get(oxr, "spec.remoteVpcs", [])
-          }
 
           remoteRoutes = [
               {
@@ -3787,7 +4032,7 @@ spec:
                       }
                       "labels": labels | {
                           "routeType": "peering",
-                          "vpcName": remoteVpc.name
+                          "vpcName" = remoteVpc.name
                       }
                   }
                   "spec": {
@@ -3821,7 +4066,7 @@ spec:
                           "krm.kcl.dev/ready" = readystr(_resourceName),
                       },
                       "labels": labels | {
-                          "vpcName": appName,
+                          "vpcName" = appName,
                       }
                   },
                   "spec": {

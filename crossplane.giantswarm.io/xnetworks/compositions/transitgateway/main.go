@@ -57,7 +57,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		panic(err)
 	}
 
-	kclTgwConfigTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/tgw-config.k")
+	kclPatchingTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/patching.k")
 	if err != nil {
 		panic(err)
 	}
@@ -67,12 +67,9 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		panic(err)
 	}
 
-	kclPatchingTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/patching.k")
-	if err != nil {
-		panic(err)
-	}
-
-	kclRamTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/ram.k")
+	// The RAM template is now shared between TGW and PeeredVpc
+	// We store it in the peeredvpc composition as the primary source
+	kclRamTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/ram.k")
 	if err != nil {
 		panic(err)
 	}
@@ -83,6 +80,11 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 	}
 
 	kclRemoteTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/remote.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclTgwConfigTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/tgw-config.k")
 	if err != nil {
 		panic(err)
 	}

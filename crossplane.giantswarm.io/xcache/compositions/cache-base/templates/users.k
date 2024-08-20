@@ -27,7 +27,7 @@ users = [
                                 {
                                     "key": "password"
                                     if name == appName:
-                                        "name": "elasticache-user-${name}"
+                                        "name": "${name}-elasticache-user"
                                     else:
                                         "name": "${appName}-elasticache-user-${name}"
                                     "namespace": namespace

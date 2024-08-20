@@ -94,6 +94,7 @@ func (in *RCCWithRegionLookupSpec) DeepCopyInto(out *RCCWithRegionLookupSpec) {
 		*out = new(v1.Reference)
 		(*in).DeepCopyInto(*out)
 	}
+	out.ManagementClusterDiscovery = in.ManagementClusterDiscovery
 	in.RdsCacheClusterParameters.DeepCopyInto(&out.RdsCacheClusterParameters)
 }
 

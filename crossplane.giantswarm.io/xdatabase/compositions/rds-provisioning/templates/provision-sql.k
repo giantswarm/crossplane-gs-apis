@@ -184,7 +184,7 @@ users = [
                 "name": providerConfigName
             }
             "writeConnectionSecretToRef": {
-                "name": "${appName}-${_engine}-user-${user.name}" if user.name != appName else "${appName}-${_engine}-user"
+                "name": "${appName}-rds-user-${user.name}" if user.name != appName else "${appName}-rds-user"
                 "namespace": get(oxr, "spec.claimRef.namespace", "")
             }
         }
@@ -194,6 +194,16 @@ users = [
     for _, user in get(config, "users", [])
     if _requiredDatabases and databases
 ]
+
+connectionSecrets = {
+    "app" = "${appName}-rds-user"
+    "users" = {
+        user.name: "${appName}-rds-user-${user.name}"
+        for database, config in _requiredDatabases
+        for _, user in get(config, "users", [])
+        if user.name != appName
+    }
+}
 
 grants = [
     {
@@ -243,6 +253,7 @@ newdxr = {
     **{
         "status": {
             "ready" = allReady()
+            "connectionSecrets" = connectionSecrets,
         },
     },
 }

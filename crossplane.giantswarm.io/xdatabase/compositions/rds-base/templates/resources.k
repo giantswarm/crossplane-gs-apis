@@ -569,8 +569,10 @@ securityGroupRules = [
         "kind": "SecurityGroupRule"
         "metadata": {
             "annotations": {
-                "krm.kcl.dev/composition-resource-name" = "security-group-rule-${i}"
-                "krn.kcl.dev/ready" = readystr("security-group-rule-${i}")
+                _cdr = regex.replace(cidr, "[^0-9]", "")
+                _resourceName = "security-group-rule-${_cdr}"
+                "krm.kcl.dev/composition-resource-name" = _resourceName
+                "krn.kcl.dev/ready" = readystr(_resourceName)
             }
             "labels": labels
         }

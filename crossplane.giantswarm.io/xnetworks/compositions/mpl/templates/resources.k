@@ -114,6 +114,7 @@ managedPrefixList = [
 ]
 
 managedPrefixListId = ocdsstatus("mpl", "id", False) if not get(oxr, "spec.id", False) else get(oxr, "spec.id", "")
+managedPrefixListArn = ocdsstatus("mpl", "arn", False) if not get(oxr, "spec.arn", False) else get(oxr, "spec.arn", "")
 
 managedPrefixListEntries = [
     {
@@ -151,6 +152,9 @@ newdxr = {
         "status": {
             if managedPrefixListId:
                 "id" = managedPrefixListId,
+
+            if managedPrefixListArn:
+                "arn" = managedPrefixListArn,
 
             "ready" = allReady(),
         }

@@ -53,6 +53,11 @@ type ManagedPrefixListSpec struct {
 type ManagedPrefixListStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
 
+	// The ARN of the prefix list.
+	//
+	// +optional
+	Arn *string `json:"arn,omitempty"`
+
 	// The ID of the prefix list.
 	//
 	// +optional

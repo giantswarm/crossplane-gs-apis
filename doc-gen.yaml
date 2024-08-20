@@ -27,6 +27,14 @@ source_repositories:
           - networks
           - vpc
           - discovery
+      managedprefixlists.xnetworks.crossplane.giantswarm.io:
+        owner:
+          - https://github.com/orgs/giantswarm/teams/team-honeybadger
+        topics:
+          - aws
+          - crossplane
+          - networks
+          - vpc
       peerings.xnetworks.crossplane.giantswarm.io:
         owner:
           - https://github.com/orgs/giantswarm/teams/team-honeybadger
@@ -109,4 +117,3 @@ source_repositories:
           - aws
           - crossplane
           - ram
-

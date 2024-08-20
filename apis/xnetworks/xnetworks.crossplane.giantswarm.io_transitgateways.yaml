@@ -82,6 +82,9 @@ spec:
                 description: Contains details about the local VPC (Where the TGW will
                   be built)
                 properties:
+                  accountId:
+                    description: Account ID the VPC is in
+                    type: string
                   cidrBlocks:
                     description: Cidr blocks for the VPC
                     items:
@@ -436,13 +439,71 @@ spec:
                 description: Resource Access Management (RAM)
                 properties:
                   allowExternalPrincipals:
-                    description: Do we allow external principles with this ram
+                    description: If external principals are allowed to access the
+                      resource access manager.
                     type: boolean
                   enabled:
                     description: Is RAM enabled
                     type: boolean
-                  principals:
-                    description: Principals that are allowed to access the resource
+                  permissions:
+                    description: The permissions to associate with the resource access
+                      manager.
+                    items:
+                      type: string
+                    type: array
+                  principles:
+                    description: A list of principals to associate with the resource
+                      access manager.
+                    items:
+                      properties:
+                        principal:
+                          description: |-
+                            The principal to associate with the resource access manager.
+
+
+                            Possible values are AWS Account ID, AWS Organization ID, or AWS organizations.
+                          type: string
+                        providerConfig:
+                          description: Provider config for accepting the share
+                          properties:
+                            name:
+                              description: Name of the referenced object.
+                              type: string
+                            policy:
+                              description: Policies for referencing.
+                              properties:
+                                resolution:
+                                  default: Required
+                                  description: |-
+                                    Resolution specifies whether resolution of this reference is required.
+                                    The default is 'Required', which means the reconcile will fail if the
+                                    reference cannot be resolved. 'Optional' means this reference will be
+                                    a no-op if it cannot be resolved.
+                                  enum:
+                                  - Required
+                                  - Optional
+                                  type: string
+                                resolve:
+                                  description: |-
+                                    Resolve specifies when this reference should be resolved. The default
+                                    is 'IfNotPresent', which will attempt to resolve the reference only when
+                                    the corresponding field is not present. Use 'Always' to resolve the
+                                    reference on every reconcile.
+                                  enum:
+                                  - Always
+                                  - IfNotPresent
+                                  type: string
+                              type: object
+                          required:
+                          - name
+                          type: object
+                      required:
+                      - principal
+                      type: object
+                    type: array
+                  resources:
+                    description: A list of resources to associate with the resource
+                      access manager.
                     items:
                       type: string
                     type: array
@@ -451,6 +512,9 @@ spec:
                 description: Contains details about the remote VPCs
                 items:
                   properties:
+                    accountId:
+                      description: Account ID the VPC is in
+                      type: string
                     cidrBlocks:
                       description: Cidr blocks for the VPC
                       items:
@@ -687,6 +751,11 @@ spec:
                   type: string
                 description: map of remote attachments
                 type: object
+              sharedPrefixLists:
+                description: Any prefix list ARNs that are shared
+                items:
+                  type: string
+                type: array
               tgwArn:
                 description: The ARN of the Transit Gateway.
                 type: string

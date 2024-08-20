@@ -9,7 +9,7 @@ remoteAttachments = [
                 "krm.kcl.dev/ready" = readystr(_resourceName)
             }
             "labels": labels | {
-                "vpcName": remoteVpc.name
+                "vpcName" = remoteVpc.name
             }
         }
         "spec": {
@@ -21,7 +21,7 @@ remoteAttachments = [
                 "region": get(remoteVpc, "region", region),
                 "subnetIds": get(remoteVpc, "subnetIds", []),
                 "tags": tags | {
-                    Name: "${appName}-${region}-${remoteVpc.name}"
+                    "Name": "${appName}-${region}-${remoteVpc.name}"
                 }
                 "transitGatewayDefaultRouteTableAssociation": get(oxr, "spec.defaultRouteTableAssociation", False),
                 "transitGatewayDefaultRouteTablePropagation": get(oxr, "spec.defaultRouteTablePropagation", False),
@@ -43,14 +43,14 @@ attachmentAccepters = [
     {
         _resourceName = "tgwaa-${appName}-${region}-${remoteVpc.name}"
         "apiVersion": "ec2.aws.upbound.io/v1beta1"
-        "kind": "TransitGatewayVpcAttachmentAccepter"
+        "kind": "TransitGatewayVPCAttachmentAccepter"
         "metadata": {
             "annotations": {
                 "krm.kcl.dev/composition-resource-name": _resourceName
                 "krm.kcl.dev/ready" = readystr(_resourceName)
             }
             "labels": labels | {
-                "vpcName": remoteVpc.name
+                "vpcName" = remoteVpc.name
             }
         }
         "spec": {
@@ -71,6 +71,7 @@ attachmentAccepters = [
             gpcr(remoteVpc).name != get(oxr, "spec.providerConfigRef.name", ""),
         ]),
         get(remoteAttachementIds, remoteVpc.name, False),
+        get(oxr, "spec.autoAcceptSharedAttachments", "enable") != "enable",
     ])
 ]
 
@@ -84,7 +85,7 @@ remotePrefixLists = [
                 False,
                 False,
                 get(routingTables, "${remoteVpc.name}.vpc.open", {}),
-                gpcr(remoteVpc),
+                pcr,
             ),
             mpl(
                 remoteVpc.name,
@@ -93,31 +94,12 @@ remotePrefixLists = [
                 True,
                 False,
                 get(routingTables, "${remoteVpc.name}.vpc.blackhole", {}),
-                gpcr(remoteVpc),
+                pcr,
             ),
         ]
         for _, remoteVpc in get(oxr, "spec.remoteVpcs", [])
     ] for i in r
 ]
-
-remotePrefixListIds = {
-    "${rVpc.name}": [
-        c for c in [
-            ocdsstatus("mpl-${appName}-${region}-${rVpc.name}", "id", "")
-            ocdsstatus("mpl-${appName}-${region}-${rVpc.name}-bh", "id", False)
-        ] if c
-    ] + [
-        c for c in [
-            get(pl, "id", "")
-            for _, pl in get(rVpc, "prefixLists", [])
-            if all_true([
-                get(pl, "id", False),
-                get(pl, "outbound", True),
-            ])
-        ]
-    ]
-    for _, rVpc in get(oxr, "spec.remoteVpcs", [])
-}
 
 remoteRoutes = [
     {
@@ -131,7 +113,7 @@ remoteRoutes = [
             }
             "labels": labels | {
                 "routeType": "peering",
-                "vpcName": remoteVpc.name
+                "vpcName" = remoteVpc.name
             }
         }
         "spec": {
@@ -165,7 +147,7 @@ remotePropagation = [
                 "krm.kcl.dev/ready" = readystr(_resourceName),
             },
             "labels": labels | {
-                "vpcName": appName,
+                "vpcName" = appName,
             }
         },
         "spec": {

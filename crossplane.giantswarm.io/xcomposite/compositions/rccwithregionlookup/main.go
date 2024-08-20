@@ -88,6 +88,43 @@ func createResources() []xpt.ComposedTemplate {
 	required := xpt.FromFieldPathPolicyRequired
 	return []xpt.ComposedTemplate{
 		{
+			Name: "mc-lookup",
+			Base: &runtime.RawExtension{
+				Object: &ccKubernetes.Object{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "kubernetes.crossplane.io/v1alpha2",
+						Kind:       "Object",
+					},
+					Spec: ccKubernetes.ObjectSpec{
+						ResourceSpec: xpv1.ResourceSpec{
+							ManagementPolicies: xpv1.ManagementPolicies{
+								xpv1.ManagementActionObserve,
+							},
+						},
+						ForProvider: ccKubernetes.ObjectParameters{
+							Manifest: runtime.RawExtension{
+								Object: &capi.Cluster{
+									TypeMeta: metav1.TypeMeta{
+										APIVersion: "cluster.x-k8s.io/v1beta1",
+										Kind:       "Cluster",
+									},
+									ObjectMeta: metav1.ObjectMeta{
+										Name:      "test-cluster",
+										Namespace: "test-namespace",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Patches: []xpt.ComposedPatch{
+				cb.FromPatch("spec.managementClusterDiscovery.name", "spec.forProvider.manifest.metadata.name"),
+				cb.FromPatch("spec.managementClusterDiscovery.namespace", "spec.forProvider.manifest.metadata.namespace"),
+				cb.FromPatch("spec.kubernetesProviderConfigRef", "spec.providerConfigRef"),
+			},
+		},
+		{
 			Name: "cluster-lookup",
 			Base: &runtime.RawExtension{
 				Object: &ccKubernetes.Object{

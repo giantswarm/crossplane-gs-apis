@@ -22,6 +22,9 @@ _items = [
                 if ramShareArn:
                     "ramShareArn" = ramShareArn,
 
+                if sharedPrefixLists:
+                    "sharedPrefixLists" = sharedPrefixLists,
+
                 "ready" = allReady(),
             }
         }

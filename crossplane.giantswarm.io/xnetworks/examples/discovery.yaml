@@ -22,3 +22,7 @@ spec:
   providerType: aws
   remoteVpcs:
   - name: golem-vpc
+  - name: operations-vpc
+    region: eu-central-1
+    providerConfigRef:
+      name: aws-gazelle

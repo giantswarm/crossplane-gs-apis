@@ -45,6 +45,7 @@ passwordGenerator = {
     }
 }
 
+_endpoint = globalEndpoint if globalEnabled else endpoint
 passwords = [
     {
         "apiVersion": "kubernetes.crossplane.io/v1alpha2"
@@ -69,9 +70,24 @@ passwords = [
                         "refreshInterval": "1h"
                         "target": {
                             if user == appName:
-                                "name": "elasticache-user-${user}"
+                                "name": "${appName}-elasticache-user"
                             else:
                                 "name": "${appName}-elasticache-user-${user}"
+                            "template": {
+                                "engineVersion": "v2"
+                                "mergePolicy": "Merge"
+                                "templateFrom": [
+                                    {
+                                        "target": "Data",
+                                        "literal": """
+                                            host: ${_endpoint}
+                                            port: ${_port}
+                                            username: ${user}
+                                            password:  {{ .password }}
+                                        """
+                                    }
+                                ],
+                            },
                         }
                         "dataFrom": [
                             {
@@ -101,7 +117,7 @@ passwords = [
     ])
 ]
 
-_endpoint = globalEndpoint if globalEnabled else endpoint
+# Not convinced this is relevant anymore
 esoConnectionSecret = {
     "apiVersion": "kubernetes.crossplane.io/v1alpha2"
     "kind": "Object"
@@ -148,7 +164,7 @@ esoConnectionSecret = {
                     "dataFrom": [
                         {
                             "extract": {
-                                "key": "elasticache-user-${appName}",
+                                "key": "${appName}-elasticache-user",
                             }
                         }
                     ],

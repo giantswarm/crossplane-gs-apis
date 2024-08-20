@@ -3,7 +3,7 @@ apiVersion: xcomposite.crossplane.giantswarm.io/v1alpha1
 kind: RCCWithRegionLookupClaim
 metadata:
   name: cloudtest-cluster-peering
-  namespace: org-presales-lutz
+  namespace: default
   labels:
     owner: honeybadger
     provider: aws
@@ -22,8 +22,12 @@ spec:
     name: default
 
   clusterDiscovery:
-    name: "lutz-cluster"
-    namespace: "org-presales-lutz"
+    name: "rdsapp"
+    namespace: "org-demotech"
+
+  managementClusterDiscovery:
+    name: "golem"
+    namespace: "org-giantswarm"
 
   rdsCacheClusterParameters:
     eso:
@@ -77,11 +81,9 @@ spec:
           public:
             mask: ""
             count: 0
-            lbSetIndex: -1
           private:
             mask: /28
             count: 2
-            lbSetIndex: -1
       tags:
         common:
           giantswarm.io/owner: honeybadger

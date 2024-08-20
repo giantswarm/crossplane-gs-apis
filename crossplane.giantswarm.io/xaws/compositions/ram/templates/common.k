@@ -76,8 +76,8 @@ dp = get(oxr, "spec.deletionPolicy", "Delete")
 labels = get(oxr, "metadata.labels", {})
 mgmtPolicy = get(oxr, "spec.managementPolicies", [])
 pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
-region = get(oxr, "spec.localVpc.region", "eu-central-1")
-tags = get(oxr, "spec.tags.common", {}) | {
-    region: region,
+region = get(oxr, "spec.region", "eu-central-1")
+tags = get(oxr, "spec.tags", {}) | {
+    "region": region,
 }
 publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})

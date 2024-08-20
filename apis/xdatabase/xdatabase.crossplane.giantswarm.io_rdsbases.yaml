@@ -1289,6 +1289,20 @@ spec:
                 description: port is the port of the database.
                 format: int64
                 type: integer
+              provisionedSecrets:
+                description: ProvisionedSecrets is the connection secrets created
+                  by the SQL provider
+                properties:
+                  app:
+                    description: The name of the secret created specifically for the
+                      app
+                    type: string
+                  users:
+                    additionalProperties:
+                      type: string
+                    description: A map of secret names created for users
+                    type: object
+                type: object
               ready:
                 description: Ready is whether all children are ready.
                 type: boolean

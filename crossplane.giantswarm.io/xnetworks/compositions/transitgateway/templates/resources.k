@@ -18,8 +18,8 @@ transitGateway = {
         "forProvider": {
             "amazonSideAsn": get(oxr, "spec.amazonSideAsn", 64512),
             "autoAcceptSharedAttachments": get(oxr, "spec.autoAcceptSharedAttachments", "enable"),
-            "defaultRouteTableAssociation": "enable" if get(oxr, "spec.defaultRouteTableAssociation", True) else "disable",
-            "defaultRouteTablePropagation": "enable" if get(oxr, "spec.defaultRouteTablePropagation", True) else "disable",
+            "defaultRouteTableAssociation": "enable" if get(oxr, "spec.defaultRouteTableAssociation", False) else "disable",
+            "defaultRouteTablePropagation": "enable" if get(oxr, "spec.defaultRouteTablePropagation", False) else "disable",
             "description": "${appName} Transit Gateway in ${region}",
             "dnsSupport": get(oxr, "spec.dnsSupport", "enable"),
             "multicastSupport": get(oxr, "spec.multicastSupport", "disable"),
@@ -124,21 +124,18 @@ tgwAssociations = [
             "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete"),
             "forProvider": {
                 "region": region,
-                "replaceExistingAssociation": all_true([
-                    id == get(localAttachmentIds, appName, False),
-                    # Extension later
-                ]),
+                "replaceExistingAssociation": False,
                 "transitGatewayAttachmentId": id,
                 "transitGatewayRouteTableId": tgwRouteTableId,
             }
             "managementPolicies": mgmtPolicy,
-            "providerConfigRef": get(oxr, "spec.providerConfigRef", {})
+            "providerConfigRef": pcr
         }
     }
     for _, id in localAttachmentIds | remoteAttachementIds
     if all_true([
-        localAttachmentIds, remoteAttachementIds,
-        tgwRouteTableId,
+        localAttachmentIds, tgwRouteTableId,
+        remoteAttachementIds,
     ])
 ]
 

@@ -3,7 +3,6 @@ resources:
 - peered-vpc-network.yaml
 - network-discovery.yaml
 - managed-prefix-list.yaml
-- xnetworks.crossplane.giantswarm.io_vpcnetworks.yaml
 - xnetworks.crossplane.giantswarm.io_managedprefixlists.yaml
 - xnetworks.crossplane.giantswarm.io_subnetsets.yaml
 - subnetset.yaml

@@ -24,7 +24,7 @@ spec:
         enabledRef: spec.enabled
         groupByRef: spec.groupBy
         patchTo: status.vpcs
-        providerConfigRef: spec.providerConfigRef.name
+        providerConfigRef: spec.providerConfigRef
         providerType: aws
         regionRef: spec.region
         vpcRef: spec.remoteVpcs

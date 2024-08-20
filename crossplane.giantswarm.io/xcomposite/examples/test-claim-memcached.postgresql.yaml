@@ -3,7 +3,7 @@ apiVersion: xcomposite.crossplane.giantswarm.io/v1alpha1
 kind: RCCWithRegionLookupClaim
 metadata:
   name: cloudtest-rds-postgresql
-  namespace: org-presales-lutz
+  namespace: default
   labels:
     owner: honeybadger
     provider: aws
@@ -21,8 +21,12 @@ spec:
     name: default
 
   clusterDiscovery:
-    name: "lutz-cluster"
-    namespace: "org-presales-lutz"
+    name: "rdsapp"
+    namespace: "org-demotech"
+
+  managementClusterDiscovery:
+    name: "golem"
+    namespace: "org-giantswarm"
 
   rdsCacheClusterParameters:
     eso:

@@ -8,6 +8,8 @@ readyState = all_true([
     len(instancesCreated) == len(_specInstances),
 ])
 
+provisionedSecrets = ocdsstatus("rds-provisioning", "connectionSecrets", {})
+
 newdxr = {
     **dxr,
     **{
@@ -37,6 +39,14 @@ newdxr = {
                     "port" = _port
 
             "ready" = readyState
+
+            if all_true([
+                get(oxr, "spec.provisionSql.enabled", False),
+                provisionedSecrets,
+                readyState,
+            ]):
+                "provisionedSecrets" = provisionedSecrets,
+
         }
     }
 }

@@ -247,6 +247,9 @@ spec:
             type: object
           status:
             properties:
+              arn:
+                description: The ARN of the prefix list.
+                type: string
               conditions:
                 description: Conditions of the resource.
                 items:

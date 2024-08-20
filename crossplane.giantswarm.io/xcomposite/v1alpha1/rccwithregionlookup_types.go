@@ -61,6 +61,11 @@ type RCCWithRegionLookupSpec struct {
 	// +required
 	KubernetesProviderConfig *xpv1.Reference `json:"kubernetesProviderConfig"`
 
+	// ManagementClusterDiscovery is the reference to the management cluster
+	//
+	// +required
+	ManagementClusterDiscovery ClusterDiscovery `json:"managementClusterDiscovery"`
+
 	// RdsCacheClusterSpec is the spec for the RDS Cache Cluster
 	//
 	// +required
@@ -125,6 +130,11 @@ type RCCWithRegionLookupStatus struct {
 	//
 	// +optional
 	CacheSubnets []string `json:"cacheSubnets,omitempty"`
+
+	// Region for the management cluster
+	//
+	// +optional
+	McRegion string `json:"mcregion,omitempty"`
 
 	// Is the composition complete
 	//

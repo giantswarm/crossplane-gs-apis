@@ -24,10 +24,10 @@ var (
 //
 // +kubebuilder:resource:scope=Cluster,categories=crossplane
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:shortName=mpl
+// +kubebuilder:resource:shortName=ram
 // +crossbuilder:generate:xrd:claimNames:kind=ResourceAccessManagerClaim,plural=resourceaccessmanagerclaims
 // +crossbuilder:generate:xrd:defaultCompositionRef:name=resource-access-manager
-// +crossbuilder:generate:xrd:enforcedCompositionRef:name=resouce-access-manager
+// +crossbuilder:generate:xrd:enforcedCompositionRef:name=resource-access-manager
 type ResourceAccessManager struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -45,8 +45,7 @@ type ResourceAccessManagerList struct {
 }
 
 type ResourceAccessManagerSpec struct {
-	RamParameters           `json:",inline"`
-	AllowExternalPrincipals *bool `json:"allowExternalPrincipals,omitempty"`
+	xpv1.ResourceSpec `json:",inline"`
 
 	// The name of the resource access manager.
 	//
@@ -63,13 +62,21 @@ type ResourceAccessManagerSpec struct {
 	// +optional
 	// +kubebuilder:validation:MaxProperties=50
 	Tags map[string]string `json:"tags,omitempty"`
+
+	RamParameters `json:",inline"`
 }
 
 type RamParameters struct {
+	// If external principals are allowed to access the resource access manager.
+	//
+	// +optional
+	// +default=false
+	AllowExternalPrincipals *bool `json:"allowExternalPrincipals,omitempty"`
+
 	// A list of principals to associate with the resource access manager.
 	//
 	// +optional
-	Principals []*Principal `json:"principles,omitempty"`
+	Principals []*Principal `json:"principals,omitempty"`
 
 	// A list of resources to associate with the resource access manager.
 	//
@@ -109,10 +116,16 @@ type Principal struct {
 	// +required
 	Principal string `json:"principal"`
 
+	// If this is a cross-org principal.
+	//
+	// +optional
+	// +default=false
+	CrossOrg *bool `json:"crossOrg,omitempty"`
+
 	// Provider config for accepting the share
 	//
 	// +optional
-	ProviderConfig xpv1.Reference `json:"providerConfig,omitempty"`
+	ProviderConfigRef xpv1.Reference `json:"providerConfigRef,omitempty"`
 }
 
 type Resource string

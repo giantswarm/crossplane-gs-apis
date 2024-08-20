@@ -23,7 +23,6 @@ var (
 )
 
 func init() {
-	SchemeBuilder.Register(&VpcNetwork{}, &VpcNetworkList{})
 	SchemeBuilder.Register(&SubnetSet{}, &SubnetSetList{})
 	SchemeBuilder.Register(&Peering{}, &PeeringList{})
 	SchemeBuilder.Register(&PeeredVpcNetwork{}, &PeeredVpcNetworkList{})

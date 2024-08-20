@@ -40,6 +40,11 @@ type TransitGatewaySpec struct {
 	// +optional
 	LocalVpc TransitGatewayVpc `json:"localVpc,omitempty"`
 
+	// Resource Access Management (RAM)
+	//
+	// +optional
+	RAM RAM `json:"ram,omitempty"`
+
 	// Contains details about the remote VPCs
 	//
 	// +optional
@@ -120,11 +125,6 @@ type TransitGatewayParameters struct {
 	// +default=disable
 	MulticastSupport string `json:"multicastSupport,omitempty"`
 
-	// Resource Access Management (RAM)
-	//
-	// +optional
-	RAM RAM `json:"ram,omitempty"`
-
 	// TransitGatewayDefaultRouteTableAssociation. Indicates whether resource
 	// attachments are automatically associated with the default association route table.
 	//
@@ -173,6 +173,11 @@ type TransitGatewayStatus struct {
 	//
 	// +optional
 	RemoteAttachmentIds map[string]string `json:"remoteAttachmentIds,omitempty"`
+
+	// Any prefix list ARNs that are shared
+	//
+	// +optional
+	SharedPrefixLists []string `json:"sharedPrefixLists,omitempty"`
 
 	// The ARN of the Transit Gateway.
 	//
@@ -259,6 +264,11 @@ type TransitGatewayNamedVpc struct {
 }
 
 type TransitGatewayVpc struct {
+	// Account ID the VPC is in
+	//
+	// +optional
+	AccountId string `json:"accountId"`
+
 	// Cidr blocks for the VPC
 	//
 	// +optional
@@ -329,26 +339,6 @@ type PrefixList struct {
 	Outbound bool `json:"outbound"`
 
 	ManagedPrefixListSubParameters `json:",inline"`
-}
-
-// Resource Access Management (RAM)
-type RAM struct {
-	// Is RAM enabled
-	//
-	// +optional
-	// +default=false
-	Enabled bool `json:"enabled"`
-
-	// Do we allow external principles with this ram
-	//
-	// +optional
-	// +default=false
-	AllowExternalPrincipals bool `json:"allowExternalPrincipals"`
-
-	// Principals that are allowed to access the resource
-	//
-	// +optional
-	Principals []string `json:"principals"`
 }
 
 // Repository type metadata.

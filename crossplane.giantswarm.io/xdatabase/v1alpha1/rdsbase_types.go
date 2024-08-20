@@ -93,6 +93,11 @@ type RdsBaseStatus struct {
 	// +optional
 	ConnectionSecret *string `json:"connectionSecret,omitempty"`
 
+	// ProvisionedSecrets is the connection secrets created by the SQL provider
+	//
+	// +optional
+	ProvisionedSecrets RdsProvisioningConnectionSecrets `json:"provisionedSecrets,omitempty"`
+
 	// ClusterIdentifier is the identifier of the DB cluster.
 	//
 	// +optional

@@ -84,6 +84,23 @@ type RdsProvisioningStatus struct {
 	//
 	// +optional
 	Ready bool `json:"ready,omitempty"`
+
+	// Connection secrets created for the databases
+	//
+	// +optional
+	ConnectionSecrets RdsProvisioningConnectionSecrets `json:"connectionSecrets,omitempty"`
+}
+
+type RdsProvisioningConnectionSecrets struct {
+	// The name of the secret created specifically for the app
+	//
+	// +optional
+	App string `json:"app,omitempty"`
+
+	// A map of secret names created for users
+	//
+	// +optional
+	Users map[string]string `json:"users,omitempty"`
 }
 
 // The name of the database to create

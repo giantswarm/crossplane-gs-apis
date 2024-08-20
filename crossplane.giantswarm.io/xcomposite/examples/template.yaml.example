@@ -15,10 +15,11 @@ spec:
   clusterDiscovery:
     clusterName: ${CLUSTER_NAME}
     clusterNamespace: ${PROJECT_NAMESPACE}
-    providerConfigRef:
-      name: kubernetes-read-only-eso-write # This is going to have to be static
-                                           # for now, otherwise the user has to
-                                           # select multiple provider configs
+
+  providerConfigRef:
+    name: kubernetes-read-only-eso-write # This is going to have to be static
+                                         # for now, otherwise the user has to
+                                         # select multiple provider configs
   rdsCacheClusterSpec:
     availabilityZones: ["a", "b", "c"] # Will be auto-discovered based on cluster settings
 
