@@ -499,6 +499,15 @@ Status of this condition; is it currently True, False, or Unknown?
 Type of this condition. At most one of each condition type may apply to
 a resource at any point in time.
 
+#### `.status.ready`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Is the subnetset ready
+
 #### `.status.routeTables`
 
 |Property |Value    |

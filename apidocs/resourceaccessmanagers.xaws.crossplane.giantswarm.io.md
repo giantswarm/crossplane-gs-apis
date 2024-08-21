@@ -5,8 +5,8 @@ description: |
   Custom resource definition (CRD) schema reference page for the ResourceAccessManager resource (resourceaccessmanagers.xaws.crossplane.giantswarm.io), as part of the Giant Swarm Management API documentation.
 weight: 100
 crd:
-  claim_name: ResourceAccessManager
-  claim_name_plural: ram
+  claim_name: ResourceAccessManagerClaim
+  claim_name_plural: resourceaccessmanagerclaims
   default_composition_ref: resource-access-manager
   enforced_composition_ref: resouce-access-manager
   name_camelcase: ResourceAccessManager
@@ -42,9 +42,9 @@ source_repository_ref: main
 <dt class="fullname">Full name:</dt>
 <dd class="fullname">resourceaccessmanagers.xaws.crossplane.giantswarm.io</dd>
 <dt class="claimname">Claim name:</dt>
-<dd class="claimname">ResourceAccessManager</dd>
+<dd class="claimname">ResourceAccessManagerClaim</dd>
 <dt class="claimnamesplural">Claim plural names:</dt>
-<dd class="claimnamesplural">ram</dd>
+<dd class="claimnamesplural">resourceaccessmanagerclaims</dd>
 <dt class="defaultcompositionref">Default composition ref:</dt>
 <dd class="defaultcompositionref">resource-access-manager</dd>
 <dt class="enforcedcompositionref">Enforced composition ref:</dt>
@@ -319,3 +319,12 @@ a resource at any point in time.
 |Required |No|
 
 The ID of the resource access manager.
+
+#### `.status.ready`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Is the resource access manager ready

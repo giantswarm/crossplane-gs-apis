@@ -887,6 +887,21 @@ External Secrets Operator must be installed if this value is set to true
 Enabled Whether or not to enable `external-secrets-operator` object
 deployments using `provider-kubernetes.
 
+#### `.spec.eso.fluxSSASecretName`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+FluxSSASecretName is the name of the secret that contains SSA details
+for each project built with infrastructure components.
+
+This secret will be updated with the name of the current project with
+all hyphens, underscores and dots replaced with an empty string.
+
+This secret must exist in the same namespace as the current project.
+
 #### `.spec.eso.kubernetesSecretStore`
 
 |Property |Value    |
@@ -2118,6 +2133,18 @@ MaxCapacity is the maximum capacity for the database.
 
 MinCapacity is the minimum capacity for the database.
 
+#### `.spec.storageThroughput`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |integer|
+|Required |No|
+
+StorageThroughput is the amount of storage throughput. Only applicable if
+`storageType` is `gp3`
+
+Only applicable if not running in cluster mode
+
 #### `.spec.storageType`
 
 |Property |Value    |
@@ -2378,6 +2405,15 @@ MonitoringRoleArn is the ARN of the monitoring role.
 |Required |No|
 
 port is the port of the database.
+
+#### `.status.ready`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Ready is whether all children are ready.
 
 #### `.status.securityGroupId`
 

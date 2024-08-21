@@ -156,15 +156,6 @@ See the design doc for more information: https://github.com/crossplane/crossplan
 
 Dns support. Indicates whether DNS support is enabled.
 
-#### `.spec.enabled`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-Determines if the TransitGateway should be enabled
-
 #### `.spec.ipv6Support`
 
 |Property |Value    |
@@ -182,43 +173,6 @@ If IPv6 support is enabled for the transit gateway.
 |Required |No|
 
 Contains details about the local VPC (Where the TGW will be built)
-
-#### `.spec.localVpc.additionalRoutes`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-Additional routes to apply to the attachment
-
-#### `.spec.localVpc.additionalRoutes[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-
-#### `.spec.localVpc.additionalRoutes[*].blackhole`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-Is this a blackhole route
-
-#### `.spec.localVpc.additionalRoutes[*].cidrBlock`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |**Yes**|
-
-The CIDR block for the route
 
 #### `.spec.localVpc.cidrBlocks`
 
@@ -266,12 +220,12 @@ Prefix lists for the VPC
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-|Default Value|ipv4|
+|Default Value|IPv4|
 
 Allowed Values:
 
-- ipv4
-- ipv6
+- IPv4
+- IPv6
 
 The address family (ipv4 or ipv6) for the prefix list.
 
@@ -340,15 +294,17 @@ The ID of the prefix list.
 
 The maximum number of entries for the prefix list.
 
-#### `.spec.localVpc.prefixLists[*].tgwAttach`
+#### `.spec.localVpc.prefixLists[*].outbound`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
 
-If this is true, the prefix list will be added to the transit gateway
-route table for the current attachment. Ignored for peering attachments.
+Outbound route
+
+This places it in the ManagedPrefixList attached
+to the outbound route table
 
 #### `.spec.localVpc.region`
 
@@ -483,6 +439,15 @@ should peer with
 
 The Account ID this VPC is associated with
 
+#### `.spec.peers[*].dynamicRouting`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Is Dynamic routing support enabled on this peer
+
 #### `.spec.peers[*].id`
 
 |Property |Value    |
@@ -518,12 +483,12 @@ via this transit gateway.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-|Default Value|ipv4|
+|Default Value|IPv4|
 
 Allowed Values:
 
-- ipv4
-- ipv6
+- IPv4
+- IPv6
 
 The address family (ipv4 or ipv6) for the prefix list.
 
@@ -592,22 +557,24 @@ The ID of the prefix list.
 
 The maximum number of entries for the prefix list.
 
-#### `.spec.peers[*].managedPrefixList[*].tgwAttach`
+#### `.spec.peers[*].managedPrefixList[*].outbound`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
 
-If this is true, the prefix list will be added to the transit gateway
-route table for the current attachment. Ignored for peering attachments.
+Outbound route
+
+This places it in the ManagedPrefixList attached
+to the outbound route table
 
 #### `.spec.peers[*].name`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |string|
-|Required |No|
+|Required |**Yes**|
 
 The name of the peer
 
@@ -687,14 +654,14 @@ reference on every reconcile.
 
 Region the remote transit gateway is located in
 
-#### `.spec.prefixListSupport`
+#### `.spec.peers[*].routeTableId`
 
 |Property |Value    |
 |:--------|:--------|
-|Type     |boolean|
-|Required |No|
+|Type     |string|
+|Required |**Yes**|
 
-If the prefix lists are supported.
+The ID of the remote route table
 
 #### `.spec.providerConfigRef`
 
@@ -953,43 +920,6 @@ Contains details about the remote VPCs
 |Required |No|
 
 
-#### `.spec.remoteVpcs[*].additionalRoutes`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-Additional routes to apply to the attachment
-
-#### `.spec.remoteVpcs[*].additionalRoutes[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-
-#### `.spec.remoteVpcs[*].additionalRoutes[*].blackhole`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-Is this a blackhole route
-
-#### `.spec.remoteVpcs[*].additionalRoutes[*].cidrBlock`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |**Yes**|
-
-The CIDR block for the route
-
 #### `.spec.remoteVpcs[*].cidrBlocks`
 
 |Property |Value    |
@@ -1045,12 +975,12 @@ Prefix lists for the VPC
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-|Default Value|ipv4|
+|Default Value|IPv4|
 
 Allowed Values:
 
-- ipv4
-- ipv6
+- IPv4
+- IPv6
 
 The address family (ipv4 or ipv6) for the prefix list.
 
@@ -1119,15 +1049,17 @@ The ID of the prefix list.
 
 The maximum number of entries for the prefix list.
 
-#### `.spec.remoteVpcs[*].prefixLists[*].tgwAttach`
+#### `.spec.remoteVpcs[*].prefixLists[*].outbound`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
 
-If this is true, the prefix list will be added to the transit gateway
-route table for the current attachment. Ignored for peering attachments.
+Outbound route
+
+This places it in the ManagedPrefixList attached
+to the outbound route table
 
 #### `.spec.remoteVpcs[*].providerConfigRef`
 
@@ -1268,25 +1200,6 @@ The ID of the VPC
 |Required |No|
 
 The tags for the transit gateway.
-
-#### `.spec.transitG1atewayCidrBlocks`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-Transit gateway CIDR blocks. A list of CIDR blocks for the VPCs.
-
-#### `.spec.transitG1atewayCidrBlocks[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
 
 #### `.spec.transitGatewayDefaultRouteTableAssociation`
 
@@ -1447,6 +1360,15 @@ If Resource Access Management is enabled, the ARN of the RAM share
 |Required |No|
 
 If Resource Access Management is enabled, the ID of the RAM share
+
+#### `.status.ready`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Is the transit gateway ready
 
 #### `.status.remoteAttachmentIds`
 

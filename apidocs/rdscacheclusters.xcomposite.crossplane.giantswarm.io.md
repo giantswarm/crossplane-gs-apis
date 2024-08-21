@@ -156,6 +156,26 @@ cluster fails.
 If enabled, NumCacheNodes must be greater than 1. Must be enabled for
 Redis (cluster mode enabled) replication groups.
 
+#### `.spec.cache.azMode`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- single-az
+- cross-az
+
+AzMode specifies the Availability Zone mode of the cluster.
+
+This parameter is only valid when the Engine parameter is memcached.
+For resiliance, we recommend setting the AzMode parameter to cross-az and
+this is the default value. In this mode, the number of nodes must be > 1
+If memcached is selected, the number of nodes will default to 3, one per
+availability zone.
+
 #### `.spec.cache.cacheClusters`
 
 |Property |Value    |
@@ -2877,6 +2897,18 @@ MaxCapacity is the maximum capacity for the database.
 
 MinCapacity is the minimum capacity for the database.
 
+#### `.spec.database.storageThroughput`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |integer|
+|Required |No|
+
+StorageThroughput is the amount of storage throughput. Only applicable if
+`storageType` is `gp3`
+
+Only applicable if not running in cluster mode
+
 #### `.spec.database.storageType`
 
 |Property |Value    |
@@ -3742,43 +3774,6 @@ Subnet tags to apply to all subnetsets
 
 TransitGateway is the transit gateway to attach to the VPC.
 
-#### `.spec.vpc.transitGateway.additionalRoutes`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-Additional routes to apply to the attachment
-
-#### `.spec.vpc.transitGateway.additionalRoutes[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-
-#### `.spec.vpc.transitGateway.additionalRoutes[*].blackhole`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-Is this a blackhole route
-
-#### `.spec.vpc.transitGateway.additionalRoutes[*].cidrBlock`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |**Yes**|
-
-The CIDR block for the route
-
 #### `.spec.vpc.transitGateway.allowPublic`
 
 |Property |Value    |
@@ -3884,7 +3879,7 @@ Dns support. Indicates whether DNS support is enabled.
 |Type     |boolean|
 |Required |No|
 
-Determines if the TransitGateway should be enabled
+Enabled specifies if the transit gateway is enabled.
 
 #### `.spec.vpc.transitGateway.ipv6Support`
 
@@ -3934,6 +3929,15 @@ Peers is a list of transit gateway peers to connect to
 
 The Account ID this VPC is associated with
 
+#### `.spec.vpc.transitGateway.peers[*].dynamicRouting`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Is Dynamic routing support enabled on this peer
+
 #### `.spec.vpc.transitGateway.peers[*].id`
 
 |Property |Value    |
@@ -3943,6 +3947,118 @@ The Account ID this VPC is associated with
 
 The ID of the gateway to peer with
 
+#### `.spec.vpc.transitGateway.peers[*].managedPrefixList`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+ManagedPrefixList contains CIDRs for networks that can be traversed
+via this transit gateway.
+
+#### `.spec.vpc.transitGateway.peers[*].managedPrefixList[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.vpc.transitGateway.peers[*].managedPrefixList[*].addressFamily`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|IPv4|
+
+Allowed Values:
+
+- IPv4
+- IPv6
+
+The address family (ipv4 or ipv6) for the prefix list.
+
+#### `.spec.vpc.transitGateway.peers[*].managedPrefixList[*].blackhole`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If this is a blackhole route
+
+#### `.spec.vpc.transitGateway.peers[*].managedPrefixList[*].entries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The prefix list entries.
+
+#### `.spec.vpc.transitGateway.peers[*].managedPrefixList[*].entries[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.vpc.transitGateway.peers[*].managedPrefixList[*].entries[*].cidr`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
+
+The CIDR block for the prefix list entry.
+
+#### `.spec.vpc.transitGateway.peers[*].managedPrefixList[*].entries[*].description`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The description for the prefix list entry.
+
+#### `.spec.vpc.transitGateway.peers[*].managedPrefixList[*].id`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The ID of the prefix list.
+
+#### `.spec.vpc.transitGateway.peers[*].managedPrefixList[*].maxEntries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |integer|
+|Required |No|
+
+The maximum number of entries for the prefix list.
+
+#### `.spec.vpc.transitGateway.peers[*].managedPrefixList[*].outbound`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Outbound route
+
+This places it in the ManagedPrefixList attached
+to the outbound route table
+
 #### `.spec.vpc.transitGateway.peers[*].name`
 
 |Property |Value    |
@@ -3950,7 +4066,7 @@ The ID of the gateway to peer with
 |Type     |string|
 |Required |**Yes**|
 
-Name of the transit gateway to peer with
+The name of the peer
 
 #### `.spec.vpc.transitGateway.peers[*].providerConfigRef`
 
@@ -4028,6 +4144,15 @@ reference on every reconcile.
 
 Region the remote transit gateway is located in
 
+#### `.spec.vpc.transitGateway.peers[*].routeTableId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The ID of the remote route table
+
 #### `.spec.vpc.transitGateway.prefixList`
 
 |Property |Value    |
@@ -4039,15 +4164,6 @@ Region the remote transit gateway is located in
 
 Prefix lists for the VPC
 
-#### `.spec.vpc.transitGateway.prefixListSupport`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-If the prefix lists are supported.
-
 #### `.spec.vpc.transitGateway.prefixList[*]`
 
 |Property |Value    |
@@ -4055,6 +4171,21 @@ If the prefix lists are supported.
 |Type     |object|
 |Required |No|
 
+
+#### `.spec.vpc.transitGateway.prefixList[*].addressFamily`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|IPv4|
+
+Allowed Values:
+
+- IPv4
+- IPv6
+
+The address family (ipv4 or ipv6) for the prefix list.
 
 #### `.spec.vpc.transitGateway.prefixList[*].blackhole`
 
@@ -4065,14 +4196,73 @@ If the prefix lists are supported.
 
 If this is a blackhole route
 
+#### `.spec.vpc.transitGateway.prefixList[*].entries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The prefix list entries.
+
+#### `.spec.vpc.transitGateway.prefixList[*].entries[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.vpc.transitGateway.prefixList[*].entries[*].cidr`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
+
+The CIDR block for the prefix list entry.
+
+#### `.spec.vpc.transitGateway.prefixList[*].entries[*].description`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The description for the prefix list entry.
+
 #### `.spec.vpc.transitGateway.prefixList[*].id`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |string|
-|Required |**Yes**|
+|Required |No|
 
 The ID of the prefix list.
+
+#### `.spec.vpc.transitGateway.prefixList[*].maxEntries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |integer|
+|Required |No|
+
+The maximum number of entries for the prefix list.
+
+#### `.spec.vpc.transitGateway.prefixList[*].outbound`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Outbound route
+
+This places it in the ManagedPrefixList attached
+to the outbound route table
 
 #### `.spec.vpc.transitGateway.prefixLists`
 
@@ -4093,6 +4283,21 @@ Prefix lists for the VPC
 |Required |No|
 
 
+#### `.spec.vpc.transitGateway.prefixLists[*].addressFamily`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|IPv4|
+
+Allowed Values:
+
+- IPv4
+- IPv6
+
+The address family (ipv4 or ipv6) for the prefix list.
+
 #### `.spec.vpc.transitGateway.prefixLists[*].blackhole`
 
 |Property |Value    |
@@ -4102,14 +4307,73 @@ Prefix lists for the VPC
 
 If this is a blackhole route
 
+#### `.spec.vpc.transitGateway.prefixLists[*].entries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The prefix list entries.
+
+#### `.spec.vpc.transitGateway.prefixLists[*].entries[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.vpc.transitGateway.prefixLists[*].entries[*].cidr`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
+
+The CIDR block for the prefix list entry.
+
+#### `.spec.vpc.transitGateway.prefixLists[*].entries[*].description`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The description for the prefix list entry.
+
 #### `.spec.vpc.transitGateway.prefixLists[*].id`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |string|
-|Required |**Yes**|
+|Required |No|
 
 The ID of the prefix list.
+
+#### `.spec.vpc.transitGateway.prefixLists[*].maxEntries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |integer|
+|Required |No|
+
+The maximum number of entries for the prefix list.
+
+#### `.spec.vpc.transitGateway.prefixLists[*].outbound`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Outbound route
+
+This places it in the ManagedPrefixList attached
+to the outbound route table
 
 #### `.spec.vpc.transitGateway.ram`
 
@@ -4171,7 +4435,7 @@ Region this VPC is located in
 |Property |Value    |
 |:--------|:--------|
 |Type     |array|
-|Required |**Yes**|
+|Required |No|
 |Min Items|0|
 |Max Items|Unlimited|
 
@@ -4186,43 +4450,6 @@ RemoteVpcs is a list of VPCs build a transit gateway between
 
 TgwWrappedVpcWithProviderConfig defines the parameters for creating a VPC with
 the option of peered subnets.
-
-#### `.spec.vpc.transitGateway.remoteVpcs[*].additionalRoutes`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-Additional routes to apply to the attachment
-
-#### `.spec.vpc.transitGateway.remoteVpcs[*].additionalRoutes[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-
-#### `.spec.vpc.transitGateway.remoteVpcs[*].additionalRoutes[*].blackhole`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-Is this a blackhole route
-
-#### `.spec.vpc.transitGateway.remoteVpcs[*].additionalRoutes[*].cidrBlock`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |**Yes**|
-
-The CIDR block for the route
 
 #### `.spec.vpc.transitGateway.remoteVpcs[*].allowPublic`
 
@@ -4283,6 +4510,21 @@ Prefix lists for the VPC
 |Required |No|
 
 
+#### `.spec.vpc.transitGateway.remoteVpcs[*].prefixLists[*].addressFamily`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|IPv4|
+
+Allowed Values:
+
+- IPv4
+- IPv6
+
+The address family (ipv4 or ipv6) for the prefix list.
+
 #### `.spec.vpc.transitGateway.remoteVpcs[*].prefixLists[*].blackhole`
 
 |Property |Value    |
@@ -4292,14 +4534,73 @@ Prefix lists for the VPC
 
 If this is a blackhole route
 
+#### `.spec.vpc.transitGateway.remoteVpcs[*].prefixLists[*].entries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The prefix list entries.
+
+#### `.spec.vpc.transitGateway.remoteVpcs[*].prefixLists[*].entries[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.vpc.transitGateway.remoteVpcs[*].prefixLists[*].entries[*].cidr`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Validation|`^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$`|
+
+The CIDR block for the prefix list entry.
+
+#### `.spec.vpc.transitGateway.remoteVpcs[*].prefixLists[*].entries[*].description`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The description for the prefix list entry.
+
 #### `.spec.vpc.transitGateway.remoteVpcs[*].prefixLists[*].id`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |string|
-|Required |**Yes**|
+|Required |No|
 
 The ID of the prefix list.
+
+#### `.spec.vpc.transitGateway.remoteVpcs[*].prefixLists[*].maxEntries`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |integer|
+|Required |No|
+
+The maximum number of entries for the prefix list.
+
+#### `.spec.vpc.transitGateway.remoteVpcs[*].prefixLists[*].outbound`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Outbound route
+
+This places it in the ManagedPrefixList attached
+to the outbound route table
 
 #### `.spec.vpc.transitGateway.remoteVpcs[*].providerConfigRef`
 
@@ -4484,25 +4785,6 @@ SubnetId is a string type that represents the unique identifier for a subnet.
 
 The tags for the transit gateway.
 
-#### `.spec.vpc.transitGateway.transitG1atewayCidrBlocks`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-Transit gateway CIDR blocks. A list of CIDR blocks for the VPCs.
-
-#### `.spec.vpc.transitGateway.transitG1atewayCidrBlocks[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-
 #### `.spec.vpc.transitGateway.transitGatewayDefaultRouteTableAssociation`
 
 |Property |Value    |
@@ -4522,120 +4804,6 @@ attachments are automatically associated with the default association route tabl
 
 TransitGatewayDefaultRouteTablePropagation. Indicates whether resource
 attachments automatically propagate routes to the default propagation route table.
-
-#### `.spec.vpc.transitGateway.transitGatewayPeers`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-TransitGatewayPeers defines other transit gateways that this transit gateway
-should peer with
-
-#### `.spec.vpc.transitGateway.transitGatewayPeers[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-
-#### `.spec.vpc.transitGateway.transitGatewayPeers[*].accountId`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-The Account ID this VPC is associated with
-
-#### `.spec.vpc.transitGateway.transitGatewayPeers[*].id`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |**Yes**|
-
-The ID of the gateway to peer with
-
-#### `.spec.vpc.transitGateway.transitGatewayPeers[*].providerConfigRef`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-ProviderConfigRef references a ProviderConfig used to create this
-resource
-
-If not provided, will fall back to the top-level ProviderConfigRef
-
-Required for cross account transit gateway peering
-
-#### `.spec.vpc.transitGateway.transitGatewayPeers[*].providerConfigRef.name`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |**Yes**|
-
-Name of the referenced object.
-
-#### `.spec.vpc.transitGateway.transitGatewayPeers[*].providerConfigRef.policy`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-Policies for referencing.
-
-#### `.spec.vpc.transitGateway.transitGatewayPeers[*].providerConfigRef.policy.resolution`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-|Default Value|Required|
-
-Allowed Values:
-
-- Required
-- Optional
-
-Resolution specifies whether resolution of this reference is required.
-The default is 'Required', which means the reconcile will fail if the
-reference cannot be resolved. 'Optional' means this reference will be
-a no-op if it cannot be resolved.
-
-#### `.spec.vpc.transitGateway.transitGatewayPeers[*].providerConfigRef.policy.resolve`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-Allowed Values:
-
-- Always
-- IfNotPresent
-
-Resolve specifies when this reference should be resolved. The default
-is 'IfNotPresent', which will attempt to resolve the reference only when
-the corresponding field is not present. Use 'Always' to resolve the
-reference on every reconcile.
-
-#### `.spec.vpc.transitGateway.transitGatewayPeers[*].region`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-Region the remote transit gateway is located in
 
 #### `.spec.vpc.transitGateway.vpcId`
 
@@ -4913,6 +5081,15 @@ RdsSubnets is the list of subnets to be used by the database
 |Type     |string|
 |Required |No|
 
+
+#### `.status.ready`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Is the composition complete
 
 #### `.status.vpc`
 

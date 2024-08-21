@@ -146,6 +146,26 @@ cluster's nodes will be created.
 |Required |No|
 
 
+#### `.spec.azMode`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- single-az
+- cross-az
+
+AzMode specifies the Availability Zone mode of the cluster.
+
+This parameter is only valid when the Engine parameter is memcached.
+For resiliance, we recommend setting the AzMode parameter to cross-az and
+this is the default value. In this mode, the number of nodes must be > 1
+If memcached is selected, the number of nodes will default to 3, one per
+availability zone.
+
 #### `.spec.cacheClusters`
 
 |Property |Value    |
@@ -712,6 +732,21 @@ External Secrets Operator must be installed if this value is set to true
 
 Enabled Whether or not to enable `external-secrets-operator` object
 deployments using `provider-kubernetes.
+
+#### `.spec.eso.fluxSSASecretName`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+FluxSSASecretName is the name of the secret that contains SSA details
+for each project built with infrastructure components.
+
+This secret will be updated with the name of the current project with
+all hyphens, underscores and dots replaced with an empty string.
+
+This secret must exist in the same namespace as the current project.
 
 #### `.spec.eso.kubernetesSecretStore`
 
@@ -1853,6 +1888,15 @@ connections.
 |Required |No|
 
 ReaderEndpoint is the DNS name of the reader endpoint for the cluster.
+
+#### `.status.ready`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Ready is a flag that indicates whether the cluster is ready.
 
 #### `.status.replicationGroupId`
 

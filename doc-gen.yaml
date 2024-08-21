@@ -10,11 +10,7 @@ source_repositories:
     short_name: crossplane-gs-apis
     commit_reference: main
     crd_paths:
-      - crossplane.giantswarm.io/xaws/package/xrds
-      - crossplane.giantswarm.io/xcomposite/package/xrds
-      - crossplane.giantswarm.io/xcache/package/xrds
-      - crossplane.giantswarm.io/xdatabase/package/xrds
-      - crossplane.giantswarm.io/xnetworks/package/xrds
+      - apis
     cr_paths:
       - crossplane.giantswarm.io/xaws/examples
       - crossplane.giantswarm.io/xcomposite/examples
@@ -63,6 +59,14 @@ source_repositories:
           - networks
           - vpc
       rdsbases.xdatabase.crossplane.giantswarm.io:
+        owner:
+          - https://github.com/orgs/giantswarm/teams/team-honeybadger
+        topics:
+          - aws
+          - crossplane
+          - database
+          - rds
+      rdsprovisionings.xdatabase.crossplane.giantswarm.io:
         owner:
           - https://github.com/orgs/giantswarm/teams/team-honeybadger
         topics:

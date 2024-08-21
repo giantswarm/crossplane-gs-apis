@@ -783,43 +783,6 @@ Subnet tags to apply to all subnetsets
 
 TransitGateway is the transit gateway to attach to the VPC.
 
-#### `.spec.transitGateway.additionalRoutes`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-Additional routes to apply to the attachment
-
-#### `.spec.transitGateway.additionalRoutes[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-
-#### `.spec.transitGateway.additionalRoutes[*].blackhole`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-Is this a blackhole route
-
-#### `.spec.transitGateway.additionalRoutes[*].cidrBlock`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |**Yes**|
-
-The CIDR block for the route
-
 #### `.spec.transitGateway.allowPublic`
 
 |Property |Value    |
@@ -925,7 +888,7 @@ Dns support. Indicates whether DNS support is enabled.
 |Type     |boolean|
 |Required |No|
 
-Determines if the TransitGateway should be enabled
+Enabled specifies if the transit gateway is enabled.
 
 #### `.spec.transitGateway.ipv6Support`
 
@@ -975,6 +938,15 @@ Peers is a list of transit gateway peers to connect to
 
 The Account ID this VPC is associated with
 
+#### `.spec.transitGateway.peers[*].dynamicRouting`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Is Dynamic routing support enabled on this peer
+
 #### `.spec.transitGateway.peers[*].id`
 
 |Property |Value    |
@@ -1010,12 +982,12 @@ via this transit gateway.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-|Default Value|ipv4|
+|Default Value|IPv4|
 
 Allowed Values:
 
-- ipv4
-- ipv6
+- IPv4
+- IPv6
 
 The address family (ipv4 or ipv6) for the prefix list.
 
@@ -1084,15 +1056,17 @@ The ID of the prefix list.
 
 The maximum number of entries for the prefix list.
 
-#### `.spec.transitGateway.peers[*].managedPrefixList[*].tgwAttach`
+#### `.spec.transitGateway.peers[*].managedPrefixList[*].outbound`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
 
-If this is true, the prefix list will be added to the transit gateway
-route table for the current attachment. Ignored for peering attachments.
+Outbound route
+
+This places it in the ManagedPrefixList attached
+to the outbound route table
 
 #### `.spec.transitGateway.peers[*].name`
 
@@ -1179,6 +1153,15 @@ reference on every reconcile.
 
 Region the remote transit gateway is located in
 
+#### `.spec.transitGateway.peers[*].routeTableId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The ID of the remote route table
+
 #### `.spec.transitGateway.prefixList`
 
 |Property |Value    |
@@ -1189,15 +1172,6 @@ Region the remote transit gateway is located in
 |Max Items|Unlimited|
 
 Prefix lists for the VPC
-
-#### `.spec.transitGateway.prefixListSupport`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-If the prefix lists are supported.
 
 #### `.spec.transitGateway.prefixList[*]`
 
@@ -1213,12 +1187,12 @@ If the prefix lists are supported.
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-|Default Value|ipv4|
+|Default Value|IPv4|
 
 Allowed Values:
 
-- ipv4
-- ipv6
+- IPv4
+- IPv6
 
 The address family (ipv4 or ipv6) for the prefix list.
 
@@ -1287,15 +1261,17 @@ The ID of the prefix list.
 
 The maximum number of entries for the prefix list.
 
-#### `.spec.transitGateway.prefixList[*].tgwAttach`
+#### `.spec.transitGateway.prefixList[*].outbound`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
 
-If this is true, the prefix list will be added to the transit gateway
-route table for the current attachment. Ignored for peering attachments.
+Outbound route
+
+This places it in the ManagedPrefixList attached
+to the outbound route table
 
 #### `.spec.transitGateway.prefixLists`
 
@@ -1322,12 +1298,12 @@ Prefix lists for the VPC
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-|Default Value|ipv4|
+|Default Value|IPv4|
 
 Allowed Values:
 
-- ipv4
-- ipv6
+- IPv4
+- IPv6
 
 The address family (ipv4 or ipv6) for the prefix list.
 
@@ -1396,15 +1372,17 @@ The ID of the prefix list.
 
 The maximum number of entries for the prefix list.
 
-#### `.spec.transitGateway.prefixLists[*].tgwAttach`
+#### `.spec.transitGateway.prefixLists[*].outbound`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
 
-If this is true, the prefix list will be added to the transit gateway
-route table for the current attachment. Ignored for peering attachments.
+Outbound route
+
+This places it in the ManagedPrefixList attached
+to the outbound route table
 
 #### `.spec.transitGateway.ram`
 
@@ -1466,7 +1444,7 @@ Region this VPC is located in
 |Property |Value    |
 |:--------|:--------|
 |Type     |array|
-|Required |**Yes**|
+|Required |No|
 |Min Items|0|
 |Max Items|Unlimited|
 
@@ -1481,43 +1459,6 @@ RemoteVpcs is a list of VPCs build a transit gateway between
 
 TgwWrappedVpcWithProviderConfig defines the parameters for creating a VPC with
 the option of peered subnets.
-
-#### `.spec.transitGateway.remoteVpcs[*].additionalRoutes`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-Additional routes to apply to the attachment
-
-#### `.spec.transitGateway.remoteVpcs[*].additionalRoutes[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-
-#### `.spec.transitGateway.remoteVpcs[*].additionalRoutes[*].blackhole`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-Is this a blackhole route
-
-#### `.spec.transitGateway.remoteVpcs[*].additionalRoutes[*].cidrBlock`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |**Yes**|
-
-The CIDR block for the route
 
 #### `.spec.transitGateway.remoteVpcs[*].allowPublic`
 
@@ -1584,12 +1525,12 @@ Prefix lists for the VPC
 |:--------|:--------|
 |Type     |string|
 |Required |No|
-|Default Value|ipv4|
+|Default Value|IPv4|
 
 Allowed Values:
 
-- ipv4
-- ipv6
+- IPv4
+- IPv6
 
 The address family (ipv4 or ipv6) for the prefix list.
 
@@ -1658,15 +1599,17 @@ The ID of the prefix list.
 
 The maximum number of entries for the prefix list.
 
-#### `.spec.transitGateway.remoteVpcs[*].prefixLists[*].tgwAttach`
+#### `.spec.transitGateway.remoteVpcs[*].prefixLists[*].outbound`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |boolean|
 |Required |No|
 
-If this is true, the prefix list will be added to the transit gateway
-route table for the current attachment. Ignored for peering attachments.
+Outbound route
+
+This places it in the ManagedPrefixList attached
+to the outbound route table
 
 #### `.spec.transitGateway.remoteVpcs[*].providerConfigRef`
 
@@ -1851,25 +1794,6 @@ SubnetId is a string type that represents the unique identifier for a subnet.
 
 The tags for the transit gateway.
 
-#### `.spec.transitGateway.transitG1atewayCidrBlocks`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-Transit gateway CIDR blocks. A list of CIDR blocks for the VPCs.
-
-#### `.spec.transitGateway.transitG1atewayCidrBlocks[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-
 #### `.spec.transitGateway.transitGatewayDefaultRouteTableAssociation`
 
 |Property |Value    |
@@ -2021,6 +1945,15 @@ Status of this condition; is it currently True, False, or Unknown?
 
 Type of this condition. At most one of each condition type may apply to
 a resource at any point in time.
+
+#### `.status.ready`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Is the network ready
 
 #### `.status.subnetBits`
 
