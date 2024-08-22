@@ -1,0 +1,11 @@
+apiVersion: aws.upbound.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: crossplane-golem-tgw
+spec:
+  assumeRoleChain:
+  - roleARN: arn:aws:iam::242036376510:role/crossplane-tgw-management
+  credentials:
+    source: WebIdentity
+    webIdentity:
+      roleARN: arn:aws:iam::242036376510:role/crossplane-assume-role

@@ -70,6 +70,12 @@ spec:
                       name:
                         description: Name is the name of the user.
                         type: string
+                      privileges:
+                        description: Privileges is a list of privileges to grant to
+                          the user.
+                        items:
+                          type: string
+                        type: array
                     required:
                     - name
                     type: object

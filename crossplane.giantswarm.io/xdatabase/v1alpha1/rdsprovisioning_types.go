@@ -138,6 +138,11 @@ type SqlUser struct {
 	//
 	// +optional
 	ConfigurationParameters map[string]*string `json:"configurationParameters,omitempty"`
+
+	// Privileges is a list of privileges to grant to the user.
+	//
+	// +optional
+	Privileges []string `json:"privileges,omitempty"`
 }
 
 // A list of SqlUser objects to use for the database

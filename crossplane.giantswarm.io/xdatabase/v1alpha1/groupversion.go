@@ -25,4 +25,5 @@ var (
 func init() {
 	SchemeBuilder.Register(&RdsBase{}, &RdsBaseList{})
 	SchemeBuilder.Register(&RdsProvisioning{}, &RdsProvisioningList{})
+	SchemeBuilder.Register(&RdsLogicalDatabase{}, &RdsLogicalDatabaseList{})
 }

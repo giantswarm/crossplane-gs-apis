@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: postgresql-client
-  namespace: org-presales-lutz
+  namespace: default
   labels:
     app: postgresql-client
   annotations:
