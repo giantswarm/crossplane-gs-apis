@@ -1341,6 +1341,11 @@ func (in *RdsLogicalDatabaseSpec) DeepCopyInto(out *RdsLogicalDatabaseSpec) {
 	*out = *in
 	in.ResourceSpec.DeepCopyInto(&out.ResourceSpec)
 	in.RdsLogicalDatabaseParameters.DeepCopyInto(&out.RdsLogicalDatabaseParameters)
+	if in.Eso != nil {
+		in, out := &in.Eso, &out.Eso
+		*out = new(eso.Eso)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.KubernetesProviderConfig != nil {
 		in, out := &in.KubernetesProviderConfig, &out.KubernetesProviderConfig
 		*out = new(v1.Reference)

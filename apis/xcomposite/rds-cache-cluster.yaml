@@ -327,7 +327,7 @@ spec:
           }
 
           # AppName here must be all lowercase with all symbols removed
-          appName = regex.replace(get(oxr, "spec.claimRef.name", ""), "[-_\.]", "_").lower()
+          appName = get(oxr, "spec.claimRef.name", "")
           dp = get(oxr, "spec.deletionPolicy", "Delete")
           mgmtPolicy = get(oxr, "spec.managementPolicies", [])
           namespace = get(oxr, "spec.claimRef.namespace", "default")
@@ -372,10 +372,11 @@ spec:
                               "apiVersion": "external-secrets.io/v1beta1",
                               "kind": "ExternalSecret",
                               "metadata": {
+                                  "name": "cc${appName}-flux-ssa",
                                   "namespace": namespace,
                               },
                               "spec": {
-                                  "refreshInterval": "1h",
+                                  "refreshInterval": "1m",
                                   "secretStoreRef": {
                                       "name": get(oxr, "spec.eso.kubernetesSecretStore", ""),
                                       "kind": "SecretStore",
@@ -392,12 +393,14 @@ spec:
                                   "target": {
                                       "name": ssasecret,
                                       "creationPolicy": "Orphan",
+                                      "deletionPolicy": "Merge",
                                       "template": {
                                           "engineVersion": "v2",
                                           "mergePolicy": "Merge",
                                           "data": {
                                               "${ssasecret}": "",
-                                              "${appName}" = '{{ "Merge" | b64enc }}',
+                                              _name = regex.replace(appName, "[-_\.]", "_").lower()
+                                              "${_name}" = "{{ \"Merge\" | b64enc }}",
                                           },
                                       }
                                   }
@@ -405,9 +408,7 @@ spec:
                           }
                       }
                       "managementPolicies": mgmtPolicy,
-                      "providerConfigRef": {
-                          "name": get(oxr, "spec.kubernetesProviderConfig.name", "")
-                      }
+                      "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"}),
                   }
               }
               for _ in [True]
@@ -509,7 +510,7 @@ spec:
           }
 
           # AppName here must be all lowercase with all symbols removed
-          appName = regex.replace(get(oxr, "spec.claimRef.name", ""), "[-_\.]", "_").lower()
+          appName = get(oxr, "spec.claimRef.name", "")
           dp = get(oxr, "spec.deletionPolicy", "Delete")
           mgmtPolicy = get(oxr, "spec.managementPolicies", [])
           namespace = get(oxr, "spec.claimRef.namespace", "default")
@@ -592,23 +593,22 @@ spec:
           # cb.ToPatch("status.rdsConnectionSecret", "status.connectionSecret"),
 
           cacheConnectionSecret = ocdsstatus("cache-base", "userSecrets.app", ocdsstatus("cache-base", "connectionSecret", ""))
+          print("ESO", cacheConnectionSecret)
           rdsConnectionSecret = ocdsstatus("rds-base", "provisionedSecrets.app", ocdsstatus("rds-base", "connectionSecret", ""))
-
+          print("ESO", rdsConnectionSecret)
           newdxr = {
-              **dxr,
+              **oxr,
               **{
                   "status" = {
                       "ready" = allReady(),
-
-                      if allReady():
-                          "cacheConnectionSecret" = cacheConnectionSecret,
-                          "rdsConnectionSecret" = rdsConnectionSecret,
+                      "cacheConnectionSecret" = cacheConnectionSecret,
+                      "rdsConnectionSecret" = rdsConnectionSecret,
                   },
               },
           }
 
           items = [
-              k for _, k in [_dbPatch, _cachePatch, newdxr] if k
+              k for k in [_dbPatch, _cachePatch, newdxr] if k
           ]
         target: ""
     step: function-kcl-dynamic-patch

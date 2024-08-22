@@ -94,274 +94,127 @@ spec:
 
           dp = get(oxr, "spec.deletionPolicy", "Delete")
           pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
-
-          e = get(oxr, "spec.engine", False)
-          _engine = ""
-
-          if e and e in ["mysql", "aurora-mysql", "mariadb"]:
-              _engine = "mysql"
-          elif e and e in ["postgres", "aurora-postgresql"]:
-              _engine = "postgresql"
-          else:
-              assert False, "Unsupported engine: ${e}"
-
+          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
+          namespace = get(oxr, "spec.claimRef.namespace", "")
           appName = get(oxr, "spec.claimRef.name", "")
-          connectionSecret = get(oxr, "spec.connectionSecretName", "")
-          _requiredDatabases = {}
+          labels = get(oxr, "metadata.labels", {})
 
-          if _engine == "mysql":
-              _requiredDatabases = get(oxr, "spec.databases", {}) | {
-                  "${appName}": {
-                      "name": appName,
-                      "users": [
-                          {
-                              "name": appName,
-                              "maxQueriesPerHour": 1000,
-                              "maxUpdatesPerHour": 1000,
-                              "maxConnectionsPerHour": 100,
-                              "maxUserConnections": 10,
-                              "privileges" = [
-                                  "ALL PRIVILEGES",
-                              ],
-                          }
-                      ]
+          esoEnabled = get(oxr, "spec.eso.enabled", False)
+          ssasecret = get(oxr, "spec.eso.fluxSSASecretName", False)
+          # The resource created here is to enable switching Flux SSA from `Ignore` to
+          # `Merge`.
+          #
+          # This allows Flux to ignore the creation of resources until the related
+          # infrastructure has been created and is ready.
+          #
+          # To enable this, Any resources created by Flux kustomization should have the
+          # annotation `kustomize.toolkit.fluxcd.io/ssa: ${PROJECT_NAME_SSA:=Ignore}`.
+          #
+          # This will then force SSA to `Ingore` the resource by default.
+          #
+          # Next, the flux kusomization should have its `postBuild` set up like follows:
+          #
+          # ```yaml
+          # postBuild:
+          #   substitute:
+          #     var_substitution_enabled: "true"
+          #   substituteFrom:
+          #   - kind: Secret
+          #     name: flux-project-ssa
+          # ```
+          fluxSSA = {
+              "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+              "kind": "Object"
+              "metadata": {
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name" = "${appName}-externalsecret"
+                      "krm.kcl.dev/ready": readystr("${appName}-externalsecret")
                   }
               }
-
-          if _engine == "postgresql":
-              _requiredDatabases = get(oxr, "spec.databases", {}) | {
-                  "${appName}": {
-                      "name": appName,
-                      "users": [
-                          {
-                              "name": appName,
-                              "connectionLimit": 10,
-                              "privileges" = [
-                                  "ALL",
+              "spec": {
+                  "deletionPolicy": dp,
+                  "forProvider": {
+                      "manifest": {
+                          "apiVersion": "external-secrets.io/v1beta1",
+                          "kind": "ExternalSecret",
+                          "metadata": {
+                              "name": "lg${ssasecret}",
+                              "namespace": namespace,
+                          },
+                          "spec": {
+                              "refreshInterval": "1m",
+                              "secretStoreRef": {
+                                  "name": get(oxr, "spec.eso.kubernetesSecretStore", ""),
+                                  "kind": "SecretStore",
+                              },
+                              "dataFrom": [
+                                  {
+                                      "find": {
+                                          "name": {
+                                              "regexp": "^${ssasecret}$",
+                                          },
+                                      },
+                                  },
                               ],
-                              "bypassRls": False,
-                              "createDb": False,
-                              "createRole": False,
-                              "inherit": True,
-                              "login": True,
-                              "replication": False,
-                              "superuser": False,
-                          }
-                      ]
-                  }
-              }
-
-          # Create provider connection secret for the database
-          newPcrName = "${appName}-${_engine}-provider-config"
-
-          providerConnectionSecret = [
-              {
-                  _resourceName = "${_engine}-connection-secret"
-                  "apiVersion": "kubernetes.crossplane.io/v1alpha2"
-                  "kind": "Object"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready": readystr(_resourceName)
-                      }
-                      "name": newPcrName
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "providerConfigRef": {
-                          "name": get(oxr, "spec.kubernetesProviderConfig.name", "")
-                      }
-                      "forProvider": {
-                          "manifest": {
-                              "apiVersion": "${_engine}.sql.crossplane.io/v1alpha1"
-                              "kind": "ProviderConfig"
-                              "metadata": {
-                                  "name": newPcrName
-                              }
-                              "spec": {
-                                  "credentials": {
-                                      "connectionSecretRef": {
-                                          "name": connectionSecret
-                                          "namespace": get(oxr, "spec.claimRef.namespace", "")
-                                      }
-                                      "source": "MySQLConnectionSecret" if _engine == "mysql" else "PostgreSQLConnectionSecret"
+                              "target": {
+                                  "name": ssasecret,
+                                  "creationPolicy": "Orphan",
+                                  "deletionPolicy": "Merge"
+                                  "template": {
+                                      "engineVersion": "v2",
+                                      "mergePolicy": "Merge",
+                                      "data": {
+                                          "${ssasecret}": "",
+                                          "${appName}" = "{{ \"Merge\" | b64enc }}",
+                                      },
                                   }
-                                  if _engine == "mysql":
-                                      "tls" = "preferred"
-                                  if _engine == "postgresql":
-                                      "defaultDatabase" = "postgres"
-                                      # https://github.com/crossplane-contrib/provider-sql/issues/102
-                                      "sslMode" = "require"
                               }
                           }
                       }
                   }
+                  "managementPolicies": mgmtPolicy,
+                  "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"}),
               }
-          ] if all_true([
-              connectionSecret, _requiredDatabases,
-          ]) else []
+          } if all_true([
+              esoEnabled,
+              ssasecret,
+              ready("${appName}-rds-provisioning"),
+          ]) else {}
 
-          _providerConfigName = get(oxr, "spec.providerConfigRef.name", "")
-          providerConfigName = newPcrName if connectionSecret else _providerConfigName
-          # Create each required database
-          databases = [
-              {
-                  _resourceName = "database-${database}"
-                  "apiVersion": "${_engine}.sql.crossplane.io/v1alpha1"
-                  "kind": "Database"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready": readystr(_resourceName)
-                      }
-                      "name": database
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "providerConfigRef": {
-                          "name": providerConfigName
-                      }
-                      "forProvider": {}
+          print("fluxSSA", ssasecret, "esoEnabled", esoEnabled, "ready", ready("${appName}-rds-provisioning"))
+
+          esoConnectionSecret = get(oxr, "status.esoConnectionSecret", False)
+          sqlEnabled = get(oxr, "spec.provisionSql.enabled", True)
+
+          provisioning = {
+              apiVersion: "xdatabase.crossplane.giantswarm.io/v1alpha1"
+              kind: "RdsProvisioning"
+              metadata: {
+                  annotations: {
+                      _resourceName = "${appName}-rds-provisioning"
+                      "krm.kcl.dev/composition-resource-name": _resourceName
+                      "krm.kcl.dev/ready": readystr(_resourceName)
                   }
               }
-
-              for database, _ in _requiredDatabases
-              if _requiredDatabases
-          ]
-
-          # Create each required user
-          users = [
-              {
-                  _resourceName = "${database}-user-${user.name}"
-                  "apiVersion": "${_engine}.sql.crossplane.io/v1alpha1"
-                  "kind": "User" if _engine == "mysql" else "Role"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready": readystr(_resourceName)
-                      }
-                      "labels": {
-                          "engine": _engine
-                          "database": database
-                          "username": user.name
-                      }
-                      "name": user.name
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "forProvider": {
-                          if _engine == "mysql":
-                              "resourceOptions": {
-                                  "maxQueriesPerHour": get(user, "maxQueriesPerHour", 1000)
-                                  "maxUpdatesPerHour": get(user, "maxUpdatesPerHour", 1000)
-                                  "maxConnectionsPerHour": get(user, "maxConnectionsPerHour", 100)
-                                  "maxUserConnections": get(user, "maxUserConnections", 10)
-                              }
-                          if _engine == "postgresql":
-                              if get(user, "configurationParameters", False):
-                                  "configurationParameters": [
-                                      {
-                                          "name": k
-                                          "value": v
-                                      }
-                                      for k, v in get(user, "configurationParameters", {})
-                                  ]
-                              "connectionLimit": get(user, "connectionLimit", 10)
-                              "privileges": {
-                                  "bypassRls": get(user, "bypassRls", False)
-                                  "createDb": get(user, "createDb", False)
-                                  "createRole": get(user, "createRole", False)
-                                  "inherit": get(user, "inherit", True)
-                                  "login": get(user, "login", True)
-                                  "replication": get(user, "replication", False)
-                                  "superUser": get(user, "superuser", False)
-                              }
-                      }
-                      "providerConfigRef": {
-                          "name": providerConfigName
-                      }
-                      "writeConnectionSecretToRef": {
-                          "name": "${appName}-rds-user-${user.name}" if user.name != appName else "${appName}-rds-user"
-                          "namespace": get(oxr, "spec.claimRef.namespace", "")
-                      }
-                  }
+              spec: {
+                  "deletionPolicy": dp,
+                  "engine": get(oxr, "spec.engine", "postgres")
+                  "claimRef": get(oxr, "spec.claimRef", {})
+                  "providerConfigRef": get(oxr, "spec.providerConfigRef", {"name": "default"})
+                  "databases": get(oxr, "spec.databases", {})
+                  "kubernetesProviderConfig": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+                  "managementPolicies": mgmtPolicy,
               }
+          } if all_true([
+              get(oxr, "spec.providerConfigRef", True),
+              get(oxr, "spec.databases", True),
+          ]) else {}
 
-              for database, config in _requiredDatabases
-              for _, user in get(config, "users", [])
-              if _requiredDatabases and databases
-          ]
-
-          connectionSecrets = {
-              "app" = "${appName}-rds-user"
-              "users" = {
-                  user.name: "${appName}-rds-user-${user.name}"
-                  for database, config in _requiredDatabases
-                  for _, user in get(config, "users", [])
-                  if user.name != appName
-              }
-          }
-
-          grants = [
-              {
-                  _resourceName = "${database}-grant-${user.name}"
-                  "apiVersion": "${_engine}.sql.crossplane.io/v1alpha1"
-                  "kind": "Grant"
-                  "metadata": {
-                      "annotations": {
-                          "krm.kcl.dev/composition-resource-name": _resourceName
-                          "krm.kcl.dev/ready": readystr(_resourceName)
-                      }
-                      "labels": {
-                          "engine": _engine
-                          "database": database
-                          "username": user.name
-                      }
-                      "name": user.name
-                  }
-                  "spec": {
-                      "deletionPolicy": dp
-                      "providerConfigRef": {
-                          "name": providerConfigName
-                      }
-                      "forProvider": {
-                          "database" = database,
-                          "privileges" = get(user, "privileges", []),
-                          if _engine == "mysql":
-                              "user" = user.name
-                          if _engine == "postgresql":
-                              "role": user.name
-                      }
-                  }
-              }
-              for database, config in _requiredDatabases
-              for _, user in get(config, "users", [])
-              if all_true([
-                  _requiredDatabases,
-                  databases,
-                  users,
-                  user,
-                  get(user, "privileges", False),
-              ])
-          ]
-
-          newdxr = {
-              **dxr,
-              **{
-                  "status": {
-                      "ready" = allReady()
-                      "connectionSecrets" = connectionSecrets,
-                  },
-              },
-          }
-
-          provisionSql = get(oxr, "spec.provisionSql", True)
           _items = [
-              i for r in [
-                  providerConnectionSecret, databases,
-                  users, grants, [newdxr],
-              ]
-              for i in r if i and provisionSql
+              i for i in [
+                  fluxSSA,
+                  provisioning,
+              ] if i
           ]
 
           items = _items

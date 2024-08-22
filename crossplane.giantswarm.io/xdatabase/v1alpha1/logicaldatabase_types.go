@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/giantswarm/crossplane-gs-apis/pkg/eso"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -39,6 +40,11 @@ type RdsLogicalDatabaseSpec struct {
 	// Sets the parameters for the provisioning
 	RdsLogicalDatabaseParameters `json:",inline"`
 
+	// Eso is the configuration for the external secrets operator
+	//
+	// +optional
+	Eso *eso.Eso `json:"eso,omitempty"`
+
 	// KubernetesProviderConfig is the provider config for the Kubernetes provider.
 	//
 	// +required
@@ -49,7 +55,7 @@ type RdsLogicalDatabaseSpec struct {
 type RdsLogicalDatabaseParameters struct {
 	// Databases is a map of databases to create.
 	//
-	// +required
+	// +optional
 	Databases map[DatabaseName]SqlUsers `json:"databases,omitempty"`
 
 	// The type of database engine being provisioned

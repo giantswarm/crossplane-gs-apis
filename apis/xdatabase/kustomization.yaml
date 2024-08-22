@@ -3,6 +3,6 @@ resources:
 - xdatabase.crossplane.giantswarm.io_rdsbases.yaml
 - rds-base.yaml
 - xdatabase.crossplane.giantswarm.io_rdsprovisionings.yaml
-- logical-database-yaml
+- logical-database.yaml
 - xdatabase.crossplane.giantswarm.io_rdslogicaldatabases.yaml
 

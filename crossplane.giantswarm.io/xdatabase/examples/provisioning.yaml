@@ -1,43 +1,14 @@
 apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
-kind: RdsProvisioning
+kind: LogicalDatabaseClaim
 metadata:
-  annotations:
-    crossplane.io/composition-resource-name: cloudtest-cluster-tgw-rds-provisioning
-  labels:
-    crossplane.io/claim-name: cloudtest-cluster-tgw
-    crossplane.io/claim-namespace: default
-    crossplane.io/composite: cloudtest-cluster-tgw-drj2c
-  name: cloudtest-cluster-tgw-drj2c-hhcpm
+  name: test-logical-database
 spec:
-  claimRef:
-    apiVersion: xcomposite.crossplane.giantswarm.io/v1alpha1
-    kind: RCCWithRegionLookupClaim
-    name: cloudtest-cluster-tgw
-    namespace: default
-  compositionRef:
-    name: rds-provisioning
-  compositionRevisionRef:
-    name: rds-provisioning-a10392c
-  compositionUpdatePolicy: Automatic
-  connectionSecretName: cloudtest-cluster-tgw-rds-master
-  deletionPolicy: Delete
-  engine: aurora-postgresql
+  eso:
+    enabled: true
+    fluxSSASecretName: fluxssa
+    kubernetesSecretStore: default
+  engine: aurora-mysql
   kubernetesProviderConfig:
     name: default
-  managementPolicies:
-  - '*'
   providerConfigRef:
-    name: default
-  resourceRefs:
-  - apiVersion: kubernetes.crossplane.io/v1alpha2
-    kind: Object
-    name: cloudtest-cluster-tgw-postgresql-provider-config
-  - apiVersion: postgresql.sql.crossplane.io/v1alpha1
-    kind: Database
-    name: cloudtest-cluster-tgw
-  - apiVersion: postgresql.sql.crossplane.io/v1alpha1
-    kind: Grant
-    name: cloudtest-cluster-tgw
-  - apiVersion: postgresql.sql.crossplane.io/v1alpha1
-    kind: Role
-    name: cloudtest-cluster-tgw
+    name: cloudtest-aurora-mysql-tgw-mysql-provider-config

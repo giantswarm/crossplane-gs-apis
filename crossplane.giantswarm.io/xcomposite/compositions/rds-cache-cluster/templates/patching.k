@@ -75,21 +75,20 @@ _cachePatch = {
 # cb.ToPatch("status.rdsConnectionSecret", "status.connectionSecret"),
 
 cacheConnectionSecret = ocdsstatus("cache-base", "userSecrets.app", ocdsstatus("cache-base", "connectionSecret", ""))
+print("ESO", cacheConnectionSecret)
 rdsConnectionSecret = ocdsstatus("rds-base", "provisionedSecrets.app", ocdsstatus("rds-base", "connectionSecret", ""))
-
+print("ESO", rdsConnectionSecret)
 newdxr = {
-    **dxr,
+    **oxr,
     **{
         "status" = {
             "ready" = allReady(),
-
-            if allReady():
-                "cacheConnectionSecret" = cacheConnectionSecret,
-                "rdsConnectionSecret" = rdsConnectionSecret,
+            "cacheConnectionSecret" = cacheConnectionSecret,
+            "rdsConnectionSecret" = rdsConnectionSecret,
         },
     },
 }
 
 items = [
-    k for _, k in [_dbPatch, _cachePatch, newdxr] if k
+    k for k in [_dbPatch, _cachePatch, newdxr] if k
 ]

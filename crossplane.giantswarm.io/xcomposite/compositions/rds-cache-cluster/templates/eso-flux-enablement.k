@@ -1,4 +1,3 @@
-
 ssasecret = get(oxr, "spec.eso.fluxSSASecretName", "")
 # The resource created here is to enable switching Flux SSA from `Ignore` to
 # `Merge`.
@@ -38,10 +37,11 @@ _items = [
                     "apiVersion": "external-secrets.io/v1beta1",
                     "kind": "ExternalSecret",
                     "metadata": {
+                        "name": "cc${appName}-flux-ssa",
                         "namespace": namespace,
                     },
                     "spec": {
-                        "refreshInterval": "1h",
+                        "refreshInterval": "1m",
                         "secretStoreRef": {
                             "name": get(oxr, "spec.eso.kubernetesSecretStore", ""),
                             "kind": "SecretStore",
@@ -58,12 +58,14 @@ _items = [
                         "target": {
                             "name": ssasecret,
                             "creationPolicy": "Orphan",
+                            "deletionPolicy": "Merge",
                             "template": {
                                 "engineVersion": "v2",
                                 "mergePolicy": "Merge",
                                 "data": {
                                     "${ssasecret}": "",
-                                    "${appName}" = '{{ "Merge" | b64enc }}',
+                                    _name = regex.replace(appName, "[-_\.]", "_").lower()
+                                    "${_name}" = "{{ \"Merge\" | b64enc }}",
                                 },
                             }
                         }
@@ -71,9 +73,7 @@ _items = [
                 }
             }
             "managementPolicies": mgmtPolicy,
-            "providerConfigRef": {
-                "name": get(oxr, "spec.kubernetesProviderConfig.name", "")
-            }
+            "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"}),
         }
     }
     for _ in [True]

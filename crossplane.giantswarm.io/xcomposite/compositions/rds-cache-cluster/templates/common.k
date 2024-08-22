@@ -73,7 +73,7 @@ allReady = lambda -> bool {
 }
 
 # AppName here must be all lowercase with all symbols removed
-appName = regex.replace(get(oxr, "spec.claimRef.name", ""), "[-_\.]", "_").lower()
+appName = get(oxr, "spec.claimRef.name", "")
 dp = get(oxr, "spec.deletionPolicy", "Delete")
 mgmtPolicy = get(oxr, "spec.managementPolicies", [])
 namespace = get(oxr, "spec.claimRef.namespace", "default")

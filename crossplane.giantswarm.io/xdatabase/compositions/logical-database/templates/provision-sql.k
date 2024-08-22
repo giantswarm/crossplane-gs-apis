@@ -1,5 +1,6 @@
 
-ssasecret = get(oxr, "spec.eso.fluxSSASecretName", "")
+esoEnabled = get(oxr, "spec.eso.enabled", False)
+ssasecret = get(oxr, "spec.eso.fluxSSASecretName", False)
 # The resource created here is to enable switching Flux SSA from `Ignore` to
 # `Merge`.
 #
@@ -37,10 +38,11 @@ fluxSSA = {
                 "apiVersion": "external-secrets.io/v1beta1",
                 "kind": "ExternalSecret",
                 "metadata": {
+                    "name": "lg${ssasecret}",
                     "namespace": namespace,
                 },
                 "spec": {
-                    "refreshInterval": "1h",
+                    "refreshInterval": "1m",
                     "secretStoreRef": {
                         "name": get(oxr, "spec.eso.kubernetesSecretStore", ""),
                         "kind": "SecretStore",
@@ -57,12 +59,14 @@ fluxSSA = {
                     "target": {
                         "name": ssasecret,
                         "creationPolicy": "Orphan",
+                        "deletionPolicy": "Merge"
                         "template": {
                             "engineVersion": "v2",
                             "mergePolicy": "Merge",
                             "data": {
                                 "${ssasecret}": "",
-                                "${appName}" = '{{ "Merge" | b64enc }}',
+                                _name = regex.replace(appName, "[-_\.]", "_").lower()
+                                "${_name}" = "{{ \"Merge\" | b64enc }}",
                             },
                         }
                     }
@@ -70,17 +74,16 @@ fluxSSA = {
             }
         }
         "managementPolicies": mgmtPolicy,
-        "providerConfigRef": {
-            "name": get(oxr, "spec.kubernetesProviderConfig.name", "")
-        }
+        "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"}),
     }
 } if all_true([
-    get(oxr, "spec.eso.enabled", False),
-    get(oxr, "spec.eso.fluxSSASecretName", False),
+    esoEnabled,
+    ssasecret,
     ready("${appName}-rds-provisioning"),
 ]) else {}
 
-esoEnabled = get(oxr, "spec.eso.enabled", False)
+print("fluxSSA", ssasecret, "esoEnabled", esoEnabled, "ready", ready("${appName}-rds-provisioning"))
+
 esoConnectionSecret = get(oxr, "status.esoConnectionSecret", False)
 sqlEnabled = get(oxr, "spec.provisionSql.enabled", True)
 
