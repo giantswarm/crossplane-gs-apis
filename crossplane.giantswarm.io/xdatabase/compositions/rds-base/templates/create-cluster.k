@@ -67,7 +67,10 @@ cluster = {
                 "clusterMembers": oxr.spec.clusterMembers
             if get(oxr, "spec.databaseName", False):
                 "databaseName": oxr.spec.databaseName
-            if get(oxr, "spec.dbClusterInstanceClass", False):
+            if all_true([
+                get(oxr, "spec.dbClusterInstanceClass", False),
+                not get(oxr, "spec.engine", "").startswith("aurora"),
+            ]):
                 "dbClusterInstanceClass": oxr.spec.dbClusterInstanceClass
             if get(oxr, "spec.dbClusterParameterGroup.name", False):
                 "dbClusterParameterGroupName": oxr.spec.dbClusterParameterGroup.name
