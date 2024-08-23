@@ -67,6 +67,7 @@ type RdsProvisioningParameters struct {
 	// Databases is a map of databases to create.
 	//
 	// +optional
+	// +mapType=atomic
 	Databases map[DatabaseName]SqlUsers `json:"databases,omitempty"`
 
 	// The type of database engine being provisioned
@@ -127,11 +128,6 @@ type SecretReference struct {
 //
 // +kubebuilder:pruning:PreserveUnknownFields
 type SqlUser struct {
-	// Name is the name of the user.
-	//
-	// +required
-	Name *string `json:"name"`
-
 	// ConfigurationParameters is the configuration parameters for the user.
 	//
 	// Only applicable for postgresql databases
@@ -147,8 +143,8 @@ type SqlUser struct {
 
 // A list of SqlUser objects to use for the database
 //
-// +listType=atomic
-type SqlUsers []*SqlUser
+// +mapType=atomic
+type SqlUsers map[string]SqlUser
 
 // Repository type metadata.
 var (

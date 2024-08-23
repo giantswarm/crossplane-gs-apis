@@ -12,47 +12,61 @@ appName = get(oxr, "spec.claimRef.name", "")
 connectionSecret = get(oxr, "spec.connectionSecretName", "")
 _requiredDatabases = {}
 
+defaultDatabase = {
+    "${appName}" = {
+        "${appName}" = {}
+    }
+}
+
 if _engine == "mysql":
-    _requiredDatabases = get(oxr, "spec.databases", {}) | {
-        "${appName}": {
-            "name": appName,
-            "users": [
-                {
-                    "name": appName,
-                    "maxQueriesPerHour": 1000,
-                    "maxUpdatesPerHour": 1000,
-                    "maxConnectionsPerHour": 100,
-                    "maxUserConnections": 10,
-                    "privileges" = [
-                        "ALL PRIVILEGES",
-                    ],
+    _requiredDatabases = {
+        "${dbName}": {
+            "users": {
+                "${username}": {
+                    **{
+                        "maxQueriesPerHour": 1000,
+                        "maxUpdatesPerHour": 1000,
+                        "maxConnectionsPerHour": 100,
+                        "maxUserConnections": 10,
+                        "privileges" = [
+                            "ALL PRIVILEGES",
+                        ],
+                    },
+                    **user,
                 }
-            ]
+                for username, user in dbUsers
+            }
         }
+        for dbName, dbUsers in defaultDatabase | get(oxr, "spec.databases", {})
     }
 
 if _engine == "postgresql":
-    _requiredDatabases = get(oxr, "spec.databases", {}) | {
-        "${appName}": {
-            "name": appName,
-            "users": [
-                {
-                    "name": appName,
-                    "connectionLimit": 10,
-                    "privileges" = [
-                        "ALL",
-                    ],
-                    "bypassRls": False,
-                    "createDb": False,
-                    "createRole": False,
-                    "inherit": True,
-                    "login": True,
-                    "replication": False,
-                    "superuser": False,
+    _requiredDatabases = {
+        "${dbName}": {
+            "users": {
+                "${username}": {
+                    **{
+                        "connectionLimit": 10,
+                        "privileges" = [
+                            "ALL",
+                        ],
+                        "bypassRls": False,
+                        "createDb": False,
+                        "createRole": False,
+                        "inherit": True,
+                        "login": True,
+                        "replication": False,
+                        "superuser": False,
+                    },
+                    **user,
                 }
-            ]
+                for username, user in dbUsers
+            }
         }
+        for dbName, dbUsers in defaultDatabase | get(oxr, "spec.databases", {})
     }
+
+print("REQUIRED DATABASES", _requiredDatabases)
 
 # Create provider connection secret for the database
 newPcrName = "${appName}-${_engine}-provider-config"
@@ -135,7 +149,7 @@ databases = [
 # Create each required user
 users = [
     {
-        _resourceName = "${database}-user-${user.name}"
+        _resourceName = "${database}-user-${username}"
         "apiVersion": "${_engine}.sql.crossplane.io/v1alpha1"
         "kind": "User" if _engine == "mysql" else "Role"
         "metadata": {
@@ -146,9 +160,9 @@ users = [
             "labels": {
                 "engine": _engine
                 "database": database
-                "username": user.name
+                "username": username
             }
-            "name": user.name
+            "name": username
         }
         "spec": {
             "deletionPolicy": dp
@@ -181,33 +195,33 @@ users = [
                     }
             }
             "providerConfigRef": {
-                "name": providerConfigName
+                "name": providerConfigName,
             }
             "writeConnectionSecretToRef": {
-                "name": "${appName}-rds-user-${user.name}" if user.name != appName else "${appName}-rds-user"
+                "name": "${appName}-rds-user-${username}" if username != appName else "${appName}-rds-user"
                 "namespace": get(oxr, "spec.claimRef.namespace", "")
             }
         }
     }
 
     for database, config in _requiredDatabases
-    for _, user in get(config, "users", [])
+    for username, user in get(config, "users", [])
     if _requiredDatabases and databases
 ]
 
 connectionSecrets = {
     "app" = "${appName}-rds-user"
     "users" = {
-        user.name: "${appName}-rds-user-${user.name}"
+        username: "${appName}-rds-user-${username}"
         for database, config in _requiredDatabases
-        for _, user in get(config, "users", [])
-        if user.name != appName
+        for username, user in get(config, "users", [])
+        if username != appName
     }
 }
 
 grants = [
     {
-        _resourceName = "${database}-grant-${user.name}"
+        _resourceName = "${database}-grant-${username}"
         "apiVersion": "${_engine}.sql.crossplane.io/v1alpha1"
         "kind": "Grant"
         "metadata": {
@@ -218,9 +232,9 @@ grants = [
             "labels": {
                 "engine": _engine
                 "database": database
-                "username": user.name
+                "username": username
             }
-            "name": user.name
+            "name": username
         }
         "spec": {
             "deletionPolicy": dp
@@ -231,14 +245,14 @@ grants = [
                 "database" = database,
                 "privileges" = get(user, "privileges", []),
                 if _engine == "mysql":
-                    "user" = user.name
+                    "user" = username
                 if _engine == "postgresql":
-                    "role": user.name
+                    "role": username
             }
         }
     }
     for database, config in _requiredDatabases
-    for _, user in get(config, "users", [])
+    for username, user in get(config, "users", [])
     if all_true([
         _requiredDatabases,
         databases,

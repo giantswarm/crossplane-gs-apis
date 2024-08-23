@@ -33,8 +33,7 @@ spec:
             properties:
               databases:
                 additionalProperties:
-                  description: A list of SqlUser objects to use for the database
-                  items:
+                  additionalProperties:
                     description: |-
                       Defines a user to create in the database
 
@@ -55,21 +54,17 @@ spec:
 
                           Only applicable for postgresql databases
                         type: object
-                      name:
-                        description: Name is the name of the user.
-                        type: string
                       privileges:
                         description: Privileges is a list of privileges to grant to
                           the user.
                         items:
                           type: string
                         type: array
-                    required:
-                    - name
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
-                  type: array
-                  x-kubernetes-list-type: atomic
+                  description: A list of SqlUser objects to use for the database
+                  type: object
+                  x-kubernetes-map-type: atomic
                 description: Databases is a map of databases to create.
                 type: object
               deletionPolicy:

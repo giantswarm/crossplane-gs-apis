@@ -165,7 +165,8 @@ spec:
                                       "mergePolicy": "Merge",
                                       "data": {
                                           "${ssasecret}": "",
-                                          "${appName}" = "{{ \"Merge\" | b64enc }}",
+                                          _name = regex.replace(appName, "[-_\.]", "_").lower()
+                                          "${_name}" = "{{ \"Merge\" | b64enc }}",
                                       },
                                   }
                               }
