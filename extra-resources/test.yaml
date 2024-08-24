@@ -1,0 +1,23 @@
+apiVersion: external-secrets.io/v1beta1
+kind: SecretStore
+metadata:
+  name: default
+  namespace: org-demotech
+spec:
+  provider:
+    kubernetes:
+      auth:
+        cert:
+          clientCert:
+            name: demotech-rds-sa
+            key: "tls.crt"
+          clientKey:
+            name: demotech-rds-sa
+            key: "tls.key"
+      remoteNamespace: org-demotech
+      server:
+        caProvider:
+          key: "tls.crt"
+          name: demotech-rds-ca
+          type: Secret
+        url: kubernetes.default

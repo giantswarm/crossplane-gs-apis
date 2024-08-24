@@ -81,6 +81,7 @@ passwords = [
                                         "target": "Data",
                                         "literal": """
                                             host: ${_endpoint}
+                                            reader: ${readerep}
                                             port: ${_port}
                                             username: ${user}
                                             password:  {{ .password }}
@@ -153,6 +154,7 @@ esoConnectionSecret = {
                                     "target": "Data",
                                     "literal": """
                                         host: ${_endpoint}
+                                        reader: ${readerep}
                                         port: ${_port}
                                         username: ${appName}
                                         password:  {{ index . "password" }}
@@ -176,7 +178,83 @@ esoConnectionSecret = {
     }
 } if _endpoint and _port else {}
 
+pushSecretStores = [
+    {
+        "name": store.secretStore,
+        "clusterScoped": True,
+    }
+    for _, store in get(oxr, "spec.eso.stores", [])
+    if get(oxr, "spec.eso.enabled", True) and store.enabled
+]
+deletionPolicy = "Delete" if dp == "Delete" else "Retain"
+
+pushSecretData = [
+    {
+        conversionStrategy: "None"
+        match: {
+            secretKey: k,
+            remoteRef: {
+                remoteKey: k
+            }
+        }
+    }
+    for _, k in [
+        "host", "reader", "port", "password", "username",
+    ]
+    if _endpoint and _port
+]
+
+# Push Secrets
+pushSecrets = [
+    {
+        "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+        "kind": "Object"
+        "metadata": {
+            "annotations": {
+                "krm.kcl.dev/composition-resource-name" = "${appName}-pushsecret"
+                "krm.kcl.dev/ready": readystr("${appName}-pushsecret")
+            }
+        }
+        "spec": {
+            "deletionPolicy": dp
+            "forProvider": {
+                "manifest": {
+                    "apiVersion": "external-secrets.io/v1alpha1"
+                    "kind": "PushSecret"
+                    "metadata": {
+                        "namespace": get(oxr, "spec.claimRef.namespace", "default")
+                    }
+                    "spec": {
+                        "refreshInterval": "10s"
+                        "secretStoreRefs": [
+                            {
+                                "name": value.name
+                                "kind": "ClusterSecretStore" if value.clusterScoped else "SecretStore"
+                            }
+                            for _, value in pushSecretStores
+                        ]
+                        "data": pushSecretData
+                        "deletionPolicy": deletionPolicy
+                        "selector": {
+                            "secret": {
+                                "name": get(password, "spec.forProvider.manifest.spec.target.name", "")
+                            }
+                        }
+                        updatePolicy: "Replace"
+                    }
+                }
+            }
+            "managementPolicies": mgmtPolicy,
+            "providerConfigRef": {
+                name: get(oxr, "spec.kubernetesProviderConfig.name", "")
+            }
+        }
+    }
+    for _, password in passwords
+    if pushSecretStores and get(oxr, "spec.eso.enabled", True)
+]
+
 _items = [
-    c for c in passwords + [passwordGenerator, esoConnectionSecret]
+    c for c in passwords + [passwordGenerator, esoConnectionSecret] + pushSecrets
     if esoEnabled and c
 ]

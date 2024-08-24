@@ -1,8 +1,9 @@
 package main
 
 import (
-	"crossbuilder/v1alpha1"
 	"strings"
+
+	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xcomposite/v1alpha1"
 
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 	xpt "github.com/crossplane-contrib/function-patch-and-transform/input/v1beta1"

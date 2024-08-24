@@ -1,8 +1,7 @@
 package main
 
 import (
-	// "github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
-	"crossbuilder/v1alpha1"
+	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 
 	xpt "github.com/crossplane-contrib/function-patch-and-transform/input/v1beta1"
 	xnd "github.com/giantswarm/crossplane-fn-network-discovery/pkg/input/v1beta1"

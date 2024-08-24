@@ -84,6 +84,12 @@ getwparentfb = lambda x: {:}, p: {:}, y: str, z: str, d: any -> any {
 
 appName = get(oxr, "spec.claimRef.name", "")
 claimRef = get(oxr, "spec.claimRef", {})
+
+cidrs = [
+    ocdsstatus("ipam-${i}", "cidr", "") if get(oxr, "spec.subnetsets.useIpam", False) else get(s, "prefix", "")
+    for i, s in get(oxr, "spec.subnetsets.cidrs", []) if s
+]
+
 dp = get(oxr, "spec.deletionPolicy", "Delete")
 labels = get(oxr, "metadata.labels", {})
 peeringEnabled = get(oxr, "spec.peering.enabled", False)

@@ -44,6 +44,14 @@ type ClusterDiscovery struct {
 	//
 	// +required
 	Namespace string `json:"namespace"`
+
+	// RemoteNamespace is the namespace on the remote cluster to
+	// apply secrets into. If not specified, the default namespace
+	// is used.
+	//
+	// +optional
+	// +default="default"
+	RemoteNamespace string `json:"remoteNamespace"`
 }
 
 // RCCWithRegionLookupSpec contains the structure required for building the
@@ -166,6 +174,11 @@ type RCCWithRegionLookupStatus struct {
 	//
 	// +optional
 	RdsSubnets []string `json:"rdsSubnets,omitempty"`
+
+	// The API server endpoint for the tenant cluster
+	//
+	// +optional
+	TenantApiServerEndpoint string `json:"tenantApiServerEndpoint,omitempty"`
 
 	// Vpc is a VPC configuration to bind the cluster to
 	//

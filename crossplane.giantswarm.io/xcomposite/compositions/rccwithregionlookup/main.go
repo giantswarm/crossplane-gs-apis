@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crossbuilder/v1alpha1"
+	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xcomposite/v1alpha1"
 
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 	xpt "github.com/crossplane-contrib/function-patch-and-transform/input/v1beta1"
@@ -159,6 +159,7 @@ func createResources() []xpt.ComposedTemplate {
 				cb.FromPatch("spec.clusterDiscovery.name", "spec.forProvider.manifest.metadata.name"),
 				cb.FromPatch("spec.clusterDiscovery.namespace", "spec.forProvider.manifest.metadata.namespace"),
 				cb.FromPatch("spec.kubernetesProviderConfigRef", "spec.providerConfigRef"),
+				cb.ToPatch("status.tenantApiServerEndpoint", "status.atProvider.spec.manifest.spec.controlPlaneEndpoint.host"),
 			},
 		},
 		{
@@ -178,6 +179,7 @@ func createResources() []xpt.ComposedTemplate {
 				cb.FromPatch("spec.kubernetesProviderConfig", "spec.kubernetesProviderConfig"),
 				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
 				cb.FromPatch("spec.managementPolicies", "spec.managementPolicies"),
+				cb.FromPatch("status.tenantApiServerEndpoint", "spec.tenantApiServerEndpoint"),
 
 				{
 					Type: xpt.PatchTypeFromCompositeFieldPath,

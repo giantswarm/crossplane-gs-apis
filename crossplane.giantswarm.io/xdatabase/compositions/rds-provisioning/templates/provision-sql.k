@@ -66,8 +66,6 @@ if _engine == "postgresql":
         for dbName, dbUsers in defaultDatabase | get(oxr, "spec.databases", {})
     }
 
-print("REQUIRED DATABASES", _requiredDatabases)
-
 # Create provider connection secret for the database
 newPcrName = "${appName}-${_engine}-provider-config"
 
@@ -260,6 +258,93 @@ grants = [
         user,
         get(user, "privileges", False),
     ])
+]
+
+# Push Secrets
+
+pushSecretData = [
+    {
+        "conversionStrategy": "None"
+        "match": {
+            "secretKey": k,
+            "remoteRef": {
+                "remoteKey": k
+            }
+        }
+    }
+    for _, k in [
+        "endpoint", "port", "password", "username",
+    ]
+]
+
+reader = get(oxr, "spec.readerEndpoint", "")
+
+pushSecrets = [
+    {
+        _name = get(user, "spec.writeConnectionSecretToRef.name", "")
+        "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+        "kind": "Object"
+        "metadata": {
+            "annotations": {
+                _resourceName = "${_name}-pushsecret"
+                "krm.kcl.dev/composition-resource-name" = _resourceName
+                "krm.kcl.dev/ready": readystr(_resourceName)
+            }
+        }
+        "spec": {
+            "deletionPolicy": dp
+            "forProvider": {
+                "manifest": {
+                    "apiVersion": "external-secrets.io/v1alpha1"
+                    "kind": "PushSecret"
+                    "metadata": {
+                        "namespace": get(oxr, "spec.claimRef.namespace", "default")
+                    }
+                    "spec": {
+                        "refreshInterval": "10s"
+                        "secretStoreRefs": [
+                            {
+                                "name": value.name
+                                "kind": "ClusterSecretStore" if value.clusterScoped else "SecretStore"
+                            }
+                            for _, value in get(oxr, "spec.eso.stores", [])
+                        ]
+                        "target": {
+                            "name": _name,
+                            "template": {
+                                "engineVersion": "v2"
+                                "templateFrom": [
+                                    {
+                                        "target": "Data"
+                                        "literal": """
+                                            "endpoint": "{{ .endpoint }}"
+                                            "port": "{{ .port }}"
+                                            "password": "{{ .password }}"
+                                            "reader": "{{ \"${reader}\" | b64enc }}"
+                                            "username": "{{ .username }}"
+                                        """
+                                    }
+                                ]
+                            }
+                        }
+                        "deletionPolicy": "Delete" if dp == "Delete" else "Retain"
+                        "selector": {
+                            "secret": {
+                                "name": _name
+                            }
+                        }
+                        "updatePolicy": "Replace"
+                    }
+                }
+            }
+            "managementPolicies": mgmtPolicy,
+            "providerConfigRef": {
+                "name": get(oxr, "spec.kubernetesProviderConfig.name", "")
+            }
+        }
+    }
+    for _, user in users
+    if get(oxr, "spec.eso.enabled", True)
 ]
 
 newdxr = {

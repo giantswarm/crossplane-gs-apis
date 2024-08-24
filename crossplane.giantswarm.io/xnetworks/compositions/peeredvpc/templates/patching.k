@@ -80,11 +80,11 @@ vpcLookup = {
     ]
 }
 
-cidrs = [
-    s.prefix
-    for s in get(oxr, "spec.subnetsets.cidrs", [])
+ipamEnabled = any_true([
+    get(s, "useIpam", False)
+    for _, s in get(oxr, "spec.subnetsets.cidrs", [])
     if s
-]
+])
 
 azl = len(get(oxr, "spec.availabilityZones", []))
 

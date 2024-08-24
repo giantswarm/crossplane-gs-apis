@@ -1465,6 +1465,11 @@ func (in *RdsProvisioningParameters) DeepCopyInto(out *RdsProvisioningParameters
 		*out = new(string)
 		**out = **in
 	}
+	if in.ReaderEndpoint != nil {
+		in, out := &in.ReaderEndpoint, &out.ReaderEndpoint
+		*out = new(string)
+		**out = **in
+	}
 	if in.Databases != nil {
 		in, out := &in.Databases, &out.Databases
 		*out = make(map[DatabaseName]SqlUsers, len(*in))
@@ -1505,6 +1510,11 @@ func (in *RdsProvisioningSpec) DeepCopyInto(out *RdsProvisioningSpec) {
 	*out = *in
 	in.ResourceSpec.DeepCopyInto(&out.ResourceSpec)
 	in.RdsProvisioningParameters.DeepCopyInto(&out.RdsProvisioningParameters)
+	if in.ESO != nil {
+		in, out := &in.ESO, &out.ESO
+		*out = new(eso.Eso)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.KubernetesProviderConfig != nil {
 		in, out := &in.KubernetesProviderConfig, &out.KubernetesProviderConfig
 		*out = new(v1.Reference)

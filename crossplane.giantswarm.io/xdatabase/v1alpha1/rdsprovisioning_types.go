@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/giantswarm/crossplane-gs-apis/pkg/eso"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -33,11 +34,23 @@ type RdsProvisioningList struct {
 }
 
 // RdsProvisioningSpec defines the desired state of RdsProvisioning
+//
+// One of `providerConfigRef` or `connectionSecretName` must be provided.
+//
+// If `providerConfigRef` is not provided, the composition will create a
+// provider config using the connectionSecretName.
+//
+// +kubebuilder:validation:XValitation:rule="self.providerConfigRef != null || self.connectionSecretName != null",message="One of providerConfigRef or connectionSecretName must be provided"
 type RdsProvisioningSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
 
 	// Sets the parameters for the provisioning
 	RdsProvisioningParameters `json:",inline"`
+
+	// ESO configuration
+	//
+	// +optional
+	ESO *eso.Eso `json:"eso,omitempty"`
 
 	// KubernetesProviderConfig is the provider config for the Kubernetes provider.
 	//
@@ -64,6 +77,11 @@ type RdsProvisioningParameters struct {
 	// +optional
 	ConnectionSecretName *string `json:"connectionSecretName,omitempty"`
 
+	// Reader Endpoint is the endpoint to use for read operations
+	//
+	// +optional
+	ReaderEndpoint *string `json:"readerEndpoint,omitempty"`
+
 	// Databases is a map of databases to create.
 	//
 	// +optional
@@ -74,6 +92,7 @@ type RdsProvisioningParameters struct {
 	//
 	// +optional
 	// +default="postgres"
+	// +kubebuilder:validation:Enum=postgres;mysql;aurora-mysql;aurora-postgres;mariadb
 	Engine *string `json:"engine,omitempty"`
 }
 

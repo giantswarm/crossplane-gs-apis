@@ -40,10 +40,15 @@ type Eso struct {
 	// +default="default"
 	KubernetesSecretStore *string `json:"kubernetesSecretStore,omitempty"`
 
+	// Tenant Cluster details
+	//
+	// +optional
+	TenantCluster TenantCluster `json:"tenantCluster,omitempty"`
+
 	// Stores is a list of secret stores to use for push secrets.
 	//
 	// +optional
-	Stores []*SecretsStore `json:"stores,omitempty"`
+	Stores []SecretsStore `json:"stores,omitempty"`
 }
 
 // SecretsStore is a reference to a secrets store to be passed to External
@@ -68,4 +73,35 @@ type SecretsStore struct {
 	// +optional
 	// +default=false
 	IsClusterSecretStore *bool `json:"isClusterSecretStore,omitempty"`
+}
+
+// TenantCluster is the configuration for the tenant cluster.
+//
+// +kubebuilder:object:root=false
+// +kubebuilder:object:generate=true
+// +kubebuilder:validation:XValidation:rule="self.enabled == true && self.namespace != null",message="namespace must be set when enabled is true"
+// +kubebuilder:validation:XValidation:rule="self.enabled == true && self.apiServerEndpoint != null",message="apiServerEndpoint must be set when enabled is true"
+// +kubebuilder:validation:XValidation:rule="self.enabled == true && self.clusterName != null",message="clusterName must be set when enabled is true"
+type TenantCluster struct {
+	// Enabled Whether or not to enable `external-secrets-operator` object
+	// deployments using `provider-kubernetes.
+	//
+	// +optional
+	// +default=false
+	Enabled *bool `json:"enabled"`
+
+	// The namespace to deploy the external secrets operator in.
+	//
+	// +optional
+	Namespace string `json:"namespace,omitempty"`
+
+	// The API endpoint for the tenant cluster.
+	//
+	// +optional
+	ApiServerEndpoint string `json:"apiServerEndpoint,omitempty"`
+
+	// The name of the tenant cluster.
+	//
+	// +optional
+	ClusterName string `json:"clusterName,omitempty"`
 }
