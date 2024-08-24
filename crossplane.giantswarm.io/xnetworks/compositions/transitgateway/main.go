@@ -16,6 +16,8 @@ type builder struct{}
 
 var Builder = builder{}
 
+var TemplateBasePath string
+
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
 		GroupVersionKind: v1alpha1.TransitGatewayGroupVersionKind,
@@ -46,44 +48,46 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		kclResourcesTemplate string
 	)
 
-	kclCommon, err = build.LoadTemplate("compositions/transitgateway/templates/common.k")
+	build.SetBasePath(TemplateBasePath)
+
+	kclCommon, err = build.LoadTemplate("templates/common.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclLocalTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/local.k")
+	kclLocalTemplate, err = build.LoadTemplate("templates/local.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclPatchingTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/patching.k")
+	kclPatchingTemplate, err = build.LoadTemplate("templates/patching.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclPeeringTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/peering.k")
+	kclPeeringTemplate, err = build.LoadTemplate("templates/peering.k")
 	if err != nil {
 		panic(err)
 	}
 
 	// The RAM template is now shared between TGW and PeeredVpc
 	// We store it in the peeredvpc composition as the primary source
-	kclRamTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/ram.k")
+	kclRamTemplate, err = build.LoadTemplate("../peeredvpc/templates/ram.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclResourcesTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/resources.k")
+	kclResourcesTemplate, err = build.LoadTemplate("templates/resources.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclRemoteTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/remote.k")
+	kclRemoteTemplate, err = build.LoadTemplate("templates/remote.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclTgwConfigTemplate, err = build.LoadTemplate("compositions/transitgateway/templates/tgw-config.k")
+	kclTgwConfigTemplate, err = build.LoadTemplate("templates/tgw-config.k")
 	if err != nil {
 		panic(err)
 	}

@@ -14,6 +14,8 @@ type builder struct{}
 
 var Builder = builder{}
 
+var TemplateBasePath string
+
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
 		GroupVersionKind: v1alpha1.SubnetSetGroupVersionKind,
@@ -36,7 +38,9 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		kclSubnetSetsTemplate string
 	)
 
-	kclSubnetSetsTemplate, err = build.LoadTemplate("compositions/subnetsets/templates/subnetsets.k")
+	build.SetBasePath(TemplateBasePath)
+
+	kclSubnetSetsTemplate, err = build.LoadTemplate("templates/subnetsets.k")
 	if err != nil {
 		panic(err)
 	}

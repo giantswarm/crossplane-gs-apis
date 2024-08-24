@@ -97,6 +97,9 @@ spec:
         - fromFieldPath: spec.kubernetesProviderConfigRef
           toFieldPath: spec.providerConfigRef
           type: FromCompositeFieldPath
+        - fromFieldPath: status.atProvider.spec.manifest.spec.controlPlaneEndpoint.host
+          toFieldPath: status.tenantApiServerEndpoint
+          type: ToCompositeFieldPath
       - base:
           apiVersion: xcomposite.crossplane.giantswarm.io/v1alpha1
           kind: RdsCacheCluster
@@ -127,6 +130,8 @@ spec:
               subnetsets:
                 cidrs: null
                 function: ""
+                ipam: false
+                poolName: ""
               tags: {}
               transitGateway:
                 accountId: ""
@@ -142,7 +147,21 @@ spec:
                 subnetIds: null
                 vpcId: ""
           status:
-            vpc: {}
+            vpc:
+              additionalCidrBlocks: null
+              cidrBlock: ""
+              id: ""
+              internetGateway: ""
+              natGateways: null
+              privateRouteTables: null
+              privateSubnets: null
+              providerConfig: ""
+              publicRouteTables: null
+              publicSubnets: null
+              region: ""
+              securityGroups: null
+              transitGateways: null
+              vpcPeeringConnections: null
         name: rds-cache-cluster
         patches:
         - fromFieldPath: spec.rdsCacheClusterParameters
@@ -162,6 +181,9 @@ spec:
           type: FromCompositeFieldPath
         - fromFieldPath: spec.managementPolicies
           toFieldPath: spec.managementPolicies
+          type: FromCompositeFieldPath
+        - fromFieldPath: status.tenantApiServerEndpoint
+          toFieldPath: spec.tenantApiServerEndpoint
           type: FromCompositeFieldPath
         - fromFieldPath: status.region
           policy:

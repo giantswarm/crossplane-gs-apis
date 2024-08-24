@@ -451,11 +451,14 @@ spec:
                     items:
                       type: string
                     type: array
-                  principles:
+                  principals:
                     description: A list of principals to associate with the resource
                       access manager.
                     items:
                       properties:
+                        crossOrg:
+                          description: If this is a cross-org principal.
+                          type: boolean
                         principal:
                           description: |-
                             The principal to associate with the resource access manager.
@@ -463,7 +466,7 @@ spec:
 
                             Possible values are AWS Account ID, AWS Organization ID, or AWS organizations.
                           type: string
-                        providerConfig:
+                        providerConfigRef:
                           description: Provider config for accepting the share
                           properties:
                             name:

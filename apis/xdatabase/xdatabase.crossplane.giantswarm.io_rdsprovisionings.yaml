@@ -29,7 +29,15 @@ spec:
       openAPIV3Schema:
         properties:
           spec:
-            description: RdsProvisioningSpec defines the desired state of RdsProvisioning
+            description: |-
+              RdsProvisioningSpec defines the desired state of RdsProvisioning
+
+
+              One of `providerConfigRef` or `connectionSecretName` must be provided.
+
+
+              If `providerConfigRef` is not provided, the composition will create a
+              provider config using the connectionSecretName.
             properties:
               connectionSecretName:
                 description: |-
@@ -99,7 +107,90 @@ spec:
                 type: boolean
               engine:
                 description: The type of database engine being provisioned
+                enum:
+                - postgres
+                - mysql
+                - aurora-mysql
+                - aurora-postgres
+                - mariadb
                 type: string
+              eso:
+                description: ESO configuration
+                properties:
+                  enabled:
+                    description: |-
+                      Enabled Whether or not to enable `external-secrets-operator` object
+                      deployments using `provider-kubernetes.
+                    type: boolean
+                  fluxSSASecretName:
+                    description: |-
+                      FluxSSASecretName is the name of the secret that contains SSA details
+                      for each project built with infrastructure components.
+
+
+                      This secret will be updated with the name of the current project with
+                      all hyphens, underscores and dots replaced with an empty string.
+
+
+                      This secret must exist in the same namespace as the current project.
+                    type: string
+                  kubernetesSecretStore:
+                    description: |-
+                      KubernetesSecretStore is the Kubernetes secret store to use.
+
+
+                      The kubernetes secret store is expected to be namespace scoped to prevent
+                      secrets leaking across namespaces.
+                    type: string
+                  stores:
+                    description: Stores is a list of secret stores to use for push
+                      secrets.
+                    items:
+                      description: |-
+                        SecretsStore is a reference to a secrets store to be passed to External
+                        Secrets Operator for creating PushSecrets
+                      properties:
+                        enabled:
+                          description: Enabled is whether the secrets store is enabled.
+                          type: boolean
+                        isClusterSecretStore:
+                          description: IsClusterSecretStore is whether the secret
+                            store is a cluster secret store.
+                          type: boolean
+                        secretStore:
+                          description: SecretStoreName is the name of the secret store.
+                          type: string
+                      required:
+                      - secretStore
+                      type: object
+                    type: array
+                  tenantCluster:
+                    description: Tenant Cluster details
+                    properties:
+                      apiServerEndpoint:
+                        description: The API endpoint for the tenant cluster.
+                        type: string
+                      clusterName:
+                        description: The name of the tenant cluster.
+                        type: string
+                      enabled:
+                        description: |-
+                          Enabled Whether or not to enable `external-secrets-operator` object
+                          deployments using `provider-kubernetes.
+                        type: boolean
+                      namespace:
+                        description: The namespace to deploy the external secrets
+                          operator in.
+                        type: string
+                    type: object
+                    x-kubernetes-validations:
+                    - message: namespace must be set when enabled is true
+                      rule: self.enabled == true && self.namespace != null
+                    - message: apiServerEndpoint must be set when enabled is true
+                      rule: self.enabled == true && self.apiServerEndpoint != null
+                    - message: clusterName must be set when enabled is true
+                      rule: self.enabled == true && self.clusterName != null
+                type: object
               kubernetesProviderConfig:
                 description: KubernetesProviderConfig is the provider config for the
                   Kubernetes provider.
@@ -278,6 +369,9 @@ spec:
                 required:
                 - name
                 type: object
+              readerEndpoint:
+                description: Reader Endpoint is the endpoint to use for read operations
+                type: string
               writeConnectionSecretToRef:
                 description: |-
                   WriteConnectionSecretToReference specifies the namespace and name of a

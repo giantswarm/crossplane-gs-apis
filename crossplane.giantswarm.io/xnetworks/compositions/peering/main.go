@@ -16,6 +16,8 @@ type builder struct{}
 
 var Builder = builder{}
 
+var TemplateBasePath string
+
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
 		GroupVersionKind: v1alpha1.PeeringGroupVersionKind,
@@ -40,12 +42,14 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		kclFooter          string = "items = _items"
 	)
 
-	kclCommon, err = build.LoadTemplate("compositions/peering/templates/common.k")
+	build.SetBasePath(TemplateBasePath)
+
+	kclCommon, err = build.LoadTemplate("templates/common.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclPeeringTemplate, err = build.LoadTemplate("compositions/peering/templates/resources.k")
+	kclPeeringTemplate, err = build.LoadTemplate("templates/resources.k")
 	if err != nil {
 		panic(err)
 	}

@@ -16,6 +16,8 @@ type builder struct{}
 
 var Builder = builder{}
 
+var TemplateBasePath string
+
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
 		GroupVersionKind: v1alpha1.RdsLogicalDatabaseGroupVersionKind,
@@ -38,12 +40,14 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		err            error
 	)
 
-	kclCommon, err = build.LoadTemplate("compositions/logical-database/templates/common.k")
+	build.SetBasePath(TemplateBasePath)
+
+	kclCommon, err = build.LoadTemplate("templates/common.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclSqlTemplate, err = build.LoadTemplate("compositions/logical-database/templates/provision-sql.k")
+	kclSqlTemplate, err = build.LoadTemplate("templates/provision-sql.k")
 	if err != nil {
 		panic(err)
 	}

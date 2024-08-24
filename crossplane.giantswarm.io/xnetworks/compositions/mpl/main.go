@@ -16,6 +16,8 @@ type builder struct{}
 
 var Builder = builder{}
 
+var TemplateBasePath string
+
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
 		GroupVersionKind: v1alpha1.ManagedPrefixListGroupVersionKind,
@@ -38,7 +40,10 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		kclMplTemplate string
 		kclFooter      string = "items = _items"
 	)
-	kclMplTemplate, err = build.LoadTemplate("compositions/mpl/templates/resources.k")
+
+	build.SetBasePath(TemplateBasePath)
+
+	kclMplTemplate, err = build.LoadTemplate("templates/resources.k")
 	if err != nil {
 		panic(err)
 	}

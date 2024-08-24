@@ -325,11 +325,14 @@ spec:
                     items:
                       type: string
                     type: array
-                  principles:
+                  principals:
                     description: A list of principals to associate with the resource
                       access manager.
                     items:
                       properties:
+                        crossOrg:
+                          description: If this is a cross-org principal.
+                          type: boolean
                         principal:
                           description: |-
                             The principal to associate with the resource access manager.
@@ -337,7 +340,7 @@ spec:
 
                             Possible values are AWS Account ID, AWS Organization ID, or AWS organizations.
                           type: string
-                        providerConfig:
+                        providerConfigRef:
                           description: Provider config for accepting the share
                           properties:
                             name:
@@ -407,7 +410,14 @@ spec:
                       description: |-
                         PeeredSubnetSet defines the parameters for creating a set of subnets with the
                         same mask.
+
+
+                        Either one of Netmask or Prefix must be set.
                       properties:
+                        netmask:
+                          description: The network mask to use when provisioning from
+                            IPAM
+                          type: integer
                         prefix:
                           description: |-
                             A VPC CIDR or Additional CIDR to use for the VPC. If this is the first
@@ -416,7 +426,7 @@ spec:
                           pattern: ^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$
                           type: string
                           x-kubernetes-validations:
-                          - message: mask is immutable
+                          - message: Cidr is immutable
                             rule: self == oldSelf
                         private:
                           description: Private is the number of private subnets to
@@ -555,10 +565,12 @@ spec:
                           - mask
                           type: object
                       required:
-                      - prefix
                       - private
                       - public
                       type: object
+                      x-kubernetes-validations:
+                      - message: Either Netmask or Prefix must be set
+                        rule: self.Netmask != 0 || self.Prefix != nil
                     maxItems: 5
                     minItems: 1
                     type: array
@@ -582,9 +594,25 @@ spec:
                     enum:
                     - multiprefixloop
                     type: string
+                  ipam:
+                    description: |-
+                      If this composition is to use IPAM to calculate the CIDR blocks for the
+                      VPC.
+                    type: boolean
+                  poolName:
+                    description: |-
+                      The name of the IPAM pool to use.
+
+
+                      Only relevant if IPAM is enabled and there are IPAM pools available in
+                      the region.
+                    type: string
                 required:
                 - cidrs
                 type: object
+                x-kubernetes-validations:
+                - message: If IPAM is enabled, poolName must be provided
+                  rule: self.ipam == true && size(self.poolName) > 0
               tags:
                 description: Tags is a map of additional tags to assign to the VPC.
                 properties:
@@ -1293,9 +1321,6 @@ spec:
                       description: A map of NAT gateways defined in this VPC
                       type: object
                       x-kubernetes-map-type: atomic
-                    owner:
-                      description: The owner of the current VPC
-                      type: string
                     privateRouteTables:
                       description: A map of private route tables defined in this VPC
                       items:
@@ -1318,9 +1343,6 @@ spec:
                       items:
                         additionalProperties:
                           properties:
-                            arn:
-                              description: The ARN of the subnet
-                              type: string
                             id:
                               description: The ID of the subnet
                               type: string
@@ -1358,9 +1380,6 @@ spec:
                       items:
                         additionalProperties:
                           properties:
-                            arn:
-                              description: The ARN of the subnet
-                              type: string
                             id:
                               description: The ID of the subnet
                               type: string
@@ -1384,21 +1403,11 @@ spec:
                     transitGateways:
                       additionalProperties:
                         properties:
-                          arn:
-                            description: The ARN of the transit gateway
-                            type: string
                           attachments:
                             additionalProperties:
                               properties:
                                 id:
                                   description: The ID of the transit gateway attachment
-                                  type: string
-                                resourceId:
-                                  description: The ID of the resource that the transit
-                                    gateway is attached to
-                                  type: string
-                                routeTableId:
-                                  description: The associated route table ID
                                   type: string
                                 type:
                                   description: The type of the transit gateway attachment
@@ -1414,13 +1423,9 @@ spec:
                           routeTables:
                             additionalProperties:
                               properties:
-                                defaultAssociation:
+                                default:
                                   description: Is this the default route table for
                                     the transit gateway
-                                  type: boolean
-                                defaultPropagation:
-                                  description: Is this the default propagation route
-                                    table for the transit gateway
                                   type: boolean
                                 id:
                                   description: The ID of the transit gateway route
@@ -1433,24 +1438,20 @@ spec:
                             type: object
                         type: object
                       description: A map of transit gateways defined in this VPC
+                      nullable: true
                       type: object
                       x-kubernetes-map-type: atomic
                     vpcPeeringConnections:
                       additionalProperties:
-                        properties:
-                          arn:
-                            description: The ARN of the VPC peering connection
-                            type: string
-                          id:
-                            description: The ID of the VPC peering connection
-                            type: string
-                        type: object
+                        type: string
                       description: A map of VPC peering connections defined in this
                         VPC
+                      nullable: true
                       type: object
                       x-kubernetes-map-type: atomic
+                  required:
+                  - id
                   type: object
-                  x-kubernetes-map-type: granular
                 description: |-
                   Vpcs contains details of both the peered VPCs and the current local VPC
                   The current VPC can be found at the `self` key

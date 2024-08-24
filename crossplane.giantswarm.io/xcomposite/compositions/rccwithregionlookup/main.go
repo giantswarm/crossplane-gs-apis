@@ -21,6 +21,8 @@ type builder struct{}
 
 var Builder = builder{}
 
+var TemplateBasePath string
+
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
 		GroupVersionKind: v1alpha1.RCCWithRegionLookupGroupVersionKind,
@@ -43,7 +45,9 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		err                 error
 	)
 
-	kclResourceTemplate, err = build.LoadTemplate("compositions/rccwithregionlookup/templates/resources.k")
+	build.SetBasePath(TemplateBasePath)
+
+	kclResourceTemplate, err = build.LoadTemplate("templates/resources.k")
 	if err != nil {
 		panic(err)
 	}

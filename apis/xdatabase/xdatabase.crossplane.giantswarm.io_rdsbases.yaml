@@ -444,6 +444,32 @@ spec:
                       - secretStore
                       type: object
                     type: array
+                  tenantCluster:
+                    description: Tenant Cluster details
+                    properties:
+                      apiServerEndpoint:
+                        description: The API endpoint for the tenant cluster.
+                        type: string
+                      clusterName:
+                        description: The name of the tenant cluster.
+                        type: string
+                      enabled:
+                        description: |-
+                          Enabled Whether or not to enable `external-secrets-operator` object
+                          deployments using `provider-kubernetes.
+                        type: boolean
+                      namespace:
+                        description: The namespace to deploy the external secrets
+                          operator in.
+                        type: string
+                    type: object
+                    x-kubernetes-validations:
+                    - message: namespace must be set when enabled is true
+                      rule: self.enabled == true && self.namespace != null
+                    - message: apiServerEndpoint must be set when enabled is true
+                      rule: self.enabled == true && self.apiServerEndpoint != null
+                    - message: clusterName must be set when enabled is true
+                      rule: self.enabled == true && self.clusterName != null
                 type: object
               globalClusterIdentifier:
                 description: GlobalClusterIdentifier is the global cluster identifier
@@ -934,6 +960,15 @@ spec:
                     type: boolean
                   engine:
                     description: The type of database engine being provisioned
+                    enum:
+                    - postgres
+                    - mysql
+                    - aurora-mysql
+                    - aurora-postgres
+                    - mariadb
+                    type: string
+                  readerEndpoint:
+                    description: Reader Endpoint is the endpoint to use for read operations
                     type: string
                 type: object
               publiclyAccessible:
