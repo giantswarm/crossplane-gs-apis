@@ -16,7 +16,7 @@ require (
 	github.com/crossplane/crossplane v1.16.0
 	github.com/crossplane/crossplane-runtime v1.17.0-rc.0.0.20240509182037-b31be7747c60
 	github.com/giantswarm/crossplane-fn-network-discovery v0.3.0-alpha1
-	github.com/mproffitt/crossbuilder v0.0.1-dev21
+	github.com/mproffitt/crossbuilder v0.0.1-dev24
 	github.com/mproffitt/function-cidr v0.0.0-20240528204613-a5ff3a0e6daa
 	github.com/upbound/provider-aws v1.4.0
 	k8s.io/apimachinery v0.30.3
