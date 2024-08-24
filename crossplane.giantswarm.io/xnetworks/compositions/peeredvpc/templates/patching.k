@@ -80,11 +80,11 @@ vpcLookup = {
     ]
 }
 
-cidrs = [
-    s.prefix
-    for s in get(oxr, "spec.subnetsets.cidrs", [])
+ipamEnabled = any_true([
+    get(s, "useIpam", False)
+    for _, s in get(oxr, "spec.subnetsets.cidrs", [])
     if s
-]
+])
 
 azl = len(get(oxr, "spec.availabilityZones", []))
 
@@ -160,7 +160,7 @@ newdxr = {
                     }
                     "transitGateways" = {
                         name = {
-                            "id": get(item, "Resource.status.atProvider.id", ""),
+                            "id": get(item, "Resource.status.tgwId", ""),
                         }
                         for name, item in ocds
                         if all_true([
@@ -181,7 +181,7 @@ newdxr = {
                             ocds,
                             get(item, "Resource.kind", "") == "Peering"
                             get(item, "Resource.apiVersion", "") == "xnetworks.crossplane.giantswarm.io/v1alpha1"
-                            get(item, "Resourece.status.peeringConnectionId", False)
+                            get(item, "Resource.status.peeringConnectionId", False)
                             get(item, "Resource.status.peeringConnectionArn", False)
                         ])
                     }

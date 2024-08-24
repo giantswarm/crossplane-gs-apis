@@ -3,7 +3,7 @@ apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: (devel)
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   name: rdsbases.xdatabase.crossplane.giantswarm.io
 spec:
@@ -437,13 +437,33 @@ spec:
                           description: IsClusterSecretStore is whether the secret
                             store is a cluster secret store.
                           type: boolean
-                        secretStore:
-                          description: SecretStoreName is the name of the secret store.
+                        name:
+                          description: Name is the name of the secret store.
                           type: string
                       required:
-                      - secretStore
+                      - name
                       type: object
                     type: array
+                  tenantCluster:
+                    description: Tenant Cluster details
+                    properties:
+                      apiServerEndpoint:
+                        description: The API endpoint for the tenant cluster.
+                        type: string
+                      clusterName:
+                        description: The name of the tenant cluster.
+                        type: string
+                      enabled:
+                        description: |-
+                          Enabled Whether or not to enable `external-secrets-operator` object
+                          deployments using `provider-kubernetes.
+                        type: boolean
+                      namespace:
+                        description: |-
+                          The namespace on the tenant cluster to deploy secrets to. If not set
+                          will default to the `default` namespace.
+                        type: string
+                    type: object
                 type: object
               globalClusterIdentifier:
                 description: GlobalClusterIdentifier is the global cluster identifier
@@ -934,6 +954,15 @@ spec:
                     type: boolean
                   engine:
                     description: The type of database engine being provisioned
+                    enum:
+                    - postgres
+                    - mysql
+                    - aurora-mysql
+                    - aurora-postgresql
+                    - mariadb
+                    type: string
+                  readerEndpoint:
+                    description: Reader Endpoint is the endpoint to use for read operations
                     type: string
                 type: object
               publiclyAccessible:
@@ -1305,6 +1334,15 @@ spec:
                     description: A map of secret names created for users
                     type: object
                 type: object
+              readerEndpoint:
+                description: |-
+                  ReaderEndpoint is the reader endpoint of the DB cluster.
+
+
+                  If this is a cluster mode, this is the reader endpoint of the cluster.
+                  When working with instances, this is a comma separated list of the reader
+                  instances.
+                type: string
               ready:
                 description: Ready is whether all children are ready.
                 type: boolean

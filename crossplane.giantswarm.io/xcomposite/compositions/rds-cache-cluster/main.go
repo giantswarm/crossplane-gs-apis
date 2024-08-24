@@ -1,8 +1,9 @@
 package main
 
 import (
-	"crossbuilder/v1alpha1"
 	"strings"
+
+	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xcomposite/v1alpha1"
 
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 	xpt "github.com/crossplane-contrib/function-patch-and-transform/input/v1beta1"
@@ -20,6 +21,8 @@ import (
 type builder struct{}
 
 var Builder = builder{}
+
+var TemplateBasePath string
 
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
@@ -45,17 +48,19 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		err               error
 	)
 
-	kclPatchTemplate, err = build.LoadTemplate("compositions/rds-cache-cluster/templates/patching.k")
+	build.SetBasePath(TemplateBasePath)
+
+	kclPatchTemplate, err = build.LoadTemplate("templates/patching.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclEsoTemplate, err = build.LoadTemplate("compositions/rds-cache-cluster/templates/eso-flux-enablement.k")
+	kclEsoTemplate, err = build.LoadTemplate("templates/eso-flux-enablement.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclCommonTemplate, err = build.LoadTemplate("compositions/rds-cache-cluster/templates/common.k")
+	kclCommonTemplate, err = build.LoadTemplate("templates/common.k")
 	if err != nil {
 		panic(err)
 	}
@@ -212,6 +217,7 @@ func createResources() []xpt.ComposedTemplate {
 				},
 				cb.ToPatch("status.rdsEndpoint", "status.endpoint"),
 				cb.ToPatch("status.rdsPort", "status.port"),
+				cb.ToPatch("status.rdsReaderEndpoint", "status.readerEndpoint"),
 			},
 		},
 	}

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"crossbuilder/v1alpha1"
+	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xdatabase/v1alpha1"
 
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 	xpt "github.com/crossplane-contrib/function-patch-and-transform/input/v1beta1"
@@ -18,6 +18,8 @@ import (
 type builder struct{}
 
 var Builder = builder{}
+
+var TemplateBasePath string
 
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
@@ -46,32 +48,34 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		err                      error
 	)
 
-	kclCommon, err = build.LoadTemplate("compositions/rds-base/templates/common.k")
+	build.SetBasePath(TemplateBasePath)
+
+	kclCommon, err = build.LoadTemplate("templates/common.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclResourcesTemplate, err = build.LoadTemplate("compositions/rds-base/templates/resources.k")
+	kclResourcesTemplate, err = build.LoadTemplate("templates/resources.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclCreateClusterTemplate, err = build.LoadTemplate("compositions/rds-base/templates/create-cluster.k")
+	kclCreateClusterTemplate, err = build.LoadTemplate("templates/create-cluster.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclPatchTemplate, err = build.LoadTemplate("compositions/rds-base/templates/patching.k")
+	kclPatchTemplate, err = build.LoadTemplate("templates/patching.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclSqlTemplate, err = build.LoadTemplate("compositions/rds-base/templates/provision-sql.k")
+	kclSqlTemplate, err = build.LoadTemplate("templates/provision-sql.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclEsoTemplate, err = build.LoadTemplate("compositions/rds-base/templates/provision-eso.k")
+	kclEsoTemplate, err = build.LoadTemplate("templates/provision-eso.k")
 	if err != nil {
 		panic(err)
 	}

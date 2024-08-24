@@ -3,7 +3,7 @@ apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: (devel)
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   name: peeredvpcnetworks.xnetworks.crossplane.giantswarm.io
 spec:
@@ -325,11 +325,14 @@ spec:
                     items:
                       type: string
                     type: array
-                  principles:
+                  principals:
                     description: A list of principals to associate with the resource
                       access manager.
                     items:
                       properties:
+                        crossOrg:
+                          description: If this is a cross-org principal.
+                          type: boolean
                         principal:
                           description: |-
                             The principal to associate with the resource access manager.
@@ -337,7 +340,7 @@ spec:
 
                             Possible values are AWS Account ID, AWS Organization ID, or AWS organizations.
                           type: string
-                        providerConfig:
+                        providerConfigRef:
                           description: Provider config for accepting the share
                           properties:
                             name:
@@ -407,7 +410,14 @@ spec:
                       description: |-
                         PeeredSubnetSet defines the parameters for creating a set of subnets with the
                         same mask.
+
+
+                        Either one of Netmask or Prefix must be set.
                       properties:
+                        netmask:
+                          description: The network mask to use when provisioning from
+                            IPAM
+                          type: integer
                         prefix:
                           description: |-
                             A VPC CIDR or Additional CIDR to use for the VPC. If this is the first
@@ -416,7 +426,7 @@ spec:
                           pattern: ^([0-9]{1,3}.){3}[0-9]{1,3}/[0-9]{1,2}$
                           type: string
                           x-kubernetes-validations:
-                          - message: mask is immutable
+                          - message: Cidr is immutable
                             rule: self == oldSelf
                         private:
                           description: Private is the number of private subnets to
@@ -581,6 +591,19 @@ spec:
                       expected to be defined on the claim.
                     enum:
                     - multiprefixloop
+                    type: string
+                  ipam:
+                    description: |-
+                      If this composition is to use IPAM to calculate the CIDR blocks for the
+                      VPC.
+                    type: boolean
+                  poolName:
+                    description: |-
+                      The name of the IPAM pool to use.
+
+
+                      Only relevant if IPAM is enabled and there are IPAM pools available in
+                      the region.
                     type: string
                 required:
                 - cidrs

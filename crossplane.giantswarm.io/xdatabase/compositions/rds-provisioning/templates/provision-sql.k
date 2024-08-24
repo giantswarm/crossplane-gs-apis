@@ -66,8 +66,6 @@ if _engine == "postgresql":
         for dbName, dbUsers in defaultDatabase | get(oxr, "spec.databases", {})
     }
 
-print("REQUIRED DATABASES", _requiredDatabases)
-
 # Create provider connection secret for the database
 newPcrName = "${appName}-${_engine}-provider-config"
 
@@ -262,6 +260,88 @@ grants = [
     ])
 ]
 
+# Push Secrets
+reader = get(oxr, "spec.readerEndpoint", "")
+
+pushSecrets = [
+    {
+        _name = get(user, "spec.writeConnectionSecretToRef.name", "")
+        "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+        "kind": "Object"
+        "metadata": {
+            "annotations": {
+                _resourceName = "${_name}-pushsecret"
+                "krm.kcl.dev/composition-resource-name" = _resourceName
+                "krm.kcl.dev/ready": readystr(_resourceName)
+            }
+        }
+        "spec": {
+            "deletionPolicy": dp
+            "forProvider": {
+                "manifest": {
+                    "apiVersion": "external-secrets.io/v1alpha1"
+                    "kind": "PushSecret"
+                    "metadata": {
+                        "namespace": get(oxr, "spec.claimRef.namespace", "default")
+                    }
+                    "spec": {
+                        "refreshInterval": "10s",
+                        "secretStoreRefs": [
+                            {
+                                "name": value.name,
+                                "kind": "ClusterSecretStore" if value.clusterScoped else "SecretStore",
+                            },
+                            for _, value in get(oxr, "spec.eso.stores", [])
+                            if value.enabled and get(oxr, "spec.eso.enabled", True)
+                        ],
+                        "template": {
+                            "engineVersion": "v2"
+                            "data": {
+                                "endpoint": "{{ .endpoint }}",
+                                "port": "{{ .port }}",
+                                "password": "{{ .password }}",
+                                "username": "{{ .username }}",
+                                "reader": reader,
+                            }
+                        },
+                        "data": [
+                            {
+                                "match": {
+                                    "secretKey": k,
+                                    "remoteRef": {
+                                        "remoteKey": _name,
+                                        "property": k,
+                                    },
+                                },
+                            },
+                            for k in [
+                                "endpoint", "port", "password", "username", "reader",
+                            ]
+                        ]
+                        "deletionPolicy": "Delete" if dp == "Delete" else "Retain",
+                        "selector": {
+                            "secret": {
+                                "name": _name,
+                            },
+                        },
+                        "updatePolicy": "Replace",
+                    }
+                }
+            }
+            "managementPolicies": mgmtPolicy,
+            "providerConfigRef": {
+                "name": get(oxr, "spec.kubernetesProviderConfig.name", "")
+            }
+        }
+    }
+    for _, user in users
+    if all_true([
+        get(oxr, "spec.eso.enabled", True),
+        get(oxr, "spec.eso.tenantCluster.apiServerEndpoint", []),
+        get(oxr, "spec.eso.tenantCluster.enabled", True),
+    ])
+]
+
 newdxr = {
     **dxr,
     **{
@@ -276,7 +356,7 @@ provisionSql = get(oxr, "spec.provisionSql", True)
 _items = [
     i for r in [
         providerConnectionSecret, databases,
-        users, grants, [newdxr],
+        users, grants, [newdxr], pushSecrets,
     ]
     for i in r if i and provisionSql
 ]

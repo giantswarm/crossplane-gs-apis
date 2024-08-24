@@ -315,6 +315,13 @@ spec:
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
+          readerEndpoint = ocdsstatus("rds-cluster", "readerEndpoint", False) if createCluster else ",".join([
+              ocdsstatus("instance-${i}" "endpoint", "")
+              for i in range(get(oxr, "spec.instanceCount", 0))
+              if i > 0
+          ])
+
+
           mgmtPolicy = get(oxr, "spec.managementPolicies", [])
           publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 
@@ -626,6 +633,13 @@ spec:
           clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
+
+          readerEndpoint = ocdsstatus("rds-cluster", "readerEndpoint", False) if createCluster else ",".join([
+              ocdsstatus("instance-${i}" "endpoint", "")
+              for i in range(get(oxr, "spec.instanceCount", 0))
+              if i > 0
+          ])
+
 
           mgmtPolicy = get(oxr, "spec.managementPolicies", [])
           publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
@@ -1591,6 +1605,13 @@ spec:
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
+          readerEndpoint = ocdsstatus("rds-cluster", "readerEndpoint", False) if createCluster else ",".join([
+              ocdsstatus("instance-${i}" "endpoint", "")
+              for i in range(get(oxr, "spec.instanceCount", 0))
+              if i > 0
+          ])
+
+
           mgmtPolicy = get(oxr, "spec.managementPolicies", [])
           publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 
@@ -1615,8 +1636,8 @@ spec:
           ]
 
           readyState = all_true([
-              allReady(),
-              len(instancesCreated) == len(_specInstances),
+              exists("instance-0"),
+              ready("instance-0"),
           ])
 
           provisionedSecrets = ocdsstatus("rds-provisioning", "connectionSecrets", {})
@@ -1644,6 +1665,8 @@ spec:
                               "clusterArn" = clusterArn,
                           if endpoint:
                               "endpoint" = endpoint,
+                          if readerEndpoint:
+                              "readerEndpoint" = readerEndpoint,
 
                           _port = ocdsstatus("rds-cluster", "port", False) if createCluster else ocdsstatus("instance-0", "port", False)
                           if _port:
@@ -1652,7 +1675,7 @@ spec:
                       "ready" = readyState
 
                       if all_true([
-                          get(oxr, "spec.provisionSql.enabled", False),
+                          get(oxr, "spec.provisionSql.enabled", True),
                           provisionedSecrets,
                           readyState,
                       ]):
@@ -1804,6 +1827,13 @@ spec:
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
+          readerEndpoint = ocdsstatus("rds-cluster", "readerEndpoint", False) if createCluster else ",".join([
+              ocdsstatus("instance-${i}" "endpoint", "")
+              for i in range(get(oxr, "spec.instanceCount", 0))
+              if i > 0
+          ])
+
+
           mgmtPolicy = get(oxr, "spec.managementPolicies", [])
           publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 
@@ -1830,10 +1860,7 @@ spec:
           ]
 
           pushSecretStores = [
-              {
-                  "name": store.secretStore,
-                  "clusterScoped": True,
-              }
+              store
               for _, store in get(oxr, "spec.eso.stores", [])
               if get(oxr, "spec.eso.enabled", True) and store.enabled
           ]
@@ -1842,23 +1869,6 @@ spec:
           passwordField = "password" if not createCluster else "attribute.master_password"
 
           ep = "endpoint" if createCluster and clusterCreated else "address" if not createCluster and masterInstance else ""
-
-          pushSecretData = [
-              {
-                  conversionStrategy: "None"
-                  match: {
-                      secretKey: k,
-                      remoteRef: {
-                          remoteKey: k
-                      }
-
-                  }
-              }
-              for _, k in [
-                  ep, "port", "password", "username",
-              ]
-              if ep
-          ]
 
           deletionPolicy = "Delete" if dp == "Delete" else "Retain"
           esoSqlSecret = [
@@ -1946,7 +1956,21 @@ spec:
                                       }
                                       for _, value in pushSecretStores
                                   ]
-                                  "data": pushSecretData
+                                  "data" = [
+                                      {
+                                          "conversionStrategy": "None"
+                                          "match": {
+                                              "secretKey": k,
+                                              "remoteRef": {
+                                                  "remoteKey": "${appName}-rds-master",
+                                                  "property": k,
+                                              },
+                                          }
+                                      }
+                                      for _, k in [
+                                          ep, "port", "password", "username",
+                                      ] if ep
+                                  ],
                                   "deletionPolicy": deletionPolicy
                                   "selector": {
                                       "secret": {
@@ -2110,6 +2134,13 @@ spec:
           endpoint = ocdsstatus("rds-cluster", "endpoint", "")
           clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
+          readerEndpoint = ocdsstatus("rds-cluster", "readerEndpoint", False) if createCluster else ",".join([
+              ocdsstatus("instance-${i}" "endpoint", "")
+              for i in range(get(oxr, "spec.instanceCount", 0))
+              if i > 0
+          ])
+
+
           mgmtPolicy = get(oxr, "spec.managementPolicies", [])
           publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 
@@ -2143,18 +2174,21 @@ spec:
                   kind: "RdsProvisioning"
                   metadata: {
                       annotations: {
-                          "krm.kcl.dev/composition-resource-name": "${appName}-rds-provisioning"
-                          "krm.kcl.dev/ready": readystr("${appName}-rds-provisioning")
+                          "krm.kcl.dev/composition-resource-name": "rds-provisioning"
+                          "krm.kcl.dev/ready": readystr("rds-provisioning")
                       }
                   }
                   spec: {
-                      "deletionPolicy": dp,
-                      "engine": get(oxr, "spec.engine", "postgres")
                       "claimRef": get(oxr, "spec.claimRef", {})
                       "connectionSecretName": useConnectionSecret
                       "databases": get(oxr, "spec.databases", {})
+                      "deletionPolicy": dp,
+                      "engine": get(oxr, "spec.engine", "postgres")
+                      "eso": get(oxr, "spec.eso", {})
                       "kubernetesProviderConfig": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
                       "managementPolicies": mgmtPolicy,
+                      if readerEndpoint:
+                          "readerEndpoint": readerEndpoint,
                   }
               }
               for _ in [True]

@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
-	//"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
-	"crossbuilder/v1alpha1"
+	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 	xpt "github.com/crossplane-contrib/function-patch-and-transform/input/v1beta1"
@@ -20,6 +18,8 @@ import (
 type builder struct{}
 
 var Builder = builder{}
+
+var TemplateBasePath string
 
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
@@ -50,32 +50,34 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		resources            []xpt.ComposedTemplate = createResources()
 	)
 
-	kclCommon, err = build.LoadTemplate("compositions/peeredvpc/templates/common.k")
+	build.SetBasePath(TemplateBasePath)
+
+	kclCommon, err = build.LoadTemplate("templates/common.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclPatchTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/patching.k")
+	kclPatchTemplate, err = build.LoadTemplate("templates/patching.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclPeeringTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/peering.k")
+	kclPeeringTemplate, err = build.LoadTemplate("templates/peering.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclRamTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/ram.k")
+	kclRamTemplate, err = build.LoadTemplate("templates/ram.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclResourcesTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/resources.k")
+	kclResourcesTemplate, err = build.LoadTemplate("templates/resources.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclTransitTemplate, err = build.LoadTemplate("compositions/peeredvpc/templates/transitgw.k")
+	kclTransitTemplate, err = build.LoadTemplate("templates/transitgw.k")
 	if err != nil {
 		panic(err)
 	}
@@ -234,29 +236,6 @@ func boolPtr(b bool) *bool {
 
 func strPtr(s string) *string {
 	return &s
-}
-
-func combineNameRegionPatch(toFieldPath, suffix string) xpt.ComposedPatch {
-	return xpt.ComposedPatch{
-		Type: xpt.PatchTypeCombineFromComposite,
-		Patch: xpt.Patch{
-			Combine: &xpt.Combine{
-				Variables: []xpt.CombineVariable{
-					{
-						FromFieldPath: "spec.claimRef.name",
-					},
-					{
-						FromFieldPath: "spec.region",
-					},
-				},
-				Strategy: xpt.CombineStrategyString,
-				String: &xpt.StringCombine{
-					Format: fmt.Sprintf("%%s-%%s%s", suffix),
-				},
-			},
-			ToFieldPath: strPtr(toFieldPath),
-		},
-	}
 }
 
 func createResources() []xpt.ComposedTemplate {

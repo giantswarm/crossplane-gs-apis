@@ -158,8 +158,6 @@ tgwManagedPrefixListIds = {
     "peer": tgwPeerPrefixListIds,
 }
 
-print("TGW Managed Prefix List IDs", tgwManagedPrefixListIds)
-
 tgwLocalPrefixListReferences = [
     plr(
         appName,

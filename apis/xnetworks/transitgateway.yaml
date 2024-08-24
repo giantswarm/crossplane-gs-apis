@@ -453,7 +453,6 @@ spec:
               for c in r if c
           ]
 
-          import yaml
           # Create the attachment to the local VPC
           localAttachments = [
               {
@@ -516,7 +515,6 @@ spec:
                   pcr,
               ),
           ]
-          print(yaml.encode(localPrefixLists))
 
           prefixListIds = [
               c for c in [
@@ -1209,8 +1207,6 @@ spec:
               "remote": tgwRemotePrefixListIds,
               "peer": tgwPeerPrefixListIds,
           }
-
-          print("TGW Managed Prefix List IDs", tgwManagedPrefixListIds)
 
           tgwLocalPrefixListReferences = [
               plr(

@@ -249,13 +249,22 @@ type VpcPeer struct {
 
 // PeeredSubnetSet defines the parameters for creating a set of subnets with the
 // same mask.
+//
+// Either one of Netmask or Prefix must be set.
 type PeeredSubnetSet struct {
+	// The network mask to use when provisioning from IPAM
+	//
+	// +optional
+	// +minimum: 16
+	// +maximum: 28
+	Netmask int `json:"netmask,omitempty"` // deliberatly does not have a default
+
 	// A VPC CIDR or Additional CIDR to use for the VPC. If this is the first
 	// entry in the list, it will be used as the default VPC CIDR, otherwise it
 	// will be assigned as an additional CIDR to the VPC.
 	//
 	// +required
-	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="mask is immutable"
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Cidr is immutable"
 	Prefix Cidr `json:"prefix"`
 
 	// Details on how to build the public subnets.
@@ -346,6 +355,9 @@ type PeeredSubnetBuilder struct {
 
 // PeeredSubnets defines the parameters for creating a set of subnets with the
 // same mask.
+//
+// If IPAM is enabled, you must provide an IPAM pool name to use for the
+// VPC Cidr blocks.
 type PeeredSubnets struct {
 	// A list of PeeredSubnetSets to create in the VPC
 	//
@@ -380,6 +392,21 @@ type PeeredSubnets struct {
 	// +kubebuilder:validation:Enum=multiprefixloop
 	// +kubebuilder:default=multiprefixloop
 	Function string `json:"function"`
+
+	// If this composition is to use IPAM to calculate the CIDR blocks for the
+	// VPC.
+	//
+	// +optional
+	// +default=false
+	IPAM bool `json:"ipam"`
+
+	// The name of the IPAM pool to use.
+	//
+	// Only relevant if IPAM is enabled and there are IPAM pools available in
+	// the region.
+	//
+	// +optional
+	PoolName string `json:"poolName"`
 }
 
 type PeeredVpcLookup struct {

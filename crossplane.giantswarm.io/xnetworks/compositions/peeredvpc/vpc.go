@@ -37,7 +37,7 @@ func createVpcResource() xpt.ComposedTemplate {
 			{
 				Type: xpt.PatchTypeFromCompositeFieldPath,
 				Patch: xpt.Patch{
-					FromFieldPath: strPtr("spec.subnetsets.cidrs[0].prefix"),
+					FromFieldPath: strPtr("status.vpcs.self.cidrBlock"),
 					ToFieldPath:   strPtr("spec.forProvider.cidrBlock"),
 				},
 			},

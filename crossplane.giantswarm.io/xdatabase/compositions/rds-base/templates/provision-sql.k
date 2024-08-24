@@ -13,18 +13,21 @@ _items = [
         kind: "RdsProvisioning"
         metadata: {
             annotations: {
-                "krm.kcl.dev/composition-resource-name": "${appName}-rds-provisioning"
-                "krm.kcl.dev/ready": readystr("${appName}-rds-provisioning")
+                "krm.kcl.dev/composition-resource-name": "rds-provisioning"
+                "krm.kcl.dev/ready": readystr("rds-provisioning")
             }
         }
         spec: {
-            "deletionPolicy": dp,
-            "engine": get(oxr, "spec.engine", "postgres")
             "claimRef": get(oxr, "spec.claimRef", {})
             "connectionSecretName": useConnectionSecret
             "databases": get(oxr, "spec.databases", {})
+            "deletionPolicy": dp,
+            "engine": get(oxr, "spec.engine", "postgres")
+            "eso": get(oxr, "spec.eso", {})
             "kubernetesProviderConfig": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
             "managementPolicies": mgmtPolicy,
+            if readerEndpoint:
+                "readerEndpoint": readerEndpoint,
         }
     }
     for _ in [True]

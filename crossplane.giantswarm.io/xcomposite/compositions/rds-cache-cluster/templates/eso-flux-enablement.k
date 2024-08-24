@@ -20,70 +20,132 @@ ssasecret = get(oxr, "spec.eso.fluxSSASecretName", "")
 #   - kind: Secret
 #     name: flux-project-ssa
 # ```
-_items = [
-    {
-        "apiVersion": "kubernetes.crossplane.io/v1alpha2"
-        "kind": "Object"
-        "metadata": {
-            "annotations": {
-                "krm.kcl.dev/composition-resource-name" = "${appName}-externalsecret"
-                "krm.kcl.dev/ready": readystr("${appName}-externalsecret")
-            }
+fluxSsa = {
+    "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+    "kind": "Object"
+    "metadata": {
+        "annotations": {
+            "krm.kcl.dev/composition-resource-name" = "${appName}-externalsecret"
+            "krm.kcl.dev/ready": readystr("${appName}-externalsecret")
         }
-        "spec": {
-            "deletionPolicy": dp,
-            "forProvider": {
-                "manifest": {
-                    "apiVersion": "external-secrets.io/v1beta1",
-                    "kind": "ExternalSecret",
-                    "metadata": {
-                        "name": "cc${appName}-flux-ssa",
-                        "namespace": namespace,
+    }
+    "spec": {
+        "deletionPolicy": dp,
+        "forProvider": {
+            "manifest": {
+                "apiVersion": "external-secrets.io/v1beta1",
+                "kind": "ExternalSecret",
+                "metadata": {
+                    "name": "cc${appName}-flux-ssa",
+                    "namespace": "default",
+                },
+                "spec": {
+                    "refreshInterval": "1m",
+                    "secretStoreRef": {
+                        "name": get(oxr, "spec.eso.kubernetesSecretStore", ""),
+                        "kind": "SecretStore",
                     },
-                    "spec": {
-                        "refreshInterval": "1m",
-                        "secretStoreRef": {
-                            "name": get(oxr, "spec.eso.kubernetesSecretStore", ""),
-                            "kind": "SecretStore",
-                        },
-                        "dataFrom": [
-                            {
-                                "find": {
-                                    "name": {
-                                        "regexp": "^${ssasecret}$",
-                                    },
+                    "dataFrom": [
+                        {
+                            "find": {
+                                "name": {
+                                    "regexp": "^${ssasecret}$",
                                 },
                             },
-                        ],
-                        "target": {
-                            "name": ssasecret,
-                            "creationPolicy": "Orphan",
-                            "deletionPolicy": "Merge",
-                            "template": {
-                                "engineVersion": "v2",
-                                "mergePolicy": "Merge",
-                                "data": {
-                                    "${ssasecret}": "",
-                                    _name = regex.replace(appName, "[-_\.]", "_").lower()
-                                    "${_name}" = "{{ \"Merge\" | b64enc }}",
-                                },
+                        },
+                    ],
+                    "target": {
+                        "name": ssasecret,
+                        "creationPolicy": "Orphan",
+                        "deletionPolicy": "Merge",
+                        "template": {
+                            "engineVersion": "v2",
+                            "mergePolicy": "Merge",
+                            "data": {
+                                "${ssasecret}": "",
+                                _name = regex.replace(appName, "[-_\.]", "_").lower()
+                                "${_name}" = "{{ \"Merge\" | b64enc }}",
+                            },
+                        }
+                    }
+                }
+            }
+        }
+        "managementPolicies": mgmtPolicy,
+        "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"}),
+    }
+} if all_true([
+    get(oxr, "spec.eso.enabled", False),
+    get(oxr, "spec.eso.fluxSSASecretName", False),
+    get(oxr, "status.cacheConnectionSecret", False),
+    get(oxr, "status.rdsConnectionSecret", False),
+    ready("peered-vpc-network"),
+    ready("cache-base"),
+    ready("rds-base"),
+]) else {}
+
+clusterName = get(oxr, "spec.eso.tenantCluster.clusterName", "")
+tenantSecretStore = {
+    "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+    "kind": "Object"
+    "metadata": {
+        "annotations": {
+            "krm.kcl.dev/composition-resource-name": "tenant-secret-store"
+            "krm.kcl.dev/ready": readystr("tenant-secret-store")
+        }
+    }
+    "spec": {
+        "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete")
+        "forProvider": {
+            "manifest": {
+                "apiVersion": "external-secrets.io/v1beta1"
+                "kind": "SecretStore"
+                "metadata": {
+                    "name": "${appName}-tenant-secret-store"
+                    "namespace": get(oxr, "spec.claimRef.namespace", "")
+                }
+                "spec": {
+                    "provider": {
+                        "kubernetes": {
+                            "auth": {
+                                "cert": {
+                                    "clientCert": {
+                                        "name": "${clusterName}-eso-cluster-auth",
+                                        "key": "tls.crt",
+                                    },
+                                    "clientKey": {
+                                        "name": "${clusterName}-eso-cluster-auth",
+                                        "key": "tls.key",
+                                    },
+                                }
+                            }
+                            "remoteNamespace": get(oxr, "spec.eso.tenantCluster.namespace", "default")
+                            "server": {
+                                "caProvider": {
+                                    "key": "ca.crt",
+                                    "name": "${clusterName}-eso-cluster-auth",
+                                    "type": "Secret"
+                                }
+                                _url = get(oxr, "spec.eso.tenantCluster.apiServerEndpoint", "kubernetes.default")
+                                "url": "https://${_url}"
                             }
                         }
                     }
                 }
             }
-            "managementPolicies": mgmtPolicy,
-            "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"}),
         }
+        "managementPolicies": get(oxr, "spec.managementPolicies", []),
+        "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
     }
-    for _ in [True]
-    if all_true([
-        get(oxr, "spec.eso.enabled", False),
-        get(oxr, "spec.eso.fluxSSASecretName", False),
-        get(oxr, "status.cacheConnectionSecret", False),
-        get(oxr, "status.rdsConnectionSecret", False),
-        ready("peered-vpc-network"),
-        ready("cache-base"),
-        ready("rds-base"),
-    ])
+} if all_true([
+    get(oxr, "spec.eso.enabled", False),
+    get(oxr, "spec.eso.tenantCluster.enabled", False),
+    clusterName,
+]) else {}
+
+_items = [
+    c for c in [
+        fluxSsa,
+        tenantSecretStore,
+    ] if c
 ]

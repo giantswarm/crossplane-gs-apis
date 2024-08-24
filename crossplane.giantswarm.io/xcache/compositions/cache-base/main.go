@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"crossbuilder/v1alpha1"
+	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xcache/v1alpha1"
 
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 	xpt "github.com/crossplane-contrib/function-patch-and-transform/input/v1beta1"
@@ -18,6 +18,7 @@ import (
 type builder struct{}
 
 var Builder = builder{}
+var TemplateBasePath string
 
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
@@ -47,32 +48,34 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		err                      error
 	)
 
-	kclCommon, err = build.LoadTemplate("compositions/cache-base/templates/common.k")
+	build.SetBasePath(TemplateBasePath)
+
+	kclCommon, err = build.LoadTemplate("templates/common.k")
 	if err != nil {
 		panic(err)
 	}
 
-	clusterTemplate, err = build.LoadTemplate("compositions/cache-base/templates/cluster.k")
+	clusterTemplate, err = build.LoadTemplate("templates/cluster.k")
 	if err != nil {
 		panic(err)
 	}
 
-	replicationGroupTemplate, err = build.LoadTemplate("compositions/cache-base/templates/replicationgroup.k")
+	replicationGroupTemplate, err = build.LoadTemplate("templates/replicationgroup.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclUsers, err = build.LoadTemplate("compositions/cache-base/templates/users.k")
+	kclUsers, err = build.LoadTemplate("templates/users.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclPassword, err = build.LoadTemplate("compositions/cache-base/templates/password-gen.k")
+	kclPassword, err = build.LoadTemplate("templates/password-gen.k")
 	if err != nil {
 		panic(err)
 	}
 
-	patchTemplate, err = build.LoadTemplate("compositions/cache-base/templates/patches.k")
+	patchTemplate, err = build.LoadTemplate("templates/patches.k")
 	if err != nil {
 		panic(err)
 	}

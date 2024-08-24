@@ -32,6 +32,18 @@ cidrBlocks = [
     for i in r if i
 ]
 
+secretStores = get(oxr, "spec.eso.stores", []) + [
+    {
+        "name" = "${appName}-tenant-secret-store",
+        "enabled" = True
+        "isClusterSecretStore" = False
+    }
+]
+
+eso = get(oxr, "spec.eso", {}) | {
+    "stores" = secretStores,
+}
+
 _dbPatch = {
     **get(dcds, "rds-base.Resource", {}),
     **{
@@ -41,8 +53,9 @@ _dbPatch = {
             }
         }
         "spec": {
+            "eso" = eso,
             "cidrBlocks": cidrBlocks,
-            "subnetIds": _dbSnIds
+            "subnetIds": _dbSnIds,
         }
     }
 } if all_true([
@@ -60,6 +73,7 @@ _cachePatch = {
             }
         }
         "spec": {
+            "eso" = eso,
             "cidrBlocks": cidrBlocks,
             "subnetIds": _cacheSnIds
         }
@@ -71,13 +85,9 @@ _cachePatch = {
     get(oxr, "status.vpc.id", False),
 ]) else {}
 
-# cb.ToPatch("status.cacheConnectionSecret", "status.connectionSecret"),
-# cb.ToPatch("status.rdsConnectionSecret", "status.connectionSecret"),
-
 cacheConnectionSecret = ocdsstatus("cache-base", "userSecrets.app", ocdsstatus("cache-base", "connectionSecret", ""))
-print("ESO", cacheConnectionSecret)
 rdsConnectionSecret = ocdsstatus("rds-base", "provisionedSecrets.app", ocdsstatus("rds-base", "connectionSecret", ""))
-print("ESO", rdsConnectionSecret)
+
 newdxr = {
     **oxr,
     **{

@@ -6,10 +6,7 @@ externalSecretStores = [
 ]
 
 pushSecretStores = [
-    {
-        "name": store.secretStore,
-        "clusterScoped": True,
-    }
+    store
     for _, store in get(oxr, "spec.eso.stores", [])
     if get(oxr, "spec.eso.enabled", True) and store.enabled
 ]
@@ -18,23 +15,6 @@ usernameField = "username" if not createCluster else "master_username"
 passwordField = "password" if not createCluster else "attribute.master_password"
 
 ep = "endpoint" if createCluster and clusterCreated else "address" if not createCluster and masterInstance else ""
-
-pushSecretData = [
-    {
-        conversionStrategy: "None"
-        match: {
-            secretKey: k,
-            remoteRef: {
-                remoteKey: k
-            }
-
-        }
-    }
-    for _, k in [
-        ep, "port", "password", "username",
-    ]
-    if ep
-]
 
 deletionPolicy = "Delete" if dp == "Delete" else "Retain"
 esoSqlSecret = [
@@ -122,7 +102,21 @@ pushSecret = [
                             }
                             for _, value in pushSecretStores
                         ]
-                        "data": pushSecretData
+                        "data" = [
+                            {
+                                "conversionStrategy": "None"
+                                "match": {
+                                    "secretKey": k,
+                                    "remoteRef": {
+                                        "remoteKey": "${appName}-rds-master",
+                                        "property": k,
+                                    },
+                                }
+                            }
+                            for _, k in [
+                                ep, "port", "password", "username",
+                            ] if ep
+                        ],
                         "deletionPolicy": deletionPolicy
                         "selector": {
                             "secret": {

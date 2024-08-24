@@ -3,8 +3,7 @@ package main
 import (
 	"strings"
 
-	//"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
-	"crossbuilder/v1alpha1"
+	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xnetworks/v1alpha1"
 
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 
@@ -16,6 +15,8 @@ import (
 type builder struct{}
 
 var Builder = builder{}
+
+var TemplateBasePath string
 
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
@@ -39,7 +40,10 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		kclMplTemplate string
 		kclFooter      string = "items = _items"
 	)
-	kclMplTemplate, err = build.LoadTemplate("compositions/mpl/templates/resources.k")
+
+	build.SetBasePath(TemplateBasePath)
+
+	kclMplTemplate, err = build.LoadTemplate("templates/resources.k")
 	if err != nil {
 		panic(err)
 	}

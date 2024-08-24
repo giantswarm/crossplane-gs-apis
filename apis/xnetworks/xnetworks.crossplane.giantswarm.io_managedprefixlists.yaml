@@ -3,7 +3,7 @@ apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: (devel)
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   name: managedprefixlists.xnetworks.crossplane.giantswarm.io
 spec:

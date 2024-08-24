@@ -2,6 +2,7 @@ apiVersion: xdatabase.crossplane.giantswarm.io/v1alpha1
 kind: LogicalDatabaseClaim
 metadata:
   name: test-logical-database
+  namespace: org-demotech
 spec:
   eso:
     enabled: true

@@ -1,4 +1,3 @@
-import yaml
 # Create the attachment to the local VPC
 localAttachments = [
     {
@@ -61,7 +60,6 @@ localPrefixLists = [
         pcr,
     ),
 ]
-print(yaml.encode(localPrefixLists))
 
 prefixListIds = [
     c for c in [

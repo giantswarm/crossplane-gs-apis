@@ -126,6 +126,13 @@ clusterResourceId = ocdsstatus("rds-cluster", "clusterResourceId", "")
 endpoint = ocdsstatus("rds-cluster", "endpoint", "")
 clusterArn = ocdsstatus("rds-cluster", "arn", "")
 
+readerEndpoint = ocdsstatus("rds-cluster", "readerEndpoint", False) if createCluster else ",".join([
+    ocdsstatus("instance-${i}" "endpoint", "")
+    for i in range(get(oxr, "spec.instanceCount", 0))
+    if i > 0
+])
+
+
 mgmtPolicy = get(oxr, "spec.managementPolicies", [])
 publishConnection = get(oxr, "spec.publishConnectionDetailsTo", {})
 

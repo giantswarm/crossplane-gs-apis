@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crossbuilder/v1alpha1"
+	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xcomposite/v1alpha1"
 
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 	xpt "github.com/crossplane-contrib/function-patch-and-transform/input/v1beta1"
@@ -20,6 +20,8 @@ import (
 type builder struct{}
 
 var Builder = builder{}
+
+var TemplateBasePath string
 
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
@@ -43,7 +45,9 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		err                 error
 	)
 
-	kclResourceTemplate, err = build.LoadTemplate("compositions/rccwithregionlookup/templates/resources.k")
+	build.SetBasePath(TemplateBasePath)
+
+	kclResourceTemplate, err = build.LoadTemplate("templates/resources.k")
 	if err != nil {
 		panic(err)
 	}
@@ -159,6 +163,7 @@ func createResources() []xpt.ComposedTemplate {
 				cb.FromPatch("spec.clusterDiscovery.name", "spec.forProvider.manifest.metadata.name"),
 				cb.FromPatch("spec.clusterDiscovery.namespace", "spec.forProvider.manifest.metadata.namespace"),
 				cb.FromPatch("spec.kubernetesProviderConfigRef", "spec.providerConfigRef"),
+				cb.ToPatch("status.tenantApiServerEndpoint", "status.atProvider.manifest.spec.controlPlaneEndpoint.host"),
 			},
 		},
 		{
@@ -178,7 +183,8 @@ func createResources() []xpt.ComposedTemplate {
 				cb.FromPatch("spec.kubernetesProviderConfig", "spec.kubernetesProviderConfig"),
 				cb.FromPatch("spec.deletionPolicy", "spec.deletionPolicy"),
 				cb.FromPatch("spec.managementPolicies", "spec.managementPolicies"),
-
+				cb.FromPatch("spec.clusterDiscovery.name", "spec.eso.tenantCluster.clusterName"),
+				cb.FromPatch("status.tenantApiServerEndpoint", "spec.eso.tenantCluster.apiServerEndpoint"),
 				{
 					Type: xpt.PatchTypeFromCompositeFieldPath,
 					Patch: xpt.Patch{
@@ -210,6 +216,7 @@ func createResources() []xpt.ComposedTemplate {
 				cb.ToPatch("status.cacheSubnets", "status.cacheSubnets"),
 				cb.ToPatch("status.rdsConnectionSecret", "status.rdsConnectionSecret"),
 				cb.ToPatch("status.rdsEndpoint", "status.rdsEndpoint"),
+				cb.ToPatch("status.rdsReaderEndpoint", "status.rdsReaderEndpoint"),
 				cb.ToPatch("status.rdsPort", "status.rdsPort"),
 				cb.ToPatch("status.rdsSubnets", "status.rdsSubnets"),
 				cb.ToPatch("status.vpc", "status.vpc"),

@@ -36,11 +36,7 @@ assert sum(requestedSets)*len(zones) < 200, """
 #
 # The remaining entries are additional CIDR ranges that can be attached with AWS
 # allowing up to 4 additional CIDR ranges.
-additionalCidrs = [
-    s.prefix
-    for s in oxr.spec.subnetsets.cidrs[1:]
-]
-
+additionalCidrs = cidrs[1:]
 calculatedCidrs = get(oxr, "status.calculatedCidrs", {})
 clusterTags = get(oxr, "spec.tags.cluster", {})
 
@@ -64,6 +60,48 @@ prisn = [
     x
     for _, x in get(self, "privateSubnets", [])
     if self and get(self, "privateSubnets", False)
+]
+
+if get(oxr, "spec.subnetsets.useIpam", False):
+    assert get(oxr, "spec.subnetsets.poolName", False), """
+        You must provide a pool name if IPAM is enabled
+    """
+
+poolName = get(oxr, "spec.subnetsets.poolName", "")
+
+# Create IPAM requests if any cidr block is marked for IPAM
+ipam = [
+    {
+        _resourceName = "ipam-${i}"
+        "apiVersion": "ec2.aws.upbound.io/v1beta1"
+        "kind": "VPCIpamPoolCidr"
+        "metadata": {
+            "annotations": {
+                "krm.kcl.dev/composition-resource-name" = _resourceName
+                "krm.kcl.dev/ready" = readystr(_resourceName)
+            }
+            "labels": labels
+        }
+        "spec": {
+            forProvider: {
+                if get(s, "cidr", False):
+                    "cidr" = get(s, "cidr", "")
+                if get(s, "netmaskLength", False):
+                    "netmaskLength" = get(s, "netmaskLength", 0)
+                "region" = region,
+                "ipamPoolId": get(oxr, "status.vpcs.self.ipam.${poolName}", "")
+            }
+            "deletionPolicy": dp
+            "managementPolicies": mgmtPolicy,
+            "providerConfigRef": pcr
+        }
+    }
+    for i, s in get(oxr, "spec.subnetsets.cidrs", [])
+    if all_true([
+        get(oxr, "spec.subnetsets.useIpam", False),
+        get(oxr, "status.vpcs.self.ipam", False),
+        get(oxr, "status.vpcs.self.ipam.${poolName}", False),
+    ])
 ]
 
 # Create the SubnetSets
@@ -183,7 +221,8 @@ subnetsets = _fpubss + _fpriss
 # Each VPC may have up to 4 additional CIDRs attached
 acs = [
     {
-        _resourceName = "cidrassoc-${i}"
+        _id = regex.replace(cidr, "[\./]", "")
+        _resourceName = "cidrassoc-${_id}"
         "apiVersion": "ec2.aws.upbound.io/v1beta1"
         "kind": "VPCIPv4CidrBlockAssociation"
         "metadata": {
@@ -408,7 +447,7 @@ igwRoutes = [
 # Create the list of items to return
 _items = [
     i for x in [
-        subnetsets, acs, eips, igw,
+        subnetsets, acs, eips, igw, ipam,
         igwRoutes, natgateways, ngwRoutes
     ]
     for i in x if i

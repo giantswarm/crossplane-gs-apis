@@ -3,7 +3,7 @@ package main
 import (
 	"strings"
 
-	"crossbuilder/v1alpha1"
+	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xdatabase/v1alpha1"
 
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 
@@ -15,6 +15,8 @@ import (
 type builder struct{}
 
 var Builder = builder{}
+
+var TemplateBasePath string
 
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
@@ -38,12 +40,14 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		err            error
 	)
 
-	kclCommon, err = build.LoadTemplate("compositions/rds-provisioning/templates/common.k")
+	build.SetBasePath(TemplateBasePath)
+
+	kclCommon, err = build.LoadTemplate("templates/common.k")
 	if err != nil {
 		panic(err)
 	}
 
-	kclSqlTemplate, err = build.LoadTemplate("compositions/rds-provisioning/templates/provision-sql.k")
+	kclSqlTemplate, err = build.LoadTemplate("templates/provision-sql.k")
 	if err != nil {
 		panic(err)
 	}

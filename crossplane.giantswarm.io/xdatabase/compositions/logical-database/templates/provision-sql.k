@@ -39,7 +39,7 @@ fluxSSA = {
                 "kind": "ExternalSecret",
                 "metadata": {
                     "name": "lg${ssasecret}",
-                    "namespace": namespace,
+                    "namespace": "default",
                 },
                 "spec": {
                     "refreshInterval": "1m",
@@ -81,8 +81,6 @@ fluxSSA = {
     ssasecret,
     ready("${appName}-rds-provisioning"),
 ]) else {}
-
-print("fluxSSA", ssasecret, "esoEnabled", esoEnabled, "ready", ready("${appName}-rds-provisioning"))
 
 esoConnectionSecret = get(oxr, "status.esoConnectionSecret", False)
 sqlEnabled = get(oxr, "spec.provisionSql.enabled", True)

@@ -70,3 +70,4 @@ readystr = lambda x: str -> str {
 
 dp = get(oxr, "spec.deletionPolicy", "Delete")
 pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
+mgmtPolicy = get(oxr, "spec.managementPolicies", [])

@@ -173,6 +173,11 @@ type RdsClusterStatus struct {
 	// +optional
 	RdsEndpoint string `json:"rdsEndpoint,omitempty"`
 
+	// RdsReaderEndpoint is the reader endpoint of the database
+	//
+	// +optional
+	RdsReaderEndpoint string `json:"rdsReaderEndpoint,omitempty"`
+
 	// RdsPort is the port of the database
 	//
 	// +optional

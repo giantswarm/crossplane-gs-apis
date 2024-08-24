@@ -151,6 +151,15 @@ type RdsBaseStatus struct {
 	// +optional
 	Port *int64 `json:"port,omitempty"`
 
+	// ReaderEndpoint is the reader endpoint of the DB cluster.
+	//
+	// If this is a cluster mode, this is the reader endpoint of the cluster.
+	// When working with instances, this is a comma separated list of the reader
+	// instances.
+	//
+	// +optional
+	ReaderEndpoint *string `json:"readerEndpoint,omitempty"`
+
 	// Ready is whether all children are ready.
 	//
 	// +optional

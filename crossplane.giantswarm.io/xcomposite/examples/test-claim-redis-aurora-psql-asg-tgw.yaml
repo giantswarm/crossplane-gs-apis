@@ -3,7 +3,7 @@ apiVersion: xcomposite.crossplane.giantswarm.io/v1alpha1
 kind: RCCWithRegionLookupClaim
 metadata:
   name: cloudtest-cluster-tgw
-  namespace: default
+  namespace: org-demotech
   labels:
     owner: honeybadger
     provider: aws
@@ -34,6 +34,8 @@ spec:
       enabled: true
       kubernetesSecretStore: default
       fluxSSASecretName: fluxssa
+      tenantCluster:
+        enabled: true
 
     cache:
       createReplicationGroup: true

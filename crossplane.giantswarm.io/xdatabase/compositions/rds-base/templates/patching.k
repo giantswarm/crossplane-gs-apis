@@ -4,8 +4,8 @@ instancesCreated = [
 ]
 
 readyState = all_true([
-    allReady(),
-    len(instancesCreated) == len(_specInstances),
+    exists("instance-0"),
+    ready("instance-0"),
 ])
 
 provisionedSecrets = ocdsstatus("rds-provisioning", "connectionSecrets", {})
@@ -33,6 +33,8 @@ newdxr = {
                     "clusterArn" = clusterArn,
                 if endpoint:
                     "endpoint" = endpoint,
+                if readerEndpoint:
+                    "readerEndpoint" = readerEndpoint,
 
                 _port = ocdsstatus("rds-cluster", "port", False) if createCluster else ocdsstatus("instance-0", "port", False)
                 if _port:
@@ -41,7 +43,7 @@ newdxr = {
             "ready" = readyState
 
             if all_true([
-                get(oxr, "spec.provisionSql.enabled", False),
+                get(oxr, "spec.provisionSql.enabled", True),
                 provisionedSecrets,
                 readyState,
             ]):
