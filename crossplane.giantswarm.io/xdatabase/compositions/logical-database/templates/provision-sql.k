@@ -66,7 +66,7 @@ fluxSSA = {
                             "data": {
                                 "${ssasecret}": "",
                                 _name = regex.replace(appName, "[-_\.]", "_").lower()
-                                "${_name}" = "{{ \"Merge\" | b64enc }}",
+                                "${_name}" = "{{ \"Merge\" }}",
                             },
                         }
                     }
