@@ -548,9 +548,8 @@ spec:
                       x-kubernetes-map-type: atomic
                   type: object
                   x-kubernetes-map-type: granular
+                description: The VPCs that have been discovered.
                 type: object
-            required:
-            - vpcs
             type: object
         required:
         - spec

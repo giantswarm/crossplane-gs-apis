@@ -62,16 +62,23 @@ type DiscoverySpec struct {
 	ProviderType string `json:"providerType"`
 
 	// The default region to look in.
+	//
+	// +required
 	Region string `json:"region"`
 
 	// Details about the remove VPCs to look up.
+	//
+	// +required
 	RemoteVpcs []VpcPeer `json:"remoteVpcs"`
 }
 
 type DiscoveryStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
 
-	Vpcs map[string]nd.AwsVpc `json:"vpcs"`
+	// The VPCs that have been discovered.
+	//
+	// +optional
+	Vpcs map[string]nd.AwsVpc `json:"vpcs,omitempty"`
 }
 
 // Repository type metadata.
