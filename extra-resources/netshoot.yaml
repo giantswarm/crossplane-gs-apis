@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: netshoot-client
+  namespace: default
+  labels:
+    app: netshoot-client
+  annotations:
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+spec:
+  securityContext:
+    runAsNonRoot: true
+    supplementalGroups: [10001]
+    fsGroup: 10001
+  containers:
+    - name: netshoot-client
+      image: nicolaka/netshoot:latest
+      imagePullPolicy: Always
+      securityContext:
+        runAsUser: 70
+        allowPrivilegeEscalation: false
+        seccompProfile:
+          type: RuntimeDefault
+        capabilities:
+          drop:
+            - ALL
+      stdin: true
+      tty: true
+      command: ["/bin/bash"]
