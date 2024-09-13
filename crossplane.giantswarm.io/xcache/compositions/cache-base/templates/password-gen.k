@@ -244,7 +244,12 @@ pushSecrets = [
         }
     }
     for _, password in passwords
-    if pushSecretStores and get(oxr, "spec.eso.enabled", True)
+    if all_true([
+        pushSecretStores,
+        get(oxr, "spec.eso.enabled", True)
+        # Do not push the default user as this is disabled
+        get(password, "spec.forProvider.manifest.spec.target.name", "") != "demotech-rcc-elasticache-user-default"
+    ])
 ]
 
 _items = [
