@@ -48,12 +48,13 @@ passwordGenerator = {
 _endpoint = globalEndpoint if globalEnabled else endpoint
 passwords = [
     {
+        _name = "${appName}-elasticache-user-${user}" if user != appName else "${appName}-elasticache-user"
         "apiVersion": "kubernetes.crossplane.io/v1alpha2"
         "kind": "Object"
         "metadata": {
             "annotations": {
-                "krm.kcl.dev/composition-resource-name": "${appName}-externalsecret-${user}"
-                "krm.kcl.dev/ready": readystr("${appName}-externalsecret-${user}")
+                "krm.kcl.dev/composition-resource-name": _name
+                "krm.kcl.dev/ready": readystr(_name)
             }
             "labels": labels
         }
@@ -69,10 +70,7 @@ passwords = [
                     "spec": {
                         "refreshInterval": "1h"
                         "target": {
-                            if user == appName:
-                                "name": "${appName}-elasticache-user"
-                            else:
-                                "name": "${appName}-elasticache-user-${user}"
+                            "name": _name
                             "template": {
                                 "engineVersion": "v2"
                                 "mergePolicy": "Merge"

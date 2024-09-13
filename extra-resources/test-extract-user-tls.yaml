@@ -2,7 +2,7 @@
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
-  name: rdsapp-eso-cluster-auth
+  name: demotech-rds-eso-cluster-auth
   namespace: org-demotech
 
 spec:
@@ -12,7 +12,7 @@ spec:
     kind: SecretStore
 
   target:
-    name: rdsapp-eso-cluster-auth
+    name: demotech-rds-eso-cluster-auth
     creationPolicy: Orphan
     deletionPolicy: Merge
     template:
@@ -21,7 +21,7 @@ spec:
       templateFrom:
       - target: Data
         literal: |-
-          {{ $kubeconfig := index . "rdsapp-kubeconfig" | fromYaml }}
+          {{ $kubeconfig := index . "demotech-rds-kubeconfig" | fromYaml }}
           {{ $value := index $kubeconfig "value" | fromYaml }}
           {{ $ca := index $value "clusters" 0 "cluster" "certificate-authority-data" | b64dec }}
           {{ $crt := index $value "users" 0 "user" "client-certificate-data" | b64dec }}
@@ -32,4 +32,4 @@ spec:
   dataFrom:
   - find:
       name:
-        regexp: rdsapp-kubeconfig
+        regexp: demotech-rds-kubeconfig
