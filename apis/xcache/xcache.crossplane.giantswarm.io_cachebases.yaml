@@ -381,6 +381,11 @@ spec:
                 - Orphan
                 - Delete
                 type: string
+              enableAuthToken:
+                description: |-
+                  EnableAuthToken specifies whether an auth token should be enabled for the
+                  replication group.
+                type: boolean
               engine:
                 description: |-
                   Engine is the name of the cache engine to be used for the clusters in

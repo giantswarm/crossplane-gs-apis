@@ -136,16 +136,16 @@ replicationGroups = [
                 "atRestEncryptionEnabled" = get(oxr, "spec.atRestEncryptionEnabled", True)
 
                 if get(oxr, "spec.transitEncryptionEnabled", False):
-                    #"autoGenerateAuthToken": True
-                    #"authTokenSecretRef": {
-                    #    "key": "token"
-                    #    "name": "${appName}-elasticache-auth-token"
-                    #    "namespace": get(oxr, "spec.claimRef.namespace", "default")
-                    #}
+                    if get(oxr, "spec.enableAuthToken", False):
+                        "autoGenerateAuthToken": True
+                        "authTokenUpdateStrategy": get(oxr, "spec.authTokenUpdateStrategy", "ROTATE")
+                        "authTokenSecretRef": {
+                            "key": "token"
+                            "name": "${appName}-elasticache-auth-token"
+                            "namespace": get(oxr, "spec.claimRef.namespace", "default")
+                        }
                     "transitEncryptionEnabled": get(oxr, "spec.transitEncryptionEnabled", True)
 
-                #if get(oxr, "spec.authTokenUpdateStrategy", False):
-                #    "authTokenUpdateStrategy": get(oxr, "spec.authTokenUpdateStrategy", "ROTATE")
                 if get(oxr, "spec.autoMinorVersionUpgrade", None) != None:
                     "autoMinorVersionUpgrade": get(oxr, "spec.autoMinorVersionUpgrade", True)
                 if get(oxr, "spec.automaticFailoverEnabled", None) != None:

@@ -480,16 +480,16 @@ spec:
                           "atRestEncryptionEnabled" = get(oxr, "spec.atRestEncryptionEnabled", True)
 
                           if get(oxr, "spec.transitEncryptionEnabled", False):
-                              #"autoGenerateAuthToken": True
-                              #"authTokenSecretRef": {
-                              #    "key": "token"
-                              #    "name": "${appName}-elasticache-auth-token"
-                              #    "namespace": get(oxr, "spec.claimRef.namespace", "default")
-                              #}
+                              if get(oxr, "spec.enableAuthToken", False):
+                                  "autoGenerateAuthToken": True
+                                  "authTokenUpdateStrategy": get(oxr, "spec.authTokenUpdateStrategy", "ROTATE")
+                                  "authTokenSecretRef": {
+                                      "key": "token"
+                                      "name": "${appName}-elasticache-auth-token"
+                                      "namespace": get(oxr, "spec.claimRef.namespace", "default")
+                                  }
                               "transitEncryptionEnabled": get(oxr, "spec.transitEncryptionEnabled", True)
 
-                          #if get(oxr, "spec.authTokenUpdateStrategy", False):
-                          #    "authTokenUpdateStrategy": get(oxr, "spec.authTokenUpdateStrategy", "ROTATE")
                           if get(oxr, "spec.autoMinorVersionUpgrade", None) != None:
                               "autoMinorVersionUpgrade": get(oxr, "spec.autoMinorVersionUpgrade", True)
                           if get(oxr, "spec.automaticFailoverEnabled", None) != None:
@@ -1177,30 +1177,30 @@ spec:
                   "spec": {
                       "deletionPolicy": dp
                       "forProvider": {
-                          if name == "default":
-                              "accessString": "off ~* +@all"
-                              "authenticationMode": [
-                                  {
-                                      "type": "no-password-required"
-                                  }
-                              ]
-                          else:
-                              "accessString": "on ~* +@all"
-                              "authenticationMode": [
-                                  {
-                                      "passwordsSecretRef": [
-                                          {
-                                              "key": "password"
-                                              if name == appName:
-                                                  "name": "${name}-elasticache-user"
-                                              else:
-                                                  "name": "${appName}-elasticache-user-${name}"
-                                              "namespace": namespace
-                                          }
-                                      ]
-                                      "type": "password"
-                                  }
-                              ]
+                          #if name == "default":
+                          #    "accessString": "off ~* +@all"
+                          #    "authenticationMode": [
+                          #        {
+                          #            "type": "no-password-required"
+                          #        }
+                          #    ]
+                          #else:
+                          "accessString": "off ~* +@all" if name == "default" else "on ~* +@all"
+                          "authenticationMode": [
+                              {
+                                  "passwordsSecretRef": [
+                                      {
+                                          "key": "password"
+                                          if name == appName:
+                                              "name": "${name}-elasticache-user"
+                                          else:
+                                              "name": "${appName}-elasticache-user-${name}"
+                                          "namespace": namespace
+                                      }
+                                  ]
+                                  "type": "password"
+                              }
+                          ]
                           "engine": get(oxr, "spec.engine", "redis")
                           "region": region
                           "tags" = tags | {
@@ -1544,7 +1544,7 @@ spec:
                   get(oxr, "spec.createReplicationGroup", True),
                   # don't create a password for the default user
                   # as this will be disabled
-                  user != "default"
+                  #user != "default"
               ])
           ]
 

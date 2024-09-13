@@ -114,7 +114,7 @@ passwords = [
         get(oxr, "spec.createReplicationGroup", True),
         # don't create a password for the default user
         # as this will be disabled
-        user != "default"
+        #user != "default"
     ])
 ]
 

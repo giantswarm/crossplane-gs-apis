@@ -592,6 +592,11 @@ spec:
 
                           Must be true if the replcation group is using r6gd nodes
                         type: boolean
+                      enableAuthToken:
+                        description: |-
+                          EnableAuthToken specifies whether an auth token should be enabled for the
+                          replication group.
+                        type: boolean
                       engine:
                         description: |-
                           Engine is the name of the cache engine to be used for the clusters in

@@ -643,6 +643,11 @@ func (in *ReplicationGroup) DeepCopyInto(out *ReplicationGroup) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.EnableAuthToken != nil {
+		in, out := &in.EnableAuthToken, &out.EnableAuthToken
+		*out = new(bool)
+		**out = **in
+	}
 	if in.Engine != nil {
 		in, out := &in.Engine, &out.Engine
 		*out = new(string)

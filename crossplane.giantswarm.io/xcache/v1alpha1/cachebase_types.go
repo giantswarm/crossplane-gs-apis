@@ -547,6 +547,13 @@ type ReplicationGroup struct {
 	// +default=false
 	DataTieringEnabled *bool `json:"dataTieringEnabled,omitempty"`
 
+	// EnableAuthToken specifies whether an auth token should be enabled for the
+	// replication group.
+	//
+	// +optional
+	// +default=false
+	EnableAuthToken *bool `json:"enableAuthToken,omitempty"`
+
 	// Engine is the name of the cache engine to be used for the clusters in
 	// this group.
 	//

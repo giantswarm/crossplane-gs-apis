@@ -12,30 +12,30 @@ users = [
         "spec": {
             "deletionPolicy": dp
             "forProvider": {
-                if name == "default":
-                    "accessString": "off ~* +@all"
-                    "authenticationMode": [
-                        {
-                            "type": "no-password-required"
-                        }
-                    ]
-                else:
-                    "accessString": "on ~* +@all"
-                    "authenticationMode": [
-                        {
-                            "passwordsSecretRef": [
-                                {
-                                    "key": "password"
-                                    if name == appName:
-                                        "name": "${name}-elasticache-user"
-                                    else:
-                                        "name": "${appName}-elasticache-user-${name}"
-                                    "namespace": namespace
-                                }
-                            ]
-                            "type": "password"
-                        }
-                    ]
+                #if name == "default":
+                #    "accessString": "off ~* +@all"
+                #    "authenticationMode": [
+                #        {
+                #            "type": "no-password-required"
+                #        }
+                #    ]
+                #else:
+                "accessString": "off ~* +@all" if name == "default" else "on ~* +@all"
+                "authenticationMode": [
+                    {
+                        "passwordsSecretRef": [
+                            {
+                                "key": "password"
+                                if name == appName:
+                                    "name": "${name}-elasticache-user"
+                                else:
+                                    "name": "${appName}-elasticache-user-${name}"
+                                "namespace": namespace
+                            }
+                        ]
+                        "type": "password"
+                    }
+                ]
                 "engine": get(oxr, "spec.engine", "redis")
                 "region": region
                 "tags" = tags | {
