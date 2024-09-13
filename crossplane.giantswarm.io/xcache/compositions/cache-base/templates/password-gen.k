@@ -110,9 +110,6 @@ passwords = [
     if all_true([
         get(oxr, "spec.engine", "redis") == "redis",
         get(oxr, "spec.createReplicationGroup", True),
-        # don't create a password for the default user
-        # as this will be disabled
-        #user != "default"
     ])
 ]
 
@@ -186,12 +183,13 @@ deletionPolicy = "Delete" if dp == "Delete" else "Retain"
 # Push Secrets
 pushSecrets = [
     {
+        _name = get(password, "spec.forProvider.manifest.spec.target.name", "")
         "apiVersion": "kubernetes.crossplane.io/v1alpha2"
         "kind": "Object"
         "metadata": {
             "annotations": {
-                "krm.kcl.dev/composition-resource-name" = "${appName}-pushsecret"
-                "krm.kcl.dev/ready": readystr("${appName}-pushsecret")
+                "krm.kcl.dev/composition-resource-name" = "pushsecret-${_name}"
+                "krm.kcl.dev/ready": readystr("pushsecret-${_name}")
             }
         }
         "spec": {
@@ -203,7 +201,6 @@ pushSecrets = [
                     "metadata": {
                         "namespace": get(oxr, "spec.claimRef.namespace", "default")
                     }
-                    _name = get(password, "spec.forProvider.manifest.spec.target.name", "")
                     "spec": {
                         "refreshInterval": "10s"
                         "secretStoreRefs": [
