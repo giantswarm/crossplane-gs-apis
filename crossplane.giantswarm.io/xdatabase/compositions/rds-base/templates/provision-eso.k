@@ -100,7 +100,9 @@ pushSecret = [
                                 "name": value.name
                                 "kind": "ClusterSecretStore" if value.clusterScoped else "SecretStore"
                             }
+                            # Don't push the master secret to the tenant cluster
                             for _, value in pushSecretStores
+                            if value.name != "${appName}-tenant-secret-store"
                         ]
                         "data" = [
                             {
