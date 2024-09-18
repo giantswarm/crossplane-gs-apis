@@ -97,6 +97,7 @@ provisioning = {
     }
     spec: {
         "deletionPolicy": dp,
+        "eso": get(oxr, "spec.eso", {}),
         "engine": get(oxr, "spec.engine", "postgres")
         "claimRef": get(oxr, "spec.claimRef", {})
         "providerConfigRef": get(oxr, "spec.providerConfigRef", {"name": "default"})
