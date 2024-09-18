@@ -85,6 +85,18 @@ fluxSSA = {
 esoConnectionSecret = get(oxr, "status.esoConnectionSecret", False)
 sqlEnabled = get(oxr, "spec.provisionSql.enabled", True)
 
+secretStores = get(oxr, "spec.eso.stores", []) + [
+    {
+        "name" = "${appName}-tenant-secret-store",
+        "enabled" = True
+        "isClusterSecretStore" = False
+    }
+]
+
+eso = get(oxr, "spec.eso", {}) | {
+    "stores" = secretStores,
+}
+
 provisioning = {
     apiVersion: "xdatabase.crossplane.giantswarm.io/v1alpha1"
     kind: "RdsProvisioning"
@@ -97,7 +109,7 @@ provisioning = {
     }
     spec: {
         "deletionPolicy": dp,
-        "eso": get(oxr, "spec.eso", {}),
+        "eso": eso,
         "engine": get(oxr, "spec.engine", "postgres")
         "claimRef": get(oxr, "spec.claimRef", {})
         "providerConfigRef": get(oxr, "spec.providerConfigRef", {"name": "default"})
@@ -110,9 +122,70 @@ provisioning = {
     get(oxr, "spec.databases", True),
 ]) else {}
 
+clusterName = get(oxr, "spec.eso.tenantCluster.clusterName", "")
+
+tenantSecretStore = {
+    "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+    "kind": "Object"
+    "metadata": {
+        "annotations": {
+            "krm.kcl.dev/composition-resource-name": "tenant-secret-store"
+            "krm.kcl.dev/ready": readystr("tenant-secret-store")
+        }
+    }
+    "spec": {
+        "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete")
+        "forProvider": {
+            "manifest": {
+                "apiVersion": "external-secrets.io/v1beta1"
+                "kind": "SecretStore"
+                "metadata": {
+                    "name": "${appName}-tenant-secret-store"
+                    "namespace": get(oxr, "spec.claimRef.namespace", "")
+                }
+                "spec": {
+                    "provider": {
+                        "kubernetes": {
+                            "auth": {
+                                "cert": {
+                                    "clientCert": {
+                                        "name": "${clusterName}-eso-cluster-auth",
+                                        "key": "tls.crt",
+                                    },
+                                    "clientKey": {
+                                        "name": "${clusterName}-eso-cluster-auth",
+                                        "key": "tls.key",
+                                    },
+                                }
+                            }
+                            "remoteNamespace": get(oxr, "spec.eso.tenantCluster.namespace", "default")
+                            "server": {
+                                "caProvider": {
+                                    "key": "ca.crt",
+                                    "name": "${clusterName}-eso-cluster-auth",
+                                    "type": "Secret"
+                                }
+                                _url = get(oxr, "spec.eso.tenantCluster.apiServerEndpoint", "kubernetes.default")
+                                "url": "https://${_url}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        "managementPolicies": get(oxr, "spec.managementPolicies", []),
+        "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+    }
+} if all_true([
+    get(oxr, "spec.eso.enabled", False),
+    get(oxr, "spec.eso.tenantCluster.enabled", False),
+    clusterName,
+]) else {}
+
 _items = [
     i for i in [
         fluxSSA,
         provisioning,
+        tenantSecretStore,
     ] if i
 ]

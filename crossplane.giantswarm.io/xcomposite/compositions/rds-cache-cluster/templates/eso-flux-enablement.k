@@ -102,7 +102,7 @@ tenantSecretStore = {
                 "apiVersion": "external-secrets.io/v1beta1"
                 "kind": "SecretStore"
                 "metadata": {
-                    "name": "${clusterName}-tenant-secret-store"
+                    "name": "${appName}-tenant-secret-store"
                     "namespace": get(oxr, "spec.claimRef.namespace", "")
                 }
                 "spec": {

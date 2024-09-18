@@ -404,7 +404,7 @@ spec:
                                       "data": {
                                           "${ssasecret}": "",
                                           _name = regex.replace(appName, "[-_\.]", "_").lower()
-                                          "${_name}" = "{{ \"Merge\" }}",
+                                          "${_name}" = "Merge",
                                       },
                                   }
                               }
@@ -425,6 +425,7 @@ spec:
           ]) else {}
 
           clusterName = get(oxr, "spec.eso.tenantCluster.clusterName", "")
+
           tenantSecretStore = {
               "apiVersion": "kubernetes.crossplane.io/v1alpha2"
               "kind": "Object"
