@@ -64,7 +64,7 @@ fluxSsa = {
                             "data": {
                                 "${ssasecret}": "",
                                 _name = regex.replace(appName, "[-_\.]", "_").lower()
-                                "${_name}" = "{{ \"Merge\" }}",
+                                "${_name}" = "Merge",
                             },
                         }
                     }
@@ -85,6 +85,7 @@ fluxSsa = {
 ]) else {}
 
 clusterName = get(oxr, "spec.eso.tenantCluster.clusterName", "")
+
 tenantSecretStore = {
     "apiVersion": "kubernetes.crossplane.io/v1alpha2"
     "kind": "Object"
@@ -101,7 +102,7 @@ tenantSecretStore = {
                 "apiVersion": "external-secrets.io/v1beta1"
                 "kind": "SecretStore"
                 "metadata": {
-                    "name": "${appName}-tenant-secret-store"
+                    "name": "${clusterName}-tenant-secret-store"
                     "namespace": get(oxr, "spec.claimRef.namespace", "")
                 }
                 "spec": {

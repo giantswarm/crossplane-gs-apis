@@ -447,11 +447,64 @@ Name specifies the name of the VPC to peer with.
 
 |Property |Value    |
 |:--------|:--------|
-|Type     |string|
+|Type     |object|
 |Required |No|
 
 ProviderConfigRef specifies the provider config to use for the peering
 connection.
+
+#### `.spec.remoteVpcs[*].providerConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.spec.remoteVpcs[*].providerConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.remoteVpcs[*].providerConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.remoteVpcs[*].providerConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
 
 #### `.spec.remoteVpcs[*].region`
 
@@ -574,5 +627,6 @@ a resource at any point in time.
 |Property |Value    |
 |:--------|:--------|
 |Type     |object|
-|Required |**Yes**|
+|Required |No|
 
+The VPCs that have been discovered.

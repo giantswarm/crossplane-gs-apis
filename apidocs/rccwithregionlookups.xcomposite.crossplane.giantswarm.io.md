@@ -97,6 +97,17 @@ Name is the name of the cluster to discover
 
 Namespace is the namespace of the cluster to discover
 
+#### `.spec.clusterDiscovery.remoteNamespace`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+RemoteNamespace is the namespace on the remote cluster to
+apply secrets into. If not specified, the default namespace
+is used.
+
 #### `.spec.deletionPolicy`
 
 |Property |Value    |
@@ -179,6 +190,44 @@ Resolve specifies when this reference should be resolved. The default
 is 'IfNotPresent', which will attempt to resolve the reference only when
 the corresponding field is not present. Use 'Always' to resolve the
 reference on every reconcile.
+
+#### `.spec.managementClusterDiscovery`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |**Yes**|
+
+ManagementClusterDiscovery is the reference to the management cluster
+
+#### `.spec.managementClusterDiscovery.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name is the name of the cluster to discover
+
+#### `.spec.managementClusterDiscovery.namespace`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Namespace is the namespace of the cluster to discover
+
+#### `.spec.managementClusterDiscovery.remoteNamespace`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+RemoteNamespace is the namespace on the remote cluster to
+apply secrets into. If not specified, the default namespace
+is used.
 
 #### `.spec.managementPolicies`
 
@@ -975,6 +1024,16 @@ DataTieringEnabled specifies whether data tiering is enabled for the
 replication group.
 
 Must be true if the replcation group is using r6gd nodes
+
+#### `.spec.rdsCacheClusterParameters.cache.enableAuthToken`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+EnableAuthToken specifies whether an auth token should be enabled for the
+replication group.
 
 #### `.spec.rdsCacheClusterParameters.cache.engine`
 
@@ -2931,7 +2990,24 @@ Determines if the RDS provisioning should be enabled
 |Type     |string|
 |Required |No|
 
+Allowed Values:
+
+- postgres
+- mysql
+- aurora-mysql
+- aurora-postgresql
+- mariadb
+
 The type of database engine being provisioned
+
+#### `.spec.rdsCacheClusterParameters.database.provisionSql.readerEndpoint`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Reader Endpoint is the endpoint to use for read operations
 
 #### `.spec.rdsCacheClusterParameters.database.publiclyAccessible`
 
@@ -3335,14 +3411,61 @@ Enabled is whether the secrets store is enabled.
 
 IsClusterSecretStore is whether the secret store is a cluster secret store.
 
-#### `.spec.rdsCacheClusterParameters.eso.stores[*].secretStore`
+#### `.spec.rdsCacheClusterParameters.eso.stores[*].name`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
 
-SecretStoreName is the name of the secret store.
+Name is the name of the secret store.
+
+#### `.spec.rdsCacheClusterParameters.eso.tenantCluster`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Tenant Cluster details
+
+#### `.spec.rdsCacheClusterParameters.eso.tenantCluster.apiServerEndpoint`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The API endpoint for the tenant cluster.
+
+#### `.spec.rdsCacheClusterParameters.eso.tenantCluster.clusterName`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The name of the tenant cluster.
+
+#### `.spec.rdsCacheClusterParameters.eso.tenantCluster.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Enabled Whether or not to enable `external-secrets-operator` object
+deployments using `provider-kubernetes.
+
+#### `.spec.rdsCacheClusterParameters.eso.tenantCluster.namespace`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The namespace on the tenant cluster to deploy secrets to. If not set
+will default to the `default` namespace.
 
 #### `.spec.rdsCacheClusterParameters.subnetGroupIndexes`
 
@@ -3461,11 +3584,64 @@ Name specifies the name of the VPC to peer with.
 
 |Property |Value    |
 |:--------|:--------|
-|Type     |string|
+|Type     |object|
 |Required |No|
 
 ProviderConfigRef specifies the provider config to use for the peering
 connection.
+
+#### `.spec.rdsCacheClusterParameters.vpc.peering.remoteVpcs[*].providerConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.spec.rdsCacheClusterParameters.vpc.peering.remoteVpcs[*].providerConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.rdsCacheClusterParameters.vpc.peering.remoteVpcs[*].providerConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.rdsCacheClusterParameters.vpc.peering.remoteVpcs[*].providerConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
 
 #### `.spec.rdsCacheClusterParameters.vpc.peering.remoteVpcs[*].region`
 
@@ -3478,6 +3654,172 @@ Region specifies the region the VPC is found in.
 
 If not defined, the region of the VPC will be assumed to be the same as
 the region of the peered VPC.
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Resource Access Management (RAM)
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.allowExternalPrincipals`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If external principals are allowed to access the resource access manager.
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Is RAM enabled
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.permissions`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The permissions to associate with the resource access manager.
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.permissions[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.principals`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+A list of principals to associate with the resource access manager.
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.principals[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.principals[*].crossOrg`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If this is a cross-org principal.
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.principals[*].principal`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The principal to associate with the resource access manager.
+
+Possible values are AWS Account ID, AWS Organization ID, or AWS organizations.
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.principals[*].providerConfigRef`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Provider config for accepting the share
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.principals[*].providerConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.principals[*].providerConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.principals[*].providerConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.principals[*].providerConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.resources`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+A list of resources to associate with the resource access manager.
+
+#### `.spec.rdsCacheClusterParameters.vpc.ram.resources[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
 
 #### `.spec.rdsCacheClusterParameters.vpc.subnetsets`
 
@@ -3517,6 +3859,17 @@ the status of the XR.
 
 PeeredSubnetSet defines the parameters for creating a set of subnets with the
 same mask.
+
+Either one of Netmask or Prefix must be set.
+
+#### `.spec.rdsCacheClusterParameters.vpc.subnetsets.cidrs[*].netmask`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |integer|
+|Required |No|
+
+The network mask to use when provisioning from IPAM
 
 #### `.spec.rdsCacheClusterParameters.vpc.subnetsets.cidrs[*].prefix`
 
@@ -3737,6 +4090,28 @@ this XRD and as it's defaulted it can be hidden from the user. The
 function input expects a path though so this has to exist but isn't
 expected to be defined on the claim.
 
+#### `.spec.rdsCacheClusterParameters.vpc.subnetsets.ipam`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If this composition is to use IPAM to calculate the CIDR blocks for the
+VPC.
+
+#### `.spec.rdsCacheClusterParameters.vpc.subnetsets.poolName`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The name of the IPAM pool to use.
+
+Only relevant if IPAM is enabled and there are IPAM pools available in
+the region.
+
 #### `.spec.rdsCacheClusterParameters.vpc.tags`
 
 |Property |Value    |
@@ -3781,6 +4156,15 @@ Subnet tags to apply to all subnetsets
 |Required |No|
 
 TransitGateway is the transit gateway to attach to the VPC.
+
+#### `.spec.rdsCacheClusterParameters.vpc.transitGateway.accountId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Account ID the VPC is in
 
 #### `.spec.rdsCacheClusterParameters.vpc.transitGateway.allowPublic`
 
@@ -4383,52 +4767,6 @@ Outbound route
 This places it in the ManagedPrefixList attached
 to the outbound route table
 
-#### `.spec.rdsCacheClusterParameters.vpc.transitGateway.ram`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-Resource Access Management (RAM)
-
-#### `.spec.rdsCacheClusterParameters.vpc.transitGateway.ram.allowExternalPrincipals`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-Do we allow external principles with this ram
-
-#### `.spec.rdsCacheClusterParameters.vpc.transitGateway.ram.enabled`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-Is RAM enabled
-
-#### `.spec.rdsCacheClusterParameters.vpc.transitGateway.ram.principals`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-Principals that are allowed to access the resource
-
-#### `.spec.rdsCacheClusterParameters.vpc.transitGateway.ram.principals[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-
 #### `.spec.rdsCacheClusterParameters.vpc.transitGateway.region`
 
 |Property |Value    |
@@ -4458,6 +4796,15 @@ RemoteVpcs is a list of VPCs build a transit gateway between
 
 TgwWrappedVpcWithProviderConfig defines the parameters for creating a VPC with
 the option of peered subnets.
+
+#### `.spec.rdsCacheClusterParameters.vpc.transitGateway.remoteVpcs[*].accountId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Account ID the VPC is in
 
 #### `.spec.rdsCacheClusterParameters.vpc.transitGateway.remoteVpcs[*].allowPublic`
 
@@ -5062,6 +5409,15 @@ Status of this condition; is it currently True, False, or Unknown?
 Type of this condition. At most one of each condition type may apply to
 a resource at any point in time.
 
+#### `.status.mcregion`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Region for the management cluster
+
 #### `.status.rdsConnectionSecret`
 
 |Property |Value    |
@@ -5089,6 +5445,15 @@ RdsEndpoint is the endpoint of the database
 |Required |No|
 
 RdsPort is the port of the database
+
+#### `.status.rdsReaderEndpoint`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+RdsReaderEndpoint is the reader endpoint of the database
 
 #### `.status.rdsSubnets`
 
@@ -5126,6 +5491,15 @@ Is the composition complete
 |Required |No|
 
 Region is the region in which the resources are created
+
+#### `.status.tenantApiServerEndpoint`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The API server endpoint for the tenant cluster
 
 #### `.status.vpc`
 

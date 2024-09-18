@@ -684,6 +684,16 @@ field in a future release. Currently, both could be set independently and
 non-default values would be honored if the feature flag is enabled.
 See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
 
+#### `.spec.enableAuthToken`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+EnableAuthToken specifies whether an auth token should be enabled for the
+replication group.
+
 #### `.spec.engine`
 
 |Property |Value    |
@@ -799,14 +809,61 @@ Enabled is whether the secrets store is enabled.
 
 IsClusterSecretStore is whether the secret store is a cluster secret store.
 
-#### `.spec.eso.stores[*].secretStore`
+#### `.spec.eso.stores[*].name`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
 
-SecretStoreName is the name of the secret store.
+Name is the name of the secret store.
+
+#### `.spec.eso.tenantCluster`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Tenant Cluster details
+
+#### `.spec.eso.tenantCluster.apiServerEndpoint`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The API endpoint for the tenant cluster.
+
+#### `.spec.eso.tenantCluster.clusterName`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The name of the tenant cluster.
+
+#### `.spec.eso.tenantCluster.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Enabled Whether or not to enable `external-secrets-operator` object
+deployments using `provider-kubernetes.
+
+#### `.spec.eso.tenantCluster.namespace`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The namespace on the tenant cluster to deploy secrets to. If not set
+will default to the `default` namespace.
 
 #### `.spec.finalSnapshotIdentifier`
 
@@ -1933,3 +1990,30 @@ SubnetGroupName is the name of the subnet group for the cluster.
 |Required |No|
 
 UserGroupId is the ID of the user group for the cluster.
+
+#### `.status.userSecrets`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+User secrets are the secrets provisioned for the app and users
+
+#### `.status.userSecrets.app`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The name of the secret created specifically for the app
+
+#### `.status.userSecrets.users`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+A map of secret names created for users

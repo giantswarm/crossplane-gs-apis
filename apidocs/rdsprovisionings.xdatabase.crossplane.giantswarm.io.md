@@ -129,7 +129,156 @@ Determines if the RDS provisioning should be enabled
 |Type     |string|
 |Required |No|
 
+Allowed Values:
+
+- postgres
+- mysql
+- aurora-mysql
+- aurora-postgresql
+- mariadb
+
 The type of database engine being provisioned
+
+#### `.spec.eso`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+ESO configuration
+
+#### `.spec.eso.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Enabled Whether or not to enable `external-secrets-operator` object
+deployments using `provider-kubernetes.
+
+#### `.spec.eso.fluxSSASecretName`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+FluxSSASecretName is the name of the secret that contains SSA details
+for each project built with infrastructure components.
+
+This secret will be updated with the name of the current project with
+all hyphens, underscores and dots replaced with an empty string.
+
+This secret must exist in the same namespace as the current project.
+
+#### `.spec.eso.kubernetesSecretStore`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+KubernetesSecretStore is the Kubernetes secret store to use.
+
+The kubernetes secret store is expected to be namespace scoped to prevent
+secrets leaking across namespaces.
+
+#### `.spec.eso.stores`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Stores is a list of secret stores to use for push secrets.
+
+#### `.spec.eso.stores[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+SecretsStore is a reference to a secrets store to be passed to External
+Secrets Operator for creating PushSecrets
+
+#### `.spec.eso.stores[*].enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Enabled is whether the secrets store is enabled.
+
+#### `.spec.eso.stores[*].isClusterSecretStore`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+IsClusterSecretStore is whether the secret store is a cluster secret store.
+
+#### `.spec.eso.stores[*].name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name is the name of the secret store.
+
+#### `.spec.eso.tenantCluster`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Tenant Cluster details
+
+#### `.spec.eso.tenantCluster.apiServerEndpoint`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The API endpoint for the tenant cluster.
+
+#### `.spec.eso.tenantCluster.clusterName`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The name of the tenant cluster.
+
+#### `.spec.eso.tenantCluster.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Enabled Whether or not to enable `external-secrets-operator` object
+deployments using `provider-kubernetes.
+
+#### `.spec.eso.tenantCluster.namespace`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The namespace on the tenant cluster to deploy secrets to. If not set
+will default to the `default` namespace.
 
 #### `.spec.kubernetesProviderConfig`
 
@@ -416,6 +565,15 @@ Type is the SecretType for the connection secret.
 
 Name is the name of the connection secret.
 
+#### `.spec.readerEndpoint`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Reader Endpoint is the endpoint to use for read operations
+
 #### `.spec.writeConnectionSecretToRef`
 
 |Property |Value    |
@@ -519,6 +677,33 @@ Status of this condition; is it currently True, False, or Unknown?
 
 Type of this condition. At most one of each condition type may apply to
 a resource at any point in time.
+
+#### `.status.connectionSecrets`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Connection secrets created for the databases
+
+#### `.status.connectionSecrets.app`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The name of the secret created specifically for the app
+
+#### `.status.connectionSecrets.users`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+A map of secret names created for users
 
 #### `.status.ready`
 

@@ -174,6 +174,15 @@ If IPv6 support is enabled for the transit gateway.
 
 Contains details about the local VPC (Where the TGW will be built)
 
+#### `.spec.localVpc.accountId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Account ID the VPC is in
+
 #### `.spec.localVpc.cidrBlocks`
 
 |Property |Value    |
@@ -871,7 +880,7 @@ Resource Access Management (RAM)
 |Type     |boolean|
 |Required |No|
 
-Do we allow external principles with this ram
+If external principals are allowed to access the resource access manager.
 
 #### `.spec.ram.enabled`
 
@@ -882,6 +891,25 @@ Do we allow external principles with this ram
 
 Is RAM enabled
 
+#### `.spec.ram.permissions`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The permissions to associate with the resource access manager.
+
+#### `.spec.ram.permissions[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+
 #### `.spec.ram.principals`
 
 |Property |Value    |
@@ -891,9 +919,110 @@ Is RAM enabled
 |Min Items|0|
 |Max Items|Unlimited|
 
-Principals that are allowed to access the resource
+A list of principals to associate with the resource access manager.
 
 #### `.spec.ram.principals[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.ram.principals[*].crossOrg`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If this is a cross-org principal.
+
+#### `.spec.ram.principals[*].principal`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The principal to associate with the resource access manager.
+
+Possible values are AWS Account ID, AWS Organization ID, or AWS organizations.
+
+#### `.spec.ram.principals[*].providerConfigRef`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Provider config for accepting the share
+
+#### `.spec.ram.principals[*].providerConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.spec.ram.principals[*].providerConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.ram.principals[*].providerConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.ram.principals[*].providerConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
+
+#### `.spec.ram.resources`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+A list of resources to associate with the resource access manager.
+
+#### `.spec.ram.resources[*]`
 
 |Property |Value    |
 |:--------|:--------|
@@ -919,6 +1048,15 @@ Contains details about the remote VPCs
 |Type     |object|
 |Required |No|
 
+
+#### `.spec.remoteVpcs[*].accountId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Account ID the VPC is in
 
 #### `.spec.remoteVpcs[*].cidrBlocks`
 
@@ -1378,6 +1516,25 @@ Is the transit gateway ready
 |Required |No|
 
 map of remote attachments
+
+#### `.status.sharedPrefixLists`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+Any prefix list ARNs that are shared
+
+#### `.status.sharedPrefixLists[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
 
 #### `.status.tgwArn`
 

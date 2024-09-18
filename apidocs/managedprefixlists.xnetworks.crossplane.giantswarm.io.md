@@ -437,6 +437,15 @@ Namespace of the secret.
 
 ### Status Properties
 
+#### `.status.arn`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The ARN of the prefix list.
+
 #### `.status.conditions`
 
 |Property |Value    |

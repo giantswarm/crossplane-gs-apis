@@ -261,11 +261,64 @@ Name specifies the name of the VPC to peer with.
 
 |Property |Value    |
 |:--------|:--------|
-|Type     |string|
+|Type     |object|
 |Required |No|
 
 ProviderConfigRef specifies the provider config to use for the peering
 connection.
+
+#### `.spec.peering.remoteVpcs[*].providerConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.spec.peering.remoteVpcs[*].providerConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.peering.remoteVpcs[*].providerConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.peering.remoteVpcs[*].providerConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
 
 #### `.spec.peering.remoteVpcs[*].region`
 
@@ -471,6 +524,172 @@ Type is the SecretType for the connection secret.
 
 Name is the name of the connection secret.
 
+#### `.spec.ram`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Resource Access Management (RAM)
+
+#### `.spec.ram.allowExternalPrincipals`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If external principals are allowed to access the resource access manager.
+
+#### `.spec.ram.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Is RAM enabled
+
+#### `.spec.ram.permissions`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+The permissions to associate with the resource access manager.
+
+#### `.spec.ram.permissions[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+
+#### `.spec.ram.principals`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+A list of principals to associate with the resource access manager.
+
+#### `.spec.ram.principals[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+
+#### `.spec.ram.principals[*].crossOrg`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If this is a cross-org principal.
+
+#### `.spec.ram.principals[*].principal`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+The principal to associate with the resource access manager.
+
+Possible values are AWS Account ID, AWS Organization ID, or AWS organizations.
+
+#### `.spec.ram.principals[*].providerConfigRef`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Provider config for accepting the share
+
+#### `.spec.ram.principals[*].providerConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.spec.ram.principals[*].providerConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.spec.ram.principals[*].providerConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.spec.ram.principals[*].providerConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
+
+#### `.spec.ram.resources`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+A list of resources to associate with the resource access manager.
+
+#### `.spec.ram.resources[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+
 #### `.spec.region`
 
 |Property |Value    |
@@ -518,6 +737,17 @@ the status of the XR.
 
 PeeredSubnetSet defines the parameters for creating a set of subnets with the
 same mask.
+
+Either one of Netmask or Prefix must be set.
+
+#### `.spec.subnetsets.cidrs[*].netmask`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |integer|
+|Required |No|
+
+The network mask to use when provisioning from IPAM
 
 #### `.spec.subnetsets.cidrs[*].prefix`
 
@@ -738,6 +968,28 @@ this XRD and as it's defaulted it can be hidden from the user. The
 function input expects a path though so this has to exist but isn't
 expected to be defined on the claim.
 
+#### `.spec.subnetsets.ipam`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+If this composition is to use IPAM to calculate the CIDR blocks for the
+VPC.
+
+#### `.spec.subnetsets.poolName`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The name of the IPAM pool to use.
+
+Only relevant if IPAM is enabled and there are IPAM pools available in
+the region.
+
 #### `.spec.tags`
 
 |Property |Value    |
@@ -782,6 +1034,15 @@ Subnet tags to apply to all subnetsets
 |Required |No|
 
 TransitGateway is the transit gateway to attach to the VPC.
+
+#### `.spec.transitGateway.accountId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Account ID the VPC is in
 
 #### `.spec.transitGateway.allowPublic`
 
@@ -1384,52 +1645,6 @@ Outbound route
 This places it in the ManagedPrefixList attached
 to the outbound route table
 
-#### `.spec.transitGateway.ram`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-Resource Access Management (RAM)
-
-#### `.spec.transitGateway.ram.allowExternalPrincipals`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-Do we allow external principles with this ram
-
-#### `.spec.transitGateway.ram.enabled`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-Is RAM enabled
-
-#### `.spec.transitGateway.ram.principals`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |array|
-|Required |No|
-|Min Items|0|
-|Max Items|Unlimited|
-
-Principals that are allowed to access the resource
-
-#### `.spec.transitGateway.ram.principals[*]`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-
 #### `.spec.transitGateway.region`
 
 |Property |Value    |
@@ -1459,6 +1674,15 @@ RemoteVpcs is a list of VPCs build a transit gateway between
 
 TgwWrappedVpcWithProviderConfig defines the parameters for creating a VPC with
 the option of peered subnets.
+
+#### `.spec.transitGateway.remoteVpcs[*].accountId`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Account ID the VPC is in
 
 #### `.spec.transitGateway.remoteVpcs[*].allowPublic`
 
@@ -1955,6 +2179,25 @@ a resource at any point in time.
 
 Is the network ready
 
+#### `.status.sharedSubnets`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |array|
+|Required |No|
+|Min Items|0|
+|Max Items|Unlimited|
+
+SharedSubnets is a list of subnet ARNs that are to be shared via RAM
+
+#### `.status.sharedSubnets[*]`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+
 #### `.status.subnetBits`
 
 |Property |Value    |
@@ -2075,11 +2318,64 @@ Name specifies the name of the VPC to peer with.
 
 |Property |Value    |
 |:--------|:--------|
-|Type     |string|
+|Type     |object|
 |Required |No|
 
 ProviderConfigRef specifies the provider config to use for the peering
 connection.
+
+#### `.status.vpcLookup.remoteVpcs[*].providerConfigRef.name`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |**Yes**|
+
+Name of the referenced object.
+
+#### `.status.vpcLookup.remoteVpcs[*].providerConfigRef.policy`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Policies for referencing.
+
+#### `.status.vpcLookup.remoteVpcs[*].providerConfigRef.policy.resolution`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+|Default Value|Required|
+
+Allowed Values:
+
+- Required
+- Optional
+
+Resolution specifies whether resolution of this reference is required.
+The default is 'Required', which means the reconcile will fail if the
+reference cannot be resolved. 'Optional' means this reference will be
+a no-op if it cannot be resolved.
+
+#### `.status.vpcLookup.remoteVpcs[*].providerConfigRef.policy.resolve`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- Always
+- IfNotPresent
+
+Resolve specifies when this reference should be resolved. The default
+is 'IfNotPresent', which will attempt to resolve the reference only when
+the corresponding field is not present. Use 'Always' to resolve the
+reference on every reconcile.
 
 #### `.status.vpcLookup.remoteVpcs[*].region`
 

@@ -953,14 +953,61 @@ Enabled is whether the secrets store is enabled.
 
 IsClusterSecretStore is whether the secret store is a cluster secret store.
 
-#### `.spec.eso.stores[*].secretStore`
+#### `.spec.eso.stores[*].name`
 
 |Property |Value    |
 |:--------|:--------|
 |Type     |string|
 |Required |**Yes**|
 
-SecretStoreName is the name of the secret store.
+Name is the name of the secret store.
+
+#### `.spec.eso.tenantCluster`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Tenant Cluster details
+
+#### `.spec.eso.tenantCluster.apiServerEndpoint`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The API endpoint for the tenant cluster.
+
+#### `.spec.eso.tenantCluster.clusterName`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The name of the tenant cluster.
+
+#### `.spec.eso.tenantCluster.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Enabled Whether or not to enable `external-secrets-operator` object
+deployments using `provider-kubernetes.
+
+#### `.spec.eso.tenantCluster.namespace`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The namespace on the tenant cluster to deploy secrets to. If not set
+will default to the `default` namespace.
 
 #### `.spec.globalClusterIdentifier`
 
@@ -1708,7 +1755,24 @@ Determines if the RDS provisioning should be enabled
 |Type     |string|
 |Required |No|
 
+Allowed Values:
+
+- postgres
+- mysql
+- aurora-mysql
+- aurora-postgresql
+- mariadb
+
 The type of database engine being provisioned
+
+#### `.spec.provisionSql.readerEndpoint`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Reader Endpoint is the endpoint to use for read operations
 
 #### `.spec.publiclyAccessible`
 
@@ -2405,6 +2469,46 @@ MonitoringRoleArn is the ARN of the monitoring role.
 |Required |No|
 
 port is the port of the database.
+
+#### `.status.provisionedSecrets`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+ProvisionedSecrets is the connection secrets created by the SQL provider
+
+#### `.status.provisionedSecrets.app`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The name of the secret created specifically for the app
+
+#### `.status.provisionedSecrets.users`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+A map of secret names created for users
+
+#### `.status.readerEndpoint`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+ReaderEndpoint is the reader endpoint of the DB cluster.
+
+If this is a cluster mode, this is the reader endpoint of the cluster.
+When working with instances, this is a comma separated list of the reader
+instances.
 
 #### `.status.ready`
 
