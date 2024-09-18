@@ -78,7 +78,7 @@ passwords = [
                                     {
                                         "target": "Data",
                                         "literal": """
-                                            host: ${_endpoint}
+                                            endpoint: ${_endpoint}
                                             reader: ${readerep}
                                             port: ${_port}
                                             username: ${user}
@@ -148,7 +148,7 @@ esoConnectionSecret = {
                                 {
                                     "target": "Data",
                                     "literal": """
-                                        host: ${_endpoint}
+                                        endpoint: ${_endpoint}
                                         reader: ${readerep}
                                         port: ${_port}
                                         username: ${appName}

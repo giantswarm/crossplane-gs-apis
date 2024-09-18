@@ -1508,7 +1508,7 @@ spec:
                                               {
                                                   "target": "Data",
                                                   "literal": """
-                                                      host: ${_endpoint}
+                                                      endpoint: ${_endpoint}
                                                       reader: ${readerep}
                                                       port: ${_port}
                                                       username: ${user}
@@ -1578,7 +1578,7 @@ spec:
                                           {
                                               "target": "Data",
                                               "literal": """
-                                                  host: ${_endpoint}
+                                                  endpoint: ${_endpoint}
                                                   reader: ${readerep}
                                                   port: ${_port}
                                                   username: ${appName}
