@@ -60,7 +60,7 @@ if _engine == "postgresql":
                     },
                     **user,
                 }
-                for username, user in dbUsers
+                for username, user in dbUsers.users
             }
         }
         for dbName, dbUsers in defaultDatabase | get(oxr, "spec.databases", {})
