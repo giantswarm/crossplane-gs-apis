@@ -1936,75 +1936,6 @@ will be created as `instance.rds` types.
 
 DatabaseName is the name of the database to create.
 
-#### `.spec.rdsCacheClusterParameters.database.databases`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-Databases determines whether or not to provision databases inside the
-RDS cluster.
-
-#### `.spec.rdsCacheClusterParameters.database.databases.connectionSecretName`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-The name of the connection secret to use for the RDS instance
-
-Required if `providerConfigRef` is not provided, ignored otherwise
-Must exist in the same namespace as the provisioning claim
-
-If this value is provided, the composition will attempt to create a
-provider config using the engine specific providerconfig spec
-
-#### `.spec.rdsCacheClusterParameters.database.databases.databases`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-Databases is a map of databases to create.
-
-#### `.spec.rdsCacheClusterParameters.database.databases.enabled`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-Determines if the RDS provisioning should be enabled
-
-#### `.spec.rdsCacheClusterParameters.database.databases.engine`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-Allowed Values:
-
-- postgres
-- mysql
-- aurora-mysql
-- aurora-postgresql
-- mariadb
-
-The type of database engine being provisioned
-
-#### `.spec.rdsCacheClusterParameters.database.databases.readerEndpoint`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-Reader Endpoint is the endpoint to use for read operations
-
 #### `.spec.rdsCacheClusterParameters.database.dbClusterInstanceClass`
 
 |Property |Value    |
@@ -3008,6 +2939,75 @@ PreferredBackupWindow is the preferred backup window.
 |Required |No|
 
 PreferredMaintenanceWindow is the preferred maintenance window.
+
+#### `.spec.rdsCacheClusterParameters.database.provisionSql`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+ProvisionSql determines whether or not to provision databases inside the
+RDS cluster.
+
+#### `.spec.rdsCacheClusterParameters.database.provisionSql.connectionSecretName`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The name of the connection secret to use for the RDS instance
+
+Required if `providerConfigRef` is not provided, ignored otherwise
+Must exist in the same namespace as the provisioning claim
+
+If this value is provided, the composition will attempt to create a
+provider config using the engine specific providerconfig spec
+
+#### `.spec.rdsCacheClusterParameters.database.provisionSql.databases`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Databases is a map of databases to create.
+
+#### `.spec.rdsCacheClusterParameters.database.provisionSql.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Determines if the RDS provisioning should be enabled
+
+#### `.spec.rdsCacheClusterParameters.database.provisionSql.engine`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- postgres
+- mysql
+- aurora-mysql
+- aurora-postgresql
+- mariadb
+
+The type of database engine being provisioned
+
+#### `.spec.rdsCacheClusterParameters.database.provisionSql.readerEndpoint`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Reader Endpoint is the endpoint to use for read operations
 
 #### `.spec.rdsCacheClusterParameters.database.publiclyAccessible`
 
