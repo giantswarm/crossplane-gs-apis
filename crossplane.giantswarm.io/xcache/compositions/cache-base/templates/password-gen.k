@@ -222,7 +222,7 @@ pushSecrets = [
                                 }
                             }
                             for _, k in [
-                                "host", "reader", "port", "password", "username",
+                                "endpoint", "reader", "port", "password", "username",
                             ]
                             if _endpoint and _port
                         ]
