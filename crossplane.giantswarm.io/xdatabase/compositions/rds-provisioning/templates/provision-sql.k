@@ -45,20 +45,18 @@ if _engine == "postgresql":
         "${dbName}": {
             "users": {
                 "${username}" = {
-                    **{
-                        "connectionLimit" = 10,
-                        "privileges" = [
-                            "ALL",
-                        ],
-                        "bypassRls" = False,
-                        "createDb" = False,
-                        "createRole" = False,
-                        "inherit" = True,
-                        "login" = True,
-                        "replication" = False,
-                        "superuser" = False,
-                    } | user,
-                }
+                    "connectionLimit" = 10,
+                    "privileges" = [
+                        "ALL",
+                    ],
+                    "bypassRls" = False,
+                    "createDb" = False,
+                    "createRole" = False,
+                    "inherit" = True,
+                    "login" = True,
+                    "replication" = False,
+                    "superuser" = False,
+                } | user,
                 for username, user in get(dbUsers, "users", {})
             }
         }
