@@ -44,7 +44,7 @@ if _engine == "postgresql":
     _requiredDatabases = {
         "${dbName}": {
             "users": {
-                "${username}": {
+                "${username}" = {
                     **{
                         "connectionLimit" = 10,
                         "privileges" = [
