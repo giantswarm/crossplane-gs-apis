@@ -311,6 +311,7 @@ pushSecrets = [
                                 "password": "{{ .password }}",
                                 "username": "{{ .username }}",
                                 "reader": reader,
+                                "database": appName,
                             }
                         },
                         "data": [
