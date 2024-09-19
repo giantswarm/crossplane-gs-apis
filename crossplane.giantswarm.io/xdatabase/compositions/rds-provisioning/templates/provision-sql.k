@@ -325,7 +325,7 @@ pushSecrets = [
                                 },
                             },
                             for k in [
-                                "endpoint", "port", "password", "username", "reader",
+                                "endpoint", "port", "password", "username", "reader", "database",
                             ]
                         ]
                         "deletionPolicy": "Delete" if dp == "Delete" else "Retain",
