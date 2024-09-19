@@ -34,7 +34,7 @@ if _engine == "mysql":
                     },
                     **user,
                 }
-                for username, user in dbUsers.users
+                for username, user in get(dbUsers, "users", {})
             }
         }
         for dbName, dbUsers in defaultDatabase | get(oxr, "spec.databases", {})
@@ -60,7 +60,7 @@ if _engine == "postgresql":
                     },
                     **user,
                 }
-                for username, user in dbUsers.users
+                for username, user in get(dbUsers, "users", {})
             }
         }
         for dbName, dbUsers in defaultDatabase | get(oxr, "spec.databases", {})
