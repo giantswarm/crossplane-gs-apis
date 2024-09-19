@@ -24,10 +24,10 @@ if _engine == "mysql":
             "users": {
                 "${username}": {
                     **{
-                        "maxQueriesPerHour": 1000,
-                        "maxUpdatesPerHour": 1000,
-                        "maxConnectionsPerHour": 100,
-                        "maxUserConnections": 10,
+                        "maxQueriesPerHour" = 1000,
+                        "maxUpdatesPerHour" = 1000,
+                        "maxConnectionsPerHour" = 100,
+                        "maxUserConnections" = 10,
                         "privileges" = [
                             "ALL PRIVILEGES",
                         ],
@@ -46,17 +46,17 @@ if _engine == "postgresql":
             "users": {
                 "${username}": {
                     **{
-                        "connectionLimit": 10,
+                        "connectionLimit" = 10,
                         "privileges" = [
                             "ALL",
                         ],
-                        "bypassRls": False,
-                        "createDb": False,
-                        "createRole": False,
-                        "inherit": True,
-                        "login": True,
-                        "replication": False,
-                        "superuser": False,
+                        "bypassRls" = False,
+                        "createDb" = False,
+                        "createRole" = False,
+                        "inherit" = True,
+                        "login" = True,
+                        "replication" = False,
+                        "superuser" = False,
                     },
                     **user,
                 }
