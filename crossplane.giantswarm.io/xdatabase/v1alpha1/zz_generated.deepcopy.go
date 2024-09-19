@@ -473,6 +473,11 @@ func (in *ClusterParameters) DeepCopyInto(out *ClusterParameters) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Databases != nil {
+		in, out := &in.Databases, &out.Databases
+		*out = new(RdsProvisioningParameters)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.DbClusterInstanceClass != nil {
 		in, out := &in.DbClusterInstanceClass, &out.DbClusterInstanceClass
 		*out = new(string)
@@ -651,11 +656,6 @@ func (in *ClusterParameters) DeepCopyInto(out *ClusterParameters) {
 		in, out := &in.PreferredMaintenanceWindow, &out.PreferredMaintenanceWindow
 		*out = new(string)
 		**out = **in
-	}
-	if in.ProvisionSql != nil {
-		in, out := &in.ProvisionSql, &out.ProvisionSql
-		*out = new(RdsProvisioningParameters)
-		(*in).DeepCopyInto(*out)
 	}
 	if in.PubliclyAccessible != nil {
 		in, out := &in.PubliclyAccessible, &out.PubliclyAccessible

@@ -666,6 +666,12 @@ type ClusterParameters struct {
 	// +optional
 	DatabaseName *string `json:"databaseName,omitempty"`
 
+	// Databases determines whether or not to provision databases inside the
+	// RDS cluster.
+	//
+	// +optional
+	Databases *RdsProvisioningParameters `json:"databases,omitempty"`
+
 	// DbClusterInstanceClass is the instance class to use.
 	//
 	// +optional
@@ -838,12 +844,6 @@ type ClusterParameters struct {
 	//
 	// +optional
 	PreferredMaintenanceWindow *string `json:"preferredMaintenanceWindow,omitempty"`
-
-	// ProvisionSql determines whether or not to provision databases inside the
-	// RDS cluster.
-	//
-	// +optional
-	ProvisionSql *RdsProvisioningParameters `json:"provisionSql,omitempty"`
 
 	// PubliclyAccessible is whether the DB instance is publicly accessible.
 	//

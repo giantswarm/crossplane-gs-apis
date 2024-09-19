@@ -863,6 +863,108 @@ spec:
                   databaseName:
                     description: DatabaseName is the name of the database to create.
                     type: string
+                  databases:
+                    description: |-
+                      Databases determines whether or not to provision databases inside the
+                      RDS cluster.
+                    properties:
+                      connectionSecretName:
+                        description: |-
+                          The name of the connection secret to use for the RDS instance
+
+
+                          Required if `providerConfigRef` is not provided, ignored otherwise
+                          Must exist in the same namespace as the provisioning claim
+
+
+                          If this value is provided, the composition will attempt to create a
+                          provider config using the engine specific providerconfig spec
+                        type: string
+                      databases:
+                        additionalProperties:
+                          additionalProperties:
+                            description: |-
+                              Defines a user to create in the database
+
+
+                              See the provider specific documentation for the available configuration
+                              parameters.
+
+
+                              postgresql: https://www.postgresql.org/docs/current/sql-createrole.html
+                              mysql: https://dev.mysql.com/doc/refman/8.0/en/user-resources.html
+
+
+                              For MySQL and MariaDB the following fields are supported:
+                              - `binlog` (boolean)
+                              - `maxConnectionsPerHour` (int) Default 100 - The maximum number of connections the user can make per hour (0 for unlimited)
+                              - `maxQueriesPerHour` (int) Default 1000 - The maximum number of queries the user can make per hour (0 for unlimited)
+                              - `maxUpdatesPerHour` (int) Default 1000 - The maximum number of updates the user can make per hour (0 for unlimited)
+                              - `maxUserConnections` (int) Default 10 - The maximum number of connections the user can have open at one time (0 for unlimited)
+                              - `privileges` ([]string) - A list of privileges to grant to the user
+
+
+                              For PostgreSQL the following fields are supported:
+                              - `configurationParameters` (map[string]*string) - A map of configuration parameters to set for the user
+                              - `privileges` ([]string) - A list of privileges to grant to the user
+                              - `connectionLimit` (int) Default 10 - The maximum number of connections the user can have open at one time
+                              - `bypassRLS` (boolean) Default false - Whether the user should bypass row level security
+                              - `createDb` (boolean) Default false - Whether the user should be able to create databases
+                              - `createRole` (boolean) Default false - Whether the user should be able to create roles
+                              - `inherit` (boolean) Default true - Whether the user should inherit privileges from roles it is a member of
+                              - `login` (boolean) Default true - Whether the user should be able to log in
+                              - `replication` (boolean) Default false - Whether the user should be able to initiate streaming replication
+                              - `superuser` (boolean) Default false - Whether the user should be a superuser
+
+
+                              With the exception of `configurationParameters`, all fields should be
+                              created as elements directly on the user object and not as nested objects.
+                            properties:
+                              configurationParameters:
+                                additionalProperties:
+                                  type: string
+                                description: |-
+                                  ConfigurationParameters is the configuration parameters for the user.
+
+
+                                  Only applicable for postgresql databases
+
+
+                                  See https://www.postgresql.org/docs/current/runtime-config-client.html for
+                                  a list of available parameters.
+                                type: object
+                              privileges:
+                                description: Privileges is a list of privileges to
+                                  grant to the user.
+                                items:
+                                  type: string
+                                type: array
+                            type: object
+                            x-kubernetes-preserve-unknown-fields: true
+                          description: A list of SqlUser objects to use for the database
+                          type: object
+                          x-kubernetes-map-type: atomic
+                        description: Databases is a map of databases to create.
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      enabled:
+                        description: Determines if the RDS provisioning should be
+                          enabled
+                        type: boolean
+                      engine:
+                        description: The type of database engine being provisioned
+                        enum:
+                        - postgres
+                        - mysql
+                        - aurora-mysql
+                        - aurora-postgresql
+                        - mariadb
+                        type: string
+                      readerEndpoint:
+                        description: Reader Endpoint is the endpoint to use for read
+                          operations
+                        type: string
+                    type: object
                   dbClusterInstanceClass:
                     description: DbClusterInstanceClass is the instance class to use.
                     type: string
@@ -1405,108 +1507,6 @@ spec:
                     description: PreferredMaintenanceWindow is the preferred maintenance
                       window.
                     type: string
-                  provisionSql:
-                    description: |-
-                      ProvisionSql determines whether or not to provision databases inside the
-                      RDS cluster.
-                    properties:
-                      connectionSecretName:
-                        description: |-
-                          The name of the connection secret to use for the RDS instance
-
-
-                          Required if `providerConfigRef` is not provided, ignored otherwise
-                          Must exist in the same namespace as the provisioning claim
-
-
-                          If this value is provided, the composition will attempt to create a
-                          provider config using the engine specific providerconfig spec
-                        type: string
-                      databases:
-                        additionalProperties:
-                          additionalProperties:
-                            description: |-
-                              Defines a user to create in the database
-
-
-                              See the provider specific documentation for the available configuration
-                              parameters.
-
-
-                              postgresql: https://www.postgresql.org/docs/current/sql-createrole.html
-                              mysql: https://dev.mysql.com/doc/refman/8.0/en/user-resources.html
-
-
-                              For MySQL and MariaDB the following fields are supported:
-                              - `binlog` (boolean)
-                              - `maxConnectionsPerHour` (int) Default 100 - The maximum number of connections the user can make per hour (0 for unlimited)
-                              - `maxQueriesPerHour` (int) Default 1000 - The maximum number of queries the user can make per hour (0 for unlimited)
-                              - `maxUpdatesPerHour` (int) Default 1000 - The maximum number of updates the user can make per hour (0 for unlimited)
-                              - `maxUserConnections` (int) Default 10 - The maximum number of connections the user can have open at one time (0 for unlimited)
-                              - `privileges` ([]string) - A list of privileges to grant to the user
-
-
-                              For PostgreSQL the following fields are supported:
-                              - `configurationParameters` (map[string]*string) - A map of configuration parameters to set for the user
-                              - `privileges` ([]string) - A list of privileges to grant to the user
-                              - `connectionLimit` (int) Default 10 - The maximum number of connections the user can have open at one time
-                              - `bypassRLS` (boolean) Default false - Whether the user should bypass row level security
-                              - `createDb` (boolean) Default false - Whether the user should be able to create databases
-                              - `createRole` (boolean) Default false - Whether the user should be able to create roles
-                              - `inherit` (boolean) Default true - Whether the user should inherit privileges from roles it is a member of
-                              - `login` (boolean) Default true - Whether the user should be able to log in
-                              - `replication` (boolean) Default false - Whether the user should be able to initiate streaming replication
-                              - `superuser` (boolean) Default false - Whether the user should be a superuser
-
-
-                              With the exception of `configurationParameters`, all fields should be
-                              created as elements directly on the user object and not as nested objects.
-                            properties:
-                              configurationParameters:
-                                additionalProperties:
-                                  type: string
-                                description: |-
-                                  ConfigurationParameters is the configuration parameters for the user.
-
-
-                                  Only applicable for postgresql databases
-
-
-                                  See https://www.postgresql.org/docs/current/runtime-config-client.html for
-                                  a list of available parameters.
-                                type: object
-                              privileges:
-                                description: Privileges is a list of privileges to
-                                  grant to the user.
-                                items:
-                                  type: string
-                                type: array
-                            type: object
-                            x-kubernetes-preserve-unknown-fields: true
-                          description: A list of SqlUser objects to use for the database
-                          type: object
-                          x-kubernetes-map-type: atomic
-                        description: Databases is a map of databases to create.
-                        type: object
-                        x-kubernetes-map-type: atomic
-                      enabled:
-                        description: Determines if the RDS provisioning should be
-                          enabled
-                        type: boolean
-                      engine:
-                        description: The type of database engine being provisioned
-                        enum:
-                        - postgres
-                        - mysql
-                        - aurora-mysql
-                        - aurora-postgresql
-                        - mariadb
-                        type: string
-                      readerEndpoint:
-                        description: Reader Endpoint is the endpoint to use for read
-                          operations
-                        type: string
-                    type: object
                   publiclyAccessible:
                     description: PubliclyAccessible is whether the DB instance is
                       publicly accessible.
