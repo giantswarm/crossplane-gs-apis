@@ -178,19 +178,19 @@ users = [
                         "configurationParameters": [
                             {
                                 "name": k
-                                "value": v
+                                "value" = v
                             }
                             for k, v in get(user, "configurationParameters", {})
                         ]
-                    "connectionLimit": get(user, "connectionLimit", 10)
+                    "connectionLimit" = get(user, "connectionLimit", 10)
                     "privileges": {
-                        "bypassRls": get(user, "bypassRls", False)
-                        "createDb": get(user, "createDb", False)
-                        "createRole": get(user, "createRole", False)
-                        "inherit": get(user, "inherit", True)
-                        "login": get(user, "login", True)
-                        "replication": get(user, "replication", False)
-                        "superUser": get(user, "superuser", False)
+                        "bypassRls" = get(user, "bypassRls", False)
+                        "createDb" = get(user, "createDb", False)
+                        "createRole" = get(user, "createRole", False)
+                        "inherit" = get(user, "inherit", True)
+                        "login" = get(user, "login", True)
+                        "replication" = get(user, "replication", False)
+                        "superUser" = get(user, "superuser", False)
                     }
             }
             "providerConfigRef": {
