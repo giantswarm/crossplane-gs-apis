@@ -32,7 +32,10 @@ if _engine == "mysql":
                             "ALL PRIVILEGES",
                         ],
                     },
-                    **user,
+                    **{
+                        k = v
+                        for k, v in user
+                    }
                 }
                 for username, user in get(dbUsers, "users", {})
             }
@@ -213,12 +216,14 @@ users = [
 
 connectionSecrets = {
     "app" = "${appName}-rds-user"
-    "users" = {
+    _users = {
         username: "${appName}-rds-user-${username}"
         for database, config in _requiredDatabases
         for username, user in get(config, "users", [])
         if username != appName
     }
+    if _users:
+        "users" = _users
 }
 
 grants = [
