@@ -378,6 +378,75 @@ will be created as `instance.rds` types.
 
 DatabaseName is the name of the database to create.
 
+#### `.spec.databases`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Databases determines whether or not to provision databases inside the
+RDS cluster.
+
+#### `.spec.databases.connectionSecretName`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+The name of the connection secret to use for the RDS instance
+
+Required if `providerConfigRef` is not provided, ignored otherwise
+Must exist in the same namespace as the provisioning claim
+
+If this value is provided, the composition will attempt to create a
+provider config using the engine specific providerconfig spec
+
+#### `.spec.databases.databases`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |object|
+|Required |No|
+
+Databases is a map of databases to create.
+
+#### `.spec.databases.enabled`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |boolean|
+|Required |No|
+
+Determines if the RDS provisioning should be enabled
+
+#### `.spec.databases.engine`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Allowed Values:
+
+- postgres
+- mysql
+- aurora-mysql
+- aurora-postgresql
+- mariadb
+
+The type of database engine being provisioned
+
+#### `.spec.databases.readerEndpoint`
+
+|Property |Value    |
+|:--------|:--------|
+|Type     |string|
+|Required |No|
+
+Reader Endpoint is the endpoint to use for read operations
+
 #### `.spec.dbClusterInstanceClass`
 
 |Property |Value    |
@@ -1704,75 +1773,6 @@ Resolve specifies when this reference should be resolved. The default
 is 'IfNotPresent', which will attempt to resolve the reference only when
 the corresponding field is not present. Use 'Always' to resolve the
 reference on every reconcile.
-
-#### `.spec.provisionSql`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-ProvisionSql determines whether or not to provision databases inside the
-RDS cluster.
-
-#### `.spec.provisionSql.connectionSecretName`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-The name of the connection secret to use for the RDS instance
-
-Required if `providerConfigRef` is not provided, ignored otherwise
-Must exist in the same namespace as the provisioning claim
-
-If this value is provided, the composition will attempt to create a
-provider config using the engine specific providerconfig spec
-
-#### `.spec.provisionSql.databases`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |object|
-|Required |No|
-
-Databases is a map of databases to create.
-
-#### `.spec.provisionSql.enabled`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |boolean|
-|Required |No|
-
-Determines if the RDS provisioning should be enabled
-
-#### `.spec.provisionSql.engine`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-Allowed Values:
-
-- postgres
-- mysql
-- aurora-mysql
-- aurora-postgresql
-- mariadb
-
-The type of database engine being provisioned
-
-#### `.spec.provisionSql.readerEndpoint`
-
-|Property |Value    |
-|:--------|:--------|
-|Type     |string|
-|Required |No|
-
-Reader Endpoint is the endpoint to use for read operations
 
 #### `.spec.publiclyAccessible`
 
