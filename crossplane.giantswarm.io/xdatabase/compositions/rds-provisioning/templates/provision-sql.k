@@ -57,8 +57,7 @@ if _engine == "postgresql":
                         "login" = True,
                         "replication" = False,
                         "superuser" = False,
-                    },
-                    **user,
+                    } | user,
                 }
                 for username, user in get(dbUsers, "users", {})
             }
