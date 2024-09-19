@@ -56,7 +56,7 @@ type RdsLogicalDatabaseParameters struct {
 	// Databases is a map of databases to create.
 	//
 	// +optional
-	Databases map[DatabaseName]SqlUsers `json:"databases,omitempty"`
+	Databases map[DatabaseName]DatabaseConfig `json:"databases,omitempty"`
 
 	// The type of database engine being provisioned
 	//
@@ -64,6 +64,13 @@ type RdsLogicalDatabaseParameters struct {
 	// +default="postgres"
 	// +kubebuilder:validation:Enum=postgres;mysql;aurora-postgresql;aurora-mysql
 	Engine *string `json:"engine,omitempty"`
+}
+
+type DatabaseConfig struct {
+	// A map of users to create for the database
+	//
+	// +optional
+	Users map[DatabaseUserName]SqlUser `json:"users"`
 }
 
 // RdsLogicalDatabaseStatus defines the observed state of RdsLogicalDatabase

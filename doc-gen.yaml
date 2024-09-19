@@ -82,6 +82,14 @@ source_repositories:
           - crossplane
           - database
           - rds
+      rdslogicaldatabases.xdatabase.crossplane.giantswarm.io:
+        owner:
+          - https://github.com/orgs/giantswarm/teams/team-honeybadger
+        topics:
+          - aws
+          - crossplane
+          - database
+          - rds
       cachebases.xcache.crossplane.giantswarm.io:
         owner:
           - https://github.com/orgs/giantswarm/teams/team-honeybadger

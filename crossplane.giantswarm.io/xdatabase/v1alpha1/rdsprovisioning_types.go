@@ -126,6 +126,9 @@ type RdsProvisioningConnectionSecrets struct {
 // The name of the database to create
 type DatabaseName string
 
+// The name of a user to create
+type DatabaseUserName string
+
 // SecretReference is a reference to a Secret
 type SecretReference struct {
 	// Name of the secret
@@ -142,6 +145,29 @@ type SecretReference struct {
 // See the provider specific documentation for the available configuration
 // parameters.
 //
+// postgresql: https://www.postgresql.org/docs/current/sql-createrole.html
+// mysql: https://dev.mysql.com/doc/refman/8.0/en/user-resources.html
+//
+// For MySQL and MariaDB the following fields are supported:
+// - `binlog` (boolean)
+// - `maxConnectionsPerHour` (int) Default 100 - The maximum number of connections the user can make per hour (0 for unlimited)
+// - `maxQueriesPerHour` (int) Default 1000 - The maximum number of queries the user can make per hour (0 for unlimited)
+// - `maxUpdatesPerHour` (int) Default 1000 - The maximum number of updates the user can make per hour (0 for unlimited)
+// - `maxUserConnections` (int) Default 10 - The maximum number of connections the user can have open at one time (0 for unlimited)
+// - `privileges` ([]string) - A list of privileges to grant to the user
+//
+// For PostgreSQL the following fields are supported:
+// - `configurationParameters` (map[string]*string) - A map of configuration parameters to set for the user
+// - `privileges` ([]string) - A list of privileges to grant to the user
+// - `connectionLimit` (int) Default 10 - The maximum number of connections the user can have open at one time
+// - `bypassRLS` (boolean) Default false - Whether the user should bypass row level security
+// - `createDb` (boolean) Default false - Whether the user should be able to create databases
+// - `createRole` (boolean) Default false - Whether the user should be able to create roles
+// - `inherit` (boolean) Default true - Whether the user should inherit privileges from roles it is a member of
+// - `login` (boolean) Default true - Whether the user should be able to log in
+// - `replication` (boolean) Default false - Whether the user should be able to initiate streaming replication
+// - `superuser` (boolean) Default false - Whether the user should be a superuser
+//
 // With the exception of `configurationParameters`, all fields should be
 // created as elements directly on the user object and not as nested objects.
 //
@@ -150,6 +176,9 @@ type SqlUser struct {
 	// ConfigurationParameters is the configuration parameters for the user.
 	//
 	// Only applicable for postgresql databases
+	//
+	// See https://www.postgresql.org/docs/current/runtime-config-client.html for
+	// a list of available parameters.
 	//
 	// +optional
 	ConfigurationParameters map[string]*string `json:"configurationParameters,omitempty"`
