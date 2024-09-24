@@ -14,7 +14,9 @@ _requiredDatabases = {}
 
 defaultDatabase = {
     "${appName}" = {
-        "${appName}" = {}
+        "users" = {
+            "${appName}" = {}
+        }
     }
 }
 

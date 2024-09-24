@@ -112,7 +112,9 @@ spec:
 
           defaultDatabase = {
               "${appName}" = {
-                  "${appName}" = {}
+                  "users" = {
+                      "${appName}" = {}
+                  }
               }
           }
 
