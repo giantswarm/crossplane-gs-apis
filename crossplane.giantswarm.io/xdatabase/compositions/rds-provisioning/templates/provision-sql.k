@@ -347,7 +347,9 @@ pushSecrets = [
         }
     }
     for _, user in ["${appName}-rds-user"] + [
-        v for _, v in get(connectionSecrets, "users", {})
+        v
+        for _, v in get(connectionSecrets, "users", {})
+        if v
     ]
     if all_true([
         get(oxr, "spec.eso.enabled", True),
