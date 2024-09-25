@@ -82,6 +82,8 @@ fluxSSA = {
     ready("${appName}-rds-provisioning"),
 ]) else {}
 
+print("Flux SSA: ", esoEnabled, ssasecret, ready("${appName}-rds-provisioning"))
+
 esoConnectionSecret = get(oxr, "status.esoConnectionSecret", False)
 sqlEnabled = get(oxr, "spec.provisionSql.enabled", True)
 
