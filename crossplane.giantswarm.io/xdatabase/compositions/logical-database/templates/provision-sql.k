@@ -38,13 +38,13 @@ fluxSSA = {
                 "apiVersion": "external-secrets.io/v1beta1",
                 "kind": "ExternalSecret",
                 "metadata": {
-                    "name": "${ssasecret}",
+                    "name": "${appName}-${ssasecret}",
                     "namespace": namespace,
                 },
                 "spec": {
                     "refreshInterval": "1m",
                     "secretStoreRef": {
-                        "name": get(oxr, "spec.eso.kubernetesSecretStore", ""),
+                        "name": get(oxr, "spec.eso.kubernetesSecretStore", "default"),
                         "kind": "SecretStore",
                     },
                     "dataFrom": [
