@@ -38,8 +38,8 @@ fluxSSA = {
                 "apiVersion": "external-secrets.io/v1beta1",
                 "kind": "ExternalSecret",
                 "metadata": {
-                    "name": "lg${ssasecret}",
-                    "namespace": "default",
+                    "name": "${ssasecret}",
+                    "namespace": namespace,
                 },
                 "spec": {
                     "refreshInterval": "1m",
