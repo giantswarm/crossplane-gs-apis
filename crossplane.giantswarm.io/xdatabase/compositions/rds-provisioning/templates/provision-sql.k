@@ -276,7 +276,7 @@ reader = get(oxr, "spec.readerEndpoint", "")
 
 pushSecrets = [
     {
-        _name = get(user, "spec.writeConnectionSecretToRef.name", "")
+        _name = user # get(user, "spec.writeConnectionSecretToRef.name", "")
         "apiVersion": "kubernetes.crossplane.io/v1alpha2"
         "kind": "Object"
         "metadata": {
