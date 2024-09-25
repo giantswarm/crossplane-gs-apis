@@ -346,7 +346,9 @@ pushSecrets = [
             }
         }
     }
-    for _, user in users
+    for _, user in ["${appName}-rds-user"] + [
+        v for _, v in get(connectionSecrets, "users", {})
+    ]
     if all_true([
         get(oxr, "spec.eso.enabled", True),
         get(oxr, "spec.eso.tenantCluster.apiServerEndpoint", []),
