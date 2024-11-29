@@ -26,6 +26,10 @@ If an API is marked `(definition only)`, check the [crossplane-examples] repo
     Create Sets of subnets which logically belong together across *n* subnets
   - VpcNetwork (definition only) [***deprecated***] Use PeeredVpcNetwork instead
 
+### Adding a new API
+
+See the [`template`](./template) directory for details on how to add a new API
+
 ## Building API documentation
 
 This project uses crd-docs-generator to build the API spec
