@@ -99,6 +99,7 @@ if [ ! -f "${BASE_PATH}/${GROUP_NAME}/v1alpha1/${group_class_lower}_types.go" ];
     ENFORCE_COMPOSITION=$(question "Enforce composition? (yes/no)" | tr '[:upper:]' '[:lower:]')
     sed -e "s|<GROUP_NAME>|${GROUP_NAME}|g" \
         -e "s|<GROUP_CLASS>|${GROUP_CLASS}|g" \
+        -e "s|<GROUP_CLASS_LOWER>|${GROUP_CLASS,,}|g" \
         -e "s|<SHORTNAME>|${SHORTNAME}|g" \
         -e "s|<COMPOSITION>|${COMPOSITION}|g" \
         template/files/xrd.go.tpl > ${BASE_PATH}/${GROUP_NAME}/v1alpha1/${group_class_lower}_types.go
