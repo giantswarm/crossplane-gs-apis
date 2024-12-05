@@ -52,6 +52,8 @@ type ExampleSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
 
 	ExampleParameters `json:",inline"`
+
+	Message string `json:",inline"`
 }
 
 type ExampleParameters struct {
