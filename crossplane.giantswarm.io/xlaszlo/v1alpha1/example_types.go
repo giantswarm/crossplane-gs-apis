@@ -25,7 +25,7 @@ var (
 // +kubebuilder:resource:scope=Cluster,categories=crossplane
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=ex
-// +crossbuilder:generate:xrd:claimNames:kind=ExampleClaim,plural=ExampleClaims
+// +crossbuilder:generate:xrd:claimNames:kind=ExampleClaim,plural=exampleclaims
 // +crossbuilder:generate:xrd:defaultCompositionRef:name=test
 // +crossbuilder:generate:xrd:enforcedCompositionRef:name=test
 type Example struct {
