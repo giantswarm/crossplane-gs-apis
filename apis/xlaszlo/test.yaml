@@ -1,0 +1,14 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  creationTimestamp: null
+  name: test
+spec:
+  compositeTypeRef:
+    apiVersion: xlaszlo.crossplane.giantswarm.io/v1alpha1
+    kind: Example
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-auto-ready
+    step: function-auto-ready
