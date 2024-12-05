@@ -71,6 +71,9 @@ spec:
                   - '*'
                   type: string
                 type: array
+              message:
+                description: Message to store in the configmap
+                type: string
               providerConfigRef:
                 default:
                   name: default

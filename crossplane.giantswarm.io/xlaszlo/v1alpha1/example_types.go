@@ -53,7 +53,10 @@ type ExampleSpec struct {
 
 	ExampleParameters `json:",inline"`
 
-	Message string `json:",inline"`
+	// Message to store in the configmap
+	// +default="default-message"
+	// +kubebuilder:validation:Required
+	Message string `json:"message,omitempty"`
 }
 
 type ExampleParameters struct {
