@@ -9,7 +9,7 @@ metadata:
 spec:
   claimNames:
     kind: ExampleClaim
-    plural: ExampleClaims
+    plural: exampleclaims
   defaultCompositionRef:
     name: test
   enforcedCompositionRef:
