@@ -25,7 +25,7 @@ var (
 // +kubebuilder:resource:scope=Cluster,categories=crossplane
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=<SHORTNAME>
-// +crossbuilder:generate:xrd:claimNames:kind=<GROUP_CLASS>Claim,plural=<GROUP_CLASS>Claims
+// +crossbuilder:generate:xrd:claimNames:kind=<GROUP_CLASS>Claim,plural=<GROUP_CLASS_LOWER>claims
 // +crossbuilder:generate:xrd:defaultCompositionRef:name=<COMPOSITION>
 // +crossbuilder:generate:xrd:enforcedCompositionRef:name=<COMPOSITION>
 type <GROUP_CLASS> struct {
