@@ -8,13 +8,13 @@ import (
 
 // Repository type metadata.
 var (
-	<GROUP_CLASS>Kind      = "<GROUP_CLASS>"
-	<GROUP_CLASS>GroupKind = schema.GroupKind{
+	ExampleKind      = "Example"
+	ExampleGroupKind = schema.GroupKind{
 		Group: XRDGroup,
-		Kind:  <GROUP_CLASS>Kind,
+		Kind:  ExampleKind,
 	}.String()
-	<GROUP_CLASS>KindAPIVersion   = <GROUP_CLASS>Kind + "." + GroupVersion.String()
-	<GROUP_CLASS>GroupVersionKind = GroupVersion.WithKind(<GROUP_CLASS>Kind)
+	ExampleKindAPIVersion   = ExampleKind + "." + GroupVersion.String()
+	ExampleGroupVersionKind = GroupVersion.WithKind(ExampleKind)
 )
 
 // +kubebuilder:object:root=true
@@ -24,39 +24,43 @@ var (
 //
 // +kubebuilder:resource:scope=Cluster,categories=crossplane
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:shortName=<SHORTNAME>
-// +crossbuilder:generate:xrd:claimNames:kind=<GROUP_CLASS>Claim,plural=<GROUP_CLASS_LOWER>claims
-// +crossbuilder:generate:xrd:defaultCompositionRef:name=<COMPOSITION>
-// +crossbuilder:generate:xrd:enforcedCompositionRef:name=<COMPOSITION>
-type <GROUP_CLASS> struct {
+// +kubebuilder:resource:shortName=ex
+// +crossbuilder:generate:xrd:claimNames:kind=ExampleClaim,plural=exampleclaims
+// +crossbuilder:generate:xrd:defaultCompositionRef:name=test
+// +crossbuilder:generate:xrd:enforcedCompositionRef:name=test
+type Example struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   <GROUP_CLASS>Spec   `json:"spec"`
-	Status <GROUP_CLASS>Status `json:"status,omitempty"`
+	Spec   ExampleSpec   `json:"spec"`
+	Status ExampleStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
-type <GROUP_CLASS>List struct {
+type ExampleList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 
-	Items []<GROUP_CLASS> `json:"items"`
+	Items []Example `json:"items"`
 }
 
 // Use the `spec` struct to contain parameters you might not want to share
 // when nesting XRDs - these will usually be parameters that may be defined
 // in a parent.
 
-type <GROUP_CLASS>Spec struct {
+type ExampleSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
 
-	<GROUP_CLASS>Parameters `json:",inline"`
+	ExampleParameters `json:",inline"`
+
+	// Message to store in the configmap
+	// +required
+	Message string `json:"message,omitempty"`
 }
 
-type <GROUP_CLASS>Parameters struct {
+type ExampleParameters struct {
 }
 
-type <GROUP_CLASS>Status struct {
+type ExampleStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
 }
