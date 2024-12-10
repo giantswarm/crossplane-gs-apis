@@ -1,0 +1,12 @@
+---
+apiVersion: xlaszlo.crossplane.giantswarm.io/v1alpha1
+kind: ExampleClaim
+metadata:
+  name: laszlo-2
+  namespace: org-laszlo
+spec:
+  name: laszlo-2
+  namespace: org-laszlo
+  message: The owls are not what they seem!
+  kubernetesProviderConfig:
+    name: default

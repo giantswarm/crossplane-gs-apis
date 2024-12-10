@@ -88,18 +88,14 @@ spec:
               "True" if ready(x) else "False"
           }
 
-          dp = get(oxr, "spec.deletionPolicy", "Delete")
-          pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
-          mgmtPolicy = get(oxr, "spec.managementPolicies", [])
-          namespace = get(oxr, "spec.claimRef.namespace", "")
-          appName = get(oxr, "spec.claimRef.name", "")
-          labels = get(oxr, "metadata.labels", {})
+          name = get(oxr, "spec.name", "laszlo-test")
+          namespace = get(oxr, "spec.namespace", "org-laszlo")
 
           configMap = {
               "apiVersion": "v1",
               "kind": "ConfigMap",
               "metadata": {
-                  "name": appName
+                  "name": name
                   "namespace": namespace
               },
               "data": {
@@ -107,7 +103,26 @@ spec:
               }
           }
 
-          _items = [configMap]
+          wrappedConfigMap = {
+              "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+              "kind": "Object"
+              "metadata": {
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name" = "${name}-configmap"
+                      "krm.kcl.dev/ready": readystr("${name}-configmap")
+                  }
+              }
+              "spec": {
+                  "deletionPolicy": "Delete",
+                  "forProvider": {
+                      "manifest": configMap
+                  }
+                  "managementPolicies": ["*"],
+                  "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"}),
+              }
+          }
+
+          _items = [wrappedConfigMap]
 
           items = _items
         target: ""
