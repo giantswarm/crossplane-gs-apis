@@ -52,13 +52,32 @@ type ExampleSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
 
 	ExampleParameters `json:",inline"`
-
-	// Message to store in the configmap
-	// +required
-	Message string `json:"message,omitempty"`
 }
 
 type ExampleParameters struct {
+	ExampleConfigMapParameters `json:",inline"`
+
+	// KubernetesProviderConfig is the provider config for the Kubernetes provider.
+	//
+	// +required
+	KubernetesProviderConfig *xpv1.Reference `json:"kubernetesProviderConfig,omitempty"`
+}
+
+type ExampleConfigMapParameters struct {
+	// Name of the configmap
+	//
+	// +required
+	Name string `json:"name,omitempty"`
+
+	// Namespace of the configmap
+	//
+	// +required
+	Namespace string `json:"namespace,omitempty"`
+
+	// Message to store in the configmap
+	//
+	// +required
+	Message string `json:"message,omitempty"`
 }
 
 type ExampleStatus struct {

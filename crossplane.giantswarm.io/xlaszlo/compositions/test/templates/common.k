@@ -67,10 +67,3 @@ readystr = lambda x: str -> str {
     """
     "True" if ready(x) else "False"
 }
-
-dp = get(oxr, "spec.deletionPolicy", "Delete")
-pcr = get(oxr, "spec.providerConfigRef", {"name": "default"})
-mgmtPolicy = get(oxr, "spec.managementPolicies", [])
-namespace = get(oxr, "spec.claimRef.namespace", "")
-appName = get(oxr, "spec.claimRef.name", "")
-labels = get(oxr, "metadata.labels", {})
