@@ -37,7 +37,12 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		panic(err)
 	}
 
-	kclSqlTemplate, err := build.LoadTemplate("templates/provision-configmap.k")
+	kclConfigMapemplate, err := build.LoadTemplate("templates/provision-configmap.k")
+	if err != nil {
+		panic(err)
+	}
+
+	kclHelmReleaseTemplate, err := build.LoadTemplate("templates/provision-helmrelease.k")
 	if err != nil {
 		panic(err)
 	}
@@ -56,7 +61,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: strings.Join([]string{kclCommon, kclSqlTemplate, kclFooter}, "\n\n"),
+					Source: strings.Join([]string{kclCommon, kclConfigMapemplate, kclHelmReleaseTemplate, kclFooter}, "\n\n"),
 				},
 			},
 		})

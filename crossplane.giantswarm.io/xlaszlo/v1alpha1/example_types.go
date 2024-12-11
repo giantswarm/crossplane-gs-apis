@@ -167,7 +167,7 @@ type DeploymentParameters struct {
 	Version string `json:"version,omitempty"`
 
 	ReleaseName string `json:"releaseName,omitempty"`
-	ƒ
+
 	ServiceAccountName string `json:"serviceAccountName,omitempty"`
 
 	// DependsOn may contain a meta.NamespacedObjectReference slice with
