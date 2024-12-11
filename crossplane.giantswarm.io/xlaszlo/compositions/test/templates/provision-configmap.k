@@ -32,4 +32,4 @@ wrappedConfigMap = {
     }
 }
 
-_items = [wrappedConfigMap]
+_items += [wrappedConfigMap]

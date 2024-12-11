@@ -67,3 +67,5 @@ readystr = lambda x: str -> str {
     """
     "True" if ready(x) else "False"
 }
+
+_items = []
