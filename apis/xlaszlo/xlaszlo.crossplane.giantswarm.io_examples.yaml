@@ -30,6 +30,47 @@ spec:
         properties:
           spec:
             properties:
+              database:
+                description: Database parameters.
+                properties:
+                  engine:
+                    description: The type of database engine being provisioned.
+                    enum:
+                    - postgres
+                    - mysql
+                    - aurora-postgresql
+                    - aurora-mysql
+                    type: string
+                  eso:
+                    properties:
+                      clusterSsaField:
+                        description: Name of the secret that contains SSA details.
+                        type: string
+                      tenantCluster:
+                        description: Configuration for the tenant cluster.
+                        properties:
+                          apiServerEndpoint:
+                            description: API endpoint URL of the target cluster.
+                            type: string
+                          clusterName:
+                            description: Name of the target cluster.
+                            type: string
+                          enabled:
+                            description: |-
+                              Whether or not to enable `external-secrets-operator` object
+                              deployments using `provider-kubernetes.
+                            type: boolean
+                        type: object
+                    type: object
+                  providerConfigRef:
+                    description: Provider config reference for the database claim.
+                    properties:
+                      string:
+                        description: Name of the provider config for the database
+                          claim
+                        type: string
+                    type: object
+                type: object
               deletionPolicy:
                 default: Delete
                 description: |-
@@ -44,6 +85,58 @@ spec:
                 - Orphan
                 - Delete
                 type: string
+              dependsOn:
+                description: |-
+                  DependsOn may contain a meta.NamespacedObjectReference slice with
+                  references to HelmRelease resources that must be ready before the HelmRelease can be reconciled.
+                items:
+                  description: |-
+                    NamespacedObjectReference contains enough information to locate the referenced Kubernetes resource object in any
+                    namespace.
+                  properties:
+                    name:
+                      description: Name of the referent.
+                      type: string
+                    namespace:
+                      description: Namespace of the referent, when not specified it
+                        acts as LocalObjectReference.
+                      type: string
+                  required:
+                  - name
+                  type: object
+                type: array
+              ingressHost:
+                type: string
+              interval:
+                type: string
+              kubeConfig:
+                description: KubeConfig for reconciling the HelmRelease on a remote
+                  cluster.
+                properties:
+                  secretRef:
+                    description: |-
+                      SecretRef holds the name of a secret that contains a key with
+                      the kubeconfig file as the value. If no key is set, the key will default
+                      to 'value'.
+                      It is recommended that the kubeconfig is self-contained, and the secret
+                      is regularly updated if credentials such as a cloud-access-token expire.
+                      Cloud specific `cmd-path` auth helpers will not function without adding
+                      binaries and credentials to the Pod that is responsible for reconciling
+                      Kubernetes resources.
+                    properties:
+                      key:
+                        description: Key in the Secret, when not specified an implementation-specific
+                          default key is used.
+                        type: string
+                      name:
+                        description: Name of the Secret.
+                        type: string
+                    required:
+                    - name
+                    type: object
+                required:
+                - secretRef
+                type: object
               kubernetesProviderConfig:
                 description: KubernetesProviderConfig is the provider config for the
                   Kubernetes provider.
@@ -107,10 +200,10 @@ spec:
                   type: string
                 type: array
               message:
-                description: Message to store in the configmap
+                description: Message to store in the configmap.
                 type: string
               name:
-                description: Name of the configmap
+                description: Name of the configmap.
                 type: string
               namespace:
                 description: Namespace of the configmap
@@ -231,6 +324,69 @@ spec:
                 required:
                 - name
                 type: object
+              releaseName:
+                type: string
+              serviceAccountName:
+                type: string
+              storageNamespace:
+                type: string
+              suspend:
+                type: boolean
+              targetNamespace:
+                type: string
+              timeout:
+                type: string
+              values:
+                description: Values holds the values for this Helm release.
+                x-kubernetes-preserve-unknown-fields: true
+              valuesFrom:
+                description: |-
+                  ValuesFrom holds references to resources containing Helm values for this HelmRelease,
+                  and information about how they should be merged.
+                properties:
+                  kind:
+                    description: Kind of the values referent, valid values are ('Secret',
+                      'ConfigMap').
+                    enum:
+                    - Secret
+                    - ConfigMap
+                    type: string
+                  name:
+                    description: |-
+                      Name of the values referent. Should reside in the same namespace as the
+                      referring resource.
+                    maxLength: 253
+                    minLength: 1
+                    type: string
+                  optional:
+                    description: |-
+                      Optional marks this ValuesReference as optional. When set, a not found error
+                      for the values reference is ignored, but any ValuesKey, TargetPath or
+                      transient error will still result in a reconciliation failure.
+                    type: boolean
+                  targetPath:
+                    description: |-
+                      TargetPath is the YAML dot notation path the value should be merged at. When
+                      set, the ValuesKey is expected to be a single flat value. Defaults to 'None',
+                      which results in the values getting merged at the root.
+                    maxLength: 250
+                    pattern: ^([a-zA-Z0-9_\-.\\\/]|\[[0-9]{1,5}\])+$
+                    type: string
+                  valuesKey:
+                    description: |-
+                      ValuesKey is the data key where the values.yaml or a specific value can be
+                      found at. Defaults to 'values.yaml'.
+                      When set, must be a valid Data Key, consisting of alphanumeric characters,
+                      '-', '_' or '.'.
+                    maxLength: 253
+                    pattern: ^[\-._a-zA-Z0-9]+$
+                    type: string
+                required:
+                - kind
+                - name
+                type: object
+              version:
+                type: string
               writeConnectionSecretToRef:
                 description: |-
                   WriteConnectionSecretToReference specifies the namespace and name of a
