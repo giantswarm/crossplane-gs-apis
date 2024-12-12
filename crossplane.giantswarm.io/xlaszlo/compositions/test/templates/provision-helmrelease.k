@@ -70,8 +70,8 @@ helmRelease = {
                 "enabled": False
             }
             "database": {
-                "connectionSecretName": "python-service-1-rds-user",
-                "name": "python-service-1"
+                "connectionSecretName": "${name}-rds-user",
+                "name": "${name}"
             },
             "imagePullSecrets": [
                 {
