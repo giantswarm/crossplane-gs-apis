@@ -1,6 +1,3 @@
-name = get(oxr, "spec.name", "laszlo-test")
-namespace = get(oxr, "spec.namespace", "org-laszlo")
-
 configMap = {
     "apiVersion": "v1",
     "kind": "ConfigMap",
