@@ -2,7 +2,7 @@ helmRepository = {
     "apiVersion": "source.toolkit.fluxcd.io/v1beta2"
     "kind": "HelmRepository"
     "metadata": {
-        "name": "python-service-1"
+        "name": "python-service-2"
         "namespace": "org-demotech"
     }
     "spec": {
@@ -40,7 +40,7 @@ helmRelease = {
     "apiVersion": "helm.toolkit.fluxcd.io/v2beta1"
     "kind": "HelmRelease"
     "metadata": {
-        "name": "python-service-1"
+        "name": "python-service-2"
         "namespace": "org-demotech"
     }
     "spec": {
@@ -50,7 +50,7 @@ helmRelease = {
                 "reconcileStrategy": "ChartVersion"
                 "sourceRef": {
                     "kind": "HelmRepository"
-                    "name": "python-service-1"
+                    "name": "python-service-2"
                 }
                 "version": ">=0.1.0-0"
             }
@@ -84,13 +84,13 @@ helmRelease = {
                     "kubernetes.io/tls-acme": "true"
                 }
                 "enabled": "true"
-                "host": "python-service-1.demotech-rds.awsprod.gigantic.io"
+                "host": "python-service-2.demotech-rds.awsprod.gigantic.io"
                 "tls": [
                     {
                         "hosts": [
-                            "python-service-1.demotech-rds.awsprod.gigantic.io"
+                            "python-service-2.demotech-rds.awsprod.gigantic.io"
                         ]
-                        "secretName": "python-service-1"
+                        "secretName": "python-service-2"
                     }
                 ]
                 "monitoring": {

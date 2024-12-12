@@ -68,4 +68,7 @@ readystr = lambda x: str -> str {
     "True" if ready(x) else "False"
 }
 
+name = get(oxr, "spec.name", "laszlo-test")
+namespace = get(oxr, "spec.namespace", "org-laszlo")
+
 _items = []
