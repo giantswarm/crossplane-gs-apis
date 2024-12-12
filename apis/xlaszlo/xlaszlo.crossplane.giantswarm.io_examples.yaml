@@ -65,7 +65,7 @@ spec:
                   providerConfigRef:
                     description: Provider config reference for the database claim.
                     properties:
-                      string:
+                      name:
                         description: Name of the provider config for the database
                           claim
                         type: string

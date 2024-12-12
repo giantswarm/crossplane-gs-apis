@@ -1,0 +1,32 @@
+---
+apiVersion: xlaszlo.crossplane.giantswarm.io/v1alpha1
+kind: ExampleClaim
+metadata:
+  name: python-service-2
+  namespace: org-demotech
+spec:
+  name: python-service-2
+  namespace: org-demotech
+  message: Hello world!
+  database:
+    engine: aurora-postgresql
+    eso:
+      clusterSsaField: demotech_rcc
+      tenantCluster:
+        apiServerEndpoint: demotech-rds-apiserver-852993111.eu-central-1.elb.amazonaws.com
+        clusterName: demotech-rds
+        enabled: true
+    providerConfigRef:
+      name: demotech-rcc-postgresql-provider-config
+  ingressHost: python-service-2.demotech-rds.awsprod.gigantic.io
+  interval: 1m
+  kubeConfig:
+    secretRef:
+      name: demotech-rds-kubeconfig
+  storageNamespace: default
+  suspend: false
+  targetNamespace: default
+  timeout: 3m
+  version: '>=0.1.0-0'
+  kubernetesProviderConfig:
+    name: default

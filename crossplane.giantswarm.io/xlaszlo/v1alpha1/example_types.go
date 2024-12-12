@@ -148,7 +148,7 @@ type ProviderConfigRefParameters struct {
 	// Name of the provider config for the database claim
 	//
 	// +optional
-	Name string `json:"string,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 type DeploymentParameters struct {

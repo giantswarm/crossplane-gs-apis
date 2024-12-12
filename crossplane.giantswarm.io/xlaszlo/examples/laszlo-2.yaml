@@ -3,10 +3,10 @@ apiVersion: xlaszlo.crossplane.giantswarm.io/v1alpha1
 kind: ExampleClaim
 metadata:
   name: laszlo-2
-  namespace: org-laszlo
+  namespace: org-demotech
 spec:
   name: laszlo-2
-  namespace: org-laszlo
+  namespace: org-demotech
   message: The owls are not what they seem!
   kubernetesProviderConfig:
     name: default

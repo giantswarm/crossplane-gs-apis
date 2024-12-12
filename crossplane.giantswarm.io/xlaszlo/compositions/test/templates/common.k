@@ -69,6 +69,6 @@ readystr = lambda x: str -> str {
 }
 
 name = get(oxr, "spec.name", "laszlo-test")
-namespace = get(oxr, "spec.namespace", "org-laszlo")
+namespace = get(oxr, "spec.namespace", "org-demotech")
 
 _items = []
