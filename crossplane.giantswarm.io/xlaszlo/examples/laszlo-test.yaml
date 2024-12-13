@@ -2,12 +2,12 @@
 apiVersion: xlaszlo.crossplane.giantswarm.io/v1alpha1
 kind: ExampleClaim
 metadata:
-  name: python-service-2
+  name: laszlo-test
   namespace: org-demotech
 spec:
-  name: python-service-2
+  name: laszlo-test
   namespace: org-demotech
-  message: Hello world!
+  message: The owls are not what they seem!
   database:
     engine: aurora-postgresql
     eso:
@@ -18,7 +18,7 @@ spec:
         enabled: true
     providerConfigRef:
       name: demotech-rcc-postgresql-provider-config
-  ingressHost: python-service-2.demotech-rds.awsprod.gigantic.io
+  ingressHost: laszlo-test.demotech-rds.awsprod.gigantic.io
   interval: 1m
   kubeConfig:
     secretRef:
@@ -28,7 +28,7 @@ spec:
   targetNamespace: default
   timeout: 3m
   chart:
-    name: python-service-1
+    name: lutzrec-1
     version: '>=0.1.0-0'
   kubernetesProviderConfig:
     name: default

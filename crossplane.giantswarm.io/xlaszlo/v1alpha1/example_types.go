@@ -164,7 +164,7 @@ type DeploymentParameters struct {
 
 	Timeout string `json:"timeout,omitempty"`
 
-	Version string `json:"version,omitempty"`
+	ChartParameters `json:"chart,omitempty"`
 
 	ReleaseName string `json:"releaseName,omitempty"`
 
@@ -191,6 +191,11 @@ type DeploymentParameters struct {
 	//
 	// +optional
 	Values *apiextensionsv1.JSON `json:"values,omitempty"`
+}
+
+type ChartParameters struct {
+	Name    string `json:"name,omitempty"`
+	Version string `json:"version,omitempty"`
 }
 
 type ExampleStatus struct {

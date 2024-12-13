@@ -30,6 +30,13 @@ spec:
         properties:
           spec:
             properties:
+              chart:
+                properties:
+                  name:
+                    type: string
+                  version:
+                    type: string
+                type: object
               database:
                 description: Database parameters.
                 properties:
@@ -385,8 +392,6 @@ spec:
                 - kind
                 - name
                 type: object
-              version:
-                type: string
               writeConnectionSecretToRef:
                 description: |-
                   WriteConnectionSecretToReference specifies the namespace and name of a

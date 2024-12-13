@@ -46,13 +46,13 @@ helmRelease = {
     "spec": {
         "chart": {
             "spec": {
-                "chart": "python-service-1",
+                "chart": get(oxr, "spec.chart.name", ""),
                 "reconcileStrategy": "ChartVersion",
                 "sourceRef": {
                     "kind": "HelmRepository",
                     "name": "${name}"
                 },
-                "version": get(oxr, "spec.version", ">=0.1.0")
+                "version": get(oxr, "spec.chart.version", ">=0.1.0")
             }
         }
         "interval": get(oxr, "spec.interval", "1m"),
@@ -66,6 +66,7 @@ helmRelease = {
         "targetNamespace": get(oxr, "spec.targetNamespace", "default"),
         "timeout": get(oxr, "spec.timeout", "3m"),
         "values": {
+            "replicaCount": 1,
             "autoscaling": {
                 "enabled": False
             }
