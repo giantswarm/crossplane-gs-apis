@@ -1,0 +1,14 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  creationTimestamp: null
+  name: app-deployment
+spec:
+  compositeTypeRef:
+    apiVersion: xappdeployment.crossplane.giantswarm.io/v1alpha1
+    kind: AppDeployment
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-auto-ready
+    step: function-auto-ready
