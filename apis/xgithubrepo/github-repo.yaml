@@ -1,0 +1,14 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  creationTimestamp: null
+  name: github-repo
+spec:
+  compositeTypeRef:
+    apiVersion: xgithubrepo.crossplane.giantswarm.io/v1alpha1
+    kind: GithubRepo
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-auto-ready
+    step: function-auto-ready
