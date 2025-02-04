@@ -1,0 +1,34 @@
+---
+apiVersion: xappdeployment.crossplane.giantswarm.io/v1alpha1
+kind: AppDeployment
+metadata:
+  name: laszlo-test
+  namespace: org-demotech
+spec:
+  name: laszlo-test
+  namespace: org-demotech
+  message: The owls are not what they seem!
+  database:
+    engine: aurora-postgresql
+    eso:
+      clusterSsaField: demotech_rcc
+      tenantCluster:
+        apiServerEndpoint: demotech-rds-apiserver-852993111.eu-central-1.elb.amazonaws.com
+        clusterName: demotech-rds
+        enabled: true
+    providerConfigRef:
+      name: demotech-rcc-postgresql-provider-config
+  ingressHost: laszlo-test.demotech-rds.awsprod.gigantic.io
+  interval: 1m
+  kubeConfig:
+    secretRef:
+      name: demotech-rds-kubeconfig
+  storageNamespace: default
+  suspend: false
+  targetNamespace: default
+  timeout: 3m
+  chart:
+    name: lutzrec-1
+    version: '>=0.1.0-0'
+  kubernetesProviderConfig:
+    name: default
