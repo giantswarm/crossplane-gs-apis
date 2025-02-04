@@ -1,0 +1,13 @@
+apiVersion: meta.pkg.crossplane.io/v1alpha1
+kind: Configuration
+metadata:
+  name: <REPO_NAME>
+  labels:
+    pkg.crossplane.io/owner: <OWNER>
+    pkg.crossplane.io/version: <VERSION>
+spec:
+  crossplane:
+    version: ">=v1.17.0"
+  dependsOn:
+  - function: xpkg.upbound.io/crossplane-contrib/function-auto-ready
+    version: ">=0.3.0"
