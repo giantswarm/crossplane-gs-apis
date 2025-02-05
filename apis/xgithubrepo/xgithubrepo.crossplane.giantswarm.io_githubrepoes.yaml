@@ -52,18 +52,11 @@ spec:
                 - Orphan
                 - Delete
                 type: string
-              githubTokenSecretRef:
+              githubAppSecretLabelValue:
                 description: |-
-                  The name and namespace of a Secret that has a key named "gh_token" with value if a GitHub
-                  authentication token used to create a new repository.
-                properties:
-                  name:
-                    description: Object name.
-                    type: string
-                  namespace:
-                    description: Object's namespace.
-                    type: string
-                type: object
+                  In order to load a Secret, it has to hav a label with the key "github-app-secret"
+                  and the value indicated in this field.
+                type: string
               managementPolicies:
                 default:
                 - '*'

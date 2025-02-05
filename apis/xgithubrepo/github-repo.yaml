@@ -2,6 +2,9 @@ apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
   creationTimestamp: null
+  labels:
+    provider: github
+    type: repository
   name: github-repo
 spec:
   compositeTypeRef:
@@ -9,6 +12,27 @@ spec:
     kind: GithubRepo
   mode: Pipeline
   pipeline:
+  - functionRef:
+      name: function-extra-resources
+    input:
+      apiVersion: extra-resources.fn.crossplane.io/v1beta1
+      kind: Input
+      metadata:
+        creationTimestamp: null
+      spec:
+        extraResources:
+        - apiVersion: v1
+          into: githubAppCredentials
+          kind: Secret
+          selector:
+            matchLabels:
+            - key: github-app-secret
+              type: FromCompositeFieldPath
+              valueFromFieldPath: spec.githubAppSecretLabelValue
+            maxMatch: 1
+            minMatch: 1
+          type: Selector
+    step: pull-github-secret
   - functionRef:
       name: function-auto-ready
     step: function-auto-ready

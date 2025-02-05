@@ -10,6 +10,7 @@ replace (
 )
 
 require (
+	github.com/crossplane-contrib/function-extra-resources v0.0.3
 	github.com/crossplane-contrib/function-kcl v0.8.0
 	github.com/crossplane-contrib/function-patch-and-transform v0.5.0
 	github.com/crossplane-contrib/provider-kubernetes v0.14.0
@@ -73,7 +74,7 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
-	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/mitchellh/mapstructure v1.5.1-0.20231216201459-8508981c8b6c // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
