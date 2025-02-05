@@ -81,7 +81,83 @@ type GithubRepoSpec struct {
 	GithubRepoParameters `json:",inline"`
 }
 
+type BackstageCatalogEntity struct {
+	// A reference of the owning Backstage entity.
+	//
+	// +required
+	Owner string `json:"owner,omitempty"`
+
+	// A lifecycle of the Backstage entity.
+	//
+	// +required
+	Lifecycle string `json:"lifecycle,omitempty"`
+}
+
+type RepositoryVisibility string
+
+const (
+	RepositoryVisibilityPublic   RepositoryVisibility = "public"
+	RepositoryVisibilityInternal RepositoryVisibility = "internal"
+	RepositoryVisibilityPrivate  RepositoryVisibility = "private"
+)
+
+type Repository struct {
+	// A name of the owning GitHub organization or user.
+	//
+	// +required
+	Owner string `json:"owner,omitempty"`
+
+	// A name for the new repository.
+	//
+	// +required
+	Name string `json:"name,omitempty"`
+
+	// A description of the new repository.
+	//
+	// +required
+	Description string `json:"description,omitempty"`
+
+	// A full name (`user/repository`) of a GitHub template repository to use.
+	//
+	// +required
+	TemplateSource string `json:"templateSource,omitempty"`
+
+	// Visibility of the created repo.
+	//
+	// +required
+	// +kubebuilder:validation:Enum=public;internal;private
+	Visibility RepositoryVisibility `json:"visibility,omitempty"`
+}
+
+type SecretReference struct {
+	// Object name.
+	//
+	// +required
+	Name string `json:"name,omitempty"`
+
+	// Object's namespace.
+	//
+	// +optional
+	Namespace string `json:"namespace,omitempty"`
+}
+
 type GithubRepoParameters struct {
+	// Backstage catalog entity configuration
+	//
+	// +required
+	BackstageCatalogEntity BackstageCatalogEntity `json:"backstageCatalogEntity,omitempty"`
+
+	// New repository configuration.
+	//
+	// +required
+	Repository Repository `json:"repository,omitempty"`
+
+	// The name and namespace of a Secret that has a key named "gh_token" with value if a GitHub
+	// authentication token used to create a new repository.
+	//
+	// +optional
+	GithubTokenSecretRef SecretReference `json:"githubTokenSecretRef,omitempty"`
+
 	// The name and namespace of a ConfigMap that has keys named "registry_domain",
 	// "registry_username" and "registry_cicd_secret_ref" that configure access to
 	// the image registry in the CICD GitHib Action.
