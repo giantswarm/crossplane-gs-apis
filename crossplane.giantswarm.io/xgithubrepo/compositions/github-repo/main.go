@@ -37,16 +37,74 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 	c.WithName("github-repo").
 		WithMode(xapiextv1.CompositionModePipeline).
 		WithLabels(map[string]string{
-			// Add labels for uniquely identifying this composition
+			"provider": "github",
+			"type":     "repository",
 		})
 
 	build.SetBasePath(TemplateBasePath)
 
-	// Add pipeline steps here
+	// Pull GitHub app credentials from secret
+	c.NewPipelineStep("pull-extra-resources").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-extra-resources",
+		}).
+		WithInput(map[string]interface{}{
+			"apiVersion": "extra-resources.fn.crossplane.io/v1beta1",
+			"kind":       "Input",
+			"spec": map[string]interface{}{
+				"extraResources": []map[string]interface{}{
+					{
+						"kind":       "Secret",
+						"apiVersion": "v1",
+						"into":       "githubAppCredentials",
+						"type":       "Selector",
+						"selector": map[string]interface{}{
+							"maxMatch": 2,
+							"minMatch": 1,
+							"matchLabels": []map[string]interface{}{
+								{
+									"key":   "secret",
+									"type":  "Value",
+									"value": "github-app",
+								},
+							},
+						},
+					},
+				},
+			},
+		})
+
+	// Get GitHub token using app credentials
+	c.NewPipelineStep("run-the-template").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-github-app-get-token",
+		}).
+		WithInput(map[string]interface{}{
+			"apiVersion": "template.fn.crossplane.io/v1beta1",
+			"kind":       "Input",
+			"secretKey":  "githubAppCredentials",
+		})
+
+	// Execute shell command with token
+	c.NewPipelineStep("shell").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-shell",
+		}).
+		WithInput(map[string]interface{}{
+			"apiVersion": "shell.fn.crossplane.io/v1beta1",
+			"kind":       "Parameters",
+			"shellEnvVars": []map[string]interface{}{
+				{
+					"key":      "GITHUB_TOKEN",
+					"valueRef": "context[apiextensions.crossplane.io/github-app-get-token].github-token",
+				},
+			},
+			"shellCommand": "echo \"GITHUB_TOKEN: $GITHUB_TOKEN\"",
+			"stdoutField": "status.atFunction.shell.stdout",
+			"stderrField": "status.atFunction.shell.stderr",
+		})
 
 	// Add the auto-ready function at the end
-	// This ensures the XR is marked ready when all
-	//   created MRs are ready
 	c.NewPipelineStep("function-auto-ready").
 		WithFunctionRef(xapiextv1.FunctionReference{
 			Name: "function-auto-ready",
