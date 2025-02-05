@@ -103,7 +103,6 @@ func (in *GithubRepoParameters) DeepCopyInto(out *GithubRepoParameters) {
 	*out = *in
 	out.BackstageCatalogEntity = in.BackstageCatalogEntity
 	out.Repository = in.Repository
-	out.GithubTokenSecretRef = in.GithubTokenSecretRef
 	out.RegistryInfoConfigMapRef = in.RegistryInfoConfigMapRef
 }
 

@@ -137,11 +137,11 @@ type GithubRepoParameters struct {
 	// +required
 	Repository Repository `json:"repository,omitempty"`
 
-	// The name and namespace of a Secret that has a key named "gh_token" with value if a GitHub
-	// authentication token used to create a new repository.
+	// In order to load a Secret, it has to hav a label with the key "github-app-secret"
+	// and the value indicated in this field.
 	//
 	// +optional
-	GithubTokenSecretRef ObjectReference `json:"githubTokenSecretRef,omitempty"`
+	GithubAppSecretLabelValue string `json:"githubAppSecretLabelValue,omitempty"`
 
 	// The name and namespace of a ConfigMap that has keys named "registry_domain",
 	// "registry_username" and "registry_cicd_secret_ref" that configure access to
