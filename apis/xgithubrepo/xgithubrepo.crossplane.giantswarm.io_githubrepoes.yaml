@@ -185,6 +185,19 @@ spec:
                 required:
                 - name
                 type: object
+              registryInfoConfigMapRef:
+                description: |-
+                  The name and namespace of a ConfigMap that has keys named "registry_domain",
+                  "registry_username" and "registry_cicd_secret_ref" that configure access to
+                  the image registry in the CICD GitHib Action.
+                properties:
+                  name:
+                    description: Name of the configmap.
+                    type: string
+                  namespace:
+                    description: Namespace of the configmap
+                    type: string
+                type: object
               writeConnectionSecretToRef:
                 description: |-
                   WriteConnectionSecretToReference specifies the namespace and name of a
