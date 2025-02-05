@@ -1,0 +1,105 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xgithubrepos.xrd.platform.giantswarm.io
+spec:
+  group: xrd.platform.giantswarm.io
+  names:
+    kind: xGithubRepo
+    singular: xgithubrepo
+    plural: xgithubrepos
+  claimNames:
+    kind: GithubRepo
+    singular: githubrepo
+    plural: githubrepos
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - backstageCatalogEntity
+                - repository
+                - registryInfoConfigMapRef
+              properties:
+                backstageCatalogEntity:
+                  description: Backstage catalog entity configuration
+                  required:
+                    - owner
+                    - lifecycle
+                  type: object
+                  properties:
+                    owner:
+                      description: A reference of the owning Backstage entity.
+                      type: string
+                    lifecycle:
+                      description: A lifecycle of the Backstage entity.
+                      type: string
+                repository:
+                  description: New repository configuration.
+                  required:
+                    - owner
+                    - name
+                    - description
+                    - templateSource
+                    - visibility
+                  type: object
+                  properties:
+                    owner:
+                      description: A name of the owning GitHub organization or user.
+                      type: string
+                    name:
+                      description: A name for the new repository.
+                      type: string
+                    description:
+                      description: A description of the new repository.
+                      type: string
+                    templateSource:
+                      description: A full name (`user/repository`) of a GitHub template repository to use.
+                      type: string
+                    visibility:
+                      description: Visibility of the created repo.
+                      enum:
+                        - public
+                        - internal
+                        - private
+                      type: string
+                githubTokenSecretRef:
+                  description: >-
+                    The name and namespace of a Secret that has a key named "gh_token" with value if a GitHub
+                    authentication token used to create a new repository.
+                  required:
+                    - name
+                  type: object
+                  properties:
+                    name:
+                      description: Object name.
+                      type: string
+                    namespace:
+                      description: Object's namespace.
+                      type: string
+                registryInfoConfigMapRef:
+                  description: >-
+                    The name and namespace of a ConfigMap that has keys named "registry_domain", 
+                    "registry_username" and "registry_cicd_secret_ref" that configure access to 
+                    the image registry in the CICD GitHib Action.
+                  required:
+                    - name
+                  type: object
+                  properties:
+                    name:
+                      description: Object name.
+                      type: string
+                    namespace:
+                      description: Object's namespace.
+                      type: string
+            status:
+              properties:
+                atFunction:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true

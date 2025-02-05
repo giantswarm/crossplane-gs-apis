@@ -64,10 +64,42 @@ type GithubRepoList struct {
 type GithubRepoSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
 
+	/*                registryInfoConfigMapRef:
+	                  description: >-
+	                  required:
+	                    - name
+	                  type: object
+	                  properties:
+	                    name:
+	                      description: Object name.
+	                      type: string
+	                    namespace:
+	                      description: Object's namespace.
+	                      type: string
+	*/
+
 	GithubRepoParameters `json:",inline"`
 }
 
 type GithubRepoParameters struct {
+	// The name and namespace of a ConfigMap that has keys named "registry_domain",
+	// "registry_username" and "registry_cicd_secret_ref" that configure access to
+	// the image registry in the CICD GitHib Action.
+	//
+	// +required
+	RegistryInfoConfigMapRef ConfigMapReference `json:"registryInfoConfigMapRef,omitempty"`
+}
+
+type ConfigMapReference struct {
+	// Name of the configmap.
+	//
+	// +required
+	Name string `json:"name,omitempty"`
+
+	// Namespace of the configmap
+	//
+	// +required
+	Namespace string `json:"namespace,omitempty"`
 }
 
 type GithubRepoStatus struct {
