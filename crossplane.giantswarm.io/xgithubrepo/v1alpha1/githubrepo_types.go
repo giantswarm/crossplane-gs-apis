@@ -62,22 +62,7 @@ type GithubRepoList struct {
 // in a parent.
 
 type GithubRepoSpec struct {
-	xpv1.ResourceSpec `json:",inline"`
-
-	/*                registryInfoConfigMapRef:
-	                  description: >-
-	                  required:
-	                    - name
-	                  type: object
-	                  properties:
-	                    name:
-	                      description: Object name.
-	                      type: string
-	                    namespace:
-	                      description: Object's namespace.
-	                      type: string
-	*/
-
+	xpv1.ResourceSpec    `json:",inline"`
 	GithubRepoParameters `json:",inline"`
 }
 
@@ -129,7 +114,7 @@ type Repository struct {
 	Visibility RepositoryVisibility `json:"visibility,omitempty"`
 }
 
-type SecretReference struct {
+type ObjectReference struct {
 	// Object name.
 	//
 	// +required
@@ -156,26 +141,14 @@ type GithubRepoParameters struct {
 	// authentication token used to create a new repository.
 	//
 	// +optional
-	GithubTokenSecretRef SecretReference `json:"githubTokenSecretRef,omitempty"`
+	GithubTokenSecretRef ObjectReference `json:"githubTokenSecretRef,omitempty"`
 
 	// The name and namespace of a ConfigMap that has keys named "registry_domain",
 	// "registry_username" and "registry_cicd_secret_ref" that configure access to
 	// the image registry in the CICD GitHib Action.
 	//
 	// +required
-	RegistryInfoConfigMapRef ConfigMapReference `json:"registryInfoConfigMapRef,omitempty"`
-}
-
-type ConfigMapReference struct {
-	// Name of the configmap.
-	//
-	// +required
-	Name string `json:"name,omitempty"`
-
-	// Namespace of the configmap
-	//
-	// +required
-	Namespace string `json:"namespace,omitempty"`
+	RegistryInfoConfigMapRef ObjectReference `json:"registryInfoConfigMapRef,omitempty"`
 }
 
 type GithubRepoStatus struct {
