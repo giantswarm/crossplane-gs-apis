@@ -28,6 +28,16 @@ spec:
         properties:
           spec:
             properties:
+              backstageCatalogEntity:
+                description: Backstage catalog entity configuration
+                properties:
+                  lifecycle:
+                    description: A lifecycle of the Backstage entity.
+                    type: string
+                  owner:
+                    description: A reference of the owning Backstage entity.
+                    type: string
+                type: object
               deletionPolicy:
                 default: Delete
                 description: |-
@@ -42,6 +52,18 @@ spec:
                 - Orphan
                 - Delete
                 type: string
+              githubTokenSecretRef:
+                description: |-
+                  The name and namespace of a Secret that has a key named "gh_token" with value if a GitHub
+                  authentication token used to create a new repository.
+                properties:
+                  name:
+                    description: Object name.
+                    type: string
+                  namespace:
+                    description: Object's namespace.
+                    type: string
+                type: object
               managementPolicies:
                 default:
                 - '*'
@@ -192,10 +214,34 @@ spec:
                   the image registry in the CICD GitHib Action.
                 properties:
                   name:
-                    description: Name of the configmap.
+                    description: Object name.
                     type: string
                   namespace:
-                    description: Namespace of the configmap
+                    description: Object's namespace.
+                    type: string
+                type: object
+              repository:
+                description: New repository configuration.
+                properties:
+                  description:
+                    description: A description of the new repository.
+                    type: string
+                  name:
+                    description: A name for the new repository.
+                    type: string
+                  owner:
+                    description: A name of the owning GitHub organization or user.
+                    type: string
+                  templateSource:
+                    description: A full name (`user/repository`) of a GitHub template
+                      repository to use.
+                    type: string
+                  visibility:
+                    description: Visibility of the created repo.
+                    enum:
+                    - public
+                    - internal
+                    - private
                     type: string
                 type: object
               writeConnectionSecretToRef:
