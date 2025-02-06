@@ -19,14 +19,17 @@ import (
 
 	xextrares "github.com/crossplane-contrib/function-extra-resources/input/v1beta1"
 	xapiextv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
+	xghtoken "github.com/giantswarm/function-github-app-get-token/input/v1beta1"
 	"github.com/mproffitt/crossbuilder/pkg/generate/composition/build"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type builder struct{}
 
-var Builder = builder{}
-var TemplateBasePath string
+var (
+	Builder          = builder{}
+	TemplateBasePath string
+)
 
 func (b *builder) GetCompositeTypeRef() build.ObjectKindReference {
 	return build.ObjectKindReference{
@@ -47,6 +50,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		one                             = uint64(1)
 		xrGithubAppSecretLabelKey       = "github-app-secret"
 		xrGithubAppSecretLabelValuePath = "spec.githubAppSecretLabelValue"
+		ctxKeyGithubAppCredentials      = "githubAppCredentials"
 	)
 
 	build.SetBasePath(TemplateBasePath)
@@ -70,7 +74,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 							// kubernetes object to pull - its apiVersion
 							APIVersion: "v1",
 							// name of the crossplane context key to store the result
-							Into: "githubAppCredentials",
+							Into: ctxKeyGithubAppCredentials,
 							// type of function's selector to use: either by direct ref or label matching
 							Type: xextrares.ResourceSourceTypeSelector,
 							// selector to use to find the object - select by labels
@@ -91,67 +95,54 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 			},
 		})
+		// get temporary access token using GitHub App auth workflow
+	c.NewPipelineStep("get-github-token").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-extra-resources",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xghtoken.Input{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "extra-resources.fn.crossplane.io/v1beta1",
+					Kind:       "Input",
+				},
+				SecretKey: "githubAppCredentials",
+			},
+		})
 		/*
-					WithInput(map[string]interface{}{
-						"apiVersion": "extra-resources.fn.crossplane.io/v1beta1",
-						"kind":       "Input",
-						"spec": map[string]interface{}{
-							"extraResources": []map[string]interface{}{
-								{
-									"kind":       "Secret",
-									"apiVersion": "v1",
-									"into":       "githubAppCredentials",
-									"type":       "Selector",
-									"selector": map[string]interface{}{
-										"maxMatch": 2,
-										"minMatch": 1,
-										"matchLabels": []map[string]interface{}{
-											{
-												"key":   "secret",
-												"type":  "Value",
-												"value": "github-app",
-											},
-										},
-									},
-								},
-							},
-						},
-					})
-			/*
-				// Get GitHub token using app credentials
-				c.NewPipelineStep("run-the-template").
-					WithFunctionRef(xapiextv1.FunctionReference{
-						Name: "function-github-app-get-token",
-					}).
-					WithInput(map[string]interface{}{
-						"apiVersion": "template.fn.crossplane.io/v1beta1",
-						"kind":       "Input",
-						"secretKey":  "githubAppCredentials",
-					})
+			// Get GitHub token using app credentials
+			c.NewPipelineStep("run-the-template").
+				WithFunctionRef(xapiextv1.FunctionReference{
+					Name: "function-github-app-get-token",
+				}).
+				WithInput(map[string]interface{}{
+					"apiVersion": "template.fn.crossplane.io/v1beta1",
+					"kind":       "Input",
+					"secretKey":  "githubAppCredentials",
+				})
 
-				// Execute shell command with token
-				c.NewPipelineStep("shell").
-					WithFunctionRef(xapiextv1.FunctionReference{
-						Name: "function-shell",
-					}).
-					WithInput(map[string]interface{}{
-						"apiVersion": "shell.fn.crossplane.io/v1beta1",
-						"kind":       "Parameters",
-						"shellEnvVars": []map[string]interface{}{
-							{
-								"key":      "GITHUB_TOKEN",
-								"valueRef": "context[apiextensions.crossplane.io/github-app-get-token].github-token",
-							},
+			// Execute shell command with token
+			c.NewPipelineStep("shell").
+				WithFunctionRef(xapiextv1.FunctionReference{
+					Name: "function-shell",
+				}).
+				WithInput(map[string]interface{}{
+					"apiVersion": "shell.fn.crossplane.io/v1beta1",
+					"kind":       "Parameters",
+					"shellEnvVars": []map[string]interface{}{
+						{
+							"key":      "GITHUB_TOKEN",
+							"valueRef": "context[apiextensions.crossplane.io/github-app-get-token].github-token",
 						},
-						"shellCommand": "echo \"GITHUB_TOKEN: $GITHUB_TOKEN\"",
-						"stdoutField": "status.atFunction.shell.stdout",
-						"stderrField": "status.atFunction.shell.stderr",
-					})
+					},
+					"shellCommand": "echo \"GITHUB_TOKEN: $GITHUB_TOKEN\"",
+					"stdoutField": "status.atFunction.shell.stdout",
+					"stderrField": "status.atFunction.shell.stderr",
+				})
 		*/
 	// Add the auto-ready function at the end
 	c.NewPipelineStep("function-auto-ready").
 		WithFunctionRef(xapiextv1.FunctionReference{
 			Name: "function-auto-ready",
 		})
-
 }
