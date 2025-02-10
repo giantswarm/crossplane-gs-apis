@@ -34,5 +34,14 @@ spec:
           type: Selector
     step: pull-github-secret
   - functionRef:
+      name: function-extra-resources
+    input:
+      apiVersion: extra-resources.fn.crossplane.io/v1beta1
+      kind: Input
+      metadata:
+        creationTimestamp: null
+      secretKey: githubAppCredentials
+    step: get-github-token
+  - functionRef:
       name: function-auto-ready
     step: function-auto-ready

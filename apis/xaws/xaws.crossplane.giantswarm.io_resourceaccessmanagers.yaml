@@ -31,6 +31,7 @@ spec:
           spec:
             properties:
               allowExternalPrincipals:
+                default: false
                 description: If external principals are allowed to access the resource
                   access manager.
                 type: boolean
@@ -90,12 +91,12 @@ spec:
                 items:
                   properties:
                     crossOrg:
+                      default: false
                       description: If this is a cross-org principal.
                       type: boolean
                     principal:
                       description: |-
                         The principal to associate with the resource access manager.
-
 
                         Possible values are AWS Account ID, AWS Organization ID, or AWS organizations.
                       type: string
@@ -314,6 +315,13 @@ spec:
                         A Message containing details about this condition's last transition from
                         one status to another, if any.
                       type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
                     reason:
                       description: A Reason for this condition's last transition from
                         one status to another.
