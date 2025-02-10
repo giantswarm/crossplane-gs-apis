@@ -18,6 +18,7 @@ import (
 	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xgithubrepo/v1alpha1"
 
 	xextrares "github.com/crossplane-contrib/function-extra-resources/input/v1beta1"
+	xfunsh "github.com/crossplane-contrib/function-shell/input/v1alpha1"
 	xapiextv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	xghtoken "github.com/giantswarm/function-github-app-get-token/input/v1beta1"
 	"github.com/mproffitt/crossbuilder/pkg/generate/composition/build"
@@ -103,43 +104,64 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		WithInput(build.ObjectKindReference{
 			Object: &xghtoken.Input{
 				TypeMeta: metav1.TypeMeta{
-					APIVersion: "extra-resources.fn.crossplane.io/v1beta1",
+					APIVersion: "github-app-get-token.fn.crossplane.giantswarm.io/v1beta1",
 					Kind:       "Input",
 				},
-				SecretKey: "githubAppCredentials",
+				SecretKey: ctxKeyGithubAppCredentials,
 			},
 		})
-		/*
-			// Get GitHub token using app credentials
-			c.NewPipelineStep("run-the-template").
-				WithFunctionRef(xapiextv1.FunctionReference{
-					Name: "function-github-app-get-token",
-				}).
-				WithInput(map[string]interface{}{
-					"apiVersion": "template.fn.crossplane.io/v1beta1",
-					"kind":       "Input",
-					"secretKey":  "githubAppCredentials",
-				})
 
-			// Execute shell command with token
-			c.NewPipelineStep("shell").
-				WithFunctionRef(xapiextv1.FunctionReference{
-					Name: "function-shell",
-				}).
-				WithInput(map[string]interface{}{
-					"apiVersion": "shell.fn.crossplane.io/v1beta1",
-					"kind":       "Parameters",
-					"shellEnvVars": []map[string]interface{}{
-						{
-							"key":      "GITHUB_TOKEN",
-							"valueRef": "context[apiextensions.crossplane.io/github-app-get-token].github-token",
-						},
+	ghBashScript, err := build.LoadTemplate("scripts/clone-render-repo.sh")
+	if err != nil {
+		panic(err)
+	}
+	c.NewPipelineStep("execute-gh-script").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-shell",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xfunsh.Parameters{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "template.fn.crossplane.io/v1alpha1",
+					Kind:       "Parameters",
+				},
+				ShellEnvVars: []xfunsh.ShellEnvVar{
+					{
+						Key:      "GITHUB_TOKEN",
+						ValueRef: "context[apiextensions.crossplane.io/github-app-get-token].github-token",
 					},
-					"shellCommand": "echo \"GITHUB_TOKEN: $GITHUB_TOKEN\"",
-					"stdoutField": "status.atFunction.shell.stdout",
-					"stderrField": "status.atFunction.shell.stderr",
-				})
-		*/
+					{
+						Key:      "REPO_OWNER",
+						ValueRef: "spec.repository.owner",
+					},
+					{
+						Key:      "REPO_NAME",
+						ValueRef: "spec.repository.name",
+					},
+					{
+						Key:      "REPO_DESCRIPTION",
+						ValueRef: "spec.repository.description",
+					},
+					{
+						Key:      "REPO_VISIBILITY",
+						ValueRef: "spec.repository.visibility",
+					},
+					{
+						Key:      "REGISTRY_DOMAIN",
+						ValueRef: "ghcr.io",
+					},
+					{
+						Key:      "BACKSTAGE_ENTITY_OWNER",
+						ValueRef: "spec.backstageCatalogEntity.owner",
+					},
+					{
+						Key:      "BACKSTAGE_ENTITY_LIFECYCLE",
+						ValueRef: "spec.backstageCatalogEntity.lifecycle",
+					},
+				},
+				ShellCommand: ghBashScript,
+			},
+		})
 	// Add the auto-ready function at the end
 	c.NewPipelineStep("function-auto-ready").
 		WithFunctionRef(xapiextv1.FunctionReference{
