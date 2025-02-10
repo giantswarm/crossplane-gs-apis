@@ -13,6 +13,7 @@ require (
 	github.com/crossplane-contrib/function-extra-resources v0.0.3
 	github.com/crossplane-contrib/function-kcl v0.8.0
 	github.com/crossplane-contrib/function-patch-and-transform v0.5.0
+	github.com/crossplane-contrib/function-shell v0.3.0
 	github.com/crossplane-contrib/provider-kubernetes v0.14.0
 	github.com/crossplane/crossplane v1.16.0
 	github.com/crossplane/crossplane-runtime v1.18.0
@@ -35,7 +36,6 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/crossplane-contrib/function-shell v0.3.0 // indirect
 	github.com/crossplane/function-sdk-go v0.4.0 // indirect
 	github.com/crossplane/upjet v1.4.1-0.20240911184956-3afbb7796d46 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect

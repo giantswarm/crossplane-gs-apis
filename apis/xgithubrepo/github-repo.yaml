@@ -36,12 +36,98 @@ spec:
   - functionRef:
       name: function-extra-resources
     input:
-      apiVersion: extra-resources.fn.crossplane.io/v1beta1
+      apiVersion: github-app-get-token.fn.crossplane.giantswarm.io/v1beta1
       kind: Input
       metadata:
         creationTimestamp: null
       secretKey: githubAppCredentials
     step: get-github-token
+  - functionRef:
+      name: function-shell
+    input:
+      apiVersion: template.fn.crossplane.io/v1alpha1
+      kind: Parameters
+      metadata:
+        creationTimestamp: null
+      shellCommand: |-
+        set -euo pipefail
+
+        # Parameters
+        REPO_OWNER="demotechinc"
+        REPO_NAME="laszlo-crossplane-provider-github"
+
+        REGISTRY_DOMAIN="ghcr.io"
+
+        BACKSTAGE_ENTITY_OWNER="exampleBackstageEntityOwner"
+        BACKSTAGE_ENTITY_LIFECYCLE="exampleBackstageEntityLifecycle"
+
+        # Clone repository
+        TMP_DIR=$(mktemp -d)
+
+        git clone "https://${GITHUB_TOKEN}@github.com/${REPO_OWNER}/${REPO_NAME}.git" "${TMP_DIR}" 2>&1
+
+        cd ${TMP_DIR}
+
+        # Do not render if the repository was modified beyond the 1st commit that created it from the template repository
+        NUMBER_OF_COMMITS=$(git rev-list --count HEAD)
+
+        if [ "${NUMBER_OF_COMMITS}" != "1" ]; then
+          echo "Repository was already modified beyond the 1st commit, bailing out."
+          exit 0
+        else
+          # Template repository
+          NEW_PATH=$(mktemp -d)
+
+          cp -a ${TMP_DIR}/project-template/ $NEW_PATH/
+
+          cat >$NEW_PATH/boilerplate-values.yml <<EOF
+        BackstageEntityOwner: ${BACKSTAGE_ENTITY_OWNER}
+        BackstageEntityLifecycle: ${BACKSTAGE_ENTITY_LIFECYCLE}
+        ProjectName: ${REPO_NAME}
+        RepoOwner: ${REPO_OWNER}
+        ImageName: ${REPO_NAME}
+        RegistryDomain: ${REGISTRY_DOMAIN}
+        RegistryName: ${REPO_OWNER}
+        EOF
+
+          git rm -r '*'
+
+          boilerplate --non-interactive --template-url "$NEW_PATH"/project-template --output-folder . --var-file "$NEW_PATH"/boilerplate-values.yml
+
+          git config user.email "crossplane@bots.github.com"
+          git config user.name "Crossplane Bot"
+
+          # git push -d origin laszlo-test-1
+          # git branch -d laszlo-test-1
+
+          # git checkout -b laszlo-test-1 2>&1
+
+          git add -A
+
+          git commit -am "Laszlo was here"
+
+          # git push origin laszlo-test-1 || true
+          git push origin main
+        fi
+      shellEnvVars:
+      - key: GITHUB_TOKEN
+        valueRef: context[apiextensions.crossplane.io/github-app-get-token].github-token
+      - key: REPO_OWNER
+        valueRef: spec.repository.owner
+      - key: REPO_NAME
+        valueRef: spec.repository.name
+      - key: REPO_DESCRIPTION
+        valueRef: spec.repository.description
+      - key: REPO_VISIBILITY
+        valueRef: spec.repository.visibility
+      - key: REGISTRY_DOMAIN
+        valueRef: ghcr.io
+      - key: BACKSTAGE_ENTITY_OWNER
+        valueRef: spec.backstageCatalogEntity.owner
+      - key: BACKSTAGE_ENTITY_LIFECYCLE
+        valueRef: spec.backstageCatalogEntity.lifecycle
+      shellEnvVarsRef: {}
+    step: execute-gh-script
   - functionRef:
       name: function-auto-ready
     step: function-auto-ready
