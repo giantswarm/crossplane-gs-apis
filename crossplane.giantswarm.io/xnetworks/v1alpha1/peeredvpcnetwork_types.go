@@ -128,7 +128,7 @@ type TransitGatewayWrapper struct {
 	// Enabled specifies if the transit gateway is enabled.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Enabled bool `json:"enabled"`
 
 	// Peers is a list of transit gateway peers to connect to
@@ -164,7 +164,7 @@ type TgwVpcDetailsWrapper struct {
 	// be linked to the public subnets
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	AllowPublic bool `json:"allowPublic"`
 }
 
@@ -177,7 +177,7 @@ type TgwWrappedVpcWithProviderConfig struct {
 	// be linked to the public subnets
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	AllowPublic bool `json:"allowPublic"`
 }
 
@@ -192,13 +192,13 @@ type VpcPeering struct {
 	// Defaults to false
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	AllowPublic bool `json:"allowPublic"`
 
 	// Enabled specifies if VPC peering is enabled.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Enabled bool `json:"enabled"`
 
 	// GroupBy specifies the key to group the remote subnets by
@@ -221,7 +221,7 @@ type WrappedVpcPeer struct {
 	// be linked to the public subnets
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	AllowPublic bool `json:"allowPublic"`
 }
 
@@ -334,7 +334,7 @@ type PeeredSubnetBuilder struct {
 	// subnet set to tag, starting from index 0.
 	//
 	// +optional
-	// +default=-1
+	// +kubeBuilder:default=-1
 	LoadBalancerIndex int `json:"lbSetIndex"`
 
 	// This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
@@ -349,7 +349,7 @@ type PeeredSubnetBuilder struct {
 	// Offset is the number of bits to offset the subnet mask by
 	//
 	// +optional
-	// +default=0
+	// +kubeBuilder:default=0
 	Offset int `json:"offset"`
 }
 
@@ -397,7 +397,7 @@ type PeeredSubnets struct {
 	// VPC.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	IPAM bool `json:"ipam"`
 
 	// The name of the IPAM pool to use.
@@ -413,7 +413,7 @@ type PeeredVpcLookup struct {
 	// If network discovery is enabled
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	Enabled bool `json:"enabled"`
 
 	// GroupBy is the key to group the remote VPCs by
