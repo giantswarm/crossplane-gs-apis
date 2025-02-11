@@ -52,7 +52,6 @@ spec:
                   A tag that can be referenced to group subnets and route tables
                   into subnetsets.
 
-
                   The tag must have an integer value
                 type: string
               kubernetesProviderConfigRef:
@@ -288,7 +287,6 @@ spec:
                       description: |-
                         Region specifies the region the VPC is found in.
 
-
                         If not defined, the region of the VPC will be assumed to be the same as
                         the region of the peered VPC.
                       type: string
@@ -341,6 +339,13 @@ spec:
                         A Message containing details about this condition's last transition from
                         one status to another, if any.
                       type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
                     reason:
                       description: A Reason for this condition's last transition from
                         one status to another.
@@ -546,6 +551,8 @@ spec:
                         VPC
                       type: object
                       x-kubernetes-map-type: atomic
+                  required:
+                  - id
                   type: object
                   x-kubernetes-map-type: granular
                 description: The VPCs that have been discovered.

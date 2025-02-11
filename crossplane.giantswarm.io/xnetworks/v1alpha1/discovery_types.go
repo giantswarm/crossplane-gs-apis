@@ -39,7 +39,7 @@ type DiscoverySpec struct {
 	// Whether this discovery is enabled.
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	Enabled bool `json:"enabled"`
 
 	// A tag that can be referenced to group subnets and route tables
@@ -48,7 +48,7 @@ type DiscoverySpec struct {
 	// The tag must have an integer value
 	//
 	// +optional
-	// +default="giantswarm.io/subnetset"
+	// +kubeBuilder:default="giantswarm.io/subnetset"
 	GroupBy string `json:"groupBy"`
 
 	// The name of the provider config to use for creating kubernetes resources.

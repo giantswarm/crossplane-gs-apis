@@ -50,7 +50,7 @@ type ClusterDiscovery struct {
 	// is used.
 	//
 	// +optional
-	// +default="default"
+	// +kubeBuilder:default="default"
 	RemoteNamespace string `json:"remoteNamespace"`
 }
 

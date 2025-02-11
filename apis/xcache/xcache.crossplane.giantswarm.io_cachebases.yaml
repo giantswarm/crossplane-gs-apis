@@ -58,7 +58,6 @@ spec:
                   automatically promoted to the primary cluster if the existing primary
                   cluster fails.
 
-
                   If enabled, NumCacheNodes must be greater than 1. Must be enabled for
                   Redis (cluster mode enabled) replication groups.
                 type: boolean
@@ -73,7 +72,6 @@ spec:
                 description: |-
                   AzMode specifies the Availability Zone mode of the cluster.
 
-
                   This parameter is only valid when the Engine parameter is memcached.
                   For resiliance, we recommend setting the AzMode parameter to cross-az and
                   this is the default value. In this mode, the number of nodes must be > 1
@@ -87,9 +85,7 @@ spec:
                 description: |-
                   CacheClusters is a list of cache clusters in the replication group.
 
-
                   This value is overridden by NumCacheClusters.
-
 
                   May be used to specify cluster specific configuration.
                 items:
@@ -109,7 +105,6 @@ spec:
                         AvailabilityZone is the name of the Availability Zone in which the
                         cluster will be created.
 
-
                         If you want to create cache nodes in multi-az, use
                         preferred_availability_zones instead.
                         Default: System chosen Availability Zone.
@@ -117,7 +112,6 @@ spec:
                     azMode:
                       description: |-
                         AzMode specifies the Availability Zone mode of the cluster.
-
 
                         This parameter is only valid when the Engine parameter is memcached.
                         For resiliance, we recommend setting the AzMode parameter to cross-az and
@@ -141,7 +135,6 @@ spec:
                         EngineVersion is the version number of the cache engine to be used for
                         the cluster. If not set this will default to the latest version.
 
-
                         This value will be ignored once the cluster is created.
                       type: string
                     finalSnapshotIdentifier:
@@ -160,7 +153,6 @@ spec:
                       description: |-
                         LogDeliveryConfiguration is a list of log delivery configurations for
                         the cluster.
-
 
                         This is only applicable when the Engine parameter is redis.
                       items:
@@ -211,7 +203,6 @@ spec:
                       description: |-
                         NodeType is the instance class to use for the cache nodes.
 
-
                         Requried unless replication group is specified.
                       type: string
                     notificationTopicArn:
@@ -223,7 +214,6 @@ spec:
                       description: |-
                         NumCacheNodes is the number of cache nodes in the cluster.
 
-
                         Required unless replication group is specified.
                       format: int64
                       type: integer
@@ -231,7 +221,6 @@ spec:
                       description: |-
                         OutpostMode specifies the outpost mode that will apply to the cache
                         cluster creation.
-
 
                         Currently only single-outpost is supported.
                       enum:
@@ -242,7 +231,6 @@ spec:
                       description: |-
                         ParameterGroupName is the name of the parameter group to associate with
                         this cluster.
-
 
                         Required unless replication group is specified.
                       type: string
@@ -256,7 +244,6 @@ spec:
                       description: |-
                         PreferredAvailabilityZones is a list of Availability Zones in which the
                         cluster's nodes will be created.
-
 
                         Memcached only. The number of availability zones must equal the number of
                         nodes specified in the NumCacheNodes parameter.
@@ -280,7 +267,6 @@ spec:
                         SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
                         from which to restore data into the cluster.
 
-
                         Optional, Redis only
                       items:
                         type: string
@@ -290,14 +276,12 @@ spec:
                         SnapshotName is the name of the snapshot from which to restore data into
                         the cluster.
 
-
                         Optional, Redis only
                       type: string
                     snapshotRetentionLimit:
                       description: |-
                         SnapshotRetentionLimit is the number of days for which ElastiCache will
                         retain automatic cache cluster snapshots before deleting them.
-
 
                         Optional, Redis only
                       format: int64
@@ -307,14 +291,12 @@ spec:
                         SnapshotWindow is the daily time range (in UTC) during which ElastiCache
                         will begin taking a daily snapshot of the cache cluster.
 
-
                         Optional, Redis only
                       type: string
                     subnetGroupName:
                       description: |-
                         SubnetGroupName is the name of the subnet group to associate with this
                         cluster.
-
 
                         Required unless replication group is specified in which case it will be
                         ignored.
@@ -330,7 +312,6 @@ spec:
                       description: |-
                         TransitEncryptionEnabled specifies whether data in the cluster is
                         encrypted in transit.
-
 
                         Optional, Memcached only
                       type: boolean
@@ -355,7 +336,6 @@ spec:
                   CreateReplicationGroup specifies whether a replication group should be
                   created.
 
-
                   If set false, the replication group configuration will be used for
                   creating a single cluster
                 type: boolean
@@ -363,7 +343,6 @@ spec:
                 description: |-
                   DataTieringEnabled specifies whether data tiering is enabled for the
                   replication group.
-
 
                   Must be true if the replcation group is using r6gd nodes
                 type: boolean
@@ -399,13 +378,11 @@ spec:
                   EngineVersion is the version number of the cache engine to be used for
                   the cluster. If not set this will default to the latest version.
 
-
                   This value will be ignored once the cluster is created.
                 type: string
               eso:
                 description: |-
                   Eso is the ESO configuration.
-
 
                   This field is used to sync secrets using `external-secrets-operator`.
                   External Secrets Operator must be installed if this value is set to true
@@ -420,17 +397,14 @@ spec:
                       FluxSSASecretName is the name of the secret that contains SSA details
                       for each project built with infrastructure components.
 
-
                       This secret will be updated with the name of the current project with
                       all hyphens, underscores and dots replaced with an empty string.
-
 
                       This secret must exist in the same namespace as the current project.
                     type: string
                   kubernetesSecretStore:
                     description: |-
                       KubernetesSecretStore is the Kubernetes secret store to use.
-
 
                       The kubernetes secret store is expected to be namespace scoped to prevent
                       secrets leaking across namespaces.
@@ -516,10 +490,8 @@ spec:
                       ParameterGroupName is the name of the parameter group to associate with
                       the global replication group.
 
-
                       Required when upgrading to a new major engine version but subsequently
                       ignored.
-
 
                       Specifying this parameter will result in an error if a major engine version
                       is not specified.
@@ -535,7 +507,6 @@ spec:
                   GlobalReplicationGroupId is the id of the global replication group to
                   which this replication group should belong.
 
-
                   If this value is specified, the number of node groups parameter must not
                   be specified.
                 type: string
@@ -550,13 +521,11 @@ spec:
                   KmsKeyId is the ID of the AWS Key Management Service (KMS) key used to
                   encrypt the data in the cluster.
 
-
                   Ignored unless AtRestEncryptionEnabled is set to true.
                 type: string
               kubernetesProviderConfig:
                 description: |-
                   Provider configuration for the kubernetes provider
-
 
                   This is required for creating users for redis clusters.
                   If Redis is the engine type, this must be provided and
@@ -597,7 +566,6 @@ spec:
                 description: |-
                   LogDeliveryConfiguration is a list of log delivery configurations for
                   the cluster.
-
 
                   This is only applicable when the Engine parameter is redis.
                 items:
@@ -667,7 +635,6 @@ spec:
                   MultiAzEnabled specifies whether the cluster should be created in
                   multiple Availability Zones.
 
-
                   If true, AutomaticFailoverEnabled must also be true.
                 type: boolean
               networkType:
@@ -682,7 +649,6 @@ spec:
                 description: |-
                   NodeType is the instance class to use for the cache nodes.
 
-
                   Requried unless global replication group is specified.
                 type: string
               notificationTopicArn:
@@ -694,10 +660,8 @@ spec:
                 description: |-
                   NumCacheClusters is the number of cache clusters in the replication group.
 
-
                   If MultiAzEnabled is true, this value must be at least 2 but generally
                   should be equal to the number of Availability Zones.
-
 
                   Conflicts with NumNodeGroups.
                 format: int64
@@ -705,7 +669,6 @@ spec:
               numCacheNodes:
                 description: |-
                   NumCacheNodes is the number of cache nodes in the cluster.
-
 
                   Ignored if replication group is specified or being created
                   This is a convenience parameter when building a single cluster.
@@ -715,10 +678,8 @@ spec:
                 description: |-
                   NumNodeGroups is the number of node groups in the replication group.
 
-
                   If GlobalReplicationGroupId is specified or GlobalReplicationGroup.Enabled
                   is true, this value must not be specified.
-
 
                   Conflicts with NumCacheClusters.
                 format: int64
@@ -913,7 +874,6 @@ spec:
                   SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
                   from which to restore data into the cluster.
 
-
                   Optional, Redis only
                 items:
                   type: string
@@ -923,14 +883,12 @@ spec:
                   SnapshotName is the name of the snapshot from which to restore data into
                   the cluster.
 
-
                   Optional, Redis only
                 type: string
               snapshotRetentionLimit:
                 description: |-
                   SnapshotRetentionLimit is the number of days for which ElastiCache will
                   retain automatic cache cluster snapshots before deleting them.
-
 
                   Optional, Redis only
                 format: int64
@@ -939,7 +897,6 @@ spec:
                 description: |-
                   SnapshotWindow is the daily time range (in UTC) during which ElastiCache
                   will begin taking a daily snapshot of the cache cluster.
-
 
                   Optional, Redis only
                 type: string
@@ -961,7 +918,6 @@ spec:
                 description: |-
                   TransitEncryptionEnabled specifies whether data in the cluster is
                   encrypted in transit.
-
 
                   Optional, Memcached only
                 type: boolean
@@ -1025,6 +981,13 @@ spec:
                         A Message containing details about this condition's last transition from
                         one status to another, if any.
                       type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
                     reason:
                       description: A Reason for this condition's last transition from
                         one status to another.

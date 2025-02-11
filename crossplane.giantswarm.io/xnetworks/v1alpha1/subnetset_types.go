@@ -32,7 +32,7 @@ type SubnetSetParameters struct {
 	// Normally leave this on the default.
 	//
 	// +optional
-	// +default=""
+	// +kubeBuilder:default=""
 	AppIndex string `json:"appIndex,omitempty"`
 
 	// Region is the region you'd like the VPC to be created in.

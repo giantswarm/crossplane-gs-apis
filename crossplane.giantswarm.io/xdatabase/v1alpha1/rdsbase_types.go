@@ -187,20 +187,20 @@ type ActivityStream struct {
 	// Enabled is whether activity stream is enabled.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Enabled *bool `json:"enabled,omitempty"`
 
 	// EngineNativeAuditFieldsIncluded is whether engine native audit fields are
 	// included. This option only applies to Oracle databases.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	EngineNativeAuditFieldsIncluded *bool `json:"engineNativeAuditFieldsIncluded,omitempty"`
 
 	// Mode is the mode of the activity stream. Valid values are `sync` and `async`.
 	//
 	// +optional
-	// +default="sync"
+	// +kubeBuilder:default="sync"
 	// +kubebuilder:validation:Enum=sync;async
 	Mode *string `json:"mode,omitempty"`
 }
@@ -209,52 +209,52 @@ type Autoscaling struct {
 	// Autoscaling is whether autoscaling is enabled.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Enabled *bool `json:"enabled,omitempty"`
 
 	// MaxCapacity is the maximum capacity for autoscaling.
 	//
 	// +optional
-	// +default=2
+	// +kubeBuilder:default=2
 	MaxCapacity *int64 `json:"maxCapacity,omitempty"`
 
 	// MinCapacity is the minimum capacity for autoscaling.
 	//
 	// +optional
-	// +default=0
+	// +kubeBuilder:default=0
 	MinCapacity *int64 `json:"minCapacity,omitempty"`
 
 	// MetricType is the type of metric to use for autoscaling.
 	//
 	// +optional
-	// +default="RDSReaderAverageCPUUtilization"
+	// +kubeBuilder:default="RDSReaderAverageCPUUtilization"
 	// +kubebuilder:validation:Enum=RDSReaderAverageCPUUtilization;RDSReaderAverageDatabaseConnections
 	MetricType *string `json:"metricType,omitempty"`
 
 	// PolicyName is the name of the autoscaling policy.
 	//
 	// +optional
-	// +default="target-metric"
+	// +kubeBuilder:default="target-metric"
 	PolicyName *string `json:"policyName,omitempty"`
 
 	// ScaleInCooldown is the amount of time, in seconds, after a scaling in
 	// activity completes before another scaling activity can start.
 	//
 	// +optional
-	// +default=300
+	// +kubeBuilder:default=300
 	ScaleInCooldown *int64 `json:"scaleInCooldown,omitempty"`
 
 	// ScaleOutCooldown is the amount of time, in seconds, after a scaling out
 	// activity completes before another scaling activity can start.
 	//
 	// +optional
-	// +default=300
+	// +kubeBuilder:default=300
 	ScaleOutCooldown *int64 `json:"scaleOutCooldown,omitempty"`
 
 	// TargetCPU is CPU threshold which will initiate autoscaling.
 	//
 	// +optional
-	// +default=70
+	// +kubeBuilder:default=70
 	TargetCPU *int64 `json:"targetCPU,omitempty"`
 
 	// TargetConnections is the average number of connections threshold which
@@ -262,7 +262,7 @@ type Autoscaling struct {
 	// default max_connections
 	//
 	// +optional
-	// +default=700
+	// +kubeBuilder:default=700
 	TargetConnections *int64 `json:"targetConnections,omitempty"`
 }
 
@@ -277,19 +277,19 @@ type CloudwatchLogGroup struct {
 	// Create is whether the log group is to be created.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Create *bool `json:"create,omitempty"`
 
 	// RetentionInDays is the number of days to retain logs for.
 	//
 	// +optional
-	// +default=0
+	// +kubeBuilder:default=0
 	RetentionInDays *int64 `json:"retentionInDays,omitempty"`
 
 	// SkipDestroy is whether the log group should be skipped during destroy.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	SkipDestroy *bool `json:"skipDestroy,omitempty"`
 }
 
@@ -302,7 +302,7 @@ type ClusterInstance struct {
 	// Overrides `ClusterParameters.AllocatedStorage`
 	//
 	// +optional
-	// +default=10
+	// +kubeBuilder:default=10
 	AllocatedStorage *int64 `json:"allocatedStorage,omitempty"`
 
 	// AllowMajorVersionUpgrade is whether major version upgrades are allowed.
@@ -313,7 +313,7 @@ type ClusterInstance struct {
 	// Overrides `ClusterParameters.AllowMajorVersionUpgrade`
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	AllowMajorVersionUpgrade *bool `json:"allowMajorVersionUpgrade,omitempty"`
 
 	// ApplyImmediately is whether changes should be applied immediately.
@@ -345,7 +345,7 @@ type ClusterInstance struct {
 	// Only applicable if not running in cluster mode
 	//
 	// +optional
-	// +default=0
+	// +kubeBuilder:default=0
 	BackupRetentionPeriod *int64 `json:"backupRetentionPeriod,omitempty"`
 
 	// CopyTagsToSnapshot is whether tags should be copied to snapshots.
@@ -365,7 +365,7 @@ type ClusterInstance struct {
 	// Only applicable if not running in cluster mode
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	DeleteAutomatedBackups *bool `json:"deleteAutomatedBackups,omitempty"`
 
 	// DeletionProtection is whether deletion protection is enabled.
@@ -413,7 +413,7 @@ type ClusterInstance struct {
 	// Only applicable if not running in cluster mode
 	//
 	// +optional
-	// +default=0
+	// +kubeBuilder:default=0
 	Iops *int64 `json:"iops,omitempty"`
 
 	// InstanceClass is the instance class to use.
@@ -556,7 +556,7 @@ type ClusterParameterGroup struct {
 	// must set this value to `pending-reboot`.
 	//
 	// +optional
-	// +default="immediate"
+	// +kubeBuilder:default="immediate"
 	// +kubebuilder:validation:Enum=immediate;pending-reboot
 	ApplyMethod *string `json:"applyMethod,omitempty"`
 
@@ -568,7 +568,7 @@ type ClusterParameterGroup struct {
 	// Create is whether the parameter group is to be created.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Create *bool `json:"create,omitempty"`
 
 	// Family is the family of the parameter group.
@@ -604,26 +604,26 @@ type ClusterParameters struct {
 	// AllocatedStorage is the size of the database.
 	//
 	// +optional
-	// +default=10
+	// +kubeBuilder:default=10
 	AllocatedStorage *int64 `json:"allocatedStorage,omitempty"`
 
 	// AllowMajorVersionUpgrade is whether major version upgrades are allowed.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	AllowMajorVersionUpgrade *bool `json:"allowMajorVersionUpgrade,omitempty"`
 
 	// ApplyImmediately is whether changes should be applied immediately.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	ApplyImmediately *bool `json:"applyImmediately,omitempty"`
 
 	// AutoMinorVersionUpgrade is whether minor version upgrades are applied
 	// automatically. This value can be overridden on a per instance basis.
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	AutoMinorVersionUpgrade *bool `json:"autoMinorVersionUpgrade,omitempty"`
 
 	// Autoscaling is the autoscaling configuration.
@@ -634,14 +634,14 @@ type ClusterParameters struct {
 	// BackupRetentionPeriod is the number of days to retain backups for.
 	//
 	// +optional
-	// +default=0
+	// +kubeBuilder:default=0
 	BackupRetentionPeriod *int64 `json:"backupRetentionPeriod,omitempty"`
 
 	// BacktrackWindow is the target backtrack window, in seconds.
 	// Only available for Aurora engine. To disable backtracking, set this value to 0.
 	//
 	// +optional
-	// +default=0
+	// +kubeBuilder:default=0
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=259200
 	BacktrackWindow *int64 `json:"backtrackWindow,omitempty"`
@@ -649,7 +649,7 @@ type ClusterParameters struct {
 	// CopyTagsToSnapshot is whether tags should be copied to snapshots.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	CopyTagsToSnapshot *bool `json:"copyTagsToSnapshot,omitempty"`
 
 	// CreateCluster is whether the cluster should be created.
@@ -658,7 +658,7 @@ type ClusterParameters struct {
 	// will be created as `instance.rds` types.
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	CreateCluster *bool `json:"createCluster,omitempty"`
 
 	// DatabaseName is the name of the database to create.
@@ -669,7 +669,7 @@ type ClusterParameters struct {
 	// DbClusterInstanceClass is the instance class to use.
 	//
 	// +optional
-	// +default="db.t4g.medium"
+	// +kubeBuilder:default="db.t4g.medium"
 	DbClusterInstanceClass *string `json:"dbClusterInstanceClass,omitempty"`
 
 	// DbClusterParameterGroup defines the parameters for the DB cluster.
@@ -685,13 +685,13 @@ type ClusterParameters struct {
 	// DeleteAutomatedBackups is whether automated backups should be deleted.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	DeleteAutomatedBackups *bool `json:"deleteAutomatedBackups,omitempty"`
 
 	// DeletionProtection is whether deletion protection is enabled.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	DeletionProtection *bool `json:"deletionProtection,omitempty"`
 
 	// Domain is the domain to use.
@@ -707,19 +707,19 @@ type ClusterParameters struct {
 	// EnableGlobalWriteForwarding is whether global write forwarding is enabled.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	EnableGlobalWriteForwarding *bool `json:"enableGlobalWriteForwarding,omitempty"`
 
 	// EnableHttpEndpoint is whether the HTTP endpoint is enabled.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	EnableHttpEndpoint *bool `json:"enableHttpEndpoint,omitempty"`
 
 	// EnableLocalWriteForwarding is whether local write forwarding is enabled.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	EnableLocalWriteForwarding *bool `json:"enableLocalWriteForwarding,omitempty"`
 
 	// EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Logs.
@@ -746,7 +746,7 @@ type ClusterParameters struct {
 	// EngineMode is the database engine mode to use.
 	//
 	// +optional
-	// +default="provisioned"
+	// +kubeBuilder:default="provisioned"
 	// +kubebuilder:validation:Enum=parallelquery;provisioned;serverless
 	EngineMode *string `json:"engineMode,omitempty"`
 
@@ -763,7 +763,7 @@ type ClusterParameters struct {
 	// IAMDatabaseAuthenticationEnabled is whether IAM database authentication is enabled.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	IAMDatabaseAuthenticationEnabled *bool `json:"iamDatabaseAuthenticationEnabled,omitempty"`
 
 	// IamRoles is a list of IAM roles to associate with the DB cluster.
@@ -774,7 +774,7 @@ type ClusterParameters struct {
 	// Iops is the amount of provisioned IOPS.
 	//
 	// +optional
-	// +default=0
+	// +kubeBuilder:default=0
 	Iops *int64 `json:"iops,omitempty"`
 
 	// InstanceCount is the number of instances to create.
@@ -804,13 +804,13 @@ type ClusterParameters struct {
 	// MultiAZ is whether the DB instance is a Multi-AZ deployment.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	MultiAz *bool `json:"multiAz,omitempty"`
 
 	// Partition is the AWS partition to use.
 	//
 	// +optional
-	// +default="aws"
+	// +kubeBuilder:default="aws"
 	// +kubebuilder:validation:Enum=aws;aws-cn;aws-us-gov
 	Partition *string `json:"partition,omitempty"`
 
@@ -848,7 +848,7 @@ type ClusterParameters struct {
 	// PubliclyAccessible is whether the DB instance is publicly accessible.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	PubliclyAccessible *bool `json:"publiclyAccessible,omitempty"`
 
 	// ReplicationSourceIdentifier ARN of a source DB cluster or DB instance if
@@ -908,7 +908,7 @@ type Endpoint struct {
 	//
 	// +optional
 	// +kubebuilder:validation:Enum=READER;ANY
-	// +default=ANY
+	// +kubeBuilder:default=ANY
 	CustomEndpointType *string `json:"customEndpointType,omitempty"`
 
 	// ExcludedMembers is a list of DB instances that aren't part of the custom
@@ -940,13 +940,13 @@ type EnhancedMonitoring struct {
 	// Enabled is whether enhanced monitoring is enabled.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Enabled *bool `json:"enabled,omitempty"`
 
 	// ForceDetachPolicies Whether to force detaching any policies the monitoring role has before destroying it
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	ForceDetachPolicies *bool `json:"forceDetachPolicies,omitempty"`
 
 	// ManagedPolicyArns is a list of ARNs for managed policies to attach to the monitoring role.
@@ -984,7 +984,7 @@ type DbParameterGroup struct {
 	// Create is whether the parameter group is created.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Create *bool `json:"create,omitempty"`
 
 	// Family is the family of the parameter group.
@@ -1025,7 +1025,7 @@ type OptionGroup struct {
 	// Enabled is whether the option group is enabled.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Enabled *bool `json:"enabled,omitempty"`
 
 	// EngineName is the name of the engine.
@@ -1082,14 +1082,14 @@ type RestoreToPointInTime struct {
 	// UseLatestRestorableTime is whether to use the latest restorable time.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	UseLatestRestorableTime *bool `json:"useLatestRestorableTime,omitempty"`
 
 	// RestoreType is the type of restore to perform. This option is ignored if
 	// not running in cluster mode.
 	//
 	// +optional
-	// +default="full-copy"
+	// +kubeBuilder:default="full-copy"
 	// +kubebuilder:validation:Enum=full-copy;copy-on-write
 	RestoreType *string `json:"restoreType,omitempty"`
 
@@ -1153,7 +1153,7 @@ type SecretRotation struct {
 	// Enabled is whether secret rotation is enabled.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Enabled *bool `json:"enabled,omitempty"`
 
 	// AutomaticallyAfterDays is the number of days after which the secret is
@@ -1165,7 +1165,7 @@ type SecretRotation struct {
 	// RotateImmediately is whether the secret should be rotated immediately.
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	RotateImmediately *bool `json:"rotateImmediately,omitempty"`
 
 	// ScheduleExpression is the schedule expression for secret rotation.

@@ -1,0 +1,235 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  creationTimestamp: null
+  labels:
+    provider: github
+    type: repository
+  name: github-repo
+spec:
+  compositeTypeRef:
+    apiVersion: xgithubrepo.crossplane.giantswarm.io/v1alpha1
+    kind: GithubRepo
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-extra-resources
+    input:
+      apiVersion: extra-resources.fn.crossplane.io/v1beta1
+      kind: Input
+      metadata:
+        creationTimestamp: null
+      spec:
+        extraResources:
+        - apiVersion: v1
+          into: githubAppCredentials
+          kind: Secret
+          selector:
+            matchLabels:
+            - key: github-app-secret
+              type: FromCompositeFieldPath
+              valueFromFieldPath: spec.githubAppSecretLabelValue
+            maxMatch: 1
+            minMatch: 1
+          type: Selector
+    step: pull-github-secret
+  - functionRef:
+      name: function-extra-resources
+    input:
+      apiVersion: github-app-get-token.fn.crossplane.giantswarm.io/v1beta1
+      kind: Input
+      metadata:
+        creationTimestamp: null
+      secretKey: githubAppCredentials
+    step: get-github-token
+  - functionRef:
+      name: function-shell
+    input:
+      apiVersion: template.fn.crossplane.io/v1alpha1
+      kind: Parameters
+      metadata:
+        creationTimestamp: null
+      shellCommand: |-
+        set -euo pipefail
+
+        # Parameters
+        REPO_OWNER="demotechinc"
+        REPO_NAME="laszlo-crossplane-provider-github"
+
+        REGISTRY_DOMAIN="ghcr.io"
+
+        BACKSTAGE_ENTITY_OWNER="exampleBackstageEntityOwner"
+        BACKSTAGE_ENTITY_LIFECYCLE="exampleBackstageEntityLifecycle"
+
+        # Clone repository
+        TMP_DIR=$(mktemp -d)
+
+        git clone "https://${GITHUB_TOKEN}@github.com/${REPO_OWNER}/${REPO_NAME}.git" "${TMP_DIR}" 2>&1
+
+        cd ${TMP_DIR}
+
+        # Do not render if the repository was modified beyond the 1st commit that created it from the template repository
+        NUMBER_OF_COMMITS=$(git rev-list --count HEAD)
+
+        if [ "${NUMBER_OF_COMMITS}" != "1" ]; then
+          echo "Repository was already modified beyond the 1st commit, bailing out."
+          exit 0
+        else
+          # Template repository
+          NEW_PATH=$(mktemp -d)
+
+          cp -a ${TMP_DIR}/project-template/ $NEW_PATH/
+
+          cat >$NEW_PATH/boilerplate-values.yml <<EOF
+        BackstageEntityOwner: ${BACKSTAGE_ENTITY_OWNER}
+        BackstageEntityLifecycle: ${BACKSTAGE_ENTITY_LIFECYCLE}
+        ProjectName: ${REPO_NAME}
+        RepoOwner: ${REPO_OWNER}
+        ImageName: ${REPO_NAME}
+        RegistryDomain: ${REGISTRY_DOMAIN}
+        RegistryName: ${REPO_OWNER}
+        EOF
+
+          git rm -r '*'
+
+          boilerplate --non-interactive --template-url "$NEW_PATH"/project-template --output-folder . --var-file "$NEW_PATH"/boilerplate-values.yml
+
+          git config user.email "crossplane@bots.github.com"
+          git config user.name "Crossplane Bot"
+
+          # git push -d origin laszlo-test-1
+          # git branch -d laszlo-test-1
+
+          # git checkout -b laszlo-test-1 2>&1
+
+          git add -A
+
+          git commit -am "Laszlo was here"
+
+          # git push origin laszlo-test-1 || true
+          git push origin main
+        fi
+      shellEnvVars:
+      - key: GITHUB_TOKEN
+        valueRef: context[apiextensions.crossplane.io/github-app-get-token].github-token
+      - key: REPO_OWNER
+        valueRef: spec.repository.owner
+      - key: REPO_NAME
+        valueRef: spec.repository.name
+      - key: REPO_DESCRIPTION
+        valueRef: spec.repository.description
+      - key: REPO_VISIBILITY
+        valueRef: spec.repository.visibility
+      - key: REGISTRY_DOMAIN
+        valueRef: ghcr.io
+      - key: BACKSTAGE_ENTITY_OWNER
+        valueRef: spec.backstageCatalogEntity.owner
+      - key: BACKSTAGE_ENTITY_LIFECYCLE
+        valueRef: spec.backstageCatalogEntity.lifecycle
+      shellEnvVarsRef: {}
+    step: execute-gh-script
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+
+          oxr = option("params").oxr
+          dxr = option("params").dxr
+          ocds = option("params").ocds
+          dcds = option("params").dcds
+
+          get = lambda obj: {:}, path: str, default: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(path, "\.")
+              c = p[0]
+              y = ".".join(p[1::])
+              obj[c] if len(p) == 1 and c in obj else default if c not in obj else get(obj[c], path, default)
+          }
+
+          _items = []
+
+          configMap = {
+              "apiVersion": "v1"
+              "kind": "ConfigMap"
+              "metadata": {
+                  "name": oxr["metadata"]["name"] + "-info"
+                  "namespace": oxr["metadata"]["namespace"]
+              }
+              "data": {
+                  "repoName": oxr["spec"]["repository"]["name"]
+                  "repoOwner": oxr["spec"]["repository"]["owner"]
+                  "repoVisibility": oxr["spec"]["repository"]["visibility"]
+                  "repoProvider": "github"
+                  "fluxHelmRepositoryName": oxr["metadata"]["name"]
+                  "registryInfoConfigMapName": oxr["github-oci-registry-info"]["name"]
+              }
+          }
+
+          wrappedConfigMap = {
+              "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+              "kind": "Object"
+              "spec": {
+                  "deletionPolicy": "Delete",
+                  "forProvider": {
+                      "manifest": configMap
+                  }
+                  "managementPolicies": ["*"],
+                  "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"}),
+              }
+          }
+
+          _items += [wrappedConfigMap]
+
+          #apiVersion: source.toolkit.fluxcd.io/v1beta2
+          #kind: HelmRepository
+          #metadata:
+          #  name: <objName>
+          #  namespace: <objNamespace>
+          #spec:
+          #  type: "oci"
+          #  interval: 5m0s
+          #  url: oci://ghcr.io/<repoOwner>/charts
+          helmRepo = {
+              "apiVersion": "source.toolkit.fluxcd.io/v1beta2"
+              "kind": "HelmRepository"
+              "metadata": {
+                  "name": oxr["metadata"]["name"]
+                  "namespace": oxr["metadata"]["namespace"]
+              }
+              "spec": {
+                  "type": "oci"
+                  "interval": "5m0s"
+                  "url": "oci://ghcr.io/" + oxr["spec"]["repository"]["owner"] + "/charts"
+              }
+          }
+
+          wrappedHelmRepo = {
+              "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+              "kind": "Object"
+              "spec": {
+                  "deletionPolicy": "Delete"
+                  "forProvider": {
+                      "manifest": helmRepo
+                  }
+                  "managementPolicies": ["*"]
+                  "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+              }
+          }
+
+          _items += [wrappedHelmRepo]
+
+          items = _items
+        target: ""
+    step: function-provision-configmap
+  - functionRef:
+      name: function-auto-ready
+    step: function-auto-ready

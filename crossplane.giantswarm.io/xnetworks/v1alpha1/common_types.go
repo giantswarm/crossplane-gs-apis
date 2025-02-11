@@ -85,7 +85,7 @@ type RAM struct {
 	// Is RAM enabled
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Enabled bool `json:"enabled"`
 
 	ram.RamParameters `json:",inline"`

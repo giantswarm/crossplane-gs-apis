@@ -63,7 +63,7 @@ type RdsProvisioningParameters struct {
 	// Determines if the RDS provisioning should be enabled
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	Enabled bool `json:"enabled"`
 
 	// The name of the connection secret to use for the RDS instance
@@ -91,7 +91,7 @@ type RdsProvisioningParameters struct {
 	// The type of database engine being provisioned
 	//
 	// +optional
-	// +default="postgres"
+	// +kubeBuilder:default="postgres"
 	// +kubebuilder:validation:Enum=postgres;mysql;aurora-mysql;aurora-postgresql;mariadb
 	Engine *string `json:"engine,omitempty"`
 }
