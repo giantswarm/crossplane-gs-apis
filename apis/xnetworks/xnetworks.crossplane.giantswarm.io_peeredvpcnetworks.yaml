@@ -37,18 +37,14 @@ spec:
         description: |-
           PeeredVpcNetwork defines the desired state of a VPC.
 
-
           This composition can be used to create an *n-dimensional* VPC with optional
           peering to other VPCs.
-
 
           A claim made against this composition will result in the creation of a VPC
           with a number of subnets grouped into sets across *n* availability zones.
 
-
           If VPC Peering is enabled, the VPC will be peered with the VPCs specified in
           the claim under the `spec.peering.remoteVpcs` field.
-
 
           Up to 5 CIDR ranges can be specified and these are done via the
           `spec.subnetsets.cidrs` field, where the first entry in the list is the
@@ -118,7 +114,6 @@ spec:
                     description: |-
                       AllowPublic specifies if the VPC peering connections should be allowed to
 
-
                       be linked to the public subnets
                       Defaults to false
                     type: boolean
@@ -181,7 +176,6 @@ spec:
                         region:
                           description: |-
                             Region specifies the region the VPC is found in.
-
 
                             If not defined, the region of the VPC will be assumed to be the same as
                             the region of the peered VPC.
@@ -337,7 +331,6 @@ spec:
                           description: |-
                             The principal to associate with the resource access manager.
 
-
                             Possible values are AWS Account ID, AWS Organization ID, or AWS organizations.
                           type: string
                         providerConfigRef:
@@ -396,12 +389,10 @@ spec:
                     description: |-
                       A list of PeeredSubnetSets to create in the VPC
 
-
                       Each VPC Cidr may be split into *n* public and *n* private subnets as long
                       as there is enough room on the cidr for it to be split at that level. Any
                       overflow will cause the composition to fail and this will be reflected in
                       the status of the XR.
-
 
                       > [!IMPORTANT]
                       > There must be at least 1 entry in this set which will be used as the VPC
@@ -410,7 +401,6 @@ spec:
                       description: |-
                         PeeredSubnetSet defines the parameters for creating a set of subnets with the
                         same mask.
-
 
                         Either one of Netmask or Prefix must be set.
                       properties:
@@ -439,7 +429,6 @@ spec:
                                 `kubernetes.io/cluster/$CLUSTER_NAME shared` being added to the subnets
                                 in this set.
 
-
                                 See [public.lbSetIndex](#specsubnetsetscidrspubliclbsetindex) and
                                 [private.lbSetIndex](#specsubnetsetscidrsprivatelbsetindex) for deciding
                                 which subnetset gets these tags.
@@ -450,7 +439,6 @@ spec:
                             count:
                               description: |-
                                 Count is the number of subnet sets to create with this mask.
-
 
                                 > [!WARNING]
                                 > Whilst this field is not `immutable`, care should be taken to never
@@ -467,7 +455,6 @@ spec:
                                 `kubernetes.io/role/internal-elb: 1` tag depending on if these are public
                                 or private subnets.
 
-
                                 If this is not set, or set to -1 (the default value), no subnets will be
                                 tagged as load balancer subnets otherwise it should be the index of the
                                 subnet set to tag, starting from index 0.
@@ -476,7 +463,6 @@ spec:
                               description: |-
                                 This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
                                 use as a mask for the subnet.
-
 
                                 To prevent subnets being destroyed and recreated *This field is immutable*
                               type: string
@@ -495,9 +481,7 @@ spec:
                           description: |-
                             Details on how to build the public subnets.
 
-
                             Public subnets are subnets with a route to the internet gateway.
-
 
                             > [!IMPORTANT]
                             > If this is the default VPC CIDR, i.e. the first entry in the list, the
@@ -512,7 +496,6 @@ spec:
                                 `kubernetes.io/cluster/$CLUSTER_NAME shared` being added to the subnets
                                 in this set.
 
-
                                 See [public.lbSetIndex](#specsubnetsetscidrspubliclbsetindex) and
                                 [private.lbSetIndex](#specsubnetsetscidrsprivatelbsetindex) for deciding
                                 which subnetset gets these tags.
@@ -523,7 +506,6 @@ spec:
                             count:
                               description: |-
                                 Count is the number of subnet sets to create with this mask.
-
 
                                 > [!WARNING]
                                 > Whilst this field is not `immutable`, care should be taken to never
@@ -540,7 +522,6 @@ spec:
                                 `kubernetes.io/role/internal-elb: 1` tag depending on if these are public
                                 or private subnets.
 
-
                                 If this is not set, or set to -1 (the default value), no subnets will be
                                 tagged as load balancer subnets otherwise it should be the index of the
                                 subnet set to tag, starting from index 0.
@@ -549,7 +530,6 @@ spec:
                               description: |-
                                 This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
                                 use as a mask for the subnet.
-
 
                                 To prevent subnets being destroyed and recreated *This field is immutable*
                               type: string
@@ -580,10 +560,8 @@ spec:
                     description: |-
                       Defines the function to use to calculate the CIDR blocks for thesubnets.
 
-
                       The default value is "multiprefixloop" which will split multiple CIDRs
                       into equal parts based on the number of bits provided.
-
 
                       `multiprefixloop` is the only function being made available as part of
                       this XRD and as it's defaulted it can be hidden from the user. The
@@ -600,7 +578,6 @@ spec:
                   poolName:
                     description: |-
                       The name of the IPAM pool to use.
-
 
                       Only relevant if IPAM is enabled and there are IPAM pools available in
                       the region.
@@ -692,7 +669,6 @@ spec:
                     description: |-
                       Multicast support. Indicates whether multicast is enabled on the transit gateway.
 
-
                       Currently unused in this composition
                     type: string
                   peers:
@@ -754,7 +730,6 @@ spec:
                                 description: |-
                                   Outbound route
 
-
                                   This places it in the ManagedPrefixList attached
                                   to the outbound route table
                                 type: boolean
@@ -768,9 +743,7 @@ spec:
                             ProviderConfigRef references a ProviderConfig used to create this
                             resource
 
-
                             If not provided, will fall back to the top-level ProviderConfigRef
-
 
                             Required for cross account transit gateway peering
                           properties:
@@ -858,7 +831,6 @@ spec:
                           description: |-
                             Outbound route
 
-
                             This places it in the ManagedPrefixList attached
                             to the outbound route table
                           type: boolean
@@ -904,7 +876,6 @@ spec:
                         outbound:
                           description: |-
                             Outbound route
-
 
                             This places it in the ManagedPrefixList attached
                             to the outbound route table
@@ -983,7 +954,6 @@ spec:
                                 description: |-
                                   Outbound route
 
-
                                   This places it in the ManagedPrefixList attached
                                   to the outbound route table
                                 type: boolean
@@ -994,9 +964,7 @@ spec:
                             ProviderConfigRef references a ProviderConfig used to create this
                             resource
 
-
                             If not provided, will fall back to the top-level ProviderConfigRef
-
 
                             Required for cross account VPCs
                             Should not be set for same account VPCs unless restricted by
@@ -1126,6 +1094,7 @@ spec:
                 - namespace
                 type: object
             required:
+            - ""
             - availabilityZones
             - peering
             - region
@@ -1157,6 +1126,13 @@ spec:
                         A Message containing details about this condition's last transition from
                         one status to another, if any.
                       type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
                     reason:
                       description: A Reason for this condition's last transition from
                         one status to another.
@@ -1280,7 +1256,6 @@ spec:
                         region:
                           description: |-
                             Region specifies the region the VPC is found in.
-
 
                             If not defined, the region of the VPC will be assumed to be the same as
                             the region of the peered VPC.
@@ -1472,6 +1447,8 @@ spec:
                         VPC
                       type: object
                       x-kubernetes-map-type: atomic
+                  required:
+                  - id
                   type: object
                   x-kubernetes-map-type: granular
                 description: |-

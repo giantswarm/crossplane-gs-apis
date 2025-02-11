@@ -169,6 +169,10 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 		})
 
 	// Use KCL to render resources
+	kclCommon, err := build.LoadTemplate("templates/common.k")
+	if err != nil {
+		panic(err)
+	}
 	kclConfigMap, err := build.LoadTemplate("templates/configmap.k")
 	if err != nil {
 		panic(err)
@@ -189,7 +193,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: strings.Join([]string{kclConfigMap, kclHelmRepo, kclFooter}, "\n\n"),
+					Source: strings.Join([]string{kclCommon, kclConfigMap, kclHelmRepo, kclFooter}, "\n\n"),
 				},
 			},
 		})

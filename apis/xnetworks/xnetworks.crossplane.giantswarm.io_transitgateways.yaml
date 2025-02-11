@@ -132,7 +132,6 @@ spec:
                           description: |-
                             Outbound route
 
-
                             This places it in the ManagedPrefixList attached
                             to the outbound route table
                           type: boolean
@@ -193,7 +192,6 @@ spec:
               multicastSupport:
                 description: |-
                   Multicast support. Indicates whether multicast is enabled on the transit gateway.
-
 
                   Currently unused in this composition
                 type: string
@@ -256,7 +254,6 @@ spec:
                             description: |-
                               Outbound route
 
-
                               This places it in the ManagedPrefixList attached
                               to the outbound route table
                             type: boolean
@@ -270,9 +267,7 @@ spec:
                         ProviderConfigRef references a ProviderConfig used to create this
                         resource
 
-
                         If not provided, will fall back to the top-level ProviderConfigRef
-
 
                         Required for cross account transit gateway peering
                       properties:
@@ -463,7 +458,6 @@ spec:
                           description: |-
                             The principal to associate with the resource access manager.
 
-
                             Possible values are AWS Account ID, AWS Organization ID, or AWS organizations.
                           type: string
                         providerConfigRef:
@@ -571,7 +565,6 @@ spec:
                             description: |-
                               Outbound route
 
-
                               This places it in the ManagedPrefixList attached
                               to the outbound route table
                             type: boolean
@@ -582,9 +575,7 @@ spec:
                         ProviderConfigRef references a ProviderConfig used to create this
                         resource
 
-
                         If not provided, will fall back to the top-level ProviderConfigRef
-
 
                         Required for cross account VPCs
                         Should not be set for same account VPCs unless restricted by
@@ -710,6 +701,13 @@ spec:
                         A Message containing details about this condition's last transition from
                         one status to another, if any.
                       type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
                     reason:
                       description: A Reason for this condition's last transition from
                         one status to another.

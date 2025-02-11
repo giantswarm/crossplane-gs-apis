@@ -1,12 +1,31 @@
-#apiVersion: v1
-#kind: ConfigMap
-#metadata:
-#  name: my-go-project-1-info
-#  namespace: default
-#data:
-#  repoName: test_repo
-#  repoOwner: alreadyexists
-#  repoVisibility: public
-#  repoProvider: github
-#  fluxHelmRepositoryName: my-go-project-1
-#  registryInfoConfigMapName: github-oci-registry-info
+configMap = {
+    "apiVersion": "v1"
+    "kind": "ConfigMap"
+    "metadata": {
+        "name": oxr["metadata"]["name"] + "-info"
+        "namespace": oxr["metadata"]["namespace"]
+    }
+    "data": {
+        "repoName": oxr["spec"]["repository"]["name"]
+        "repoOwner": oxr["spec"]["repository"]["owner"]
+        "repoVisibility": oxr["spec"]["repository"]["visibility"]
+        "repoProvider": "github"
+        "fluxHelmRepositoryName": oxr["metadata"]["name"]
+        "registryInfoConfigMapName": oxr["github-oci-registry-info"]["name"]
+    }
+}
+
+wrappedConfigMap = {
+    "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+    "kind": "Object"
+    "spec": {
+        "deletionPolicy": "Delete",
+        "forProvider": {
+            "manifest": configMap
+        }
+        "managementPolicies": ["*"],
+        "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"}),
+    }
+}
+
+_items += [wrappedConfigMap]

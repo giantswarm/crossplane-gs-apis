@@ -31,7 +31,6 @@ spec:
           spec:
             properties:
               allowExternalPrincipals:
-                default: false
                 description: If external principals are allowed to access the resource
                   access manager.
                 type: boolean
@@ -91,7 +90,6 @@ spec:
                 items:
                   properties:
                     crossOrg:
-                      default: false
                       description: If this is a cross-org principal.
                       type: boolean
                     principal:

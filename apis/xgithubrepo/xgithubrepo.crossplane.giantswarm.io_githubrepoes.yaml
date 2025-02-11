@@ -37,6 +37,9 @@ spec:
                   owner:
                     description: A reference of the owning Backstage entity.
                     type: string
+                required:
+                - lifecycle
+                - owner
                 type: object
               deletionPolicy:
                 default: Delete
@@ -212,6 +215,8 @@ spec:
                   namespace:
                     description: Object's namespace.
                     type: string
+                required:
+                - name
                 type: object
               repository:
                 description: New repository configuration.
@@ -236,6 +241,12 @@ spec:
                     - internal
                     - private
                     type: string
+                required:
+                - description
+                - name
+                - owner
+                - templateSource
+                - visibility
                 type: object
               writeConnectionSecretToRef:
                 description: |-
@@ -258,6 +269,10 @@ spec:
                 - name
                 - namespace
                 type: object
+            required:
+            - backstageCatalogEntity
+            - registryInfoConfigMapRef
+            - repository
             type: object
           status:
             properties:
@@ -277,6 +292,13 @@ spec:
                         A Message containing details about this condition's last transition from
                         one status to another, if any.
                       type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
                     reason:
                       description: A Reason for this condition's last transition from
                         one status to another.
