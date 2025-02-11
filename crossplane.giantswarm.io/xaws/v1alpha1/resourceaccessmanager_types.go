@@ -70,7 +70,7 @@ type RamParameters struct {
 	// If external principals are allowed to access the resource access manager.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	AllowExternalPrincipals *bool `json:"allowExternalPrincipals,omitempty"`
 
 	// A list of principals to associate with the resource access manager.
@@ -119,7 +119,7 @@ type Principal struct {
 	// If this is a cross-org principal.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	CrossOrg *bool `json:"crossOrg,omitempty"`
 
 	// Provider config for accepting the share

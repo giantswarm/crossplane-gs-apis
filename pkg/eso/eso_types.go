@@ -17,7 +17,7 @@ type Eso struct {
 	// deployments using `provider-kubernetes.
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	Enabled *bool `json:"enabled,omitempty"`
 
 	// FluxSSASecretName is the name of the secret that contains SSA details
@@ -37,7 +37,7 @@ type Eso struct {
 	// secrets leaking across namespaces.
 	//
 	// +optional
-	// +default="default"
+	// +kubeBuilder:default="default"
 	KubernetesSecretStore *string `json:"kubernetesSecretStore,omitempty"`
 
 	// Tenant Cluster details
@@ -60,7 +60,7 @@ type SecretsStore struct {
 	// Enabled is whether the secrets store is enabled.
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	Enabled *bool `json:"enabled,omitempty"`
 
 	// Name is the name of the secret store.
@@ -71,7 +71,7 @@ type SecretsStore struct {
 	// IsClusterSecretStore is whether the secret store is a cluster secret store.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	IsClusterSecretStore *bool `json:"isClusterSecretStore,omitempty"`
 }
 
@@ -84,7 +84,7 @@ type TenantCluster struct {
 	// deployments using `provider-kubernetes.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Enabled *bool `json:"enabled"`
 
 	// The namespace on the tenant cluster to deploy secrets to. If not set

@@ -61,7 +61,7 @@ type RdsLogicalDatabaseParameters struct {
 	// The type of database engine being provisioned
 	//
 	// +optional
-	// +default="postgres"
+	// +kubeBuilder:default="postgres"
 	// +kubebuilder:validation:Enum=postgres;mysql;aurora-postgresql;aurora-mysql
 	Engine *string `json:"engine,omitempty"`
 }

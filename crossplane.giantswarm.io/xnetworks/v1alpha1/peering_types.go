@@ -62,7 +62,7 @@ type PeeringParameters struct {
 	// Determines if the VPC peering should be enabled
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	Enabled bool `json:"enabled"`
 
 	// Details of the local VPC
