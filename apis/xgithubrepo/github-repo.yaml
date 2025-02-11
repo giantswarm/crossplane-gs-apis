@@ -129,5 +129,40 @@ spec:
       shellEnvVarsRef: {}
     step: execute-gh-script
   - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          #apiVersion: v1
+          #kind: ConfigMap
+          #metadata:
+          #  name: my-go-project-1-info
+          #  namespace: default
+          #data:
+          #  repoName: test_repo
+          #  repoOwner: alreadyexists
+          #  repoVisibility: public
+          #  repoProvider: github
+          #  fluxHelmRepositoryName: my-go-project-1
+          #  registryInfoConfigMapName: github-oci-registry-info
+
+          #apiVersion: source.toolkit.fluxcd.io/v1beta2
+          #kind: HelmRepository
+          #metadata:
+          #  name: <objName>
+          #  namespace: <objNamespace>
+          #spec:
+          #  type: "oci"
+          #  interval: 5m0s
+          #  url: oci://ghcr.io/<repoOwner>/charts
+
+          items = _items
+        target: ""
+    step: function-provision-configmap
+  - functionRef:
       name: function-auto-ready
     step: function-auto-ready

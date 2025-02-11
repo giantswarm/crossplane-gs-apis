@@ -15,9 +15,12 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/giantswarm/crossplane-gs-apis/crossplane.giantswarm.io/xgithubrepo/v1alpha1"
 
 	xextrares "github.com/crossplane-contrib/function-extra-resources/input/v1beta1"
+	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
 	xfunsh "github.com/crossplane-contrib/function-shell/input/v1alpha1"
 	xapiextv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	xghtoken "github.com/giantswarm/function-github-app-get-token/input/v1beta1"
@@ -96,7 +99,8 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 				},
 			},
 		})
-		// get temporary access token using GitHub App auth workflow
+
+	// get temporary access token using GitHub App auth workflow
 	c.NewPipelineStep("get-github-token").
 		WithFunctionRef(xapiextv1.FunctionReference{
 			Name: "function-extra-resources",
@@ -111,6 +115,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 			},
 		})
 
+	// Execute the GitHub provisioning script
 	ghBashScript, err := build.LoadTemplate("scripts/clone-render-repo.sh")
 	if err != nil {
 		panic(err)
@@ -160,6 +165,32 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					},
 				},
 				ShellCommand: ghBashScript,
+			},
+		})
+
+	// Use KCL to render resources
+	kclConfigMap, err := build.LoadTemplate("templates/configmap.k")
+	if err != nil {
+		panic(err)
+	}
+	kclHelmRepo, err := build.LoadTemplate("templates/helmrepository.k")
+	if err != nil {
+		panic(err)
+	}
+	kclFooter := "items = _items"
+	c.NewPipelineStep("function-provision-configmap").
+		WithFunctionRef(xapiextv1.FunctionReference{
+			Name: "function-kcl",
+		}).
+		WithInput(build.ObjectKindReference{
+			Object: &xkcl.KCLInput{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "krm.kcl.dev/v1alpha1",
+					Kind:       "KCLInput",
+				},
+				Spec: xkcl.RunSpec{
+					Source: strings.Join([]string{kclConfigMap, kclHelmRepo, kclFooter}, "\n\n"),
+				},
 			},
 		})
 	// Add the auto-ready function at the end
