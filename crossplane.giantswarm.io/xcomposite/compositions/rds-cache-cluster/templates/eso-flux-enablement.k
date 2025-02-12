@@ -48,6 +48,7 @@ fluxSsa = {
                     "dataFrom": [
                         {
                             "find": {
+                                "conversionStrategy": "None",
                                 "name": {
                                     "regexp": "^${ssasecret}$",
                                 },
