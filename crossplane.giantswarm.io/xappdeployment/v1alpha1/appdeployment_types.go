@@ -4,6 +4,7 @@ import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	v2beta1 "github.com/fluxcd/helm-controller/api/v2beta1"
 	"github.com/fluxcd/pkg/apis/meta"
+	"github.com/giantswarm/crossplane-gs-apis/pkg/eso"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -117,30 +118,7 @@ type DatabaseEsoParameters struct {
 	// Configuration for the tenant cluster.
 	//
 	// +optional
-	TenantCluster TenantClusterParameters `json:"tenantCluster,omitempty"`
-}
-
-// TenantCluster is the configuration for the tenant cluster.
-//
-// +kubebuilder:object:root=false
-// +kubebuilder:object:generate=true
-type TenantClusterParameters struct {
-	// API endpoint URL of the target cluster.
-	//
-	// +optional
-	ApiServerEndpoint string `json:"apiServerEndpoint,omitempty"`
-
-	// Name of the target cluster.
-	//
-	// +optional
-	ClusterName string `json:"clusterName,omitempty"`
-
-	// Whether or not to enable `external-secrets-operator` object
-	// deployments using `provider-kubernetes.
-	//
-	// +optional
-	// +default=false
-	Enabled bool `json:"enabled,omitempty"`
+	TenantCluster eso.TenantCluster `json:"tenantCluster,omitempty"`
 }
 
 type ProviderConfigRefParameters struct {

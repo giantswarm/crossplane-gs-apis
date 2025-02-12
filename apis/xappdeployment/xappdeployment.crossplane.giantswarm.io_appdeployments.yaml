@@ -55,16 +55,21 @@ spec:
                         description: Configuration for the tenant cluster.
                         properties:
                           apiServerEndpoint:
-                            description: API endpoint URL of the target cluster.
+                            description: The API endpoint for the tenant cluster.
                             type: string
                           clusterName:
-                            description: Name of the target cluster.
+                            description: The name of the tenant cluster.
                             type: string
                           enabled:
                             description: |-
-                              Whether or not to enable `external-secrets-operator` object
+                              Enabled Whether or not to enable `external-secrets-operator` object
                               deployments using `provider-kubernetes.
                             type: boolean
+                          namespace:
+                            description: |-
+                              The namespace on the tenant cluster to deploy secrets to. If not set
+                              will default to the `default` namespace.
+                            type: string
                         type: object
                     type: object
                   providerConfigRef:
