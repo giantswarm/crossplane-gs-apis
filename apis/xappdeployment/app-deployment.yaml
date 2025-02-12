@@ -1,0 +1,317 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  creationTimestamp: null
+  name: app-deployment
+spec:
+  compositeTypeRef:
+    apiVersion: xappdeployment.crossplane.giantswarm.io/v1alpha1
+    kind: AppDeployment
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: function-kcl
+    input:
+      apiVersion: krm.kcl.dev/v1alpha1
+      kind: KCLInput
+      metadata:
+        creationTimestamp: null
+      spec:
+        source: |-
+          import regex
+
+          oxr = option("params").oxr
+          dxr = option("params").dxr
+          ocds = option("params").ocds
+          dcds = option("params").dcds
+
+          get = lambda x: {:}, y: str, d: any -> any {
+              """
+              Get an item from a dictionary using a dot separated path.
+              If the item is not found, return a default value.
+              """
+              p = regex.split(y, "\.")
+              c = p[0]
+              y = ".".join(p[1:])
+              x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
+          }
+
+          exists = lambda x: any -> bool {
+              """
+              Check if a value exists.
+              """
+              x in list(ocds)
+          }
+
+          ocdsstatus = lambda x: str, y: str, d: any -> any {
+              """
+              Get an item from the status of an ocds resource.
+              """
+              _x = None
+              if get(ocds, "${x}.Resource.status.atProvider", False):
+                  _x = get(ocds, "${x}.Resource.status.atProvider.${y}", d)
+              else:
+                  _x = get(ocds, "${x}.Resource.status.${y}", d)
+              _x if _x else d
+          }
+
+          # Unlike other compositions in this series,
+          # provisioning does not always have `atProvider` status.
+          #
+          # This means we can only rely on the conditions of resources
+          # and not add a confirmation step to the validation.
+          ready = lambda x: str -> bool {
+              """
+              Check if a value is ready.
+              """
+              conditionsReady = all_true([
+                  get(c, "status", "False") == "True" for c in ocdsstatus(x, "conditions", [])
+              ])
+              any_true([exists(x), conditionsReady])
+          }
+
+          allReady = lambda -> bool {
+              """
+              Check if all managed resources are ready.
+              """
+              all_true([
+                  ready(x)
+                  for x in list(ocds)
+              ])
+          }
+
+
+          readystr = lambda x: str -> str {
+              """
+              Check if a value is ready.
+              """
+              "True" if ready(x) else "False"
+          }
+
+          name = get(oxr, "spec.name", "laszlo-test")
+          namespace = get(oxr, "spec.namespace", "org-demotech")
+
+          _items = []
+
+          configMap = {
+              "apiVersion": "v1",
+              "kind": "ConfigMap",
+              "metadata": {
+                  "name": name
+                  "namespace": namespace
+              },
+              "data": {
+                  "message": get(oxr, "spec.message", "default-message")
+              }
+          }
+
+          wrappedConfigMap = {
+              "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+              "kind": "Object"
+              "metadata": {
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name" = "${name}-configmap"
+                      "krm.kcl.dev/ready": readystr("${name}-configmap")
+                  }
+              }
+              "spec": {
+                  "deletionPolicy": "Delete",
+                  "forProvider": {
+                      "manifest": configMap
+                  }
+                  "managementPolicies": ["*"],
+                  "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"}),
+              }
+          }
+
+          _items += [wrappedConfigMap]
+
+          logicalDatabase = {
+              "apiVersion": "xdatabase.crossplane.giantswarm.io/v1alpha1"
+              "kind": "LogicalDatabaseClaim"
+              "metadata": {
+                  "name": "${name}",
+                  "namespace": "${namespace}"
+              }
+              "spec": {
+                  "deletionPolicy": "Delete",
+                  "engine": get(oxr, "spec.database.engine", "postgres"),
+                  "eso": {
+                      "enabled": True,
+                      "fluxSSASecretName": get(oxr, "spec.database.eso.clusterSsaField", "postgres"),
+                      "kubernetesSecretStore": "default",
+                      "tenantCluster": {
+                          "apiServerEndpoint": get(oxr, "spec.database.eso.tenantCluster.apiServerEndpoint", ""),
+                          "clusterName": get(oxr, "spec.database.eso.tenantCluster.clusterName", ""),
+                          "enabled": get(oxr, "spec.database.eso.tenantCluster.enabled", False)
+                      }
+                  },
+                  "kubernetesProviderConfig": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"}),
+                  "managementPolicies": ["*"],
+                  "providerConfigRef": {
+                      "name": get(oxr, "spec.database.providerConfigRef.name", "default")
+                  }
+              }
+          }
+
+          wrappedLogicalDatabase = {
+              "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+              "kind": "Object"
+              "metadata": {
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name" = "${name}-logical-database"
+                      "krm.kcl.dev/ready": readystr("${name}-logical-database")
+                  }
+              }
+              "spec": {
+                  "deletionPolicy": "Delete"
+                  "forProvider": {
+                      "manifest": logicalDatabase
+                  }
+                  "managementPolicies": ["*"]
+                  "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+              }
+          }
+
+          _items += [wrappedLogicalDatabase]
+
+          helmRepository = {
+              "apiVersion": "source.toolkit.fluxcd.io/v1beta2"
+              "kind": "HelmRepository"
+              "metadata": {
+                  "name": "${name}",
+                  "namespace": "${namespace}"
+              }
+              "spec": {
+                  "interval": "5m0s",
+                  "provider": "generic",
+                  "secretRef": {
+                      "name": "ghcr-pull-secret"
+                  },
+                  "timeout": "60s",
+                  "type": "oci",
+                  "url": "oci://ghcr.io/demotechinc/charts"
+              }
+          }
+
+          wrappedHelmRepository = {
+              "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+              "kind": "Object"
+              "metadata": {
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name" = "${name}-helm-repository"
+                      "krm.kcl.dev/ready": readystr("${name}-helm-repository")
+                  }
+              }
+              "spec": {
+                  "deletionPolicy": "Delete"
+                  "forProvider": {
+                      "manifest": helmRepository
+                  }
+                  "managementPolicies": ["*"]
+                  "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+              }
+          }
+
+          helmRelease = {
+              "apiVersion": "helm.toolkit.fluxcd.io/v2beta1"
+              "kind": "HelmRelease"
+              "metadata": {
+                  "name": "${name}",
+                  "namespace": "${namespace}"
+              },
+              "spec": {
+                  "chart": {
+                      "spec": {
+                          "chart": get(oxr, "spec.chart.name", ""),
+                          "reconcileStrategy": "ChartVersion",
+                          "sourceRef": {
+                              "kind": "HelmRepository",
+                              "name": "${name}"
+                          },
+                          "version": get(oxr, "spec.chart.version", ">=0.1.0")
+                      }
+                  }
+                  "interval": get(oxr, "spec.interval", "1m"),
+                  "kubeConfig": {
+                      "secretRef": {
+                          "name": get(oxr, "spec.kubeConfig.secretRef.name", "")
+                      }
+                  }
+                  "storageNamespace": get(oxr, "spec.storageNamespace", "default"),
+                  "suspend": get(oxr, "spec.suspend", False),
+                  "targetNamespace": get(oxr, "spec.targetNamespace", "default"),
+                  "timeout": get(oxr, "spec.timeout", "3m"),
+                  "values": {
+                      "replicaCount": 1,
+                      "autoscaling": {
+                          "enabled": False
+                      }
+                      "database": {
+                          "connectionSecretName": "${name}-rds-user",
+                          "name": "${name}"
+                      },
+                      "imagePullSecrets": [
+                          {
+                              "name": "ghcr-pull-secret"
+                          }
+                      ],
+                      "inMemoryStore": False,
+                      "ingress": {
+                          "annotations": {
+                              "kubernetes.io/tls-acme": "true"
+                          }
+                          "enabled": True,
+                          "host": get(oxr, "spec.ingressHost", ""),
+                          "tls": [
+                              {
+                                  "hosts": [
+                                      get(oxr, "spec.ingressHost", "")
+                                  ],
+                                  "secretName": "${name}"
+                              }
+                          ]
+                      },
+                      "monitoring": {
+                          "serviceMonitor": {
+                              "enabled": True,
+                              "extraLabels": {
+                                  "application.giantswarm.io/team": "demotechinc"
+                              }
+                          },
+                      },
+                      "pdb": {
+                          "enabled": False
+                      },
+                      "redisConnectionSecretName": "demotech-rcc-elasticache-user"
+                  }
+              }
+          }
+
+          wrappedHelmRelease = {
+              "apiVersion": "kubernetes.crossplane.io/v1alpha2"
+              "kind": "Object"
+              "metadata": {
+                  "annotations": {
+                      "krm.kcl.dev/composition-resource-name" = "${name}-helm-release"
+                      "krm.kcl.dev/ready": readystr("${name}-helm-release")
+                  }
+              }
+              "spec": {
+                  "deletionPolicy": "Delete"
+                  "forProvider": {
+                      "manifest": helmRelease
+                  }
+                  "managementPolicies": ["*"]
+                  "providerConfigRef": get(oxr, "spec.kubernetesProviderConfig", {"name": "default"})
+              }
+          }
+
+          _items += [wrappedHelmRepository, wrappedHelmRelease]
+
+          items = _items
+        target: ""
+    step: function-provision-configmap
+  - functionRef:
+      name: function-auto-ready
+    step: function-auto-ready

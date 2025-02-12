@@ -47,6 +47,12 @@ github.com/fatih/camelcase v1.0.0/go.mod h1:yN2Sb0lFhZJUdVvtELVWefmrXpuZESvPmqwo
 github.com/fatih/color v1.13.0/go.mod h1:kLAiJbzzSOZDVNGyDpeOxJ47H46qBXwg5ILebYFFOfk=
 github.com/fatih/color v1.16.0 h1:zmkK9Ngbjj+K0yRhTVONQh1p/HknKYSlNT+vZCzyokM=
 github.com/fatih/color v1.16.0/go.mod h1:fL2Sau1YI5c0pdGEVCbKQbLXB6edEj1ZgiY4NijnWvE=
+github.com/fluxcd/helm-controller/api v0.36.2 h1:9JaTc91yocG1oQkM/GMfpZ/nGPpliRjZBNwyAsW5584=
+github.com/fluxcd/helm-controller/api v0.36.2/go.mod h1:zkcRy3PxG0NoxSY5SjiSA5tWOGa6spIbWsChQY8FXqM=
+github.com/fluxcd/pkg/apis/kustomize v1.1.1 h1:MSGn4z0R9PptmoPFHnx2nEZ8Jtl1sKfw0cuDQY2HYwM=
+github.com/fluxcd/pkg/apis/kustomize v1.1.1/go.mod h1:0pCu0ecIY+ZM0iE/hOHYwCMZ3b0SpBrjJ1SH3FFyYdE=
+github.com/fluxcd/pkg/apis/meta v1.1.2 h1:Unjo7hxadtB2dvGpeFqZZUdsjpRA08YYSBb7dF2WIAM=
+github.com/fluxcd/pkg/apis/meta v1.1.2/go.mod h1:BHQyRHCskGMEDf6kDGbgQ+cyiNpUHbLsCOsaMYM2maI=
 github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nosvA=
 github.com/fsnotify/fsnotify v1.7.0/go.mod h1:40Bi/Hjc2AVfZrqy+aj+yEI+/bRxZnMJyTJwOpGvigM=
 github.com/giantswarm/crossplane-fn-network-discovery v0.4.0 h1:tcNqpr9gcqYMESudWKYUliBNAHj7HnHg9Oc2Ok0ZBaY=
