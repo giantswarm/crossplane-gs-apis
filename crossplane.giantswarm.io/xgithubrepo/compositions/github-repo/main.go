@@ -21,9 +21,9 @@ import (
 
 	xextrares "github.com/crossplane-contrib/function-extra-resources/input/v1beta1"
 	xkcl "github.com/crossplane-contrib/function-kcl/input/v1beta1"
-	xfunsh "github.com/crossplane-contrib/function-shell/input/v1alpha1"
 	xapiextv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	xghtoken "github.com/giantswarm/function-github-app-get-token/input/v1beta1"
+	xfunsh "github.com/giantswarm/function-shell-idp/input/v1alpha1"
 	"github.com/mproffitt/crossbuilder/pkg/generate/composition/build"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -150,6 +150,10 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					{
 						Key:      "REPO_VISIBILITY",
 						ValueRef: "spec.repository.visibility",
+					},
+					{
+						Key:      "REPO_TEMPLATE_SOURCE",
+						ValueRef: "spec.repository.templateSource",
 					},
 					{
 						Key:      "REGISTRY_DOMAIN",
