@@ -34,7 +34,7 @@ spec:
           type: Selector
     step: pull-github-secret
   - functionRef:
-      name: function-extra-resources
+      name: function-github-app-get-token
     input:
       apiVersion: github-app-get-token.fn.crossplane.giantswarm.io/v1beta1
       kind: Input
@@ -43,7 +43,7 @@ spec:
       secretKey: githubAppCredentials
     step: get-github-token
   - functionRef:
-      name: function-shell
+      name: function-shell-idp
     input:
       apiVersion: template.fn.crossplane.io/v1alpha1
       kind: Parameters

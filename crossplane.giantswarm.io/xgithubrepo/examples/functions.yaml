@@ -53,7 +53,7 @@ kind: Function
 metadata:
   name: function-shell-idp
 spec:
-  package: gsoci.giantswarm.io/giantswarm/function-shell-idp:v0.3.0
+  package: gsoci.azurecr.io/giantswarm/function-shell-idp:v0.3.0
   runtimeConfigRef:
     apiVersion: pkg.crossplane.io/v1beta1
     kind: DeploymentRuntimeConfig
@@ -64,7 +64,7 @@ kind: Function
 metadata:
   name: function-github-app-get-token
 spec:
-  package: gsoci.giantswarm.io/giantswarm/function-github-app-get-token:v0.1.1
+  package: gsoci.azurecr.io/giantswarm/function-github-app-get-token:v0.1.1
   runtimeConfigRef:
     apiVersion: pkg.crossplane.io/v1beta1
     kind: DeploymentRuntimeConfig
