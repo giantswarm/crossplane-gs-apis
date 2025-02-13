@@ -103,7 +103,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 	// get temporary access token using GitHub App auth workflow
 	c.NewPipelineStep("get-github-token").
 		WithFunctionRef(xapiextv1.FunctionReference{
-			Name: "function-extra-resources",
+			Name: "function-github-app-get-token",
 		}).
 		WithInput(build.ObjectKindReference{
 			Object: &xghtoken.Input{
@@ -122,7 +122,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 	}
 	c.NewPipelineStep("execute-gh-script").
 		WithFunctionRef(xapiextv1.FunctionReference{
-			Name: "function-shell",
+			Name: "function-shell-idp",
 		}).
 		WithInput(build.ObjectKindReference{
 			Object: &xfunsh.Parameters{

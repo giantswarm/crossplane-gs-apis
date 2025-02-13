@@ -13,12 +13,12 @@ require (
 	github.com/crossplane-contrib/function-extra-resources v0.0.3
 	github.com/crossplane-contrib/function-kcl v0.8.0
 	github.com/crossplane-contrib/function-patch-and-transform v0.5.0
-	github.com/crossplane-contrib/function-shell v0.3.0
 	github.com/crossplane-contrib/provider-kubernetes v0.14.0
 	github.com/crossplane/crossplane v1.16.0
 	github.com/crossplane/crossplane-runtime v1.18.0
 	github.com/giantswarm/crossplane-fn-network-discovery v0.4.0
 	github.com/giantswarm/function-github-app-get-token v0.1.1
+	github.com/giantswarm/function-shell-idp v0.3.0
 	github.com/mproffitt/crossbuilder v0.0.2-rc2
 	github.com/mproffitt/function-cidr v0.0.0-20240528204613-a5ff3a0e6daa
 	github.com/upbound/provider-aws v1.14.0
@@ -46,7 +46,6 @@ require (
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
-	github.com/giantswarm/function-shell-idp v0.3.0 // indirect
 	github.com/go-json-experiment/json v0.0.0-20250129011340-4e0381018ad6 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
