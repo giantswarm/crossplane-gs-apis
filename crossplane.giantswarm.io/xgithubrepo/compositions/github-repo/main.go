@@ -156,16 +156,16 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 						ValueRef: "spec.repository.templateSource",
 					},
 					{
-						Key:      "REGISTRY_DOMAIN",
-						ValueRef: "ghcr.io",
-					},
-					{
 						Key:      "BACKSTAGE_ENTITY_OWNER",
 						ValueRef: "spec.backstageCatalogEntity.owner",
 					},
 					{
 						Key:      "BACKSTAGE_ENTITY_LIFECYCLE",
 						ValueRef: "spec.backstageCatalogEntity.lifecycle",
+					},
+					{
+						Key:   "REGISTRY_DOMAIN",
+						Value: "ghcr.io",
 					},
 				},
 				ShellCommand: ghBashScript,

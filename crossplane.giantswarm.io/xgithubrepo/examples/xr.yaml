@@ -1,0 +1,17 @@
+apiVersion: xgithubrepo.crossplane.giantswarm.io/v1alpha1
+kind: GithubRepo
+metadata:
+  name: my-go-project-xp-1
+spec:
+  backstageCatalogEntity:
+    owner: group:default/team-platform
+    lifecycle: experimental
+  repository:
+    name: my-go-project-xp-1
+    owner: DemoTechInc
+    description: "My first crossplane project"
+    templateSource: giantswarm/devplatform-template-go-service
+    visibility: private
+  registryInfoConfigMapRef:
+    name: github-oci-registry-info
+  githubAppSecretLabelValue: idp-demo
