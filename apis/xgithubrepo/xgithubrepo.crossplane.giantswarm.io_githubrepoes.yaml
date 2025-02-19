@@ -276,6 +276,8 @@ spec:
             type: object
           status:
             properties:
+              atFunction:
+                x-kubernetes-preserve-unknown-fields: true
               conditions:
                 description: Conditions of the resource.
                 items:
@@ -322,6 +324,8 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+            required:
+            - atFunction
             type: object
         required:
         - spec

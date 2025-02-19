@@ -11,13 +11,18 @@ configMap = {
         "repoVisibility": oxr["spec"]["repository"]["visibility"]
         "repoProvider": "github"
         "fluxHelmRepositoryName": oxr["metadata"]["name"]
-        "registryInfoConfigMapName": oxr["spec"]["github-oci-registry-info"]["name"]
+        "registryInfoConfigMapName": oxr["spec"]["registryInfoConfigMapRef"]["name"]
     }
 }
 
 wrappedConfigMap = {
     "apiVersion": "kubernetes.crossplane.io/v1alpha2"
     "kind": "Object"
+    "metadata": {
+        "annotations": {
+            "krm.kcl.dev/composition-resource-name" = "${name}-config-map"
+        }
+    }
     "spec": {
         "deletionPolicy": "Delete"
         "forProvider": {

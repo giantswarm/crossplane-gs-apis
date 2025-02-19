@@ -24,6 +24,11 @@ helmRepo = {
 wrappedHelmRepo = {
     "apiVersion": "kubernetes.crossplane.io/v1alpha2"
     "kind": "Object"
+    "metadata": {
+        "annotations": {
+            "krm.kcl.dev/composition-resource-name" = "${name}-helm-repository"
+        }
+    }
     "spec": {
         "deletionPolicy": "Delete"
         "forProvider": {

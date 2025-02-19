@@ -17,6 +17,7 @@ done
 
 log "Starting clone and render pipeline"
 
+cd /tmp
 # Create and clone repository using gh CLI
 log "Checking if repository ${REPO_OWNER}/${REPO_NAME} exists"
 REPO_INFO=$(gh repo view "${REPO_OWNER}/${REPO_NAME}" --json owner,name,visibility 2>/dev/null || echo "{}")
@@ -44,12 +45,15 @@ if jq -e . >/dev/null 2>&1 <<<"$REPO_INFO" && [ "$(jq -r '.name' <<<"$REPO_INFO"
 	fi
 
 	log "Repository ${REPO_OWNER}/${REPO_NAME} already exists and configuration matches, skipping creation"
-	gh repo clone "${REPO_OWNER}/${REPO_NAME}"
 else
 	log "Creating repository ${REPO_OWNER}/${REPO_NAME} using gh CLI"
 	gh repo create "${REPO_OWNER}/${REPO_NAME}" -d "${REPO_DESCRIPTION}" "--${REPO_VISIBILITY}" -p "${REPO_TEMPLATE_SOURCE}" || true
+	#FIXME: github is a bit slow sometimes and the created repo can be empty if cloned immediately
+	sleep 2
 fi
 # Change directory: assume local folder is the same as repo name
+rm -rf "${REPO_NAME}" || true
+gh repo clone "${REPO_OWNER}/${REPO_NAME}" 2>&1
 cd "${REPO_NAME}"
 
 # Check if repository was initialized
@@ -83,18 +87,17 @@ git rm -r '*' || true
 log "Running boilerplate command to render template"
 boilerplate --non-interactive --template-url "$NEW_PATH"/project-template --output-folder . --var-file "$NEW_PATH"/boilerplate-values.yml
 
-git config user.email "crossplane@bots.github.com"
-git config user.name "Crossplane Bot"
-
 # Stage and commit changes
 git add -A
 set +e
+log "Running pre-commit hooks"
 pre-commit run -a
 set -e
 git add -A
 
 git config user.email "giant-idp@bots.github.com"
 git config user.name "Giant IDP Bot"
+log "Commit all the changes"
 git commit -am "$GIT_LOG_INIT_MESSAGE"
 
 log "Pushing changes to main branch"

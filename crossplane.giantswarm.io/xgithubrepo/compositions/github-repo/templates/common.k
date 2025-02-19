@@ -16,4 +16,6 @@ get = lambda obj: {:}, path: str, default: any -> any {
     obj[c] if len(p) == 1 and c in obj else default if c not in obj else get(obj[c], path, default)
 }
 
+name = get(oxr, "spec.name", "THIS_SHALL_NOT_HAPPEN")
+
 _items = []

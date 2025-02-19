@@ -153,5 +153,6 @@ type GithubRepoParameters struct {
 
 type GithubRepoStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
-	// TODO: add function-shell output storing fields
+	// +kubebuilder:pruning:PreserveUnknownFields
+	AtFunction map[string]interface{} `json:"atFunction"`
 }
