@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -e
 
 # Added function for logging with timestamps
 log() {
@@ -44,6 +44,7 @@ if jq -e . >/dev/null 2>&1 <<<"$REPO_INFO" && [ "$(jq -r '.name' <<<"$REPO_INFO"
 	fi
 
 	log "Repository ${REPO_OWNER}/${REPO_NAME} already exists and configuration matches, skipping creation"
+	gh repo clone "${REPO_OWNER}/${REPO_NAME}"
 else
 	log "Creating repository ${REPO_OWNER}/${REPO_NAME} using gh CLI"
 	gh repo create "${REPO_OWNER}/${REPO_NAME}" -d "${REPO_DESCRIPTION}" "--${REPO_VISIBILITY}" -p "${REPO_TEMPLATE_SOURCE}" || true
