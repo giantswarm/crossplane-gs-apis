@@ -53,6 +53,7 @@ else
 fi
 # Change directory: assume local folder is the same as repo name
 rm -rf "${REPO_NAME}" || true
+gh auth setup-git
 gh repo clone "${REPO_OWNER}/${REPO_NAME}" 2>&1
 cd "${REPO_NAME}"
 
@@ -101,6 +102,7 @@ log "Commit all the changes"
 git commit -am "$GIT_LOG_INIT_MESSAGE"
 
 log "Pushing changes to main branch"
+git remote show origin
 git push origin main
 git tag -m "Initial release" "0.1.0"
 git push origin "0.1.0"

@@ -78,9 +78,10 @@ spec:
         \"--${REPO_VISIBILITY}\" -p \"${REPO_TEMPLATE_SOURCE}\" || true\n\t#FIXME:
         github is a bit slow sometimes and the created repo can be empty if cloned
         immediately\n\tsleep 2\nfi\n# Change directory: assume local folder is the
-        same as repo name\nrm -rf \"${REPO_NAME}\" || true\ngh repo clone \"${REPO_OWNER}/${REPO_NAME}\"
-        2>&1\ncd \"${REPO_NAME}\"\n\n# Check if repository was initialized\nGIT_LOG_INIT_MESSAGE=\"Initial
-        commit: fill in template values\"\ngit_out=$(git log --grep \"^${GIT_LOG_INIT_MESSAGE}\\$\")\nif
+        same as repo name\nrm -rf \"${REPO_NAME}\" || true\ngh auth setup-git\ngh
+        repo clone \"${REPO_OWNER}/${REPO_NAME}\" 2>&1\ncd \"${REPO_NAME}\"\n\n# Check
+        if repository was initialized\nGIT_LOG_INIT_MESSAGE=\"Initial commit: fill
+        in template values\"\ngit_out=$(git log --grep \"^${GIT_LOG_INIT_MESSAGE}\\$\")\nif
         [[ -n \"$git_out\" ]]; then\n\tlog \"Repository was already initialized\"\n\texit
         0\nelse\n\tlog \"Repository wasn't initialized, proceeding with templating.\"\nfi\n\n#
         Template processing (same as previous logic)\nlog \"Preparing template files.\"\nNEW_PATH=$(mktemp
@@ -92,12 +93,11 @@ spec:
         boilerplate command to render template\"\nboilerplate --non-interactive --template-url
         \"$NEW_PATH\"/project-template --output-folder . --var-file \"$NEW_PATH\"/boilerplate-values.yml\n\n#
         Stage and commit changes\ngit add -A\nset +e\nlog \"Running pre-commit hooks\"\npre-commit
-        run -a\nset -e\ngit add -A\n\n# git config user.email \"giant-idp@bots.github.com\"\n#
-        git config user.name \"Giant IDP Bot\"\n# log \"Commit all the changes\"\n#
-        git commit -am \"$GIT_LOG_INIT_MESSAGE\"\n#\n# log \"Pushing changes to main
-        branch\"\n# git push origin main\n# git tag -m \"Initial release\" \"0.1.0\"\n#
-        git push origin \"0.1.0\"\n#\n# git push origin main\n\nlog \"Pipeline finished
-        successfully\""
+        run -a\nset -e\ngit add -A\n\ngit config user.email \"giant-idp@bots.github.com\"\ngit
+        config user.name \"Giant IDP Bot\"\nlog \"Commit all the changes\"\ngit commit
+        -am \"$GIT_LOG_INIT_MESSAGE\"\n\nlog \"Pushing changes to main branch\"\ngit
+        remote show origin\ngit push origin main\ngit tag -m \"Initial release\" \"0.1.0\"\ngit
+        push origin \"0.1.0\"\n\ngit push origin main\n\nlog \"Pipeline finished successfully\""
       shellEnvVars:
       - key: GITHUB_TOKEN
         valueRef: context[apiextensions.crossplane.io/github-app-get-token].github-token
