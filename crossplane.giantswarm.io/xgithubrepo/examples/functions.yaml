@@ -53,7 +53,7 @@ kind: Function
 metadata:
   name: function-shell-idp
 spec:
-  package: gsoci.azurecr.io/giantswarm/function-shell-idp:v0.3.1
+  package: gsoci.azurecr.io/giantswarm/function-shell-idp:v0.3.2
   runtimeConfigRef:
     apiVersion: pkg.crossplane.io/v1beta1
     kind: DeploymentRuntimeConfig
