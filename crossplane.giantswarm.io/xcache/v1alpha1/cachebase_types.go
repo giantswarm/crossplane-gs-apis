@@ -194,14 +194,14 @@ type Cluster struct {
 	// immediately or during the next maintenance window.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	ApplyImmediately *bool `json:"applyImmediately,omitempty"`
 
 	// AutoMinorVersionUpgrade specifies whether minor engine upgrades will be
 	// applied automatically to the cluster during the maintenance window.
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	AutoMinorVersionUpgrade *bool `json:"autoMinorVersionUpgrade,omitempty"`
 
 	// AzMode specifies the Availability Zone mode of the cluster.
@@ -213,7 +213,7 @@ type Cluster struct {
 	// availability zone.
 	//
 	// +optional
-	// +default=cross-az
+	// +kubeBuilder:default=cross-az
 	// +kubebuilder:validation:Enum=single-az;cross-az
 	AzMode *string `json:"azMode,omitempty"`
 
@@ -251,7 +251,7 @@ type Cluster struct {
 	// IpDiscovery is the method used to discover cluster nodes.
 	//
 	// +optional
-	// +default=ipv4
+	// +kubeBuilder:default=ipv4
 	// +kubebuilder:validation:Enum=ipv4;ipv6
 	IpDiscovery *string `json:"ipDiscovery,omitempty"`
 
@@ -267,13 +267,13 @@ type Cluster struct {
 	// maintenance can occur.
 	//
 	// +optional
-	// +default=Sun:05:00-Mon:09:00
+	// +kubeBuilder:default=Sun:05:00-Mon:09:00
 	MaintenanceWindow *string `json:"maintenanceWindow,omitempty"`
 
 	// NetworkType specifies the network configuration for the cluster.
 	//
 	// +optional
-	// +default=ipv4
+	// +kubeBuilder:default=ipv4
 	// +kubebuilder:validation:Enum=ipv4;ipv6;dual_stack
 	NetworkType *string `json:"networkType,omitempty"`
 
@@ -303,7 +303,7 @@ type Cluster struct {
 	// Currently only single-outpost is supported.
 	//
 	// +optional
-	// +default=single-outpost
+	// +kubeBuilder:default=single-outpost
 	// +kubebuilder:validation:Enum=single-outpost;cross-outpost
 	OutpostMode *string `json:"outpostMode,omitempty"`
 
@@ -319,7 +319,7 @@ type Cluster struct {
 	// connections.
 	//
 	// +optional
-	// +default=6379
+	// +kubeBuilder:default=6379
 	Port *int64 `json:"port,omitempty"`
 
 	// PreferredAvailabilityZones is a list of Availability Zones in which the
@@ -414,7 +414,7 @@ type LogDeliveryConfiguration struct {
 	// LogFormat The log format to use.
 	//
 	// +optional
-	// +default=json
+	// +kubeBuilder:default=json
 	// +kubebuilder:validation:Enum=text;json
 	LogFormat *string `json:"logFormat,omitempty"`
 
@@ -469,7 +469,7 @@ type ReplicationGroup struct {
 	// availability zone.
 	//
 	// +optional
-	// +default=cross-az
+	// +kubeBuilder:default=cross-az
 	// +kubebuilder:validation:Enum=single-az;cross-az
 	AzMode *string `json:"azMode,omitempty"`
 
@@ -477,20 +477,20 @@ type ReplicationGroup struct {
 	// immediately or during the next maintenance window.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	ApplyImmediately *bool `json:"applyImmediately,omitempty"`
 
 	// AtRestEncryptionEnabled specifies whether data stored in the cluster is
 	// encrypted at rest.
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	AtRestEncryptionEnabled *bool `json:"atRestEncryptionEnabled,omitempty"`
 
 	// AuthTokenUpdateStrategy specifies how the auth token should be updated.
 	//
 	// +optional
-	// +default=ROTATE
+	// +kubeBuilder:default=ROTATE
 	// +kubebuilder:validation:Enum=rotate;set
 	AuthTokenUpdateStrategy *string `json:"authTokenUpdateStrategy,omitempty"`
 
@@ -498,7 +498,7 @@ type ReplicationGroup struct {
 	// applied automatically to the cluster during the maintenance window.
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	AutoMinorVersionUpgrade *bool `json:"autoMinorVersionUpgrade,omitempty"`
 
 	// AutomaticFailoverEnabled specifies whether a read replica will be
@@ -509,7 +509,7 @@ type ReplicationGroup struct {
 	// Redis (cluster mode enabled) replication groups.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	AutomaticFailoverEnabled *bool `json:"automaticFailoverEnabled,omitempty"`
 
 	// CacheClusters is a list of cache clusters in the replication group.
@@ -528,14 +528,14 @@ type ReplicationGroup struct {
 	// creating a single cluster
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	CreateReplicationGroup *bool `json:"createReplicationGroup,omitempty"`
 
 	// ClusterModeEnabled specifies whether cluster mode is enabled for the
 	// replication group.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	ClusterModeEnabled *bool `json:"clusterModeEnabled,omitempty"`
 
 	// DataTieringEnabled specifies whether data tiering is enabled for the
@@ -544,21 +544,21 @@ type ReplicationGroup struct {
 	// Must be true if the replcation group is using r6gd nodes
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	DataTieringEnabled *bool `json:"dataTieringEnabled,omitempty"`
 
 	// EnableAuthToken specifies whether an auth token should be enabled for the
 	// replication group.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	EnableAuthToken *bool `json:"enableAuthToken,omitempty"`
 
 	// Engine is the name of the cache engine to be used for the clusters in
 	// this group.
 	//
 	// +optional
-	// +default=redis
+	// +kubeBuilder:default=redis
 	// +kubebuilder:validation:Enum=memcached;redis
 	Engine *string `json:"engine"`
 
@@ -593,7 +593,7 @@ type ReplicationGroup struct {
 	// IpDiscovery is the method used to discover cluster nodes.
 	//
 	// +optional
-	// +default=ipv4
+	// +kubeBuilder:default=ipv4
 	// +kubebuilder:validation:Enum=ipv4;ipv6
 	IpDiscovery *string `json:"ipDiscovery,omitempty"`
 
@@ -626,7 +626,7 @@ type ReplicationGroup struct {
 	// maintenance can occur.
 	//
 	// +optional
-	// +default=Sun:05:00-Mon:09:00
+	// +kubeBuilder:default=Sun:05:00-Mon:09:00
 	MaintenanceWindow *string `json:"maintenanceWindow,omitempty"`
 
 	// MultiAzEnabled specifies whether the cluster should be created in
@@ -635,13 +635,13 @@ type ReplicationGroup struct {
 	// If true, AutomaticFailoverEnabled must also be true.
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	MultiAzEnabled *bool `json:"multiAzEnabled,omitempty"`
 
 	// NetworkType specifies the network configuration for the cluster.
 	//
 	// +optional
-	// +default=ipv4
+	// +kubeBuilder:default=ipv4
 	// +kubebuilder:validation:Enum=ipv4;ipv6;dual_stack
 	NetworkType *string `json:"networkType,omitempty"`
 
@@ -666,7 +666,7 @@ type ReplicationGroup struct {
 	// Conflicts with NumNodeGroups.
 	//
 	// +optional
-	// +default=1
+	// +kubeBuilder:default=1
 	NumCacheClusters *int64 `json:"numCacheClusters,omitempty"`
 
 	// NumNodeGroups is the number of node groups in the replication group.
@@ -685,7 +685,7 @@ type ReplicationGroup struct {
 	// This is a convenience parameter when building a single cluster.
 	//
 	// +optional
-	// +default=3
+	// +kubeBuilder:default=3
 	NumCacheNodes *int64 `json:"numCacheNodes,omitempty"`
 
 	// ParameterGroupName is the name of the parameter group to associate with
@@ -705,7 +705,7 @@ type ReplicationGroup struct {
 	// connections.
 	//
 	// +optional
-	// +default=6379
+	// +kubeBuilder:default=6379
 	Port *int64 `json:"port,omitempty"`
 
 	// PreferredCacheClusterAzs is a list ec2 availability zones in which the
@@ -717,7 +717,7 @@ type ReplicationGroup struct {
 	// ReplicasPerNodeGroup is the number of read replicas per node group.
 	//
 	// +optional
-	// +default=0
+	// +kubeBuilder:default=0
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=5
 	ReplicasPerNodeGroup *int64 `json:"replicasPerNodeGroup,omitempty"`
@@ -787,7 +787,7 @@ type GlobalReplicationGroup struct {
 	// cluster fails.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	AutomaticFailoverEnabled *bool `json:"automaticFailoverEnabled,omitempty"`
 
 	// CacheNodeType is the instance class to use for the cache nodes.
@@ -798,7 +798,7 @@ type GlobalReplicationGroup struct {
 	// Enabled is a flag that enables the global replication group.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Enabled *bool `json:"enabled,omitempty"`
 
 	// EngineVersion is the version number of the cache engine to be used for

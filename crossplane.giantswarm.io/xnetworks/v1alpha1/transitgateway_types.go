@@ -71,7 +71,7 @@ type TransitGatewayParameters struct {
 	//
 	// +optional
 	// +kube:validation:Enum=disable;enable
-	// +default=disable
+	// +kubeBuilder:default=disable
 	ApplianceModeSupport string `json:"applianceModeSupport,omitempty"`
 
 	// Auto accept shared attachments. Indicates whether there is automatic
@@ -79,41 +79,41 @@ type TransitGatewayParameters struct {
 	//
 	// +optional
 	// +kube:validation:Enum=disable;enable
-	// +default=enable
+	// +kubeBuilder:default=enable
 	AutoAcceptSharedAttachments string `json:"autoAcceptSharedAttachments,omitempty"`
 
 	// Create the policy table.
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	CreatePolicyTable bool `json:"createPolicyTable,omitempty"`
 
 	// Default route table association. Indicates whether resource attachments
 	// are automatically associated with the default association route table.
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	DefaultRouteTableAssociation bool `json:"defaultRouteTableAssociation,omitempty"`
 
 	// Default route table propagation. Indicates whether resource attachments
 	// automatically propagate routes to the default propagation route table.
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	DefaultRouteTablePropagation bool `json:"defaultRouteTablePropagation,omitempty"`
 
 	// Dns support. Indicates whether DNS support is enabled.
 	//
 	// +optional
 	// +kube:validation:Enum=disable;enable
-	// +default=enable
+	// +kubeBuilder:default=enable
 	DnsSupport string `json:"dnsSupport,omitempty"`
 
 	// If IPv6 support is enabled for the transit gateway.
 	//
 	// +optional
 	// +kube:validation:Enum=disable;enable
-	// +default=disable
+	// +kubeBuilder:default=disable
 	Ipv6Support string `json:"ipv6Support,omitempty"`
 
 	// Multicast support. Indicates whether multicast is enabled on the transit gateway.
@@ -122,7 +122,7 @@ type TransitGatewayParameters struct {
 	//
 	// +optional
 	// +kube:validation:Enum=disable;enable
-	// +default=disable
+	// +kubeBuilder:default=disable
 	MulticastSupport string `json:"multicastSupport,omitempty"`
 
 	// TransitGatewayDefaultRouteTableAssociation. Indicates whether resource
@@ -130,7 +130,7 @@ type TransitGatewayParameters struct {
 	//
 	// +optional
 	// +kube:validation:Enum=disable;enable
-	// +default=disable
+	// +kubeBuilder:default=disable
 	TransitGatewayDefaultRouteTableAssociation string `json:"transitGatewayDefaultRouteTableAssociation,omitempty"`
 
 	// TransitGatewayDefaultRouteTablePropagation. Indicates whether resource
@@ -138,7 +138,7 @@ type TransitGatewayParameters struct {
 	//
 	// +optional
 	// +kube:validation:Enum=disable;enable
-	// +default=disable
+	// +kubeBuilder:default=disable
 	TransitGatewayDefaultRouteTablePropagation string `json:"transitGatewayDefaultRouteTablePropagation,omitempty"`
 
 	// The tags for the transit gateway.
@@ -152,7 +152,7 @@ type TransitGatewayParameters struct {
 	//
 	// +optional
 	// +kube:validation:Enum=disable;enable
-	// +default=enable
+	// +kubeBuilder:default=enable
 	VpnEcmpSupport string `json:"vpnEcmpSupport,omitempty"`
 }
 
@@ -214,7 +214,7 @@ type TransitGatewayPeer struct {
 	// Is Dynamic routing support enabled on this peer
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	DynamicRouting bool `json:"dynamicRouting"`
 
 	// The ID of the gateway to peer with
@@ -321,7 +321,7 @@ type PrefixList struct {
 	// If this is a blackhole route
 	//
 	// +optional
-	// +default=false
+	// +kubeBuilder:default=false
 	Blackhole bool `json:"blackhole"`
 
 	// The ID of the prefix list.
@@ -335,7 +335,7 @@ type PrefixList struct {
 	// to the outbound route table
 	//
 	// +optional
-	// +default=true
+	// +kubeBuilder:default=true
 	Outbound bool `json:"outbound"`
 
 	ManagedPrefixListSubParameters `json:",inline"`
