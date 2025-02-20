@@ -1,5 +1,5 @@
 apiVersion: xgithubrepo.crossplane.giantswarm.io/v1alpha1
-kind: GithubRepo
+kind: GithubRepoClaim
 metadata:
   name: my-go-project-xp-1
 spec:

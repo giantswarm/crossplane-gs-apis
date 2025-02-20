@@ -95,16 +95,16 @@ pre-commit run -a
 set -e
 git add -A
 
-git config user.email "giant-idp@bots.github.com"
-git config user.name "Giant IDP Bot"
-log "Commit all the changes"
-git commit -am "$GIT_LOG_INIT_MESSAGE"
-
-log "Pushing changes to main branch"
-git push origin main
-git tag -m "Initial release" "0.1.0"
-git push origin "0.1.0"
-
-git push origin main
+# git config user.email "giant-idp@bots.github.com"
+# git config user.name "Giant IDP Bot"
+# log "Commit all the changes"
+# git commit -am "$GIT_LOG_INIT_MESSAGE"
+#
+# log "Pushing changes to main branch"
+# git push origin main
+# git tag -m "Initial release" "0.1.0"
+# git push origin "0.1.0"
+#
+# git push origin main
 
 log "Pipeline finished successfully"

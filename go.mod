@@ -1,8 +1,6 @@
 module github.com/giantswarm/crossplane-gs-apis
 
-go 1.23.0
-
-toolchain go1.23.2
+go 1.24.0
 
 //replace (
 //	github.com/crossplane/crossplane => github.com/crossplane/crossplane v1.15.3
@@ -18,11 +16,11 @@ require (
 	github.com/crossplane/crossplane-runtime v1.18.0
 	github.com/giantswarm/crossplane-fn-network-discovery v0.4.0
 	github.com/giantswarm/function-github-app-get-token v0.1.1
-	github.com/giantswarm/function-shell-idp v0.3.0
+	github.com/giantswarm/function-shell-idp v0.3.1
 	github.com/mproffitt/crossbuilder v0.0.2-rc2
 	github.com/mproffitt/function-cidr v0.0.0-20240528204613-a5ff3a0e6daa
 	github.com/upbound/provider-aws v1.14.0
-	k8s.io/apimachinery v0.32.1
+	k8s.io/apimachinery v0.32.2
 	sigs.k8s.io/cluster-api v1.7.4
 	sigs.k8s.io/controller-runtime v0.20.1
 )

@@ -2,8 +2,8 @@ configMap = {
     "apiVersion": "v1"
     "kind": "ConfigMap"
     "metadata": {
-        "name": oxr["metadata"]["name"] + "-info"
-        "namespace": oxr["metadata"]["namespace"]
+        "name": oxr["spec"]["claimRef"]["name"] + "-info"
+        "namespace": oxr["spec"]["claimRef"]["namespace"]
     }
     "data": {
         "repoName": oxr["spec"]["repository"]["name"]
@@ -21,6 +21,7 @@ wrappedConfigMap = {
     "metadata": {
         "annotations": {
             "krm.kcl.dev/composition-resource-name" = "${name}-config-map"
+            "krm.kcl.dev/ready": readystr("${name}-helm-repository")
         }
     }
     "spec": {

@@ -11,8 +11,8 @@ helmRepo = {
     "apiVersion": "source.toolkit.fluxcd.io/v1beta2"
     "kind": "HelmRepository"
     "metadata": {
-        "name": oxr["metadata"]["name"]
-        "namespace": oxr["metadata"]["namespace"]
+        "name": oxr["spec"]["claimRef"]["name"]
+        "namespace": oxr["spec"]["claimRef"]["namespace"]
     }
     "spec": {
         "type": "oci"
@@ -27,6 +27,7 @@ wrappedHelmRepo = {
     "metadata": {
         "annotations": {
             "krm.kcl.dev/composition-resource-name" = "${name}-helm-repository"
+            "krm.kcl.dev/ready": readystr("${name}-helm-repository")
         }
     }
     "spec": {

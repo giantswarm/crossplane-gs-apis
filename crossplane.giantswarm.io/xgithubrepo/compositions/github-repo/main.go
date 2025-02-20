@@ -169,6 +169,9 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					},
 				},
 				ShellCommand: ghBashScript,
+				Shell:        "bash",
+				StdoutField:  "status.repoInitShellScript.stdout",
+				StderrField:  "status.repoInitShellScript.stderr",
 			},
 		})
 
@@ -181,7 +184,7 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 	if err != nil {
 		panic(err)
 	}
-	kclHelmRepo, err := build.LoadTemplate("templates/helmrepository.k")
+	// kclHelmRepo, err := build.LoadTemplate("templates/helmrepository.k")
 	if err != nil {
 		panic(err)
 	}
@@ -197,7 +200,8 @@ func (b *builder) Build(c build.CompositionSkeleton) {
 					Kind:       "KCLInput",
 				},
 				Spec: xkcl.RunSpec{
-					Source: strings.Join([]string{kclCommon, kclConfigMap, kclHelmRepo, kclFooter}, "\n\n"),
+					// Source: strings.Join([]string{kclCommon, kclConfigMap, kclHelmRepo, kclFooter}, "\n\n"),
+					Source: strings.Join([]string{kclCommon, kclConfigMap, kclFooter}, "\n\n"),
 				},
 			},
 		})

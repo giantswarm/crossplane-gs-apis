@@ -151,8 +151,15 @@ type GithubRepoParameters struct {
 	RegistryInfoConfigMapRef ObjectReference `json:"registryInfoConfigMapRef,omitempty"`
 }
 
+type RepoInitShellScriptOutput struct {
+	// Standard output
+	StdOut string `json:"stdout,omitempty"`
+
+	// Standard error
+	StdErr string `json:"stderr,omitempty"`
+}
+
 type GithubRepoStatus struct {
 	xpv1.ConditionedStatus `json:",inline"`
-	// +kubebuilder:pruning:PreserveUnknownFields
-	AtFunction map[string]interface{} `json:"atFunction"`
+	RepoInitShellScript    RepoInitShellScriptOutput `json:"repoInitShellScript,omitempty"`
 }
