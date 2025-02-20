@@ -32,9 +32,7 @@ spec:
             description: |-
               RdsProvisioningSpec defines the desired state of RdsProvisioning
 
-
               One of `providerConfigRef` or `connectionSecretName` must be provided.
-
 
               If `providerConfigRef` is not provided, the composition will create a
               provider config using the connectionSecretName.
@@ -43,10 +41,8 @@ spec:
                 description: |-
                   The name of the connection secret to use for the RDS instance
 
-
                   Required if `providerConfigRef` is not provided, ignored otherwise
                   Must exist in the same namespace as the provisioning claim
-
 
                   If this value is provided, the composition will attempt to create a
                   provider config using the engine specific providerconfig spec
@@ -57,14 +53,11 @@ spec:
                     description: |-
                       Defines a user to create in the database
 
-
                       See the provider specific documentation for the available configuration
                       parameters.
 
-
                       postgresql: https://www.postgresql.org/docs/current/sql-createrole.html
                       mysql: https://dev.mysql.com/doc/refman/8.0/en/user-resources.html
-
 
                       For MySQL and MariaDB the following fields are supported:
                       - `binlog` (boolean)
@@ -73,7 +66,6 @@ spec:
                       - `maxUpdatesPerHour` (int) Default 1000 - The maximum number of updates the user can make per hour (0 for unlimited)
                       - `maxUserConnections` (int) Default 10 - The maximum number of connections the user can have open at one time (0 for unlimited)
                       - `privileges` ([]string) - A list of privileges to grant to the user
-
 
                       For PostgreSQL the following fields are supported:
                       - `configurationParameters` (map[string]*string) - A map of configuration parameters to set for the user
@@ -87,7 +79,6 @@ spec:
                       - `replication` (boolean) Default false - Whether the user should be able to initiate streaming replication
                       - `superuser` (boolean) Default false - Whether the user should be a superuser
 
-
                       With the exception of `configurationParameters`, all fields should be
                       created as elements directly on the user object and not as nested objects.
                     properties:
@@ -97,9 +88,7 @@ spec:
                         description: |-
                           ConfigurationParameters is the configuration parameters for the user.
 
-
                           Only applicable for postgresql databases
-
 
                           See https://www.postgresql.org/docs/current/runtime-config-client.html for
                           a list of available parameters.
@@ -157,17 +146,14 @@ spec:
                       FluxSSASecretName is the name of the secret that contains SSA details
                       for each project built with infrastructure components.
 
-
                       This secret will be updated with the name of the current project with
                       all hyphens, underscores and dots replaced with an empty string.
-
 
                       This secret must exist in the same namespace as the current project.
                     type: string
                   kubernetesSecretStore:
                     description: |-
                       KubernetesSecretStore is the Kubernetes secret store to use.
-
 
                       The kubernetes secret store is expected to be namespace scoped to prevent
                       secrets leaking across namespaces.
@@ -417,6 +403,8 @@ spec:
                 - name
                 - namespace
                 type: object
+            required:
+            - kubernetesProviderConfig
             type: object
           status:
             description: RdsProvisioningStatus defines the observed state of RdsProvisioning
@@ -437,6 +425,13 @@ spec:
                         A Message containing details about this condition's last transition from
                         one status to another, if any.
                       type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
                     reason:
                       description: A Reason for this condition's last transition from
                         one status to another.

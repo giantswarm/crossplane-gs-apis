@@ -1,3 +1,5 @@
 *.code-workspace
 extra-resources/crossplane-tgw.yaml
 plugins/*
+**/.vscode
+**/.env*

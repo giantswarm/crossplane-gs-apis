@@ -1,0 +1,13 @@
+apiVersion: meta.pkg.crossplane.io/v1alpha1
+kind: Configuration
+metadata:
+  name: xgithubrepo
+  labels:
+    pkg.crossplane.io/owner: giantswarm
+    pkg.crossplane.io/version: v0.0.1
+spec:
+  crossplane:
+    version: ">=v1.18"
+  dependsOn:
+    - function: xpkg.upbound.io/crossplane-contrib/function-auto-ready
+      version: ">=0.3.0"

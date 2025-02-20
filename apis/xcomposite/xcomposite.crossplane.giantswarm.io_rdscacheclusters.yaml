@@ -69,14 +69,12 @@ spec:
                       automatically promoted to the primary cluster if the existing primary
                       cluster fails.
 
-
                       If enabled, NumCacheNodes must be greater than 1. Must be enabled for
                       Redis (cluster mode enabled) replication groups.
                     type: boolean
                   azMode:
                     description: |-
                       AzMode specifies the Availability Zone mode of the cluster.
-
 
                       This parameter is only valid when the Engine parameter is memcached.
                       For resiliance, we recommend setting the AzMode parameter to cross-az and
@@ -91,9 +89,7 @@ spec:
                     description: |-
                       CacheClusters is a list of cache clusters in the replication group.
 
-
                       This value is overridden by NumCacheClusters.
-
 
                       May be used to specify cluster specific configuration.
                     items:
@@ -113,7 +109,6 @@ spec:
                             AvailabilityZone is the name of the Availability Zone in which the
                             cluster will be created.
 
-
                             If you want to create cache nodes in multi-az, use
                             preferred_availability_zones instead.
                             Default: System chosen Availability Zone.
@@ -121,7 +116,6 @@ spec:
                         azMode:
                           description: |-
                             AzMode specifies the Availability Zone mode of the cluster.
-
 
                             This parameter is only valid when the Engine parameter is memcached.
                             For resiliance, we recommend setting the AzMode parameter to cross-az and
@@ -145,7 +139,6 @@ spec:
                             EngineVersion is the version number of the cache engine to be used for
                             the cluster. If not set this will default to the latest version.
 
-
                             This value will be ignored once the cluster is created.
                           type: string
                         finalSnapshotIdentifier:
@@ -164,7 +157,6 @@ spec:
                           description: |-
                             LogDeliveryConfiguration is a list of log delivery configurations for
                             the cluster.
-
 
                             This is only applicable when the Engine parameter is redis.
                           items:
@@ -215,7 +207,6 @@ spec:
                           description: |-
                             NodeType is the instance class to use for the cache nodes.
 
-
                             Requried unless replication group is specified.
                           type: string
                         notificationTopicArn:
@@ -227,7 +218,6 @@ spec:
                           description: |-
                             NumCacheNodes is the number of cache nodes in the cluster.
 
-
                             Required unless replication group is specified.
                           format: int64
                           type: integer
@@ -235,7 +225,6 @@ spec:
                           description: |-
                             OutpostMode specifies the outpost mode that will apply to the cache
                             cluster creation.
-
 
                             Currently only single-outpost is supported.
                           enum:
@@ -246,7 +235,6 @@ spec:
                           description: |-
                             ParameterGroupName is the name of the parameter group to associate with
                             this cluster.
-
 
                             Required unless replication group is specified.
                           type: string
@@ -260,7 +248,6 @@ spec:
                           description: |-
                             PreferredAvailabilityZones is a list of Availability Zones in which the
                             cluster's nodes will be created.
-
 
                             Memcached only. The number of availability zones must equal the number of
                             nodes specified in the NumCacheNodes parameter.
@@ -284,7 +271,6 @@ spec:
                             SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
                             from which to restore data into the cluster.
 
-
                             Optional, Redis only
                           items:
                             type: string
@@ -294,14 +280,12 @@ spec:
                             SnapshotName is the name of the snapshot from which to restore data into
                             the cluster.
 
-
                             Optional, Redis only
                           type: string
                         snapshotRetentionLimit:
                           description: |-
                             SnapshotRetentionLimit is the number of days for which ElastiCache will
                             retain automatic cache cluster snapshots before deleting them.
-
 
                             Optional, Redis only
                           format: int64
@@ -311,14 +295,12 @@ spec:
                             SnapshotWindow is the daily time range (in UTC) during which ElastiCache
                             will begin taking a daily snapshot of the cache cluster.
 
-
                             Optional, Redis only
                           type: string
                         subnetGroupName:
                           description: |-
                             SubnetGroupName is the name of the subnet group to associate with this
                             cluster.
-
 
                             Required unless replication group is specified in which case it will be
                             ignored.
@@ -334,7 +316,6 @@ spec:
                           description: |-
                             TransitEncryptionEnabled specifies whether data in the cluster is
                             encrypted in transit.
-
 
                             Optional, Memcached only
                           type: boolean
@@ -352,7 +333,6 @@ spec:
                       CreateReplicationGroup specifies whether a replication group should be
                       created.
 
-
                       If set false, the replication group configuration will be used for
                       creating a single cluster
                     type: boolean
@@ -360,7 +340,6 @@ spec:
                     description: |-
                       DataTieringEnabled specifies whether data tiering is enabled for the
                       replication group.
-
 
                       Must be true if the replcation group is using r6gd nodes
                     type: boolean
@@ -381,7 +360,6 @@ spec:
                     description: |-
                       EngineVersion is the version number of the cache engine to be used for
                       the cluster. If not set this will default to the latest version.
-
 
                       This value will be ignored once the cluster is created.
                     type: string
@@ -423,10 +401,8 @@ spec:
                           ParameterGroupName is the name of the parameter group to associate with
                           the global replication group.
 
-
                           Required when upgrading to a new major engine version but subsequently
                           ignored.
-
 
                           Specifying this parameter will result in an error if a major engine version
                           is not specified.
@@ -441,7 +417,6 @@ spec:
                     description: |-
                       GlobalReplicationGroupId is the id of the global replication group to
                       which this replication group should belong.
-
 
                       If this value is specified, the number of node groups parameter must not
                       be specified.
@@ -458,13 +433,11 @@ spec:
                       KmsKeyId is the ID of the AWS Key Management Service (KMS) key used to
                       encrypt the data in the cluster.
 
-
                       Ignored unless AtRestEncryptionEnabled is set to true.
                     type: string
                   kubernetesProviderConfig:
                     description: |-
                       Provider configuration for the kubernetes provider
-
 
                       This is required for creating users for redis clusters.
                       If Redis is the engine type, this must be provided and
@@ -505,7 +478,6 @@ spec:
                     description: |-
                       LogDeliveryConfiguration is a list of log delivery configurations for
                       the cluster.
-
 
                       This is only applicable when the Engine parameter is redis.
                     items:
@@ -549,7 +521,6 @@ spec:
                       MultiAzEnabled specifies whether the cluster should be created in
                       multiple Availability Zones.
 
-
                       If true, AutomaticFailoverEnabled must also be true.
                     type: boolean
                   networkType:
@@ -564,7 +535,6 @@ spec:
                     description: |-
                       NodeType is the instance class to use for the cache nodes.
 
-
                       Requried unless global replication group is specified.
                     type: string
                   notificationTopicArn:
@@ -576,10 +546,8 @@ spec:
                     description: |-
                       NumCacheClusters is the number of cache clusters in the replication group.
 
-
                       If MultiAzEnabled is true, this value must be at least 2 but generally
                       should be equal to the number of Availability Zones.
-
 
                       Conflicts with NumNodeGroups.
                     format: int64
@@ -587,7 +555,6 @@ spec:
                   numCacheNodes:
                     description: |-
                       NumCacheNodes is the number of cache nodes in the cluster.
-
 
                       Ignored if replication group is specified or being created
                       This is a convenience parameter when building a single cluster.
@@ -597,10 +564,8 @@ spec:
                     description: |-
                       NumNodeGroups is the number of node groups in the replication group.
 
-
                       If GlobalReplicationGroupId is specified or GlobalReplicationGroup.Enabled
                       is true, this value must not be specified.
-
 
                       Conflicts with NumCacheClusters.
                     format: int64
@@ -677,7 +642,6 @@ spec:
                       SnapshotArns is a list of Amazon Resource Names (ARNs) of the snapshots
                       from which to restore data into the cluster.
 
-
                       Optional, Redis only
                     items:
                       type: string
@@ -687,14 +651,12 @@ spec:
                       SnapshotName is the name of the snapshot from which to restore data into
                       the cluster.
 
-
                       Optional, Redis only
                     type: string
                   snapshotRetentionLimit:
                     description: |-
                       SnapshotRetentionLimit is the number of days for which ElastiCache will
                       retain automatic cache cluster snapshots before deleting them.
-
 
                       Optional, Redis only
                     format: int64
@@ -703,7 +665,6 @@ spec:
                     description: |-
                       SnapshotWindow is the daily time range (in UTC) during which ElastiCache
                       will begin taking a daily snapshot of the cache cluster.
-
 
                       Optional, Redis only
                     type: string
@@ -718,7 +679,6 @@ spec:
                     description: |-
                       TransitEncryptionEnabled specifies whether data in the cluster is
                       encrypted in transit.
-
 
                       Optional, Memcached only
                     type: boolean
@@ -945,6 +905,8 @@ spec:
                           group.
                         maxProperties: 50
                         type: object
+                    required:
+                    - name
                     type: object
                   deleteAutomatedBackups:
                     description: DeleteAutomatedBackups is whether automated backups
@@ -1099,7 +1061,6 @@ spec:
                     description: |-
                       InstanceCount is the number of instances to create.
 
-
                       If set, this value will create the requested number of instances using
                       defaults from the cluster configuration. If `instances` are specified,
                       this value is ignored.
@@ -1113,10 +1074,8 @@ spec:
                           description: |-
                             AllocatedStorage is the size of the database.
 
-
                             Only applicable if not running in cluster mode. In cluster mode this value
                             is ignored.
-
 
                             Overrides `ClusterParameters.AllocatedStorage`
                           format: int64
@@ -1125,17 +1084,14 @@ spec:
                           description: |-
                             AllowMajorVersionUpgrade is whether major version upgrades are allowed.
 
-
                             Only applicable if not running in cluster mode. In cluster mode this value
                             is ignored.
-
 
                             Overrides `ClusterParameters.AllowMajorVersionUpgrade`
                           type: boolean
                         applyImmediately:
                           description: |-
                             ApplyImmediately is whether changes should be applied immediately.
-
 
                             Overrides `ClusterParameters.ApplyImmediately`
                           nullable: true
@@ -1144,7 +1100,6 @@ spec:
                           description: |-
                             AutoMinorVersionUpgrade is whether minor version upgrades are applied
                             automatically.
-
 
                             Overrides `ClusterParameters.AutoMinorVersionUpgrade`
                           nullable: true
@@ -1158,7 +1113,6 @@ spec:
                         backupRetentionPeriod:
                           description: |-
                             BackupRetentionPeriod is the number of days to retain backups for.
-
 
                             Only applicable if not running in cluster mode
                           format: int64
@@ -1177,13 +1131,11 @@ spec:
                           description: |-
                             DeleteAutomatedBackups is whether automated backups should be deleted.
 
-
                             Only applicable if not running in cluster mode
                           type: boolean
                         deletionProtection:
                           description: |-
                             DeletionProtection is whether deletion protection is enabled.
-
 
                             Only applicable if not running in cluster mode
                           nullable: true
@@ -1192,14 +1144,12 @@ spec:
                           description: |-
                             DomainIamRoleName is the name of the IAM role to use.
 
-
                             Only applicable if not running in cluster mode
                           nullable: true
                           type: string
                         enabledCloudwatchLogsExports:
                           description: |-
                             EnabledCloudwatchLogsExports is the list of log types to export to CloudWatch Logs.
-
 
                             Only applicable if not running in cluster mode
                           items:
@@ -1217,14 +1167,12 @@ spec:
                           description: |-
                             FinalSnapshotIdentifier is the identifier of the final snapshot.
 
-
                             Only applicable if not running in cluster mode
                           nullable: true
                           type: string
                         iamDatabaseAuthenticationEnabled:
                           description: |-
                             IamDatabaseAuthenticationEnabled is whether IAM database authentication is enabled.
-
 
                             Only applicable if not running in cluster mode
                           nullable: true
@@ -1237,14 +1185,12 @@ spec:
                           description: |-
                             Iops is the amount of provisioned IOPS.
 
-
                             Only applicable if not running in cluster mode
                           format: int64
                           type: integer
                         licenseModel:
                           description: |-
                             LicenseModel is the license model to use.
-
 
                             Only applicable if not running in cluster mode.
                           nullable: true
@@ -1260,14 +1206,12 @@ spec:
                           description: |-
                             MultiAZ is whether the DB instance is a Multi-AZ deployment.
 
-
                             Only applicable if not running in cluster mode
                           nullable: true
                           type: boolean
                         networkType:
                           description: |-
                             NetworkType is the network type to use.
-
 
                             Only applicable if not running in cluster mode
                           nullable: true
@@ -1276,7 +1220,6 @@ spec:
                           description: |-
                             OptionGroupName is the name of the option group to associate with this DB
                             instance.
-
 
                             Only applicable if not running in cluster mode
                           nullable: true
@@ -1327,14 +1270,12 @@ spec:
                           description: |-
                             SkipFinalSnapshot is whether to skip the final snapshot.
 
-
                             Only applicable if not running in cluster mode
                           nullable: true
                           type: boolean
                         storageEncrypted:
                           description: |-
                             StorageEncrypted is whether storage is encrypted.
-
 
                             Only applicable if not running in cluster mode
                           nullable: true
@@ -1344,7 +1285,6 @@ spec:
                             StorageThroughput is the amount of storage throughput. Only applicable if
                             `storageType` is `gp3`
 
-
                             Only applicable if not running in cluster mode
                           format: int64
                           nullable: true
@@ -1352,7 +1292,6 @@ spec:
                         storageType:
                           description: |-
                             StorageType is the storage type to use.
-
 
                             Only applicable if not running in cluster mode
                           nullable: true
@@ -1414,10 +1353,8 @@ spec:
                         description: |-
                           The name of the connection secret to use for the RDS instance
 
-
                           Required if `providerConfigRef` is not provided, ignored otherwise
                           Must exist in the same namespace as the provisioning claim
-
 
                           If this value is provided, the composition will attempt to create a
                           provider config using the engine specific providerconfig spec
@@ -1428,14 +1365,11 @@ spec:
                             description: |-
                               Defines a user to create in the database
 
-
                               See the provider specific documentation for the available configuration
                               parameters.
 
-
                               postgresql: https://www.postgresql.org/docs/current/sql-createrole.html
                               mysql: https://dev.mysql.com/doc/refman/8.0/en/user-resources.html
-
 
                               For MySQL and MariaDB the following fields are supported:
                               - `binlog` (boolean)
@@ -1444,7 +1378,6 @@ spec:
                               - `maxUpdatesPerHour` (int) Default 1000 - The maximum number of updates the user can make per hour (0 for unlimited)
                               - `maxUserConnections` (int) Default 10 - The maximum number of connections the user can have open at one time (0 for unlimited)
                               - `privileges` ([]string) - A list of privileges to grant to the user
-
 
                               For PostgreSQL the following fields are supported:
                               - `configurationParameters` (map[string]*string) - A map of configuration parameters to set for the user
@@ -1458,7 +1391,6 @@ spec:
                               - `replication` (boolean) Default false - Whether the user should be able to initiate streaming replication
                               - `superuser` (boolean) Default false - Whether the user should be a superuser
 
-
                               With the exception of `configurationParameters`, all fields should be
                               created as elements directly on the user object and not as nested objects.
                             properties:
@@ -1468,9 +1400,7 @@ spec:
                                 description: |-
                                   ConfigurationParameters is the configuration parameters for the user.
 
-
                                   Only applicable for postgresql databases
-
 
                                   See https://www.postgresql.org/docs/current/runtime-config-client.html for
                                   a list of available parameters.
@@ -1647,7 +1577,6 @@ spec:
                       StorageThroughput is the amount of storage throughput. Only applicable if
                       `storageType` is `gp3`
 
-
                       Only applicable if not running in cluster mode
                     format: int64
                     nullable: true
@@ -1662,6 +1591,10 @@ spec:
                     description: Tags is a set of tags to associate with the DB cluster.
                     maxProperties: 50
                     type: object
+                required:
+                - engine
+                - engineVersion
+                - masterUsername
                 type: object
               deletionPolicy:
                 default: Delete
@@ -1690,17 +1623,14 @@ spec:
                       FluxSSASecretName is the name of the secret that contains SSA details
                       for each project built with infrastructure components.
 
-
                       This secret will be updated with the name of the current project with
                       all hyphens, underscores and dots replaced with an empty string.
-
 
                       This secret must exist in the same namespace as the current project.
                     type: string
                   kubernetesSecretStore:
                     description: |-
                       KubernetesSecretStore is the Kubernetes secret store to use.
-
 
                       The kubernetes secret store is expected to be namespace scoped to prevent
                       secrets leaking across namespaces.
@@ -1954,7 +1884,6 @@ spec:
                         description: |-
                           AllowPublic specifies if the VPC peering connections should be allowed to
 
-
                           be linked to the public subnets
                           Defaults to false
                         type: boolean
@@ -2018,7 +1947,6 @@ spec:
                               description: |-
                                 Region specifies the region the VPC is found in.
 
-
                                 If not defined, the region of the VPC will be assumed to be the same as
                                 the region of the peered VPC.
                               type: string
@@ -2056,7 +1984,6 @@ spec:
                             principal:
                               description: |-
                                 The principal to associate with the resource access manager.
-
 
                                 Possible values are AWS Account ID, AWS Organization ID, or AWS organizations.
                               type: string
@@ -2113,12 +2040,10 @@ spec:
                         description: |-
                           A list of PeeredSubnetSets to create in the VPC
 
-
                           Each VPC Cidr may be split into *n* public and *n* private subnets as long
                           as there is enough room on the cidr for it to be split at that level. Any
                           overflow will cause the composition to fail and this will be reflected in
                           the status of the XR.
-
 
                           > [!IMPORTANT]
                           > There must be at least 1 entry in this set which will be used as the VPC
@@ -2127,7 +2052,6 @@ spec:
                           description: |-
                             PeeredSubnetSet defines the parameters for creating a set of subnets with the
                             same mask.
-
 
                             Either one of Netmask or Prefix must be set.
                           properties:
@@ -2156,7 +2080,6 @@ spec:
                                     `kubernetes.io/cluster/$CLUSTER_NAME shared` being added to the subnets
                                     in this set.
 
-
                                     See [public.lbSetIndex](#specsubnetsetscidrspubliclbsetindex) and
                                     [private.lbSetIndex](#specsubnetsetscidrsprivatelbsetindex) for deciding
                                     which subnetset gets these tags.
@@ -2167,7 +2090,6 @@ spec:
                                 count:
                                   description: |-
                                     Count is the number of subnet sets to create with this mask.
-
 
                                     > [!WARNING]
                                     > Whilst this field is not `immutable`, care should be taken to never
@@ -2184,7 +2106,6 @@ spec:
                                     `kubernetes.io/role/internal-elb: 1` tag depending on if these are public
                                     or private subnets.
 
-
                                     If this is not set, or set to -1 (the default value), no subnets will be
                                     tagged as load balancer subnets otherwise it should be the index of the
                                     subnet set to tag, starting from index 0.
@@ -2193,7 +2114,6 @@ spec:
                                   description: |-
                                     This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
                                     use as a mask for the subnet.
-
 
                                     To prevent subnets being destroyed and recreated *This field is immutable*
                                   type: string
@@ -2212,9 +2132,7 @@ spec:
                               description: |-
                                 Details on how to build the public subnets.
 
-
                                 Public subnets are subnets with a route to the internet gateway.
-
 
                                 > [!IMPORTANT]
                                 > If this is the default VPC CIDR, i.e. the first entry in the list, the
@@ -2229,7 +2147,6 @@ spec:
                                     `kubernetes.io/cluster/$CLUSTER_NAME shared` being added to the subnets
                                     in this set.
 
-
                                     See [public.lbSetIndex](#specsubnetsetscidrspubliclbsetindex) and
                                     [private.lbSetIndex](#specsubnetsetscidrsprivatelbsetindex) for deciding
                                     which subnetset gets these tags.
@@ -2240,7 +2157,6 @@ spec:
                                 count:
                                   description: |-
                                     Count is the number of subnet sets to create with this mask.
-
 
                                     > [!WARNING]
                                     > Whilst this field is not `immutable`, care should be taken to never
@@ -2257,7 +2173,6 @@ spec:
                                     `kubernetes.io/role/internal-elb: 1` tag depending on if these are public
                                     or private subnets.
 
-
                                     If this is not set, or set to -1 (the default value), no subnets will be
                                     tagged as load balancer subnets otherwise it should be the index of the
                                     subnet set to tag, starting from index 0.
@@ -2266,7 +2181,6 @@ spec:
                                   description: |-
                                     This should be a valid CIDR or CIDR suffix (including the prefix `/`) to
                                     use as a mask for the subnet.
-
 
                                     To prevent subnets being destroyed and recreated *This field is immutable*
                                   type: string
@@ -2297,10 +2211,8 @@ spec:
                         description: |-
                           Defines the function to use to calculate the CIDR blocks for thesubnets.
 
-
                           The default value is "multiprefixloop" which will split multiple CIDRs
                           into equal parts based on the number of bits provided.
-
 
                           `multiprefixloop` is the only function being made available as part of
                           this XRD and as it's defaulted it can be hidden from the user. The
@@ -2317,7 +2229,6 @@ spec:
                       poolName:
                         description: |-
                           The name of the IPAM pool to use.
-
 
                           Only relevant if IPAM is enabled and there are IPAM pools available in
                           the region.
@@ -2412,7 +2323,6 @@ spec:
                         description: |-
                           Multicast support. Indicates whether multicast is enabled on the transit gateway.
 
-
                           Currently unused in this composition
                         type: string
                       peers:
@@ -2474,7 +2384,6 @@ spec:
                                     description: |-
                                       Outbound route
 
-
                                       This places it in the ManagedPrefixList attached
                                       to the outbound route table
                                     type: boolean
@@ -2488,9 +2397,7 @@ spec:
                                 ProviderConfigRef references a ProviderConfig used to create this
                                 resource
 
-
                                 If not provided, will fall back to the top-level ProviderConfigRef
-
 
                                 Required for cross account transit gateway peering
                               properties:
@@ -2580,7 +2487,6 @@ spec:
                               description: |-
                                 Outbound route
 
-
                                 This places it in the ManagedPrefixList attached
                                 to the outbound route table
                               type: boolean
@@ -2628,7 +2534,6 @@ spec:
                             outbound:
                               description: |-
                                 Outbound route
-
 
                                 This places it in the ManagedPrefixList attached
                                 to the outbound route table
@@ -2707,7 +2612,6 @@ spec:
                                     description: |-
                                       Outbound route
 
-
                                       This places it in the ManagedPrefixList attached
                                       to the outbound route table
                                     type: boolean
@@ -2718,9 +2622,7 @@ spec:
                                 ProviderConfigRef references a ProviderConfig used to create this
                                 resource
 
-
                                 If not provided, will fall back to the top-level ProviderConfigRef
-
 
                                 Required for cross account VPCs
                                 Should not be set for same account VPCs unless restricted by
@@ -2859,6 +2761,7 @@ spec:
             - database
             - kubernetesProviderConfig
             - region
+            - subnetGroupIndexes
             - vpc
             type: object
           status:
@@ -2924,6 +2827,13 @@ spec:
                         A Message containing details about this condition's last transition from
                         one status to another, if any.
                       type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
                     reason:
                       description: A Reason for this condition's last transition from
                         one status to another.
@@ -3149,6 +3059,8 @@ spec:
                       VPC
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - id
                 type: object
                 x-kubernetes-map-type: granular
             type: object
