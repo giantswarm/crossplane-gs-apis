@@ -54,6 +54,14 @@ fluxSSA = {
                                     "regexp": "^${ssasecret}$",
                                 },
                             },
+                            "rewrite": [
+                                {
+                                    "regexp": {
+                                        "source": "(.*)",
+                                        "target": "$1",
+                                    },
+                                },
+                            ],
                         },
                     ],
                     "target": {

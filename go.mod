@@ -14,12 +14,15 @@ require (
 	github.com/crossplane-contrib/provider-kubernetes v0.14.0
 	github.com/crossplane/crossplane v1.16.0
 	github.com/crossplane/crossplane-runtime v1.18.0
+	github.com/fluxcd/helm-controller/api v0.36.2
+	github.com/fluxcd/pkg/apis/meta v1.1.2
 	github.com/giantswarm/crossplane-fn-network-discovery v0.4.0
 	github.com/giantswarm/function-github-app-get-token v0.1.1
 	github.com/giantswarm/function-shell-idp v0.3.1
 	github.com/mproffitt/crossbuilder v0.0.2-rc2
 	github.com/mproffitt/function-cidr v0.0.0-20240528204613-a5ff3a0e6daa
 	github.com/upbound/provider-aws v1.14.0
+	k8s.io/apiextensions-apiserver v0.32.1
 	k8s.io/apimachinery v0.32.2
 	sigs.k8s.io/cluster-api v1.7.4
 	sigs.k8s.io/controller-runtime v0.20.1
@@ -42,6 +45,7 @@ require (
 	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
 	github.com/fatih/camelcase v1.0.0 // indirect
 	github.com/fatih/color v1.18.0 // indirect
+	github.com/fluxcd/pkg/apis/kustomize v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
 	github.com/go-json-experiment/json v0.0.0-20250129011340-4e0381018ad6 // indirect
@@ -119,7 +123,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/api v0.32.1 // indirect
-	k8s.io/apiextensions-apiserver v0.32.1 // indirect
 	k8s.io/client-go v0.32.1 // indirect
 	k8s.io/component-base v0.32.1 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
