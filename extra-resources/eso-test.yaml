@@ -1,5 +1,5 @@
 ---
-apiVersion: external-secrets.io/v1beta1
+apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: fluxssa
@@ -10,9 +10,9 @@ spec:
     name: default
     kind: SecretStore
   dataFrom:
-  - find:
-      name:
-        regexp: "^fluxssa$"
+    - find:
+        name:
+          regexp: "^fluxssa$"
   target:
     name: fluxssa
     creationPolicy: Orphan
@@ -22,7 +22,7 @@ spec:
       mergePolicy: Merge
       data:
         fluxssa: ""
-        myproject: "{{ \"merge\" | b64enc }}"
+        myproject: '{{ "merge" | b64enc }}'
 ---
 apiVersion: generators.external-secrets.io/v1alpha1
 kind: Password
@@ -37,7 +37,7 @@ spec:
   noUpper: false
   allowRepeat: True
 ---
-apiVersion: external-secrets.io/v1beta1
+apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: test-passwordgen
@@ -55,15 +55,16 @@ spec:
       engineVersion: v2
       mergePolicy: Replace
       templateFrom:
-      - target: Data
-        literal: |-
-          host: "example-host.net"
-          port: 1234
-          username: "example-user"
-          password: "{{ .password }}"
+        - target: Data
+          literal: |-
+            host: "example-host.net"
+            port: 1234
+            username: "example-user"
+            password: "{{ .password }}"
   dataFrom:
-  - sourceRef:
-      generatorRef:
-        apiVersion: generators.external-secrets.io/v1alpha1
-        kind: Password
-        name: test-passwordgen
+    - sourceRef:
+        generatorRef:
+          apiVersion: generators.external-secrets.io/v1alpha1
+          kind: Password
+          name: test-passwordgen
+
