@@ -31,7 +31,7 @@ esoSqlSecret = [
             "deletionPolicy": dp,
             "forProvider": {
                 manifest: {
-                    "apiVersion": "external-secrets.io/v1beta1"
+                    "apiVersion": "external-secrets.io/v1"
                     "kind": "ExternalSecret"
                     "metadata": {
                         "namespace": namespace
