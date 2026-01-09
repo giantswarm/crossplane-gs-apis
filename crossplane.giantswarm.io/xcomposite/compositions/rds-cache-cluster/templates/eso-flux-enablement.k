@@ -33,7 +33,7 @@ fluxSsa = {
         "deletionPolicy": dp,
         "forProvider": {
             "manifest": {
-                "apiVersion": "external-secrets.io/v1beta1",
+                "apiVersion": "external-secrets.io/v1",
                 "kind": "ExternalSecret",
                 "metadata": {
                     "name": "${appName}-flux-ssa",
@@ -107,7 +107,7 @@ tenantSecretStore = {
         "deletionPolicy": get(oxr, "spec.deletionPolicy", "Delete")
         "forProvider": {
             "manifest": {
-                "apiVersion": "external-secrets.io/v1beta1"
+                "apiVersion": "external-secrets.io/v1"
                 "kind": "SecretStore"
                 "metadata": {
                     "name": "${appName}-tenant-secret-store"
